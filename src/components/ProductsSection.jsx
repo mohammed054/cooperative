@@ -95,7 +95,7 @@ const ProductsSection = () => {
                           className="rounded-lg shadow-2xl"
                           effect="blur"
                         />
-                        <div className={`absolute -bottom-4 -right-4 bg-${product.color} text-dark-gray p-3 rounded-lg`}>
+                         <div className={`absolute -bottom-4 -right-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
                           <FaExpand className="text-xl" />
                         </div>
                       </div>
@@ -166,7 +166,7 @@ const ProductsSection = () => {
                           className="rounded-lg shadow-2xl"
                           effect="blur"
                         />
-                        <div className={`absolute -bottom-4 -left-4 bg-${product.color} text-dark-gray p-3 rounded-lg`}>
+                         <div className={`absolute -bottom-4 -left-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
                           <FaExpand className="text-xl" />
                         </div>
                       </div>
@@ -184,10 +184,10 @@ const ProductsSection = () => {
                       </h3>
                       <div className="flex flex-wrap gap-2 mb-4">
                         {product.tags.map((tag, tagIndex) => (
-                          <span
-                            key={tagIndex}
-                            className="bg-electric-blue/20 text-electric-blue px-3 py-1 rounded-full text-sm"
-                          >
+                           <span
+                             key={tagIndex}
+                             className={`${product.color === 'gold' ? 'bg-gold/20 text-gold' : 'bg-electric-blue/20 text-electric-blue'} px-3 py-1 rounded-full text-sm`}
+                           >
                             {tag}
                           </span>
                         ))}
@@ -196,11 +196,11 @@ const ProductsSection = () => {
                         {product.description}
                       </p>
                       <div className="flex items-center space-x-4 mb-8">
-                        {product.features.map((Feature, featureIndex) => (
-                          <div key={featureIndex} className="text-electric-blue">
-                            <Feature className="text-xl" />
-                          </div>
-                        ))}
+                         {product.features.map((Feature, featureIndex) => (
+                           <div key={featureIndex} className={product.color === 'gold' ? 'text-gold' : 'text-electric-blue'}>
+                             <Feature className="text-xl" />
+                           </div>
+                         ))}
                       </div>
                       <div className="flex flex-col sm:flex-row gap-4">
                         <motion.button
@@ -210,11 +210,11 @@ const ProductsSection = () => {
                         >
                           See All Products
                         </motion.button>
-                        <motion.button
-                          className="bg-transparent border-2 border-electric-blue text-electric-blue px-6 py-3 rounded-full font-semibold hover:bg-electric-blue hover:text-dark-gray transition-all duration-300"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
+                         <motion.button
+                           className={`bg-transparent border-2 ${product.color === 'gold' ? 'border-gold text-gold hover:bg-gold' : 'border-electric-blue text-electric-blue hover:bg-electric-blue'} hover:text-dark-gray px-6 py-3 rounded-full font-semibold transition-all duration-300`}
+                           whileHover={{ scale: 1.05 }}
+                           whileTap={{ scale: 0.95 }}
+                         >
                           Contact Us <FaArrowRight className="inline ml-2" />
                         </motion.button>
                       </div>
