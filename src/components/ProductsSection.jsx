@@ -121,10 +121,10 @@ const ProductsSection = () => {
                           </span>
                         ))}
                       </div>
-                      <p className="text-light-gray mb-6 leading-relaxed">
+<p className="text-light-gray mb-6 leading-relaxed">
                         {product.description}
                       </p>
-<div className="flex items-center space-x-4 mb-8">
+                      <div className="flex items-center space-x-4 mb-8">
                         {product.features.map((FeatureComponent, featureIndex) => (
                           <div key={featureIndex} className="text-gold">
                             <FeatureComponent className="text-xl" />
@@ -192,17 +192,17 @@ const ProductsSection = () => {
                           </span>
                         ))}
                       </div>
-                      <p className="text-light-gray mb-6 leading-relaxed">
+<p className="text-light-gray mb-6 leading-relaxed">
                         {product.description}
                       </p>
-<div className="flex items-center space-x-4 mb-8">
+                       <div className="flex items-center space-x-4 mb-8">
                          {product.features.map((FeatureComponent, featureIndex) => (
                            <div key={featureIndex} className={product.color === 'gold' ? 'text-gold' : 'text-electric-blue'}>
                              <FeatureComponent className="text-xl" />
                            </div>
                          ))}
                        </div>
-                      <div className="flex flex-col sm:flex-row gap-4">
+                       <div className="flex flex-col sm:flex-row gap-4">
                         <motion.button
                           className="btn-primary"
                           whileHover={{ scale: 1.05 }}
