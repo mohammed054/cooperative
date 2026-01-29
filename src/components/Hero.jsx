@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import LazyLoadImage from 'react-lazy-load-image-component';
 import { FaArrowDown, FaPlay } from 'react-icons/fa';
 
 const Hero = () => {
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoLoaded] = useState(false);
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);

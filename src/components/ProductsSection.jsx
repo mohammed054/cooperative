@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import LazyLoadImage from 'react-lazy-load-image-component';
 import { FaArrowRight, FaExpand, FaUsers, FaWifi, FaCar } from 'react-icons/fa';
 
 const ProductsSection = () => {
-  const [activeProduct, setActiveProduct] = useState(0);
 
   const products = [
     {
