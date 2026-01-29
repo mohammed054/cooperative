@@ -4,13 +4,13 @@ import { FaArrowRight, FaExpand, FaUsers, FaWifi, FaCar } from 'react-icons/fa';
 
 const ProductsSection = () => {
 
-  const products = [
+const products = [
     {
       name: 'Premium Event Package',
       tags: ['500ft²', 'Indoor', 'AV Included'],
       description: 'Complete solution for medium-sized corporate events with full AV support and premium seating arrangements.',
-      image: '/api/placeholder/800/400',
-      smallImage: '/api/placeholder/100/100',
+      image: '/images/product-large.jpg',
+      smallImage: '/images/product-small.jpg',
       features: [FaUsers, FaWifi, FaCar],
       color: 'gold',
     },
@@ -18,8 +18,8 @@ const ProductsSection = () => {
       name: 'Executive Conference Setup',
       tags: ['1000ft²', 'Indoor', 'Premium'],
       description: 'High-end conference setup with luxury seating, advanced presentation systems, and dedicated technical support.',
-      image: '/api/placeholder/800/400',
-      smallImage: '/api/placeholder/100/100',
+      image: '/images/product-large.jpg',
+      smallImage: '/images/product-small.jpg',
       features: [FaUsers, FaWifi, FaExpand],
       color: 'electric-blue',
     },
@@ -27,8 +27,8 @@ const ProductsSection = () => {
       name: 'Outdoor Festival Package',
       tags: ['2000ft²', 'Outdoor', 'All-Weather'],
       description: 'Weather-resistant setup perfect for outdoor corporate events, festivals, and large gatherings.',
-      image: '/api/placeholder/800/400',
-      smallImage: '/api/placeholder/100/100',
+      image: '/images/product-large.jpg',
+      smallImage: '/images/product-small.jpg',
       features: [FaExpand, FaWifi, FaCar],
       color: 'gold',
     },

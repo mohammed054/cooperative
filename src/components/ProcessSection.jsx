@@ -105,7 +105,7 @@ const ProcessSection = () => {
           >
             <div className="relative">
 <img
-                src="/api/placeholder/600/500"
+                src="/images/process-bg.jpg"
                 alt="Event setup process"
                 className="rounded-lg shadow-2xl w-full"
                 loading="lazy"

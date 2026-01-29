@@ -8,30 +8,30 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 const StandardsCarousel = () => {
-  const standards = [
+const standards = [
     {
       icon: <FaChair className="text-4xl" />,
       title: 'High-quality chairs',
       description: 'Premium seating solutions for professional settings',
-      image: '/api/placeholder/400/300',
+      image: '/images/standard-1.jpg',
     },
     {
       icon: <FaMicrophone className="text-4xl" />,
       title: 'Reliable AV equipment',
       description: 'State-of-the-art audio and visual technology',
-      image: '/api/placeholder/400/300',
+      image: '/images/standard-1.jpg',
     },
     {
       icon: <FaTv className="text-4xl" />,
       title: 'Custom stands',
       description: 'Bespoke display solutions tailored to your needs',
-      image: '/api/placeholder/400/300',
+      image: '/images/standard-1.jpg',
     },
     {
       icon: <FaTools className="text-4xl" />,
       title: 'Full setup support',
       description: 'Professional installation and technical support',
-      image: '/api/placeholder/400/300',
+      image: '/images/standard-1.jpg',
     },
   ];
 

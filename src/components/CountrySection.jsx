@@ -24,7 +24,7 @@ const CountrySection = () => {
           >
             <div className="relative">
 <img
-                src="/api/placeholder/600/400"
+                src="/images/country-bg.jpg"
                 alt="Nationwide event coverage"
                 className="rounded-lg shadow-2xl w-full"
                 loading="lazy"

@@ -8,30 +8,30 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 const VenueCarousel = () => {
-  const venues = [
+const venues = [
     {
       name: 'Conference Hall',
-      image: '/api/placeholder/400/300',
+      image: '/images/venue-1.jpg',
       description: 'Professional conference spaces with modern amenities',
     },
     {
       name: 'Outdoor Venue',
-      image: '/api/placeholder/400/300',
+      image: '/images/venue-1.jpg',
       description: 'Beautiful outdoor settings for memorable events',
     },
     {
       name: 'Banquet Hall',
-      image: '/api/placeholder/400/300',
+      image: '/images/venue-1.jpg',
       description: 'Elegant banquet halls for sophisticated gatherings',
     },
     {
       name: 'Meeting Room',
-      image: '/api/placeholder/400/300',
+      image: '/images/venue-1.jpg',
       description: 'Intimate meeting rooms for focused discussions',
     },
     {
       name: 'Exhibition Space',
-      image: '/api/placeholder/400/300',
+      image: '/images/venue-1.jpg',
       description: 'Spacious exhibition areas for large events',
     },
   ];
