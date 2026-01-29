@@ -11,26 +11,103 @@
   body {
     margin: 0;
     min-width: 320px;
-    background-color: #1a1a1a;
-    color: #ffffff;
+    background-color: #0F172A;
+    color: #FFFFFF;
     font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-gold text-dark-gray px-6 py-3 font-semibold rounded hover:bg-white hover:text-dark-gray transition-all duration-300;
+    @apply bg-primary text-white px-8 py-4 font-semibold rounded-full hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl;
   }
   
   .btn-secondary {
-    @apply border-2 border-gold text-gold px-6 py-3 font-semibold rounded hover:bg-gold hover:text-dark-gray transition-all duration-300;
+    @apply border border-accent text-accent px-8 py-4 font-semibold rounded-full hover:bg-accent hover:text-primary transition-all duration-300;
   }
   
-  .text-gradient {
-    @apply bg-gradient-to-r from-gold to-electric-blue bg-clip-text text-transparent;
+  .btn-outline {
+    @apply border border-white text-white px-6 py-3 rounded-full hover:bg-white hover:text-primary transition-all duration-300;
   }
   
-  .nav-link {
-    @apply text-white hover:bg-white hover:text-dark-gray px-4 py-2 rounded transition-all duration-300;
+  .section-primary {
+    @apply bg-primary;
+  }
+  
+  .section-secondary {
+    @apply bg-secondary;
+  }
+  
+  .card {
+    @apply bg-secondary rounded-xl p-6 shadow-xl border border-gray-200/20;
+  }
+  
+  .glass-card {
+    @apply bg-primary/10 backdrop-blur-sm border border-accent/20 rounded-xl p-6;
+  }
+  
+  .nav-item {
+    @apply text-white hover:text-accent px-4 py-2 rounded-lg transition-all duration-300;
+  }
+  
+  .divider-dots {
+    @apply flex items-center gap-2 py-8;
+  }
+  
+  .dot {
+    @apply w-2 h-2 rounded-full bg-gray-400;
+  }
+  
+  .dot-active {
+    @apply w-2 h-2 rounded-full bg-accent;
+  }
+  
+  .hover-underline {
+    @apply relative inline-block;
+  }
+  
+  .hover-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-accent transition-all duration-300;
+  }
+  
+  .hover-lift {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+  
+  .accent-border {
+    @apply border-l-4 border-accent;
+  }
+  
+  .accent-text {
+    @apply text-accent;
+  }
+  
+  .accent-bg {
+    @apply bg-accent/20;
+  }
+  
+  .micro-accent {
+    @apply text-pink-500 font-semibold;
+  }
+  
+  .micro-accent-hover:hover {
+    @apply text-pink-500 scale-105 transition-transform duration-300;
+  }
+  
+  .gradient-corporate {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  }
+  
+  .gradient-accent {
+    @apply bg-gradient-to-r from-accent to-yellow-400 bg-clip-text text-transparent;
+  }
+  
+  .shadow-corporate {
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
+  }
+  
+  .shadow-accent {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
   }
 }

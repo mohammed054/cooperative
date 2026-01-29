@@ -33,9 +33,9 @@ const Navbar = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-sm ${
         scrolled 
-          ? 'bg-dark-gray/95 backdrop-blur-sm shadow-lg' 
+          ? 'bg-primary/95 shadow-corporate' 
           : 'bg-transparent'
       }`}
     >
@@ -43,7 +43,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <motion.div 
-            className="text-white font-bold text-xl"
+            className="text-white font-bold text-xl accent-text hover-lift"
             whileHover={{ scale: 1.05 }}
           >
             LOGO
@@ -57,8 +57,8 @@ const Navbar = () => {
                 onClick={() => scrollToSection(item.section)}
                 className={`
                   ${item.isButton 
-                    ? 'bg-gold text-dark-gray px-6 py-2 rounded-full font-semibold hover:bg-white hover:text-dark-gray transition-all duration-300' 
-                    : 'nav-link'
+                    ? 'btn-secondary' 
+                    : 'nav-item'
                   }
                 `}
                 whileHover={{ scale: 1.05 }}
@@ -67,7 +67,7 @@ const Navbar = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                {item.isButton && <FaPhoneAlt className="inline mr-2" />}
+                  {item.isButton && <FaPhoneAlt className="inline mr-2 micro-accent" />}
                 {item.label}
               </motion.button>
             ))}

@@ -11,7 +11,7 @@ const CountrySection = () => {
   };
 
   return (
-    <section id="country" className="py-20 bg-dark-gray overflow-hidden">
+    <section id="country" className="py-20 section-primary overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Image */}
@@ -29,7 +29,7 @@ const CountrySection = () => {
                 className="rounded-lg shadow-2xl w-full"
                 loading="lazy"
               />
-              <div className="absolute -bottom-6 -right-6 bg-gold text-dark-gray p-4 rounded-lg">
+               <div className="absolute -bottom-6 -right-6 bg-corporate-gold text-primary p-4 rounded-lg shadow-accent">
                 <FaPhone className="text-2xl mb-2" />
                 <p className="font-bold">Nationwide Service</p>
               </div>
@@ -48,30 +48,30 @@ const CountrySection = () => {
               We Do It Across the Country
             </h2>
             <p className="text-light-gray text-lg mb-8 leading-relaxed">
-              Our team provides seamless event setup across cities, ensuring every rental arrives on time and ready. From coast to coast, we bring professional event solutions directly to your venue, no matter the location.
-            </p>
-            <p className="text-light-gray text-lg mb-8 leading-relaxed">
-              With local partners in every major metropolitan area, we guarantee consistent quality and reliable service for your corporate events, conferences, and special occasions.
-            </p>
+             Our team provides seamless event setup across cities, ensuring every rental arrives on time and ready. From coast to coast, we bring professional event solutions directly to your venue, no matter the location.
+             </p>
+             <p className="text-body">
+               With local partners in every major metropolitan area, we guarantee consistent quality and reliable service for your corporate events, conferences, and special occasions.
+             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <motion.button
-                onClick={() => scrollToSection('process')}
-                className="btn-primary text-lg px-8 py-4"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Learn More
-              </motion.button>
-              <motion.button
-                onClick={() => scrollToSection('contact')}
-                className="bg-transparent border-2 border-gold text-gold px-8 py-4 rounded-full font-semibold hover:bg-gold hover:text-dark-gray transition-all duration-300 text-lg"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaEnvelope className="inline mr-2" />
-                Contact Us
-              </motion.button>
+               <motion.button
+                 onClick={() => scrollToSection('process')}
+                 className="btn-primary hover-lift"
+                 whileHover={{ scale: 1.05 }}
+                 whileTap={{ scale: 0.95 }}
+               >
+                 Learn More
+               </motion.button>
+             <motion.button
+               onClick={() => scrollToSection('contact')}
+               className="btn-outline hover-lift"
+                 whileHover={{ scale: 1.05 }}
+                 whileTap={{ scale: 0.95 }}
+               >
+                 <FaEnvelope className="inline mr-2 micro-accent" />
+                 Contact Us
+               </motion.button>
             </div>
 
             {/* Stats */}
@@ -83,8 +83,8 @@ const CountrySection = () => {
                 viewport={{ once: true }}
                 className="text-center"
               >
-                <div className="text-3xl font-bold text-gold">50+</div>
-                <div className="text-light-gray text-sm">Cities</div>
+                <div className="text-3xl font-bold accent-text">50+</div>
+                <div className="text-small">Cities</div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -93,8 +93,8 @@ const CountrySection = () => {
                 viewport={{ once: true }}
                 className="text-center"
               >
-                <div className="text-3xl font-bold text-gold">1000+</div>
-                <div className="text-light-gray text-sm">Events</div>
+                <div className="text-3xl font-bold accent-text">1000+</div>
+                <div className="text-small">Events</div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -103,8 +103,8 @@ const CountrySection = () => {
                 viewport={{ once: true }}
                 className="text-center"
               >
-                <div className="text-3xl font-bold text-gold">99%</div>
-                <div className="text-light-gray text-sm">On-time</div>
+                <div className="text-3xl font-bold accent-text">99%</div>
+                <div className="text-small">On-time</div>
               </motion.div>
             </div>
           </motion.div>

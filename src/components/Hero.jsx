@@ -15,14 +15,14 @@ const Hero = () => {
   return (
     <section id="hero" className="relative h-screen overflow-hidden">
       {/* Background Video Placeholder */}
-      <div className="absolute inset-0 bg-dark-gray">
+      <div className="absolute inset-0 bg-primary">
 <img
           src="/images/hero-bg.jpg"
           alt="Event background"
           className="w-full h-full object-cover opacity-50"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-dark-gray/70 to-dark-gray/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 to-primary/95" />
       </div>
 
       {/* Content */}
@@ -32,18 +32,18 @@ const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight"
+            className="heading-xl"
           >
             Corporate Event Rentals
             <br />
-            <span className="text-gradient">Made Simple</span>
+            <span className="gradient-corporate">Made Simple</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-lg sm:text-xl lg:text-2xl text-light-gray mb-8 font-light"
+            className="text-body"
           >
             Chairs • AV Equipment • Stands • Full Setup
           </motion.p>
@@ -56,7 +56,7 @@ const Hero = () => {
           >
             <motion.button
               onClick={() => scrollToSection('rentals')}
-              className="btn-primary text-lg px-8 py-4"
+              className="btn-primary hover-lift"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -65,7 +65,7 @@ const Hero = () => {
 
             <motion.button
               onClick={() => scrollToSection('rentals')}
-              className="bg-transparent border-2 border-gold text-gold px-8 py-4 rounded-full font-semibold hover:bg-gold hover:text-dark-gray transition-all duration-300 text-lg"
+              className="btn-outline hover-lift"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -87,7 +87,7 @@ const Hero = () => {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="text-gold text-2xl"
+          className="text-accent text-2xl"
         >
           <FaArrowDown />
         </motion.div>
@@ -95,7 +95,7 @@ const Hero = () => {
 
       {/* Video Play Button Overlay */}
       <motion.button
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gold/20 hover:bg-gold/30 rounded-full p-8 transition-all duration-300"
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 accent-bg hover:bg-micro-pink rounded-full p-8 transition-all duration-300 micro-accent-hover"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         initial={{ opacity: 0 }}

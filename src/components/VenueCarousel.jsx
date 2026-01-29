@@ -37,7 +37,7 @@ const venues = [
   ];
 
   return (
-    <section id="rentals" className="py-20 bg-charcoal">
+    <section id="rentals" className="py-20 section-secondary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -56,16 +56,16 @@ const venues = [
 
         <div className="relative">
           {/* Custom Navigation Buttons */}
-          <div className="custom-nav-prev absolute left-0 top-1/2 transform -translate-y-1/2 z-10 -translate-x-4 lg:translate-x-0">
-            <button className="bg-gold hover:bg-white text-dark-gray p-3 rounded-full shadow-lg transition-all duration-300">
-              <FaChevronLeft className="text-xl" />
-            </button>
-          </div>
-          <div className="custom-nav-next absolute right-0 top-1/2 transform -translate-y-1/2 z-10 translate-x-4 lg:translate-x-0">
-            <button className="bg-gold hover:bg-white text-dark-gray p-3 rounded-full shadow-lg transition-all duration-300">
-              <FaChevronRight className="text-xl" />
-            </button>
-          </div>
+            <div className="custom-nav-prev absolute left-0 top-1/2 transform -translate-y-1/2 z-10 -translate-x-4 lg:translate-x-0">
+              <button className="accent-text bg-corporate-gold hover:bg-white hover:text-primary p-3 rounded-full shadow-lg transition-all duration-300">
+                <FaChevronLeft className="text-xl" />
+              </button>
+            </div>
+            <div className="custom-nav-next absolute right-0 top-1/2 transform -translate-y-1/2 z-10 translate-x-4 lg:translate-x-0">
+              <button className="accent-text bg-corporate-gold hover:bg-white hover:text-primary p-3 rounded-full shadow-lg transition-all duration-300">
+                <FaChevronRight className="text-xl" />
+              </button>
+            </div>
 
           <Swiper
             modules={[Navigation, Autoplay]}
@@ -106,7 +106,7 @@ const venues = [
                   viewport={{ once: true }}
                   className="group cursor-pointer"
                 >
-                  <div className="relative overflow-hidden rounded-lg bg-dark-gray">
+                  <div className="relative overflow-hidden rounded-lg card">
 <img
                       src={venue.image}
                       alt={venue.name}
@@ -116,7 +116,7 @@ const venues = [
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-gray/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-gold transition-colors duration-300">
+                    <h3 className="heading-md hover-underline">
                       {venue.name}
                     </h3>
                     <p className="text-light-gray text-sm line-clamp-2">
@@ -125,7 +125,7 @@ const venues = [
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="mt-4 text-gold hover:text-white font-medium transition-colors duration-300"
+                      className="accent-text hover-underline"
                     >
                       Learn More →
                     </motion.button>
