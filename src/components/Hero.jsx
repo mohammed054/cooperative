@@ -17,7 +17,6 @@ const Hero = () => {
       {/* Background Video Placeholder */}
       <div className="absolute inset-0 bg-dark-gray">
 <img
-          ref={imgRef}
           src="/api/placeholder/1920/1080"
           alt="Event background"
           className="w-full h-full object-cover opacity-50"
