@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import LazyLoadImage from 'react-lazy-load-image-component';
 import { FaClipboardList, FaCheckCircle, FaPhone } from 'react-icons/fa';
 
 const ProcessSection = () => {
@@ -105,10 +104,11 @@ const ProcessSection = () => {
             className="order-2 lg:order-1"
           >
             <div className="relative">
-<LazyLoadImage
+<img
                 src="/api/placeholder/600/500"
                 alt="Event setup process"
                 className="rounded-lg shadow-2xl w-full"
+                loading="lazy"
               />
               <div className="absolute top-6 -right-6 bg-electric-blue text-dark-gray p-4 rounded-lg">
                 <FaClipboardList className="text-2xl mb-2" />

@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import LazyLoadImage from 'react-lazy-load-image-component';
 import { FaArrowDown, FaPhone, FaEnvelope } from 'react-icons/fa';
 
 const CountrySection = () => {
@@ -24,10 +23,11 @@ const CountrySection = () => {
             className="order-2 lg:order-1"
           >
             <div className="relative">
-<LazyLoadImage
+<img
                 src="/api/placeholder/600/400"
                 alt="Nationwide event coverage"
                 className="rounded-lg shadow-2xl w-full"
+                loading="lazy"
               />
               <div className="absolute -bottom-6 -right-6 bg-gold text-dark-gray p-4 rounded-lg">
                 <FaPhone className="text-2xl mb-2" />

@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
-import LazyLoadImage from 'react-lazy-load-image-component';
 import { FaChevronLeft, FaChevronRight, FaStar, FaChair, FaMicrophone, FaTv, FaTools } from 'react-icons/fa';
 
 import 'swiper/css';
@@ -103,10 +102,11 @@ const StandardsCarousel = () => {
                   className="bg-charcoal rounded-lg overflow-hidden group cursor-pointer"
                 >
                   <div className="relative h-48 overflow-hidden">
-<LazyLoadImage
+<img
                         src={standard.image}
                         alt={standard.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
                       />
                     <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>

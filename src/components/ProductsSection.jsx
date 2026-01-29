@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import LazyLoadImage from 'react-lazy-load-image-component';
 import { FaArrowRight, FaExpand, FaUsers, FaWifi, FaCar } from 'react-icons/fa';
 
 const ProductsSection = () => {
@@ -67,11 +66,12 @@ const ProductsSection = () => {
             >
               {/* Background Image */}
               <div className="absolute inset-0 rounded-2xl overflow-hidden">
-<LazyLoadImage
-                          src={product.smallImage}
-alt={product.name}
-                          className="rounded-lg shadow-2xl"
-                        />
+<img
+                        src={product.smallImage}
+                        alt={product.name}
+                        className="rounded-lg shadow-2xl"
+                        loading="lazy"
+                      />
                 <div className="absolute inset-0 bg-gradient-to-r from-dark-gray/90 via-dark-gray/70 to-dark-gray/90" />
               </div>
 
@@ -86,15 +86,15 @@ alt={product.name}
                       transition={{ duration: 0.6, delay: 0.3 }}
                       viewport={{ once: true }}
                       className="hidden lg:block"
-                    >
+>
                       <div className="relative">
-                        <LazyLoadImage
+                        <img
                           src={product.smallImage}
                           alt={product.name}
                           className="rounded-lg shadow-2xl"
-                          effect="blur"
-/>
-                        <div className={`absolute -bottom-4 -right-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
+                          loading="lazy"
+                        />
+                         <div className={`absolute -bottom-4 -right-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
                           <FaExpand className="text-xl" />
                         </div>
                       </div>
@@ -157,15 +157,15 @@ alt={product.name}
                       transition={{ duration: 0.6, delay: 0.3 }}
                       viewport={{ once: true }}
                       className="hidden lg:block"
-                    >
+>
                       <div className="relative">
-                        <LazyLoadImage
+                        <img
                           src={product.smallImage}
                           alt={product.name}
                           className="rounded-lg shadow-2xl"
-                          effect="blur"
-/>
-                        <div className={`absolute -bottom-4 -left-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
+                          loading="lazy"
+                        />
+                         <div className={`absolute -bottom-4 -left-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
                           <FaExpand className="text-xl" />
                         </div>
                       </div>

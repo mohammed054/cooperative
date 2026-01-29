@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import LazyLoadImage from 'react-lazy-load-image-component';
 import { FaArrowDown, FaPlay } from 'react-icons/fa';
 
 const Hero = () => {
@@ -17,10 +16,12 @@ const Hero = () => {
     <section id="hero" className="relative h-screen overflow-hidden">
       {/* Background Video Placeholder */}
       <div className="absolute inset-0 bg-dark-gray">
-<LazyLoadImage
+<img
+          ref={imgRef}
           src="/api/placeholder/1920/1080"
           alt="Event background"
           className="w-full h-full object-cover opacity-50"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-dark-gray/70 to-dark-gray/90" />
       </div>
