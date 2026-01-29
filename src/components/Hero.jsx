@@ -17,11 +17,10 @@ const Hero = () => {
     <section id="hero" className="relative h-screen overflow-hidden">
       {/* Background Video Placeholder */}
       <div className="absolute inset-0 bg-dark-gray">
-        <LazyLoadImage
+<LazyLoadImage
           src="/api/placeholder/1920/1080"
           alt="Event background"
           className="w-full h-full object-cover opacity-50"
-          effect="blur"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-dark-gray/70 to-dark-gray/90" />
       </div>

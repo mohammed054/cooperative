@@ -24,11 +24,10 @@ const CountrySection = () => {
             className="order-2 lg:order-1"
           >
             <div className="relative">
-              <LazyLoadImage
+<LazyLoadImage
                 src="/api/placeholder/600/400"
                 alt="Nationwide event coverage"
                 className="rounded-lg shadow-2xl w-full"
-                effect="blur"
               />
               <div className="absolute -bottom-6 -right-6 bg-gold text-dark-gray p-4 rounded-lg">
                 <FaPhone className="text-2xl mb-2" />

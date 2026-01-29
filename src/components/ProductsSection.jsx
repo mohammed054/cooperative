@@ -67,12 +67,11 @@ const ProductsSection = () => {
             >
               {/* Background Image */}
               <div className="absolute inset-0 rounded-2xl overflow-hidden">
-                <LazyLoadImage
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover opacity-30"
-                  effect="blur"
-                />
+<LazyLoadImage
+                          src={product.smallImage}
+alt={product.name}
+                          className="rounded-lg shadow-2xl"
+                        />
                 <div className="absolute inset-0 bg-gradient-to-r from-dark-gray/90 via-dark-gray/70 to-dark-gray/90" />
               </div>
 
@@ -94,8 +93,8 @@ const ProductsSection = () => {
                           alt={product.name}
                           className="rounded-lg shadow-2xl"
                           effect="blur"
-                        />
-                         <div className={`absolute -bottom-4 -right-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
+/>
+                        <div className={`absolute -bottom-4 -right-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
                           <FaExpand className="text-xl" />
                         </div>
                       </div>
@@ -165,8 +164,8 @@ const ProductsSection = () => {
                           alt={product.name}
                           className="rounded-lg shadow-2xl"
                           effect="blur"
-                        />
-                         <div className={`absolute -bottom-4 -left-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
+/>
+                        <div className={`absolute -bottom-4 -left-4 ${product.color === 'gold' ? 'bg-gold' : 'bg-electric-blue'} text-dark-gray p-3 rounded-lg`}>
                           <FaExpand className="text-xl" />
                         </div>
                       </div>

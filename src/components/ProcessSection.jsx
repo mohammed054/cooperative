@@ -105,11 +105,10 @@ const ProcessSection = () => {
             className="order-2 lg:order-1"
           >
             <div className="relative">
-              <LazyLoadImage
+<LazyLoadImage
                 src="/api/placeholder/600/500"
                 alt="Event setup process"
                 className="rounded-lg shadow-2xl w-full"
-                effect="blur"
               />
               <div className="absolute top-6 -right-6 bg-electric-blue text-dark-gray p-4 rounded-lg">
                 <FaClipboardList className="text-2xl mb-2" />
