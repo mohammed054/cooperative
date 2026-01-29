@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import LazyLoadImage from 'react-lazy-load-image-component';
 import { FaArrowRight, FaRocket } from 'react-icons/fa';
 
