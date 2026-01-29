@@ -29,7 +29,7 @@ const ProcessSection = () => {
   ];
 
   return (
-    <section id="process" className="py-20 bg-charcoal overflow-hidden">
+    <section id="process" className="py-20 section-secondary overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Content */}
@@ -43,11 +43,11 @@ const ProcessSection = () => {
               Using a Process Built Around You
             </h2>
             <p className="text-light-gray text-lg mb-8 leading-relaxed">
-              We coordinate every step, from initial inquiry to setup, ensuring your event is flawless. Think of us as your event sherpa.
-            </p>
-            <p className="text-light-gray text-lg mb-8 leading-relaxed">
-              Our streamlined process eliminates the stress of event planning, allowing you to focus on what matters most - your guests and your message.
-            </p>
+             We coordinate every step, from initial inquiry to setup, ensuring your event is flawless. Think of us as your event sherpa.
+             </p>
+             <p className="text-body">
+               Our streamlined process eliminates the stress of event planning, allowing you to focus on what matters most - your guests and your message.
+             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <motion.button
@@ -103,23 +103,21 @@ const ProcessSection = () => {
             viewport={{ once: true }}
             className="order-2 lg:order-1"
           >
-            <div className="relative">
-<img
-                src="/images/process-bg.jpg"
-                alt="Event setup process"
-                className="rounded-lg shadow-2xl w-full"
-                loading="lazy"
-              />
-              <div className="absolute top-6 -right-6 bg-electric-blue text-dark-gray p-4 rounded-lg">
-                <FaClipboardList className="text-2xl mb-2" />
-                <p className="font-bold">Step-by-Step</p>
-                <p className="text-sm">Process</p>
-              </div>
-              <div className="absolute bottom-6 -left-6 bg-gold text-dark-gray p-4 rounded-lg">
-                <FaCheckCircle className="text-2xl mb-2" />
-                <p className="font-bold">Guaranteed</p>
-                <p className="text-sm">Quality</p>
-              </div>
+              <div className="relative">
+                <img
+                  src="/images/process-bg.jpg"
+                  alt="Event setup process"
+                  className="rounded-lg shadow-2xl w-full"
+                  loading="lazy"
+                />
+                <div className="absolute top-6 -right-6 bg-corporate-gold text-primary p-4 rounded-lg shadow-accent">
+                  <FaClipboardList className="text-2xl mb-2" />
+                  <p className="font-bold">Step-by-Step</p>
+                </div>
+                <div className="absolute bottom-6 -left-6 bg-corporate-gold text-primary p-4 rounded-lg shadow-accent">
+                  <FaCheckCircle className="text-2xl mb-2 accent-text" />
+                  <p className="font-bold">Guaranteed Quality</p>
+                </div>
             </div>
           </motion.div>
         </div>

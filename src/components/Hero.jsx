@@ -16,10 +16,10 @@ const Hero = () => {
     <section id="hero" className="relative h-screen overflow-hidden">
       {/* Background Video Placeholder */}
       <div className="absolute inset-0 bg-primary">
-<img
-          src="/images/hero-bg.jpg"
-          alt="Event background"
-          className="w-full h-full object-cover opacity-50"
+        <img
+          src="/images/hero-professional.jpg"
+          alt="Professional corporate event setup with elegant lighting and modern design"
+          className="w-full h-full object-cover"
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/80 to-primary/95" />

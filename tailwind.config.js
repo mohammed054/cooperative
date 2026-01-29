@@ -7,15 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        'primary': '#0F172A',       // Deep navy
-        'secondary': '#111827',     // Charcoal 
-        'accent': '#EC4899',       // Light blue accent
-        'white': '#FFFFFF',
-        'light-gray': '#F8FAFC',   // Very light gray
-        'medium-gray': '#64748B',    // Medium gray
-        'dark-gray': '#1E293B',      // Dark gray
-        'corporate-gold': '#FFD700',   // Gold accent
-        'micro-pink': '#E11D48',       // Very limited pink accent
+        'ghaimu-primary': '#4E4F68',     // RGB: 78, 79, 104
+        'ghaimu-accent': '#E191BC',      // RGB: 225, 145, 188 - VERY LIMITED USE
+        'ghaimu-white': '#FFFFFF',       // White
+        'ghaimu-light-gray': '#F6F7FA',  // Light Gray
+        'ghaimu-dark-gray': '#2A2A2A',   // Dark Gray (text)
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],

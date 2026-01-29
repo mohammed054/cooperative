@@ -19,35 +19,35 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white px-8 py-4 font-semibold rounded-full hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl;
+    @apply bg-ghaimu-primary text-ghaimu-white px-8 py-4 font-semibold rounded-full hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl;
   }
   
   .btn-secondary {
-    @apply border border-accent text-accent px-8 py-4 font-semibold rounded-full hover:bg-accent hover:text-primary transition-all duration-300;
+    @apply border border-ghaimu-accent text-ghaimu-accent px-8 py-4 font-semibold rounded-full hover:bg-ghaimu-accent hover:text-ghaimu-primary transition-all duration-300;
   }
   
   .btn-outline {
-    @apply border border-white text-white px-6 py-3 rounded-full hover:bg-white hover:text-primary transition-all duration-300;
+    @apply border border-ghaimu-white text-ghaimu-white px-6 py-3 rounded-full hover:bg-ghaimu-white hover:text-ghaimu-primary transition-all duration-300;
   }
   
   .section-primary {
-    @apply bg-primary;
+    @apply bg-ghaimu-primary;
   }
   
   .section-secondary {
-    @apply bg-secondary;
+    @apply bg-ghaimu-light-gray;
   }
   
   .card {
-    @apply bg-secondary rounded-xl p-6 shadow-xl border border-gray-200/20;
+    @apply bg-ghaimu-white rounded-xl p-6 shadow-xl border border-ghaimu-light-gray;
   }
   
   .glass-card {
-    @apply bg-primary/10 backdrop-blur-sm border border-accent/20 rounded-xl p-6;
+    @apply bg-ghaimu-primary/10 backdrop-blur-sm border border-ghaimu-accent/20 rounded-xl p-6;
   }
   
   .nav-item {
-    @apply text-white hover:text-accent px-4 py-2 rounded-lg transition-all duration-300;
+    @apply text-ghaimu-white hover:text-ghaimu-accent px-4 py-2 rounded-lg transition-all duration-300;
   }
   
   .divider-dots {
@@ -55,11 +55,11 @@
   }
   
   .dot {
-    @apply w-2 h-2 rounded-full bg-gray-400;
+    @apply w-2 h-2 rounded-full bg-ghaimu-dark-gray/60;
   }
   
   .dot-active {
-    @apply w-2 h-2 rounded-full bg-accent;
+    @apply w-2 h-2 rounded-full bg-ghaimu-accent;
   }
   
   .hover-underline {
@@ -68,7 +68,7 @@
   
   .hover-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-full h-0.5 bg-accent transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-ghaimu-accent transition-all duration-300;
   }
   
   .hover-lift {
@@ -76,38 +76,34 @@
   }
   
   .accent-border {
-    @apply border-l-4 border-accent;
+    @apply border-l-4 border-ghaimu-accent;
   }
   
   .accent-text {
-    @apply text-accent;
+    @apply text-ghaimu-accent;
   }
   
   .accent-bg {
-    @apply bg-accent/20;
+    @apply bg-ghaimu-accent/20;
   }
   
   .micro-accent {
-    @apply text-pink-500 font-semibold;
+    @apply text-ghaimu-accent;
   }
   
   .micro-accent-hover:hover {
-    @apply text-pink-500 scale-105 transition-transform duration-300;
+    @apply text-ghaimu-accent scale-105 transition-transform duration-300;
   }
   
-  .gradient-corporate {
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  .gradient-ghaimu {
+    background: linear-gradient(135deg, #4E4F68 0%, #2A2A2A 100%);
   }
   
-  .gradient-accent {
-    @apply bg-gradient-to-r from-accent to-yellow-400 bg-clip-text text-transparent;
+  .shadow-ghaimu {
+    box-shadow: 0 4px 20px rgba(78, 79, 104, 0.15);
   }
   
-  .shadow-corporate {
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
-  }
-  
-  .shadow-accent {
-    box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+  .shadow-ghaimu-accent {
+    box-shadow: 0 0 20px rgba(225, 145, 188, 0.3);
   }
 }

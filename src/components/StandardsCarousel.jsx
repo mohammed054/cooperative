@@ -36,7 +36,7 @@ const standards = [
   ];
 
   return (
-    <section id="standards" className="py-20 bg-dark-gray">
+    <section id="standards" className="py-20 section-secondary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -45,10 +45,10 @@ const standards = [
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="heading-xl">
             It All Starts With Our Standards
           </h2>
-          <p className="text-light-gray text-lg max-w-3xl mx-auto">
+          <p className="text-body max-w-3xl mx-auto">
             We maintain the highest industry standards in every aspect of our service, from equipment quality to customer support
           </p>
         </motion.div>
@@ -122,7 +122,7 @@ const standards = [
                     </p>
                     <div className="flex justify-center items-center space-x-1">
                       {[...Array(5)].map((_, i) => (
-                        <FaStar key={i} className="text-gold text-sm" />
+                        <FaStar key={i} className="accent-text text-sm" />
                       ))}
                     </div>
                   </div>

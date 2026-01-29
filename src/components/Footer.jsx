@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaMapMarkerAlt, FaPhone, FaEnvelope, FaArrowUp } from 'react-icons/fa';
+import { FaFacebook, FaLinkedin, FaTwitter, FaMapMarkerAlt, FaPhone, FaEnvelope, FaArrowUp } from 'react-icons/fa';
+import logo from '../assets/images/logo.webp';
 
 const Footer = () => {
   const scrollToSection = (sectionId) => {
@@ -15,9 +16,9 @@ const Footer = () => {
   };
 
   return (
-    <footer id="contact" className="bg-dark-gray text-white py-16">
+    <footer className="bg-ghaimu-dark-gray text-ghaimu-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -25,30 +26,18 @@ const Footer = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="text-2xl font-bold text-gold mb-6">LOGO</div>
-            <p className="text-light-gray mb-6 leading-relaxed">
-              Professional event rentals for corporate gatherings, conferences, and special occasions across the country.
+            <img 
+              src={logo} 
+              alt="GHAIM UAE" 
+              className="h-10 w-auto mb-4"
+            />
+            <p className="text-ghaimu-light-gray mb-6 leading-relaxed text-sm">
+              Strategic business solutions that drive efficiency, scalability, and sustainable growth for enterprises across the UAE and beyond.
             </p>
             <div className="flex space-x-4">
               <motion.a
                 href="#"
-                className="text-light-gray hover:text-gold transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FaFacebook className="text-xl" />
-              </motion.a>
-              <motion.a
-                href="#"
-                className="text-light-gray hover:text-gold transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FaInstagram className="text-xl" />
-              </motion.a>
-              <motion.a
-                href="#"
-                className="text-light-gray hover:text-gold transition-colors duration-300"
+                className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -56,11 +45,19 @@ const Footer = () => {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-light-gray hover:text-gold transition-colors duration-300"
+                className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <FaTwitter className="text-xl" />
+              </motion.a>
+              <motion.a
+                href="#"
+                className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <FaFacebook className="text-xl" />
               </motion.a>
             </div>
           </motion.div>
@@ -72,38 +69,38 @@ const Footer = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-white mb-6">Quick Links</h3>
+            <h3 className="text-lg font-semibold text-ghaimu-white mb-6">Quick Links</h3>
             <ul className="space-y-3">
               <li>
                 <button
                   onClick={() => scrollToSection('hero')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left"
+                  className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-left text-sm"
                 >
                   Home
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => scrollToSection('rentals')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left"
+                  onClick={() => scrollToSection('services')}
+                  className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-left text-sm"
                 >
-                  Rentals
+                  Services
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => scrollToSection('process')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left"
+                  onClick={() => scrollToSection('comparison')}
+                  className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-left text-sm"
                 >
-                  Process
+                  Why Choose Us
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => scrollToSection('testimonials')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left"
+                  onClick={() => scrollToSection('why-ghaimu')}
+                  className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-left text-sm"
                 >
-                  Testimonials
+                  About GHAIM UAE
                 </button>
               </li>
             </ul>
@@ -116,49 +113,65 @@ const Footer = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-white mb-6">Contact Info</h3>
+            <h3 className="text-lg font-semibold text-ghaimu-white mb-6">Contact Info</h3>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <FaPhone className="text-gold" />
-                <span className="text-light-gray">+123 456 7890</span>
+                <FaPhone className="text-ghaimu-primary" />
+                <span className="text-ghaimu-light-gray text-sm">+971 XX XXX XXXX</span>
               </div>
               <div className="flex items-center space-x-3">
-                <FaEnvelope className="text-gold" />
-                <span className="text-light-gray">info@example.com</span>
+                <FaEnvelope className="text-ghaimu-primary" />
+                <span className="text-ghaimu-light-gray text-sm">info@ghaimuae.com</span>
               </div>
               <div className="flex items-center space-x-3">
-                <FaMapMarkerAlt className="text-gold" />
-                <span className="text-light-gray">123 Event St, City</span>
+                <FaMapMarkerAlt className="text-ghaimu-primary" />
+                <span className="text-ghaimu-light-gray text-sm">Dubai, UAE</span>
               </div>
             </div>
           </motion.div>
 
-          {/* Newsletter */}
+          {/* Services */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-white mb-6">Stay Updated</h3>
-            <p className="text-light-gray mb-6">
-              Subscribe to our newsletter for exclusive offers and event planning tips.
-            </p>
-            <form className="space-y-3">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="w-full px-4 py-2 bg-charcoal border border-gold/30 rounded-lg text-white placeholder-light-gray focus:outline-none focus:border-gold transition-colors duration-300"
-              />
-              <motion.button
-                type="submit"
-                className="w-full bg-gold hover:bg-white text-dark-gray font-semibold py-2 px-4 rounded-lg transition-all duration-300"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Subscribe
-              </motion.button>
-            </form>
+            <h3 className="text-lg font-semibold text-ghaimu-white mb-6">Our Services</h3>
+            <ul className="space-y-3">
+              <li>
+                <button
+                  onClick={() => scrollToSection('services')}
+                  className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-left text-sm"
+                >
+                  Corporate Services
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => scrollToSection('services')}
+                  className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-left text-sm"
+                >
+                  Logistics Solutions
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => scrollToSection('services')}
+                  className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-left text-sm"
+                >
+                  Infrastructure Services
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => scrollToSection('services')}
+                  className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-left text-sm"
+                >
+                  Custom Solutions
+                </button>
+              </li>
+            </ul>
           </motion.div>
         </div>
 
@@ -168,21 +181,21 @@ const Footer = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          className="border-t border-charcoal mt-12 pt-8"
+          className="border-t border-ghaimu-primary/20 mt-8 pt-8"
         >
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-light-gray text-sm mb-4 md:mb-0">
-              © 2026 Event Rentals. All Rights Reserved.
+            <div className="text-ghaimu-light-gray text-sm mb-4 md:mb-0">
+              © 2026 GHAIM UAE. All Rights Reserved.
             </div>
             <div className="flex space-x-6">
-              <button className="text-light-gray hover:text-gold transition-colors duration-300 text-sm">
+              <button className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-sm">
                 Privacy Policy
               </button>
-              <button className="text-light-gray hover:text-gold transition-colors duration-300 text-sm">
+              <button className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-sm">
                 Terms of Service
               </button>
-              <button className="text-light-gray hover:text-gold transition-colors duration-300 text-sm">
-                Sitemap
+              <button className="text-ghaimu-light-gray hover:text-ghaimu-white transition-colors duration-300 text-sm">
+                Cookie Policy
               </button>
             </div>
           </div>
@@ -191,7 +204,7 @@ const Footer = () => {
         {/* Back to Top Button */}
         <motion.button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-gold hover:bg-white text-dark-gray p-4 rounded-full shadow-lg transition-all duration-300 z-50"
+          className="fixed bottom-8 right-8 bg-ghaimu-primary hover:bg-ghaimu-white text-ghaimu-white hover:text-ghaimu-primary p-4 rounded-full shadow-lg transition-all duration-300 z-50"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ opacity: 0, y: 50 }}
