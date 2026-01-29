@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main ]
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,6 +36,9 @@ jobs:
 
     - name: Setup Pages 📄
       uses: actions/configure-pages@v4
+      with:
+        # Automatically configure Pages for this repository
+        enablement: true
 
     - name: Upload artifact 📤
       uses: actions/upload-pages-artifact@v3
@@ -40,10 +49,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-
-    permissions:
-      pages: write
-      id-token: write
 
     environment:
       name: github-pages
