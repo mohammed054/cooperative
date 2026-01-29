@@ -124,10 +124,10 @@ const ProductsSection = () => {
                       <p className="text-light-gray mb-6 leading-relaxed">
                         {product.description}
                       </p>
-                      <div className="flex items-center space-x-4 mb-8">
-                        {product.features.map((Feature, featureIndex) => (
+<div className="flex items-center space-x-4 mb-8">
+                        {product.features.map((FeatureComponent, featureIndex) => (
                           <div key={featureIndex} className="text-gold">
-                            <Feature className="text-xl" />
+                            <FeatureComponent className="text-xl" />
                           </div>
                         ))}
                       </div>
@@ -195,13 +195,13 @@ const ProductsSection = () => {
                       <p className="text-light-gray mb-6 leading-relaxed">
                         {product.description}
                       </p>
-                      <div className="flex items-center space-x-4 mb-8">
-                         {product.features.map((Feature, featureIndex) => (
+<div className="flex items-center space-x-4 mb-8">
+                         {product.features.map((FeatureComponent, featureIndex) => (
                            <div key={featureIndex} className={product.color === 'gold' ? 'text-gold' : 'text-electric-blue'}>
-                             <Feature className="text-xl" />
+                             <FeatureComponent className="text-xl" />
                            </div>
                          ))}
-                      </div>
+                       </div>
                       <div className="flex flex-col sm:flex-row gap-4">
                         <motion.button
                           className="btn-primary"
