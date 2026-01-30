@@ -7,12 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        'primary': '#4E4F68',       // Charcoal / Navy
-        'accent': '#E191BC',       // Accent Pink (micro-use only)
-        'bg-main': '#FFFFFF',      // Main background
-        'bg-muted': '#F6F7F9',     // Light gray sections
-        'text-primary': '#4E4F68',  // Primary text
-        'text-muted': '#6B7280',    // Muted text
+        'primary-text': 'rgb(78, 79, 104)',      // Primary text color
+        'primary-accent': '#64B5F6',            // Light blue from logo
+        'micro-accent': 'rgb(225, 145, 188)',    // Pink for micro-elements only
+        'bg-main': '#ffffff',                   // Main white background
+        'bg-muted': '#f6f7f9',                  // Alternate sections
+        'bg-soft': '#fafafa',                   // Soft contrast sections
+        'text-primary': 'rgb(78, 79, 104)',      // Primary text
+        'text-muted': '#6B7280',                 // Muted text
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],

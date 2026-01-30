@@ -47,7 +47,7 @@ const products = [
           <h2 className="heading-lg">
             We Work With You to Make It Yours
           </h2>
-          <p className="text-light-gray text-lg max-w-3xl mx-auto">
+          <p className="text-text-muted text-lg max-w-3xl mx-auto">
             Customizable rental packages tailored to your specific event requirements
           </p>
         </motion.div>
@@ -72,7 +72,7 @@ const products = [
                         className="rounded-lg shadow-2xl"
                         loading="lazy"
                       />
-                <div className="absolute inset-0 bg-gradient-to-r from-dark-gray/90 via-dark-gray/70 to-dark-gray/90" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-text/40 via-primary-text/30 to-primary-text/40" />
               </div>
 
               {/* Content */}
@@ -114,18 +114,18 @@ const products = [
                         {product.tags.map((tag, tagIndex) => (
                           <span
                             key={tagIndex}
-                            className="bg-gold/20 text-gold px-3 py-1 rounded-full text-sm"
+                            className="bg-primary-accent/20 text-primary-accent px-3 py-1 rounded-full text-sm"
                           >
                             {tag}
                           </span>
                         ))}
                       </div>
-<p className="text-light-gray mb-6 leading-relaxed">
+<p className="text-text-muted mb-6 leading-relaxed">
                         {product.description}
                       </p>
                       <div className="flex items-center space-x-4 mb-8">
                         {product.features.map((FeatureComponent, featureIndex) => (
-                          <div key={featureIndex} className="text-gold">
+                          <div key={featureIndex} className="text-primary-accent">
                             <FeatureComponent className="text-xl" />
                           </div>
                         ))}
@@ -139,7 +139,7 @@ const products = [
                           See All Products
                         </motion.button>
                         <motion.button
-                          className="bg-transparent border-2 border-gold text-gold px-6 py-3 rounded-full font-semibold hover:bg-gold hover:text-dark-gray transition-all duration-300"
+                          className="bg-transparent border-2 border-gold text-primary-accent px-6 py-3 rounded-full font-semibold hover:bg-gold hover:text-dark-gray transition-all duration-300"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
@@ -185,18 +185,18 @@ const products = [
                         {product.tags.map((tag, tagIndex) => (
                            <span
                              key={tagIndex}
-                             className={`${product.color === 'gold' ? 'bg-gold/20 text-gold' : 'bg-electric-blue/20 text-electric-blue'} px-3 py-1 rounded-full text-sm`}
+                             className={`${product.color === 'gold' ? 'bg-gold/20 text-primary-accent' : 'bg-electric-blue/20 text-electric-blue'} px-3 py-1 rounded-full text-sm`}
                            >
                             {tag}
                           </span>
                         ))}
                       </div>
-<p className="text-light-gray mb-6 leading-relaxed">
+<p className="text-text-muted mb-6 leading-relaxed">
                         {product.description}
                       </p>
                        <div className="flex items-center space-x-4 mb-8">
                          {product.features.map((FeatureComponent, featureIndex) => (
-                           <div key={featureIndex} className={product.color === 'gold' ? 'text-gold' : 'text-electric-blue'}>
+                           <div key={featureIndex} className={product.color === 'gold' ? 'text-primary-accent' : 'text-electric-blue'}>
                              <FeatureComponent className="text-xl" />
                            </div>
                          ))}
@@ -210,7 +210,7 @@ const products = [
                           See All Products
                         </motion.button>
                          <motion.button
-                           className={`bg-transparent border-2 ${product.color === 'gold' ? 'border-gold text-gold hover:bg-gold' : 'border-electric-blue text-electric-blue hover:bg-electric-blue'} hover:text-dark-gray px-6 py-3 rounded-full font-semibold transition-all duration-300`}
+                           className={`bg-transparent border-2 ${product.color === 'gold' ? 'border-gold text-primary-accent hover:bg-gold' : 'border-electric-blue text-electric-blue hover:bg-electric-blue'} hover:text-dark-gray px-6 py-3 rounded-full font-semibold transition-all duration-300`}
                            whileHover={{ scale: 1.05 }}
                            whileTap={{ scale: 0.95 }}
                          >

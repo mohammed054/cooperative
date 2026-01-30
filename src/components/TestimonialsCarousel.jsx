@@ -47,7 +47,7 @@ const TestimonialsCarousel = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-20 bg-dark-gray">
+    <section id="testimonials" className="py-20 bg-bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -56,7 +56,7 @@ const TestimonialsCarousel = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-text mb-4">
             But Don't Take It From Us
           </h2>
           <p className="text-light-gray text-lg max-w-3xl mx-auto">
@@ -110,22 +110,22 @@ const TestimonialsCarousel = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-charcoal rounded-lg p-8 h-full flex flex-col"
+                  className="bg-white rounded-lg p-8 h-full flex flex-col shadow-md"
                 >
                   {/* Quote Icon */}
-                  <div className="text-gold mb-4">
+                  <div className="text-primary-accent mb-4">
                     <FaQuoteLeft className="text-3xl opacity-50" />
                   </div>
 
                   {/* Quote */}
-                  <p className="text-light-gray mb-6 flex-grow leading-relaxed">
+                  <p className="text-text-muted mb-6 flex-grow leading-relaxed">
                     "{testimonial.quote}"
                   </p>
 
                   {/* Rating */}
                   <div className="flex items-center space-x-1 mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <FaStar key={i} className="text-gold" />
+                      <FaStar key={i} className="text-primary-accent" />
                     ))}
                   </div>
 
@@ -157,23 +157,23 @@ const TestimonialsCarousel = () => {
           viewport={{ once: true }}
           className="mt-16"
         >
-          <div className="bg-charcoal rounded-lg p-8">
+          <div className="bg-white rounded-lg p-8 shadow-md">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="text-4xl font-bold text-gold mb-2">500+</div>
-                <div className="text-light-gray">Happy Clients</div>
+                <div className="text-4xl font-bold text-primary-accent mb-2">500+</div>
+                <div className="text-text-muted">Happy Clients</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-gold mb-2">4.9/5</div>
-                <div className="text-light-gray">Average Rating</div>
+                <div className="text-4xl font-bold text-primary-accent mb-2">4.9/5</div>
+                <div className="text-text-muted">Average Rating</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-gold mb-2">98%</div>
-                <div className="text-light-gray">Would Recommend</div>
+                <div className="text-4xl font-bold text-primary-accent mb-2">98%</div>
+                <div className="text-text-muted">Would Recommend</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-gold mb-2">10 Years</div>
-                <div className="text-light-gray">In Business</div>
+                <div className="text-4xl font-bold text-primary-accent mb-2">10 Years</div>
+                <div className="text-text-muted">In Business</div>
               </div>
             </div>
           </div>

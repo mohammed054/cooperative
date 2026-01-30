@@ -15,7 +15,7 @@ const Footer = () => {
   };
 
   return (
-    <footer id="contact" className="bg-primary text-bg-main py-16">
+    <footer id="contact" className="bg-muted text-primary-text py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
@@ -39,7 +39,7 @@ const Footer = () => {
             <div className="flex space-x-4">
               <motion.a
                 href="#"
-                className="text-text-muted hover:text-accent transition-colors duration-300"
+                className="text-text-muted hover:text-primary-accent transition-colors duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -47,7 +47,7 @@ const Footer = () => {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-text-muted hover:text-accent transition-colors duration-300"
+                className="text-text-muted hover:text-primary-accent transition-colors duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -55,7 +55,7 @@ const Footer = () => {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-text-muted hover:text-accent transition-colors duration-300"
+                className="text-text-muted hover:text-primary-accent transition-colors duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -63,7 +63,7 @@ const Footer = () => {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-text-muted hover:text-accent transition-colors duration-300"
+                className="text-text-muted hover:text-primary-accent transition-colors duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -79,7 +79,7 @@ const Footer = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-bg-main mb-6">Quick Links</h3>
+            <h3 className="text-lg font-semibold text-primary-text mb-6">Quick Links</h3>
             <ul className="space-y-3">
               <li>
                 <button
@@ -123,19 +123,19 @@ const Footer = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-bg-main mb-6">Contact Info</h3>
+            <h3 className="text-lg font-semibold text-primary-text mb-6">Contact Info</h3>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <FaPhone className="text-accent" />
-                <span className="text-light-gray">+123 456 7890</span>
+                <FaPhone className="text-primary-accent" />
+                <span className="text-text-muted">+123 456 7890</span>
               </div>
               <div className="flex items-center space-x-3">
-                <FaEnvelope className="text-accent" />
-                <span className="text-light-gray">info@example.com</span>
+                <FaEnvelope className="text-primary-accent" />
+                <span className="text-text-muted">info@example.com</span>
               </div>
               <div className="flex items-center space-x-3">
-                <FaMapMarkerAlt className="text-accent" />
-                <span className="text-light-gray">123 Event St, City</span>
+                <FaMapMarkerAlt className="text-primary-accent" />
+                <span className="text-text-muted">123 Event St, City</span>
               </div>
             </div>
           </motion.div>
@@ -147,7 +147,7 @@ const Footer = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-bg-main mb-6">Stay Updated</h3>
+            <h3 className="text-lg font-semibold text-primary-text mb-6">Stay Updated</h3>
             <p className="text-text-muted mb-6">
               Subscribe to our newsletter for exclusive offers and event planning tips.
             </p>
@@ -155,11 +155,11 @@ const Footer = () => {
               <input
                 type="email"
                 placeholder="Your email"
-                className="w-full px-4 py-2 bg-primary/50 border border-accent/30 rounded-lg text-bg-main placeholder-text-muted focus:outline-none focus:border-accent transition-colors duration-300"
+                className="w-full px-4 py-2 bg-white/50 border border-primary-accent/30 rounded-lg text-primary-text placeholder-text-muted focus:outline-none focus:border-primary-accent transition-colors duration-300"
               />
               <motion.button
                 type="submit"
-                className="w-full bg-accent hover:bg-primary text-bg-main font-semibold py-2 px-4 rounded-lg transition-all duration-300"
+                className="w-full bg-primary-accent hover:bg-primary-accent/90 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -175,7 +175,7 @@ const Footer = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          className="border-t border-primary/20 mt-12 pt-8"
+          className="border-t border-primary-accent/20 mt-12 pt-8"
         >
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-text-muted text-sm mb-4 md:mb-0">
@@ -198,7 +198,7 @@ const Footer = () => {
         {/* Back to Top Button */}
         <motion.button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-accent hover:bg-primary text-bg-main p-4 rounded-full shadow-lg transition-all duration-300 z-50"
+          className="fixed bottom-8 right-8 bg-primary-accent hover:bg-primary-accent/90 text-white p-4 rounded-full shadow-lg transition-all duration-300 z-50"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ opacity: 0, y: 50 }}

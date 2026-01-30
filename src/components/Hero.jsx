@@ -15,14 +15,14 @@ const Hero = () => {
   return (
     <section id="hero" className="relative h-screen overflow-hidden">
       {/* Background Video Placeholder */}
-      <div className="absolute inset-0 bg-primary">
+      <div className="absolute inset-0">
         <img
           src="/images/hero-professional.jpg"
           alt="Professional corporate event setup with elegant lighting and modern design"
           className="w-full h-full object-cover"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 to-primary/95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-text/40 via-primary-text/60 to-primary-text/80" />
       </div>
 
       {/* Content */}
@@ -87,7 +87,7 @@ const Hero = () => {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="text-accent text-2xl"
+          className="text-primary-accent text-2xl"
         >
           <FaArrowDown />
         </motion.div>
@@ -95,7 +95,7 @@ const Hero = () => {
 
       {/* Video Play Button Overlay */}
       <motion.button
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 accent-bg hover:bg-micro-pink rounded-full p-8 transition-all duration-300 micro-accent-hover"
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary-accent/80 hover:bg-primary-accent rounded-full p-8 transition-all duration-300"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         initial={{ opacity: 0 }}

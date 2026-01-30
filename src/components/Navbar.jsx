@@ -62,8 +62,8 @@ const Navbar = () => {
                 onClick={() => scrollToSection(item.section)}
                 className={`
                   ${item.isButton 
-                    ? 'border border-accent text-accent px-8 py-4 font-semibold rounded-full hover:bg-accent hover:text-bg-main transition-all duration-300' 
-                    : 'text-text-primary hover:text-accent px-4 py-2 rounded-lg transition-all duration-300'
+                    ? 'bg-primary-accent text-white px-8 py-4 font-semibold rounded-full hover:bg-primary-accent/90 transition-all duration-300' 
+                    : 'text-primary-text hover:text-primary-accent px-4 py-2 rounded-lg transition-all duration-300'
                   }
                 `}
                 whileHover={{ scale: 1.05 }}
@@ -72,7 +72,7 @@ const Navbar = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                  {item.isButton && <FaPhoneAlt className="inline mr-2 text-accent" />}
+                  {item.isButton && <FaPhoneAlt className="inline mr-2 text-white" />}
                 {item.label}
               </motion.button>
             ))}
@@ -81,7 +81,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
-              className="text-text-primary p-2"
+              className="text-primary-text p-2"
               onClick={() => {
                 // Mobile menu toggle logic here
               }}

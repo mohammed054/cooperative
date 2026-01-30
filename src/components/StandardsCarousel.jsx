@@ -99,7 +99,7 @@ const standards = [
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-charcoal rounded-lg overflow-hidden group cursor-pointer"
+                  className="bg-white rounded-lg overflow-hidden group cursor-pointer shadow-md"
                 >
                   <div className="relative h-48 overflow-hidden">
 <img
@@ -108,16 +108,16 @@ const standards = [
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
                       />
-                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary-text/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                   <div className="p-6">
-                    <div className="text-gold mb-4 flex justify-center">
+                    <div className="text-primary-accent mb-4 flex justify-center">
                       {standard.icon}
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-3 text-center">
+                    <h3 className="text-xl font-semibold text-primary-text mb-3 text-center">
                       {standard.title}
                     </h3>
-                    <p className="text-light-gray text-sm text-center mb-4">
+                    <p className="text-text-muted text-sm text-center mb-4">
                       {standard.description}
                     </p>
                     <div className="flex justify-center items-center space-x-1">
@@ -142,20 +142,20 @@ const standards = [
           <div className="bg-charcoal rounded-lg p-8 max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-gold">100%</div>
-                <div className="text-light-gray text-sm">Quality Checked</div>
+                <div className="text-3xl font-bold text-primary-accent">100%</div>
+                <div className="text-text-muted text-sm">Quality Checked</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gold">24/7</div>
-                <div className="text-light-gray text-sm">Support</div>
+                <div className="text-3xl font-bold text-primary-accent">24/7</div>
+                <div className="text-text-muted text-sm">Support</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gold">5★</div>
-                <div className="text-light-gray text-sm">Rating</div>
+                <div className="text-3xl font-bold text-primary-accent">5★</div>
+                <div className="text-text-muted text-sm">Rating</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gold">ISO</div>
-                <div className="text-light-gray text-sm">Certified</div>
+                <div className="text-3xl font-bold text-primary-accent">ISO</div>
+                <div className="text-text-muted text-sm">Certified</div>
               </div>
             </div>
           </div>

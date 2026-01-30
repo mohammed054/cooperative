@@ -4,11 +4,13 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #4E4F68;
-  --color-accent: #E191BC;
-  --color-bg-main: #FFFFFF;
-  --color-bg-muted: #F6F7F9;
-  --color-text-primary: #4E4F68;
+  --color-primary-text: rgb(78, 79, 104);
+  --color-primary-accent: #64B5F6;
+  --color-micro-accent: rgb(225, 145, 188);
+  --color-bg-main: #ffffff;
+  --color-bg-muted: #f6f7f9;
+  --color-bg-soft: #fafafa;
+  --color-text-primary: rgb(78, 79, 104);
   --color-text-muted: #6B7280;
 }
 
@@ -21,42 +23,42 @@
     margin: 0;
     min-width: 320px;
     background-color: var(--color-bg-main);
-    color: var(--color-text-primary);
+    color: var(--color-primary-text);
     font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-bg-main px-8 py-4 font-semibold rounded-full hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl;
+    @apply bg-primary-accent text-white px-8 py-4 font-semibold rounded-full hover:bg-primary-accent/90 transition-all duration-300 shadow-lg hover:shadow-xl;
   }
   
   .btn-secondary {
-    @apply border border-accent text-accent px-8 py-4 font-semibold rounded-full hover:bg-accent hover:text-bg-main transition-all duration-300;
+    @apply border border-primary-accent text-primary-accent px-8 py-4 font-semibold rounded-full hover:bg-primary-accent hover:text-white transition-all duration-300;
   }
   
   .btn-outline {
-    @apply border border-primary text-primary px-6 py-3 rounded-full hover:bg-primary hover:text-bg-main transition-all duration-300;
+    @apply border border-primary-accent text-primary-accent px-6 py-3 rounded-full hover:bg-primary-accent hover:text-white transition-all duration-300;
   }
   
   .section-primary {
-    @apply bg-primary;
+    @apply bg-bg-main;
   }
   
   .section-secondary {
-    @apply bg-muted;
+    @apply bg-bg-muted;
   }
   
   .card {
-    @apply bg-muted rounded-xl p-6 shadow-xl border border-primary/20;
+    @apply bg-bg-soft rounded-xl p-6 shadow-xl border border-primary-accent/20;
   }
   
   .glass-card {
-    @apply bg-primary/5 backdrop-blur-sm border border-accent/20 rounded-xl p-6;
+    @apply bg-white/50 backdrop-blur-sm border border-primary-accent/20 rounded-xl p-6;
   }
   
   .nav-item {
-    @apply text-text-primary hover:text-accent px-4 py-2 rounded-lg transition-all duration-300;
+    @apply text-primary-text hover:text-primary-accent px-4 py-2 rounded-lg transition-all duration-300;
   }
   
   .divider-dots {
@@ -68,7 +70,7 @@
   }
   
   .dot-active {
-    @apply w-2 h-2 rounded-full bg-accent;
+    @apply w-2 h-2 rounded-full bg-micro-accent;
   }
   
   .hover-underline {
@@ -77,7 +79,7 @@
   
   .hover-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-full h-0.5 bg-accent transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-primary-accent transition-all duration-300;
   }
   
   .hover-lift {
@@ -85,30 +87,30 @@
   }
   
   .accent-border {
-    @apply border-l-4 border-accent;
+    @apply border-l-4 border-primary-accent;
   }
   
   .accent-text {
-    @apply text-accent;
+    @apply text-primary-accent;
   }
   
   .accent-bg {
-    @apply bg-accent/20;
+    @apply bg-primary-accent/10;
   }
   
   .micro-accent {
-    @apply text-accent font-semibold;
+    @apply text-micro-accent font-semibold;
   }
   
   .micro-accent-hover:hover {
-    @apply text-accent scale-105 transition-transform duration-300;
+    @apply text-micro-accent scale-105 transition-transform duration-300;
   }
   
   .shadow-corporate {
-    box-shadow: 0 4px 20px rgba(78, 79, 104, 0.15);
+    box-shadow: 0 4px 20px rgba(100, 181, 246, 0.15);
   }
   
   .shadow-accent {
-    box-shadow: 0 0 20px rgba(225, 145, 188, 0.3);
+    box-shadow: 0 0 20px rgba(225, 145, 188, 0.2);
   }
 }

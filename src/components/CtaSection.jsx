@@ -11,7 +11,7 @@ const CtaSection = () => {
   };
 
   return (
-    <section id="cta" className="py-32 bg-gradient-to-br from-dark-gray via-charcoal to-dark-gray relative overflow-hidden">
+    <section id="cta" className="py-32 bg-gradient-to-br from-bg-soft via-bg-muted to-bg-main relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -130,7 +130,7 @@ const CtaSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             viewport={{ once: true }}
-            className="mt-16 pt-12 border-t border-charcoal"
+            className="mt-16 pt-12 border-t border-primary-accent/20"
           >
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-8 sm:space-y-0 sm:space-x-16">
               <div className="text-center">
