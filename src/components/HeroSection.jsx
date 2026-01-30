@@ -48,15 +48,15 @@ const HeroSection = () => {
             animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 30 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            {/* Primary CTA */}
-            <motion.button
-              onClick={() => scrollToSection('contact')}
-              className="px-10 py-4 bg-primary-accent text-white font-semibold rounded-full hover:opacity-90 transition-all duration-300 text-lg shadow-lg hover:shadow-xl"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Get Started
-            </motion.button>
+             {/* Primary CTA */}
+             <motion.button
+               onClick={() => scrollToSection('contact')}
+               className="px-10 py-4 bg-primary-accent text-white font-semibold rounded-full hover:bg-opacity-90 hover:shadow-xl transition-all duration-300 text-lg shadow-lg"
+               whileHover={{ scale: 1.02 }}
+               whileTap={{ scale: 0.98 }}
+             >
+               Get Started
+             </motion.button>
 
             {/* Secondary CTA - Arrow Only Circle */}
             <motion.button
