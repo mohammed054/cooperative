@@ -1,27 +1,41 @@
 import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import VenueCarousel from './components/VenueCarousel';
-import CountrySection from './components/CountrySection';
-import ProcessSection from './components/ProcessSection';
-import StandardsCarousel from './components/StandardsCarousel';
-import ProductsSection from './components/ProductsSection';
-import TestimonialsCarousel from './components/TestimonialsCarousel';
-import CtaSection from './components/CtaSection';
+import { useScrollSnap } from './hooks/useScrollSnap';
+import GhaimuHeader from './components/GhaimuHeader';
+import HeroSection from './components/HeroSection';
+import ComparisonIntro from './components/ComparisonIntro';
+import ComparisonScroll from './components/ComparisonScroll';
+import SolutionsStack from './components/SolutionsStack';
+import WhyGhaimu from './components/WhyGhaimu';
+import GhaimuProcessSection from './components/GhaimuProcessSection';
+import ClientTrust from './components/ClientTrust';
+import FinalCta from './components/FinalCta';
 import Footer from './components/Footer';
 
 function App() {
+  const sectionIds = [
+    'hero',
+    'comparison-intro',
+    'comparison',
+    'services',
+    'why-ghaimu',
+    'process',
+    'client-trust',
+    'contact'
+  ];
+
+  useScrollSnap(sectionIds);
+
   return (
     <div className="App">
-      <Navbar />
-      <Hero />
-      <VenueCarousel />
-      <CountrySection />
-      <ProcessSection />
-      <StandardsCarousel />
-      <ProductsSection />
-      <TestimonialsCarousel />
-      <CtaSection />
+      <GhaimuHeader />
+      <HeroSection />
+      <ComparisonIntro />
+      <ComparisonScroll />
+      <SolutionsStack />
+      <WhyGhaimu />
+      <GhaimuProcessSection />
+      <ClientTrust />
+      <FinalCta />
       <Footer />
     </div>
   );
