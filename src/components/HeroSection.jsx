@@ -32,14 +32,14 @@ const HeroSection = () => {
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
            {/* Main Headline */}
-          <motion.h1 
-            className="text-5xl md:text-7xl lg:text-8xl font-bold text-ghaimu-white mb-12 leading-tight max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 30 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            Premium event solutions built for scale, precision, and impact.
-          </motion.h1>
+           <motion.h1 
+             className="text-3xl md:text-4xl lg:text-5xl font-bold text-ghaimu-white mb-12 leading-tight max-w-3xl mx-auto"
+             initial={{ opacity: 0, y: 30 }}
+             animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 30 }}
+             transition={{ duration: 0.8, delay: 0.2 }}
+           >
+             Premium event solutions built for scale, precision, and impact.
+           </motion.h1>
 
            {/* CTA Buttons */}
           <motion.div 
