@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaPhoneAlt } from 'react-icons/fa';
+
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -41,45 +41,45 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          {/* Logo - GHAIM Text */}
           <motion.div 
             className="hover-lift"
             whileHover={{ scale: 1.05 }}
           >
-            <img 
-              src="/images/logo.svg" 
-              alt="Event Rentals Logo" 
-              className="h-10 w-auto"
-              style={{ maxHeight: '48px' }}
-            />
+            <span className={`text-4xl font-bold transition-colors duration-300 ${
+              scrolled ? 'text-primary-text' : 'text-white'
+            }`}>
+              GHAIM
+            </span>
           </motion.div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item, index) => (
                <motion.button
-                 key={item.label}
-                 onClick={() => scrollToSection(item.section)}
-                 className={`
-                   ${item.isButton 
-                     ? 'bg-primary-accent text-white px-8 py-4 font-semibold rounded-full hover:bg-primary-accent/90 transition-all duration-300' 
-                     : 'text-primary-text hover:text-link-hover px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2'
-                   }
-                 `}
-                 whileHover={{ scale: 1.05 }}
-                 whileTap={{ scale: 0.95 }}
-                 initial={{ opacity: 0, y: -20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ duration: 0.3, delay: index * 0.1 }}
-               >
-                   {item.isButton && <FaPhoneAlt className="inline mr-2 text-white" />}
-                    {!item.isButton && (
-                      <span className="inline-block text-xl font-bold leading-none mr-2">
-                        +
-                      </span>
-                    )}
-                 {item.label}
-               </motion.button>
+                  key={item.label}
+                  onClick={() => scrollToSection(item.section)}
+                  className={`
+                    ${item.isButton 
+                      ? 'bg-primary-accent text-white px-8 py-4 font-semibold rounded-full hover:bg-primary-accent/90 transition-all duration-300 flex items-center gap-2' 
+                      : 'text-primary-text hover:text-link-hover px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2'
+                    }
+                  `}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                     <motion.span 
+                       className="inline-block text-xl font-bold leading-none w-5 h-5 flex items-center justify-center" 
+                       whileHover={{ rotate: 45 }}
+                       transition={{ duration: 0.3 }}
+                     >
+                       +
+                     </motion.span>
+                  {item.label}
+                </motion.button>
             ))}
           </div>
 
