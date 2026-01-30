@@ -116,9 +116,10 @@
   }
 
   .btn-arrow-circle {
-    @apply w-12 h-12 rounded-full border-2 border-white/50 bg-white/10 text-white flex items-center justify-center transition-all duration-300;
+    @apply w-12 h-12 rounded-full bg-primary-accent text-white flex items-center justify-center transition-all duration-500 p-0 relative overflow-hidden hover:rotate-45 hover:bg-primary-accent/90;
   }
-  .btn-arrow-circle:hover {
-    @apply border-white bg-white/20 shadow-lg;
+  .btn-arrow-circle:hover::before {
+    content: '';
+    @apply absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-all duration-500;
   }
 }

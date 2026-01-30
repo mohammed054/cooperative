@@ -47,7 +47,7 @@ const Navbar = () => {
             whileHover={{ scale: 1.05 }}
           >
             <img 
-              src="/images/logo.webp" 
+              src="/images/logo.svg" 
               alt="Event Rentals Logo" 
               className="h-10 w-auto"
               style={{ maxHeight: '48px' }}
@@ -73,15 +73,15 @@ const Navbar = () => {
                  transition={{ duration: 0.3, delay: index * 0.1 }}
                >
                    {item.isButton && <FaPhoneAlt className="inline mr-2 text-white" />}
-                   {!item.isButton && (
-                     <motion.span
-                       className="inline-block"
-                       whileHover={{ rotate: 135 }}
-                       transition={{ duration: 0.3 }}
-                     >
-                       +
-                     </motion.span>
-                   )}
+                    {!item.isButton && (
+                      <motion.span
+                        className="inline-block text-lg font-bold leading-none"
+                        whileHover={{ rotate: 135 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        +
+                      </motion.span>
+                    )}
                  {item.label}
                </motion.button>
             ))}
