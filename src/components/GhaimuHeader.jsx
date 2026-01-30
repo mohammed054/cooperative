@@ -100,7 +100,7 @@ const GhaimuHeader = () => {
                 key={item.label}
                 onClick={() => scrollToSection(item.section)}
                 className={`
-                  px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2
+                  px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center
                   ${item.isButton 
                     ? scrolled 
                       ? 'bg-primary-accent text-white hover:bg-primary-accent/90' 
@@ -116,14 +116,16 @@ const GhaimuHeader = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <motion.span 
-                  className="inline-block text-xl font-bold leading-none w-5 h-5 flex items-center justify-center" 
-                  whileHover={{ rotate: 45 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  +
-                </motion.span>
                 {item.label}
+                {!item.isButton && (
+                  <motion.span 
+                    className="inline-block text-xl font-bold leading-none w-5 h-5 flex items-center justify-center ml-2" 
+                    whileHover={{ rotate: 135 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    +
+                  </motion.span>
+                )}
               </motion.button>
             ))}
 
