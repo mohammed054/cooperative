@@ -8,7 +8,7 @@ export default {
     extend: {
       colors: {
         'primary-text': 'rgb(78, 79, 104)',      // Primary text color
-        'primary-accent': '#64B5F6',            // Light blue from logo
+        'primary-accent': 'rgb(45, 46, 64)',    // Soft charcoal for CTAs
         'micro-accent': 'rgb(225, 145, 188)',    // Pink for micro-elements only
         'bg-main': '#ffffff',                   // Main white background
         'bg-muted': '#f6f7f9',                  // Alternate sections

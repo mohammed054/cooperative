@@ -5,7 +5,7 @@
 
 :root {
   --color-primary-text: rgb(78, 79, 104);
-  --color-primary-accent: #64B5F6;
+  --color-primary-accent: rgb(45, 46, 64);
   --color-micro-accent: rgb(225, 145, 188);
   --color-bg-main: #ffffff;
   --color-bg-muted: #f6f7f9;
@@ -107,7 +107,7 @@
   }
   
   .shadow-corporate {
-    box-shadow: 0 4px 20px rgba(100, 181, 246, 0.15);
+    box-shadow: 0 4px 20px rgba(45, 46, 64, 0.15);
   }
   
   .shadow-accent {
