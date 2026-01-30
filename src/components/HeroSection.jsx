@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import backgroundVideo from '../assets/videos/background.mp4';
 
 const HeroSection = () => {
   const [ref, inView] = useInView({
@@ -21,8 +22,19 @@ const HeroSection = () => {
       ref={ref}
       className="relative w-screen h-screen flex items-center justify-center bg-ghaimuae-primary overflow-hidden"
     >
-      {/* Background Subtle Pattern/Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-ghaimuae-primary via-ghaimuae-primary to-ghaimuae-dark-gray opacity-50" />
+      {/* Background Video */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+      >
+        <source src={backgroundVideo} type="video/mp4" />
+      </video>
+      
+      {/* Dark Overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/40" />
       
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
