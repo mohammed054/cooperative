@@ -94,7 +94,7 @@ const ClientTrust = () => {
     <section 
       id="client-trust" 
       ref={ref}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ghaimu-white to-ghaimu-light-gray py-20"
+      className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ghaimuae-white to-ghaimuae-light-gray py-20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Title */}
@@ -104,10 +104,10 @@ const ClientTrust = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-20"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ghaimu-primary mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ghaimuae-primary mb-6">
             Client Trust & Success
           </h2>
-          <p className="text-xl text-ghaimu-dark-gray max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-ghaimuae-dark-gray max-w-3xl mx-auto leading-relaxed">
             Our metrics reflect our commitment to excellence. Every number represents a promise kept and a relationship built on trust.
           </p>
         </motion.div>
@@ -122,7 +122,7 @@ const ClientTrust = () => {
               transition={{ duration: 0.6, delay: stat.delay }}
               className="text-center group"
             >
-              <div className="bg-ghaimu-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-ghaimu-light-gray group-hover:border-ghaimu-primary/30">
+              <div className="bg-ghaimuae-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-ghaimuae-light-gray group-hover:border-ghaimuae-primary/30">
                 {/* Icon */}
                 <motion.div
                   initial={{ scale: 0 }}
@@ -139,7 +139,7 @@ const ClientTrust = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: inView ? 1 : 0 }}
                   transition={{ duration: 0.6, delay: stat.delay + 0.3 }}
-                  className="text-4xl lg:text-5xl font-bold text-ghaimu-primary mb-2"
+                  className="text-4xl lg:text-5xl font-bold text-ghaimuae-primary mb-2"
                 >
                   {stat.number.includes('+') ? (
                     <>
@@ -173,7 +173,7 @@ const ClientTrust = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: inView ? 1 : 0 }}
                   transition={{ duration: 0.6, delay: stat.delay + 0.4 }}
-                  className="text-xl font-semibold text-ghaimu-dark-gray mb-3"
+                  className="text-xl font-semibold text-ghaimuae-dark-gray mb-3"
                 >
                   {stat.label}
                 </motion.h3>
@@ -183,7 +183,7 @@ const ClientTrust = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: inView ? 1 : 0 }}
                   transition={{ duration: 0.6, delay: stat.delay + 0.5 }}
-                  className="text-ghaimu-dark-gray/80 text-sm leading-relaxed"
+                  className="text-ghaimuae-dark-gray/80 text-sm leading-relaxed"
                 >
                   {stat.description}
                 </motion.p>
@@ -197,9 +197,9 @@ const ClientTrust = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 30 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="bg-ghaimu-primary rounded-3xl p-8 lg:p-12"
+          className="bg-ghaimuae-primary rounded-3xl p-8 lg:p-12"
         >
-          <h3 className="text-2xl lg:text-3xl font-bold text-ghaimu-white text-center mb-12">
+          <h3 className="text-2xl lg:text-3xl font-bold text-ghaimuae-white text-center mb-12">
             Our Impact & Achievements
           </h3>
           
@@ -210,9 +210,9 @@ const ClientTrust = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: inView ? 1 : 0, scale: inView ? 1 : 0.9 }}
                 transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
-                className="text-center text-ghaimu-white"
+                className="text-center text-ghaimuae-white"
               >
-                <div className="bg-ghaimu-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-ghaimu-white/20 transition-all duration-300">
+                <div className="bg-ghaimuae-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-ghaimuae-white/20 transition-all duration-300">
                   <h4 className="text-lg font-semibold mb-2">{achievement.title}</h4>
                   <div className="text-3xl lg:text-4xl font-bold mb-1">
                     <CounterAnimation 
@@ -222,7 +222,7 @@ const ClientTrust = () => {
                     />
                     <span className="text-xl ml-1">{achievement.unit}</span>
                   </div>
-                  <p className="text-ghaimu-light-gray text-sm mt-2">
+                  <p className="text-ghaimuae-light-gray text-sm mt-2">
                     {achievement.description}
                   </p>
                 </div>
@@ -238,7 +238,7 @@ const ClientTrust = () => {
           transition={{ duration: 0.8, delay: 1 }}
           className="mt-16 text-center"
         >
-          <div className="flex flex-wrap justify-center items-center gap-8 text-ghaimu-dark-gray/60">
+          <div className="flex flex-wrap justify-center items-center gap-8 text-ghaimuae-dark-gray/60">
             <div className="flex items-center">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
               <span>ISO Certified</span>
@@ -260,7 +260,7 @@ const ClientTrust = () => {
 
         {/* Scroll Indicator */}
         <motion.p 
-          className="text-center text-ghaimu-dark-gray/70 mt-16"
+          className="text-center text-ghaimuae-dark-gray/70 mt-16"
           initial={{ opacity: 0 }}
           animate={{ opacity: inView ? 1 : 0 }}
           transition={{ duration: 0.8, delay: 1.2 }}

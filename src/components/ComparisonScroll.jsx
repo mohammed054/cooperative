@@ -17,7 +17,7 @@ const ComparisonScroll = () => {
         features: ["Large initial investment", "Hidden maintenance fees", "Complex pricing structure", "Limited ROI tracking"],
         icon: "💰"
       },
-      ghaimu: {
+      ghaimuae: {
         description: "Predictable costs with transparent pricing model",
         features: ["Fixed subscription model", "No hidden fees", "Clear ROI metrics", "Scalable pricing"],
         icon: "📈"
@@ -30,7 +30,7 @@ const ComparisonScroll = () => {
         features: ["6-12 month setup", "Complex installation", "Extended training periods", "Slow issue resolution"],
         icon: "🐌"
       },
-      ghaimu: {
+      ghaimuae: {
         description: "Rapid deployment with immediate value realization",
         features: ["Weeks, not months", "Plug-and-play setup", "Instant onboarding", "24/7 support"],
         icon: "⚡"
@@ -43,7 +43,7 @@ const ComparisonScroll = () => {
         features: ["Regular outages", "Emergency fixes only", "Limited monitoring", "No proactive support"],
         icon: "⚠️"
       },
-      ghaimu: {
+      ghaimuae: {
         description: "99.9% uptime with predictive maintenance",
         features: ["Guaranteed uptime", "Proactive monitoring", "Preventive maintenance", "Real-time alerts"],
         icon: "✅"
@@ -56,7 +56,7 @@ const ComparisonScroll = () => {
         features: ["Business hours only", "Long wait times", "Generic solutions", "No dedicated support"],
         icon: "📞"
       },
-      ghaimu: {
+      ghaimuae: {
         description: "24/7 dedicated support with personalized service",
         features: ["24/7 availability", "Instant response", "Custom solutions", "Dedicated account manager"],
         icon: "🎯"
@@ -69,7 +69,7 @@ const ComparisonScroll = () => {
         features: ["Fixed capacity", "Expensive upgrades", "Complex scaling", "Performance degradation"],
         icon: "📦"
       },
-      ghaimu: {
+      ghaimuae: {
         description: "Infinite scalability with elastic infrastructure",
         features: ["Auto-scaling", "Instant upgrades", "Seamless expansion", "Consistent performance"],
         icon: "🚀"
@@ -101,7 +101,7 @@ const ComparisonScroll = () => {
     <section 
       id="comparison" 
       ref={ref}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ghaimu-primary to-ghaimu-dark-gray py-20"
+      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ghaimuaeae-primary to-ghaimuaeae-dark-gray py-20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Title */}
@@ -111,10 +111,10 @@ const ComparisonScroll = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ghaimu-white mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ghaimuaeae-white mb-4">
             Detailed Comparison
           </h2>
-          <p className="text-xl text-ghaimu-light-gray max-w-3xl mx-auto">
+          <p className="text-xl text-ghaimuaeae-light-gray max-w-3xl mx-auto">
             Each scroll reveals a new comparison. See how GHAIM UAE transforms every aspect of your business operations.
           </p>
         </motion.div>
@@ -134,18 +134,18 @@ const ComparisonScroll = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-ghaimu-white/10 backdrop-blur-sm rounded-2xl p-8 lg:p-12 border border-ghaimu-white/20"
+              className="bg-ghaimuaeae-white/10 backdrop-blur-sm rounded-2xl p-8 lg:p-12 border border-ghaimuaeae-white/20"
             >
               <div className="flex items-center mb-6">
                 <span className="text-4xl mr-4">{currentComparison.traditional.icon}</span>
-                <h3 className="text-2xl lg:text-3xl font-bold text-ghaimu-white">
+                <h3 className="text-2xl lg:text-3xl font-bold text-ghaimuaeae-white">
                   Traditional
                 </h3>
               </div>
-              <h4 className="text-xl font-semibold text-ghaimu-light-gray mb-6">
+              <h4 className="text-xl font-semibold text-ghaimuaeae-light-gray mb-6">
                 {currentComparison.title}
               </h4>
-              <p className="text-ghaimu-light-gray mb-8 leading-relaxed">
+              <p className="text-ghaimuaeae-light-gray mb-8 leading-relaxed">
                 {currentComparison.traditional.description}
               </p>
               <ul className="space-y-4">
@@ -158,7 +158,7 @@ const ComparisonScroll = () => {
                     className="flex items-center"
                   >
                     <div className="w-2 h-2 bg-red-400 rounded-full mr-3"></div>
-                    <span className="text-ghaimu-light-gray">{feature}</span>
+                    <span className="text-ghaimuaeae-light-gray">{feature}</span>
                   </motion.li>
                 ))}
               </ul>
@@ -169,22 +169,22 @@ const ComparisonScroll = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-ghaimu-white rounded-2xl p-8 lg:p-12 shadow-2xl"
+              className="bg-ghaimuaeae-white rounded-2xl p-8 lg:p-12 shadow-2xl"
             >
               <div className="flex items-center mb-6">
-                <span className="text-4xl mr-4">{currentComparison.ghaimu.icon}</span>
-                <h3 className="text-2xl lg:text-3xl font-bold text-ghaimu-primary">
+                <span className="text-4xl mr-4">{currentComparison.ghaimuae.icon}</span>
+                <h3 className="text-2xl lg:text-3xl font-bold text-ghaimuaeae-primary">
                   GHAIM UAE
                 </h3>
               </div>
-              <h4 className="text-xl font-semibold text-ghaimu-dark-gray mb-6">
+              <h4 className="text-xl font-semibold text-ghaimuaeae-dark-gray mb-6">
                 {currentComparison.title}
               </h4>
-              <p className="text-ghaimu-dark-gray mb-8 leading-relaxed">
-                {currentComparison.ghaimu.description}
+              <p className="text-ghaimuaeae-dark-gray mb-8 leading-relaxed">
+                {currentComparison.ghaimuae.description}
               </p>
               <ul className="space-y-4">
-                {currentComparison.ghaimu.features.map((feature, index) => (
+                {currentComparison.ghaimuae.features.map((feature, index) => (
                   <motion.li
                     key={index}
                     initial={{ opacity: 0, x: 20 }}
@@ -193,7 +193,7 @@ const ComparisonScroll = () => {
                     className="flex items-center"
                   >
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                    <span className="text-ghaimu-dark-gray">{feature}</span>
+                    <span className="text-ghaimuaeae-dark-gray">{feature}</span>
                   </motion.li>
                 ))}
               </ul>
@@ -207,7 +207,7 @@ const ComparisonScroll = () => {
             <motion.div
               key={index}
               className={`h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex ? 'w-8 bg-ghaimu-white' : 'w-2 bg-ghaimu-white/30'
+                index === currentIndex ? 'w-8 bg-ghaimuaeae-white' : 'w-2 bg-ghaimuaeae-white/30'
               }`}
               whileHover={{ scale: 1.2 }}
             />
@@ -216,7 +216,7 @@ const ComparisonScroll = () => {
 
         {/* Scroll Instruction */}
         <motion.p 
-          className="text-center text-ghaimu-light-gray mt-8"
+          className="text-center text-ghaimuaeae-light-gray mt-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: inView ? 1 : 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}

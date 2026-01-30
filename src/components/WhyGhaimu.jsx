@@ -135,9 +135,9 @@ const WhyGhaimu = () => {
 
   return (
     <section 
-      id="why-ghaimu" 
+      id="why-ghaimuae" 
       ref={ref}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ghaimu-light-gray to-ghaimu-white py-20"
+      className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ghaimuaeae-light-gray to-ghaimuaeae-white py-20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Title */}
@@ -147,10 +147,10 @@ const WhyGhaimu = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-20"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ghaimu-primary mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ghaimuaeae-primary mb-6">
             Why GHAIM UAE
           </h2>
-          <p className="text-xl text-ghaimu-dark-gray max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-ghaimuaeae-dark-gray max-w-3xl mx-auto leading-relaxed">
             Confident, professional, and results-driven. These are the pillars that make us the preferred choice for businesses seeking excellence.
           </p>
         </motion.div>
@@ -173,7 +173,7 @@ const WhyGhaimu = () => {
               className="group relative"
             >
               {/* Card */}
-              <div className="bg-ghaimu-white rounded-2xl p-8 lg:p-10 shadow-lg hover:shadow-2xl transition-all duration-300 border border-ghaimu-light-gray">
+              <div className="bg-ghaimuaeae-white rounded-2xl p-8 lg:p-10 shadow-lg hover:shadow-2xl transition-all duration-300 border border-ghaimuaeae-light-gray">
                 {/* Icon and Number */}
                 <div className="flex items-center mb-6">
                   <motion.div
@@ -183,7 +183,7 @@ const WhyGhaimu = () => {
                   >
                     {strength.icon}
                   </motion.div>
-                  <div className="text-3xl lg:text-4xl font-bold text-ghaimu-primary">
+                  <div className="text-3xl lg:text-4xl font-bold text-ghaimuaeae-primary">
                     <CounterAnimation inView={strength.inView} delay={strength.delay}>
                       {strength.number}
                     </CounterAnimation>
@@ -191,12 +191,12 @@ const WhyGhaimu = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl lg:text-2xl font-bold text-ghaimu-dark-gray mb-4 group-hover:text-ghaimu-primary transition-colors duration-300">
+                <h3 className="text-xl lg:text-2xl font-bold text-ghaimuaeae-dark-gray mb-4 group-hover:text-ghaimuaeae-primary transition-colors duration-300">
                   {strength.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-ghaimu-dark-gray/80 leading-relaxed">
+                <p className="text-ghaimuaeae-dark-gray/80 leading-relaxed">
                   {strength.description}
                 </p>
 
@@ -205,12 +205,12 @@ const WhyGhaimu = () => {
                   initial={{ width: 0 }}
                   animate={{ width: strength.inView ? '100%' : 0 }}
                   transition={{ duration: 0.8, delay: strength.delay + 0.3 }}
-                  className="h-1 bg-ghaimu-primary rounded-full mt-6"
+                  className="h-1 bg-ghaimuaeae-primary rounded-full mt-6"
                 />
               </div>
 
               {/* Hover Glow Effect */}
-              <div className="absolute inset-0 bg-ghaimu-primary/5 rounded-2xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-ghaimuaeae-primary/5 rounded-2xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </motion.div>
           ))}
         </div>
@@ -222,11 +222,11 @@ const WhyGhaimu = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="mt-20 text-center"
         >
-          <div className="bg-ghaimu-primary rounded-2xl p-8 lg:p-12">
-            <h3 className="text-2xl lg:text-3xl font-bold text-ghaimu-white mb-4">
+          <div className="bg-ghaimuaeae-primary rounded-2xl p-8 lg:p-12">
+            <h3 className="text-2xl lg:text-3xl font-bold text-ghaimuaeae-white mb-4">
               No Marketing Fluff, Just Results
             </h3>
-            <p className="text-lg lg:text-xl text-ghaimu-light-gray leading-relaxed max-w-4xl mx-auto">
+            <p className="text-lg lg:text-xl text-ghaimuaeae-light-gray leading-relaxed max-w-4xl mx-auto">
               We believe in delivering measurable outcomes rather than making empty promises. 
               Our success is measured by your growth, and every solution we provide is designed 
               to create tangible value for your business.
@@ -236,7 +236,7 @@ const WhyGhaimu = () => {
 
         {/* Scroll Indicator */}
         <motion.p 
-          className="text-center text-ghaimu-dark-gray/70 mt-12"
+          className="text-center text-ghaimuaeae-dark-gray/70 mt-12"
           initial={{ opacity: 0 }}
           animate={{ opacity: inView ? 1 : 0 }}
           transition={{ duration: 0.8, delay: 1 }}

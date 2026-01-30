@@ -19,10 +19,10 @@ const HeroSection = () => {
     <section 
       id="hero" 
       ref={ref}
-      className="relative w-screen h-screen flex items-center justify-center bg-ghaimu-primary overflow-hidden"
+      className="relative w-screen h-screen flex items-center justify-center bg-ghaimuae-primary overflow-hidden"
     >
       {/* Background Subtle Pattern/Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-ghaimu-primary via-ghaimu-primary to-ghaimu-dark-gray opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-ghaimuae-primary via-ghaimuae-primary to-ghaimuae-dark-gray opacity-50" />
       
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -33,7 +33,7 @@ const HeroSection = () => {
         >
            {/* Main Headline */}
            <motion.h1 
-             className="text-3xl md:text-4xl lg:text-5xl font-bold text-ghaimu-white mb-12 leading-tight max-w-3xl mx-auto"
+             className="text-3xl md:text-4xl lg:text-5xl font-bold text-ghaimuae-white mb-12 leading-tight max-w-3xl mx-auto"
              initial={{ opacity: 0, y: 30 }}
              animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 30 }}
              transition={{ duration: 0.8, delay: 0.2 }}

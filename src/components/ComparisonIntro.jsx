@@ -12,7 +12,7 @@ const ComparisonIntro = () => {
     <section 
       id="comparison-intro" 
       ref={ref}
-      className="min-h-screen flex items-center justify-center bg-ghaimu-light-gray"
+      className="min-h-screen flex items-center justify-center bg-ghaimuae-light-gray"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -23,21 +23,21 @@ const ComparisonIntro = () => {
         >
           {/* Main Title */}
           <motion.h2 
-            className="text-4xl md:text-6xl lg:text-7xl font-bold text-ghaimu-primary mb-8"
+            className="text-4xl md:text-6xl lg:text-7xl font-bold text-ghaimuae-primary mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: inView ? 1 : 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             Traditional Solutions
             <br />
-            <span className="text-ghaimu-dark-gray">vs</span>
+            <span className="text-ghaimuae-dark-gray">vs</span>
             <br />
             GHAIM UAE
           </motion.h2>
 
           {/* Subtitle */}
           <motion.p 
-            className="text-xl md:text-2xl text-ghaimu-dark-gray mb-16 max-w-4xl mx-auto leading-relaxed"
+            className="text-xl md:text-2xl text-ghaimuae-dark-gray mb-16 max-w-4xl mx-auto leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: inView ? 1 : 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -54,46 +54,46 @@ const ComparisonIntro = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             {/* Traditional Column */}
-            <div className="bg-ghaimu-white p-8 rounded-lg shadow-lg">
-              <h3 className="text-2xl font-bold text-ghaimu-dark-gray mb-4">Traditional Approach</h3>
+            <div className="bg-ghaimuae-white p-8 rounded-lg shadow-lg">
+              <h3 className="text-2xl font-bold text-ghaimuae-dark-gray mb-4">Traditional Approach</h3>
               <div className="space-y-4">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-ghaimu-primary rounded-full mr-3"></div>
-                  <span className="text-ghaimu-dark-gray">Limited scalability</span>
+                  <div className="w-3 h-3 bg-ghaimuae-primary rounded-full mr-3"></div>
+                  <span className="text-ghaimuae-dark-gray">Limited scalability</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-ghaimu-primary rounded-full mr-3"></div>
-                  <span className="text-ghaimu-dark-gray">Complex integration</span>
+                  <div className="w-3 h-3 bg-ghaimuae-primary rounded-full mr-3"></div>
+                  <span className="text-ghaimuae-dark-gray">Complex integration</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-ghaimu-primary rounded-full mr-3"></div>
-                  <span className="text-ghaimu-dark-gray">Higher operational costs</span>
+                  <div className="w-3 h-3 bg-ghaimuae-primary rounded-full mr-3"></div>
+                  <span className="text-ghaimuae-dark-gray">Higher operational costs</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-ghaimu-primary rounded-full mr-3"></div>
-                  <span className="text-ghaimu-dark-gray">Extended implementation time</span>
+                  <div className="w-3 h-3 bg-ghaimuae-primary rounded-full mr-3"></div>
+                  <span className="text-ghaimuae-dark-gray">Extended implementation time</span>
                 </div>
               </div>
             </div>
 
             {/* GHAIM UAE Column */}
-            <div className="bg-ghaimu-primary p-8 rounded-lg shadow-lg text-ghaimu-white">
+            <div className="bg-ghaimuae-primary p-8 rounded-lg shadow-lg text-ghaimuae-white">
               <h3 className="text-2xl font-bold mb-4">GHAIM UAE Advantage</h3>
               <div className="space-y-4">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-ghaimu-white rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-ghaimuae-white rounded-full mr-3"></div>
                   <span>Infinite scalability</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-ghaimu-white rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-ghaimuae-white rounded-full mr-3"></div>
                   <span>Seamless integration</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-ghaimu-white rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-ghaimuae-white rounded-full mr-3"></div>
                   <span>Optimized cost efficiency</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-ghaimu-white rounded-full mr-3"></div>
+                  <div className="w-3 h-3 bg-ghaimuae-white rounded-full mr-3"></div>
                   <span>Rapid deployment</span>
                 </div>
               </div>
@@ -107,18 +107,18 @@ const ComparisonIntro = () => {
             animate={{ opacity: inView ? 1 : 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
           >
-            <div className="h-px bg-ghaimu-primary w-24"></div>
+            <div className="h-px bg-ghaimuae-primary w-24"></div>
             <motion.div 
-              className="w-4 h-4 bg-ghaimu-primary rounded-full"
+              className="w-4 h-4 bg-ghaimuae-primary rounded-full"
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             ></motion.div>
-            <div className="h-px bg-ghaimu-primary w-24"></div>
+            <div className="h-px bg-ghaimuae-primary w-24"></div>
           </motion.div>
 
           {/* Scroll Indicator */}
           <motion.p 
-            className="text-ghaimu-primary mt-8 font-medium"
+            className="text-ghaimuae-primary mt-8 font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: inView ? 1 : 0 }}
             transition={{ duration: 0.8, delay: 1 }}

@@ -15,6 +15,11 @@ export default {
         'bg-soft': '#fafafa',                   // Soft contrast sections
         'text-primary': 'rgb(78, 79, 104)',      // Primary text
         'text-muted': '#6B7280',                 // Muted text
+        // GHAIM UAE brand colors
+        'ghaimuae-primary': '#1C1C1C',          // Primary dark color for scrolled background
+        'ghaimuae-white': '#FFFFFF',            // White color for button backgrounds
+        'ghaimuae-dark-gray': '#4E4F68',        // Dark gray for primary text when scrolled
+        'ghaimuae-light-gray': '#6B7280',       // Light gray for non-hovered nav links when scrolled
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],

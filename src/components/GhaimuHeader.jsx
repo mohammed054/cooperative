@@ -50,10 +50,10 @@ const GhaimuHeader = () => {
 
   const navItems = [
     { label: 'Services', section: 'services' },
-    { label: 'Solutions', section: 'solutions' },
-    { label: 'Comparison', section: 'comparison' },
-    { label: 'About', section: 'why-ghaimu' },
-    { label: 'Contact Us', section: 'contact', isButton: true },
+    { label: 'Rentals', section: 'rentals' },
+    { label: 'Process', section: 'process' },
+    { label: 'Coverage', section: 'coverage' },
+    { label: 'Get Started', section: 'get-started', isButton: true },
   ];
 
   return (
@@ -69,7 +69,7 @@ const GhaimuHeader = () => {
       }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
         scrolled 
-          ? 'bg-ghaimu-primary/90 backdrop-blur-md shadow-xl border-b border-white/10' 
+          ? 'bg-white shadow-xl border-b border-gray-200' 
           : 'bg-transparent'
       }`}
     >
@@ -86,6 +86,11 @@ const GhaimuHeader = () => {
               alt="GHAIM UAE" 
               className="h-10 w-auto"
             />
+            <span className={`ml-3 text-xl font-bold transition-colors duration-300 ${
+              scrolled ? 'text-ghaimuae-primary' : 'text-white'
+            }`}>
+              GHAIM
+            </span>
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -95,10 +100,14 @@ const GhaimuHeader = () => {
                 key={item.label}
                 onClick={() => scrollToSection(item.section)}
                 className={`
-                  px-4 py-2 rounded-lg font-medium transition-all duration-200
+                  px-4 py-2 rounded-lg font-medium transition-all duration-300
                   ${item.isButton 
-                    ? 'bg-ghaimu-white text-ghaimu-primary hover:bg-opacity-90' 
-                    : 'text-ghaimu-white hover:bg-ghaimu-white/10'
+                    ? scrolled 
+                      ? 'bg-primary-accent text-white hover:bg-primary-accent/90' 
+                      : 'bg-ghaimuae-white text-primary-accent hover:bg-opacity-90'
+                    : scrolled
+                      ? 'text-ghaimuae-light-gray hover:text-black hover:bg-ghaimuae-light-gray/10'
+                      : 'text-white hover:bg-white/10'
                   }
                 `}
                 whileHover={{ scale: 1.05 }}
@@ -110,12 +119,31 @@ const GhaimuHeader = () => {
                 {item.label}
               </motion.button>
             ))}
+            
+            {/* Plus Button - Far Right */}
+            <motion.button
+              className={`
+                w-8 h-8 flex items-center justify-center rounded-lg 
+                transition-all duration-300 ml-2
+                ${scrolled ? 'text-ghaimuae-primary' : 'text-white'}
+                hover:bg-black/10
+              `}
+              whileHover={{ rotate: 135 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </motion.button>
           </nav>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
-              className="text-ghaimu-white p-2 hover:bg-ghaimu-white/10 rounded-lg transition-colors"
+              className={`p-2 hover:bg-white/10 rounded-lg transition-colors ${
+                scrolled ? 'text-ghaimuae-primary' : 'text-white'
+              }`}
               onClick={() => {
                 // Mobile menu toggle logic here
               }}

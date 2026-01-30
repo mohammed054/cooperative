@@ -105,7 +105,7 @@ const GhaimuProcessSection = () => {
     <section 
       id="process" 
       ref={sectionRef}
-      className="min-h-screen flex items-center justify-center bg-ghaimu-primary py-20"
+      className="min-h-screen flex items-center justify-center bg-ghaimuae-primary py-20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Title */}
@@ -115,10 +115,10 @@ const GhaimuProcessSection = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ghaimu-white mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-ghaimuae-white mb-6">
             Our Process
           </h2>
-          <p className="text-xl text-ghaimu-light-gray max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-ghaimuae-light-gray max-w-3xl mx-auto leading-relaxed">
             Each scroll reveals a new step in our proven methodology. From consultation to ongoing support, we ensure excellence at every stage.
           </p>
         </motion.div>
@@ -131,7 +131,7 @@ const GhaimuProcessSection = () => {
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-ghaimu-white"
+            className="text-ghaimuae-white"
           >
             {/* Step Number and Title */}
             <div className="flex items-center mb-8">
@@ -139,7 +139,7 @@ const GhaimuProcessSection = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-6xl lg:text-8xl font-bold text-ghaimu-white/20 mr-6"
+                className="text-6xl lg:text-8xl font-bold text-ghaimuae-white/20 mr-6"
               >
                 {currentStepData.number}
               </motion.div>
@@ -156,7 +156,7 @@ const GhaimuProcessSection = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
-                  className="flex items-center text-ghaimu-light-gray"
+                  className="flex items-center text-ghaimuae-light-gray"
                 >
                   <span className="text-2xl mr-2">{currentStepData.icon}</span>
                   <span>Duration: {currentStepData.duration}</span>
@@ -169,7 +169,7 @@ const GhaimuProcessSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-lg lg:text-xl text-ghaimu-light-gray mb-8 leading-relaxed"
+              className="text-lg lg:text-xl text-ghaimuae-light-gray mb-8 leading-relaxed"
             >
               {currentStepData.description}
             </motion.p>
@@ -189,8 +189,8 @@ const GhaimuProcessSection = () => {
                   transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
                   className="flex items-center"
                 >
-                  <div className="w-3 h-3 bg-ghaimu-light-gray rounded-full mr-4"></div>
-                  <span className="text-ghaimu-light-gray">{detail}</span>
+                  <div className="w-3 h-3 bg-ghaimuae-light-gray rounded-full mr-4"></div>
+                  <span className="text-ghaimuae-light-gray">{detail}</span>
                 </motion.div>
               ))}
             </motion.div>
@@ -245,7 +245,7 @@ const GhaimuProcessSection = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.5 }}
-                  className="text-2xl font-bold text-ghaimu-white text-center"
+                  className="text-2xl font-bold text-ghaimuae-white text-center"
                 >
                   {currentStepData.title}
                 </motion.div>
@@ -253,7 +253,7 @@ const GhaimuProcessSection = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.7 }}
-                  className="text-ghaimu-light-gray text-center mt-2"
+                  className="text-ghaimuae-light-gray text-center mt-2"
                 >
                   Step {currentStep + 1} of {steps.length}
                 </motion.div>
@@ -276,8 +276,8 @@ const GhaimuProcessSection = () => {
               }}
               className={`h-3 rounded-full transition-all duration-300 ${
                 index === currentStep 
-                  ? 'w-12 bg-ghaimu-white' 
-                  : 'w-3 bg-ghaimu-white/30 hover:bg-ghaimu-white/50'
+                  ? 'w-12 bg-ghaimuae-white' 
+                  : 'w-3 bg-ghaimuae-white/30 hover:bg-ghaimuae-white/50'
               }`}
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.9 }}
@@ -299,8 +299,8 @@ const GhaimuProcessSection = () => {
               }}
               className={`text-sm font-medium transition-all duration-300 ${
                 index === currentStep 
-                  ? 'text-ghaimu-white font-semibold' 
-                  : 'text-ghaimu-light-gray/60 hover:text-ghaimu-light-gray'
+                  ? 'text-ghaimuae-white font-semibold' 
+                  : 'text-ghaimuae-light-gray/60 hover:text-ghaimuae-light-gray'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -312,7 +312,7 @@ const GhaimuProcessSection = () => {
 
         {/* Scroll Instruction */}
         <motion.p 
-          className="text-center text-ghaimu-light-gray/70 mt-12"
+          className="text-center text-ghaimuae-light-gray/70 mt-12"
           initial={{ opacity: 0 }}
           animate={{ opacity: inView ? 1 : 0 }}
           transition={{ duration: 0.8, delay: 1 }}
