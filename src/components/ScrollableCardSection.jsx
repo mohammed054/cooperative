@@ -50,6 +50,11 @@ const ScrollableCardSection = () => {
     });
   };
 
+  // Reset scroll to top when component mounts or page reloads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Handle vertical to horizontal scroll conversion
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -64,8 +69,8 @@ const ScrollableCardSection = () => {
       
       e.preventDefault();
       
-      // Convert vertical scroll to horizontal
-      const scrollAmount = e.deltaY;
+      // Convert vertical scroll to horizontal (left direction)
+      const scrollAmount = e.deltaY * 2; // Multiply for better responsiveness
       scrollContainer.scrollLeft += scrollAmount;
 
       // Check if we've reached the end
@@ -105,10 +110,40 @@ const ScrollableCardSection = () => {
 
     // Add event listener
     section.addEventListener('wheel', handleWheel, { passive: false });
+    
+    // Also handle touch events for mobile
+    let touchStartX = 0;
+    let touchStartY = 0;
+    
+    const handleTouchStart = (e) => {
+      if (hasCompletedHorizontalScroll) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+    
+    const handleTouchMove = (e) => {
+      if (hasCompletedHorizontalScroll) return;
+      
+      const touchEndX = e.touches[0].clientX;
+      const touchEndY = e.touches[0].clientY;
+      const deltaX = touchStartX - touchEndX;
+      const deltaY = touchStartY - touchEndY;
+      
+      // If scrolling more vertically than horizontally, prevent default to use our custom logic
+      if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        e.preventDefault();
+        scrollContainer.scrollLeft += deltaY * 2;
+      }
+    };
+
+    scrollContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+    scrollContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     return () => {
       observer.disconnect();
       section.removeEventListener('wheel', handleWheel);
+      scrollContainer.removeEventListener('touchstart', handleTouchStart);
+      scrollContainer.removeEventListener('touchmove', handleTouchMove);
     };
   }, [hasCompletedHorizontalScroll]);
 
