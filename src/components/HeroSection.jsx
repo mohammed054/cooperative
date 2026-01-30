@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import backgroundVideo from '../assets/videos/background.mp4';
+import GetStartedButton from './GetStartedButton';
 
 const HeroSection = () => {
   const [ref, inView] = useInView({
@@ -61,11 +62,10 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
               {/* Primary CTA */}
-              <button className="relative overflow-hidden rounded-full px-10 py-4 bg-primary-accent text-white font-semibold transition-all duration-500 hover:text-gray-200 text-lg shadow-lg">
-                Get Started
-                {/* Hover scrape effect */}
-                <span className="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-all duration-500"></span>
-              </button>
+              <GetStartedButton 
+                className="px-10 py-4 text-lg"
+                onClick={() => scrollToSection('get-started')}
+              />
 
              {/* Secondary CTA - Arrow Only Circle */}
              <button 

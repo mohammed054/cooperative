@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import logo from '../assets/images/logo.webp';
+import GetStartedButton from './GetStartedButton';
 
 const GhaimuHeader = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -97,30 +98,42 @@ const GhaimuHeader = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems.map((item, index) => (
-              <motion.button
-                key={item.label}
-                onClick={() => scrollToSection(item.section)}
-                className={`
-                  px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center
-                  ${item.isButton 
-                    ? scrolled 
-                      ? 'bg-primary-accent text-white hover:bg-primary-accent/90' 
-                      : 'bg-ghaimuae-white text-primary-accent hover:bg-opacity-90'
-                    : scrolled
-                      ? 'text-ghaimuae-light-gray hover:text-black hover:bg-white'
-                      : 'text-white hover:bg-white hover:text-black'
-                  }
-                `}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onHoverStart={() => setHoveredItem(item.label)}
-                onHoverEnd={() => setHoveredItem(null)}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                {item.label}
-                {!item.isButton && (
+              item.isButton && item.label === 'Get Started' ? (
+                <GetStartedButton
+                  key={item.label}
+                  onClick={() => scrollToSection(item.section)}
+                  className="text-sm px-6 py-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                />
+              ) : (
+                <motion.button
+                  key={item.label}
+                  onClick={() => scrollToSection(item.section)}
+                  className={`
+                    px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center
+                    ${item.isButton 
+                      ? scrolled 
+                        ? 'bg-primary-accent text-white hover:bg-primary-accent/90' 
+                        : 'bg-ghaimuae-white text-primary-accent hover:bg-opacity-90'
+                      : scrolled
+                        ? 'text-ghaimuae-light-gray hover:text-black hover:bg-white'
+                        : 'text-white hover:bg-white hover:text-black'
+                    }
+                  `}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onHoverStart={() => setHoveredItem(item.label)}
+                  onHoverEnd={() => setHoveredItem(null)}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  {item.label}
+                  {!item.isButton && (
                   <motion.span 
                     className="inline-block text-xl font-bold leading-none w-5 h-5 flex items-center justify-center ml-2" 
                     animate={{ rotate: hoveredItem === item.label ? 135 : 0 }}
@@ -130,6 +143,7 @@ const GhaimuHeader = () => {
                   </motion.span>
                 )}
               </motion.button>
+              )
             ))}
 
           </nav>

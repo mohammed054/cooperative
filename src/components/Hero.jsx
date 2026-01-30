@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaArrowDown, FaPlay } from 'react-icons/fa';
+import GetStartedButton from './GetStartedButton';
 
 const Hero = () => {
   const [videoLoaded] = useState(false);
@@ -54,14 +55,12 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <motion.button
+            <GetStartedButton
               onClick={() => scrollToSection('rentals')}
-              className="btn-primary hover-lift"
+              className="hover-lift"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-            >
-              Get Started
-            </motion.button>
+            />
 
             <motion.button
               onClick={() => scrollToSection('rentals')}
