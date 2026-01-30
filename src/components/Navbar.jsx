@@ -74,13 +74,9 @@ const Navbar = () => {
                >
                    {item.isButton && <FaPhoneAlt className="inline mr-2 text-white" />}
                     {!item.isButton && (
-                      <motion.span
-                        className="inline-block text-lg font-bold leading-none"
-                        whileHover={{ rotate: 135 }}
-                        transition={{ duration: 0.3 }}
-                      >
+                      <span className="inline-block text-xl font-bold leading-none mr-2">
                         +
-                      </motion.span>
+                      </span>
                     )}
                  {item.label}
                </motion.button>
