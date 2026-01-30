@@ -1,107 +1,65 @@
-import React, { useState } from 'react';
+// src/components/Hero.jsx
+import React from 'react';
 import { motion } from 'framer-motion';
-import { FaArrowDown, FaPlay } from 'react-icons/fa';
+import { FaArrowDown } from 'react-icons/fa';
 import GetStartedButton from './GetStartedButton';
+import backgroundVideo from '../assets/videos/background.mp4'; // replace with your video
 
 const Hero = () => {
-  const [videoLoaded] = useState(false);
-
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <section id="hero" className="relative h-screen overflow-hidden">
-      {/* Background Video Placeholder */}
-      <div className="absolute inset-0">
-        <img
-          src="/images/hero-professional.jpg"
-          alt="Professional corporate event setup with elegant lighting and modern design"
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary-text/40 via-primary-text/60 to-primary-text/80" />
-      </div>
+    <section id="hero" className="relative w-screen h-screen overflow-hidden">
+      {/* Background Video */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+      >
+        <source src={backgroundVideo} type="video/mp4" />
+      </video>
+
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-black/40" />
 
       {/* Content */}
-      <div className="relative z-10 h-full flex items-center justify-center">
-        <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="heading-xl"
-          >
-            Corporate Event Rentals
-            <br />
-            <span className="gradient-corporate">Made Simple</span>
-          </motion.h1>
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 lg:px-8">
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-2xl md:text-3xl lg:text-4xl font-bold text-ghaimuae-primary max-w-3xl mx-auto leading-tight mb-8"
+        >
+          Premium Event Solutions Built for Scale, Precision, and Impact
+        </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-body"
-          >
-            Chairs • AV Equipment • Stands • Full Setup
-          </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+        >
+          <GetStartedButton
+            className="px-10 py-4 text-lg"
+            onClick={() => scrollToSection('scrollable-cards')}
+          />
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          >
-            <GetStartedButton
-              onClick={() => scrollToSection('rentals')}
-              className="hover-lift"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            />
-
-            <motion.button
-              onClick={() => scrollToSection('rentals')}
-              className="btn-outline hover-lift"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaPlay className="inline mr-2" />
-              Watch Demo
-            </motion.button>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Scroll Down Arrow */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
-        onClick={() => scrollToSection('rentals')}
-      >
+        {/* Scroll down arrow */}
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="text-primary-accent text-2xl"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer text-white"
+          onClick={() => scrollToSection('scrollable-cards')}
         >
-          <FaArrowDown />
+          <FaArrowDown size={24} />
         </motion.div>
-      </motion.div>
-
-      {/* Video Play Button Overlay */}
-      <motion.button
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary-accent/80 hover:bg-primary-accent rounded-full p-8 transition-all duration-300"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: videoLoaded ? 0 : 1 }}
-      >
-        <FaPlay className="text-white text-3xl" />
-      </motion.button>
+      </div>
     </section>
   );
 };

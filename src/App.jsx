@@ -1,7 +1,7 @@
 import React from 'react';
 import GhaimuHeader from './components/GhaimuHeader';
-import HeroSection from './components/HeroSection';
-import ScrollableCardSection from './components/ScrollableCardSection';
+import Hero from './components/Hero'; // NEW
+import ScrollableCardSection from './components/ScrollableCardSection'; // NEW
 import SolutionsStack from './components/SolutionsStack';
 import WhyGhaimu from './components/WhyGhaimu';
 import GhaimuProcessSection from './components/GhaimuProcessSection';
@@ -10,11 +10,10 @@ import FinalCta from './components/FinalCta';
 import Footer from './components/Footer';
 
 function App() {
-
   return (
     <div className="App">
       <GhaimuHeader />
-      <HeroSection />
+      <Hero />
       <ScrollableCardSection />
       <SolutionsStack />
       <WhyGhaimu />
