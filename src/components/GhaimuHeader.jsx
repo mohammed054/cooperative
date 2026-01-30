@@ -86,7 +86,7 @@ const GhaimuHeader = () => {
               alt="GHAIM UAE" 
               className="h-10 w-auto"
             />
-            <span className={`ml-3 text-xl font-bold transition-colors duration-300 ${
+            <span className={`ml-3 text-4xl font-bold transition-colors duration-300 ${
               scrolled ? 'text-ghaimuae-primary' : 'text-white'
             }`}>
               GHAIM
@@ -100,7 +100,7 @@ const GhaimuHeader = () => {
                 key={item.label}
                 onClick={() => scrollToSection(item.section)}
                 className={`
-                  px-4 py-2 rounded-lg font-medium transition-all duration-300
+                  px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2
                   ${item.isButton 
                     ? scrolled 
                       ? 'bg-primary-accent text-white hover:bg-primary-accent/90' 
@@ -116,26 +116,17 @@ const GhaimuHeader = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
+                <motion.span 
+                  className="inline-block text-xl font-bold leading-none w-5 h-5 flex items-center justify-center" 
+                  whileHover={{ rotate: 45 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  +
+                </motion.span>
                 {item.label}
               </motion.button>
             ))}
-            
-            {/* Plus Button - Far Right */}
-            <motion.button
-              className={`
-                w-8 h-8 flex items-center justify-center rounded-lg 
-                transition-all duration-300 ml-2
-                ${scrolled ? 'text-ghaimuae-primary' : 'text-white'}
-                hover:bg-black/10
-              `}
-              whileHover={{ rotate: 135 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </motion.button>
+
           </nav>
 
           {/* Mobile Menu Button */}
