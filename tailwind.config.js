@@ -7,15 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        'primary': '#0F172A',       // Deep navy
-        'secondary': '#111827',     // Charcoal 
-        'accent': '#EC4899',       // Light blue accent
-        'white': '#FFFFFF',
-        'light-gray': '#F8FAFC',   // Very light gray
-        'medium-gray': '#64748B',    // Medium gray
-        'dark-gray': '#1E293B',      // Dark gray
-        'corporate-gold': '#FFD700',   // Gold accent
-        'micro-pink': '#E11D48',       // Very limited pink accent
+        'primary': '#4E4F68',       // Charcoal / Navy
+        'accent': '#E191BC',       // Accent Pink (micro-use only)
+        'bg-main': '#FFFFFF',      // Main background
+        'bg-muted': '#F6F7F9',     // Light gray sections
+        'text-primary': '#4E4F68',  // Primary text
+        'text-muted': '#6B7280',    // Muted text
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],

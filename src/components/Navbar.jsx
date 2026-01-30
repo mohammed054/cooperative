@@ -35,7 +35,7 @@ const Navbar = () => {
       transition={{ duration: 0.5 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-sm ${
         scrolled 
-          ? 'bg-primary/95 shadow-corporate' 
+          ? 'bg-white/95 shadow-lg' 
           : 'bg-transparent'
       }`}
     >
@@ -43,10 +43,15 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <motion.div 
-            className="text-white font-bold text-xl accent-text hover-lift"
+            className="hover-lift"
             whileHover={{ scale: 1.05 }}
           >
-            LOGO
+            <img 
+              src="/images/logo.webp" 
+              alt="Event Rentals Logo" 
+              className="h-10 w-auto"
+              style={{ maxHeight: '48px' }}
+            />
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -57,8 +62,8 @@ const Navbar = () => {
                 onClick={() => scrollToSection(item.section)}
                 className={`
                   ${item.isButton 
-                    ? 'btn-secondary' 
-                    : 'nav-item'
+                    ? 'border border-accent text-accent px-8 py-4 font-semibold rounded-full hover:bg-accent hover:text-bg-main transition-all duration-300' 
+                    : 'text-text-primary hover:text-accent px-4 py-2 rounded-lg transition-all duration-300'
                   }
                 `}
                 whileHover={{ scale: 1.05 }}
@@ -67,7 +72,7 @@ const Navbar = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                  {item.isButton && <FaPhoneAlt className="inline mr-2 micro-accent" />}
+                  {item.isButton && <FaPhoneAlt className="inline mr-2 text-accent" />}
                 {item.label}
               </motion.button>
             ))}
@@ -76,7 +81,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
-              className="text-white p-2"
+              className="text-text-primary p-2"
               onClick={() => {
                 // Mobile menu toggle logic here
               }}
