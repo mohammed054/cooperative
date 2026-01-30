@@ -20,6 +20,7 @@ export default {
         'ghaimuae-white': '#FFFFFF',            // White color for button backgrounds
         'ghaimuae-dark-gray': '#4E4F68',        // Dark gray for primary text when scrolled
         'ghaimuae-light-gray': '#6B7280',       // Light gray for non-hovered nav links when scrolled
+        'logo-blue': '#3B82F6',                 // Light blue from logo for primary buttons
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
@@ -28,6 +29,7 @@ export default {
         'fade-in': 'fadeIn 1s ease-in-out',
         'slide-in-left': 'slideInLeft 0.8s ease-out',
         'slide-in-right': 'slideInRight 0.8s ease-out',
+        'scrape': 'scrape 0.7s ease-in-out',
       },
       keyframes: {
         fadeIn: {
@@ -41,6 +43,10 @@ export default {
         slideInRight: {
           '0%': { opacity: '0', transform: 'translateX(50px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        scrape: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
     },
