@@ -33,11 +33,11 @@ const Navbar = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-sm ${
-        scrolled 
-          ? 'bg-white/95 shadow-lg' 
-          : 'bg-transparent'
-      }`}
+       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+         scrolled 
+           ? 'bg-navbar-scrolled shadow-lg' 
+           : 'bg-transparent'
+       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -63,7 +63,7 @@ const Navbar = () => {
                  className={`
                    ${item.isButton 
                      ? 'bg-primary-accent text-white px-8 py-4 font-semibold rounded-full hover:bg-primary-accent/90 transition-all duration-300' 
-                     : 'text-primary-text hover:text-primary-accent px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2'
+                     : 'text-primary-text hover:text-link-hover px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2'
                    }
                  `}
                  whileHover={{ scale: 1.05 }}

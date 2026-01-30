@@ -4,13 +4,14 @@
 @tailwind utilities;
 
 :root {
-  --color-primary-text: rgb(78, 79, 104);
-  --color-primary-accent: rgb(45, 46, 64);
+  --color-primary-text: #1C1C1C;
+  --color-primary-accent: #1C1C1C;
+  --color-link-hover: #000000;
+  --color-navbar-scrolled: #F5F5F5;
   --color-micro-accent: rgb(225, 145, 188);
   --color-bg-main: #ffffff;
   --color-bg-muted: #f6f7f9;
   --color-bg-soft: #fafafa;
-  --color-text-primary: rgb(78, 79, 104);
   --color-text-muted: #6B7280;
 }
 
@@ -58,7 +59,7 @@
   }
   
   .nav-item {
-    @apply text-primary-text hover:text-primary-accent px-4 py-2 rounded-lg transition-all duration-300;
+    @apply text-primary-text hover:text-link-hover px-4 py-2 rounded-lg transition-all duration-300;
   }
   
   .divider-dots {
