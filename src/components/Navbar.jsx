@@ -57,24 +57,33 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item, index) => (
-              <motion.button
-                key={item.label}
-                onClick={() => scrollToSection(item.section)}
-                className={`
-                  ${item.isButton 
-                    ? 'bg-primary-accent text-white px-8 py-4 font-semibold rounded-full hover:bg-primary-accent/90 transition-all duration-300' 
-                    : 'text-primary-text hover:text-primary-accent px-4 py-2 rounded-lg transition-all duration-300'
-                  }
-                `}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                  {item.isButton && <FaPhoneAlt className="inline mr-2 text-white" />}
-                {item.label}
-              </motion.button>
+               <motion.button
+                 key={item.label}
+                 onClick={() => scrollToSection(item.section)}
+                 className={`
+                   ${item.isButton 
+                     ? 'bg-primary-accent text-white px-8 py-4 font-semibold rounded-full hover:bg-primary-accent/90 transition-all duration-300' 
+                     : 'text-primary-text hover:text-primary-accent px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2'
+                   }
+                 `}
+                 whileHover={{ scale: 1.05 }}
+                 whileTap={{ scale: 0.95 }}
+                 initial={{ opacity: 0, y: -20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 0.3, delay: index * 0.1 }}
+               >
+                   {item.isButton && <FaPhoneAlt className="inline mr-2 text-white" />}
+                   {!item.isButton && (
+                     <motion.span
+                       className="inline-block"
+                       whileHover={{ rotate: 135 }}
+                       transition={{ duration: 0.3 }}
+                     >
+                       +
+                     </motion.span>
+                   )}
+                 {item.label}
+               </motion.button>
             ))}
           </div>
 
