@@ -1,5 +1,4 @@
 import React from 'react';
-import { useScrollSnap } from './hooks/useScrollSnap';
 import GhaimuHeader from './components/GhaimuHeader';
 import HeroSection from './components/HeroSection';
 import ComparisonIntro from './components/ComparisonIntro';
@@ -12,18 +11,6 @@ import FinalCta from './components/FinalCta';
 import Footer from './components/Footer';
 
 function App() {
-  const sectionIds = [
-    'hero',
-    'comparison-intro',
-    'comparison',
-    'services',
-    'why-ghaimu',
-    'process',
-    'client-trust',
-    'contact'
-  ];
-
-  useScrollSnap(sectionIds);
 
   return (
     <div className="App">
