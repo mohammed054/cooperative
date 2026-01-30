@@ -1,8 +1,7 @@
 import React from 'react';
 import GhaimuHeader from './components/GhaimuHeader';
 import HeroSection from './components/HeroSection';
-import ComparisonIntro from './components/ComparisonIntro';
-import ComparisonScroll from './components/ComparisonScroll';
+import ScrollableCardSection from './components/ScrollableCardSection';
 import SolutionsStack from './components/SolutionsStack';
 import WhyGhaimu from './components/WhyGhaimu';
 import GhaimuProcessSection from './components/GhaimuProcessSection';
@@ -16,8 +15,7 @@ function App() {
     <div className="App">
       <GhaimuHeader />
       <HeroSection />
-      <ComparisonIntro />
-      <ComparisonScroll />
+      <ScrollableCardSection />
       <SolutionsStack />
       <WhyGhaimu />
       <GhaimuProcessSection />
