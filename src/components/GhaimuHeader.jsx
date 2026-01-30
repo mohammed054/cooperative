@@ -6,6 +6,7 @@ const GhaimuHeader = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [hoveredItem, setHoveredItem] = useState(null);
   const scrollTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -106,12 +107,14 @@ const GhaimuHeader = () => {
                       ? 'bg-primary-accent text-white hover:bg-primary-accent/90' 
                       : 'bg-ghaimuae-white text-primary-accent hover:bg-opacity-90'
                     : scrolled
-                      ? 'text-ghaimuae-light-gray hover:text-black hover:bg-ghaimuae-light-gray/10'
-                      : 'text-white hover:bg-white/10'
+                      ? 'text-ghaimuae-light-gray hover:text-black hover:bg-white'
+                      : 'text-white hover:bg-white hover:text-black'
                   }
                 `}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onHoverStart={() => setHoveredItem(item.label)}
+                onHoverEnd={() => setHoveredItem(null)}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -120,7 +123,7 @@ const GhaimuHeader = () => {
                 {!item.isButton && (
                   <motion.span 
                     className="inline-block text-xl font-bold leading-none w-5 h-5 flex items-center justify-center ml-2" 
-                    whileHover={{ rotate: 135 }}
+                    animate={{ rotate: hoveredItem === item.label ? 135 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
                     +
