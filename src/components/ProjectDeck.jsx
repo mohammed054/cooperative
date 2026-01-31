@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
+// Updated project images
 const projects = [
-  "images/seating.png",
-  "images/av-setup.png",
-  "images/lighting-effects.png"
+  "images/event1.jpg",
+  "images/event2.jpg",
+  "images/event3.jpg"
 ];
 
 const ProjectDeck = () => {

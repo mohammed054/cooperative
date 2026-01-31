@@ -1,48 +1,12 @@
 import React, { useRef, useEffect, useState } from "react";
 
 const cards = [
-  {
-    title: "Event Planning",
-    subtitle: "Organize with precision",
-    description: "Plan your events with precision.",
-    // Path changed to relative for GitHub Pages compatibility
-    img: "images/event-planning.png"
-  },
-  {
-    title: "AV Setup",
-    subtitle: "High-quality tech",
-    description: "High-quality audio-visual equipment.",
-    // Path changed to relative for GitHub Pages compatibility
-    img: "images/av-setup.png"
-  },
-  {
-    title: "Seating & Staging",
-    subtitle: "Custom arrangements",
-    description: "Custom seating arrangements.",
-    // Path changed to relative for GitHub Pages compatibility
-    img: "images/seating.png"
-  },
-  {
-    title: "Lighting & Effects",
-    subtitle: "Set the mood",
-    description: "Mood and theme lighting.",
-    // Path changed to relative for GitHub Pages compatibility
-    img: "images/lighting-effects.png"
-  },
-  {
-    title: "Full Production",
-    subtitle: "End-to-end solutions",
-    description: "End-to-end event solutions.",
-    // Path changed to relative for GitHub Pages compatibility
-    img: "images/full-production.png"
-  },
-  {
-    title: "Always On Time",
-    subtitle: "Precision Scheduling",
-    description: "Never miss a beat—our events run exactly on schedule, every time.",
-    // Path changed to relative for GitHub Pages compatibility
-    img: "images/always-on-time.png"
-  }
+  { title: "Event Planning", subtitle: "Organize with precision", description: "Plan your events with precision.", img: "images/event-planning.png" },
+  { title: "AV Setup", subtitle: "High-quality tech", description: "High-quality audio-visual equipment.", img: "images/av-setup.png" },
+  { title: "Seating & Staging", subtitle: "Custom arrangements", description: "Custom seating arrangements.", img: "images/seating.png" },
+  { title: "Lighting & Effects", subtitle: "Set the mood", description: "Mood and theme lighting.", img: "images/lighting-effects.png" },
+  { title: "Full Production", subtitle: "End-to-end solutions", description: "End-to-end event solutions.", img: "images/full-production.png" },
+  { title: "Always On Time", subtitle: "Precision Scheduling", description: "Never miss a beat—our events run exactly on schedule, every time.", img: "images/always-on-time.png" }
 ];
 
 const ScrollableCardSection = () => {
@@ -60,13 +24,12 @@ const ScrollableCardSection = () => {
       const rect = section.getBoundingClientRect();
       const scrollableHeight = section.offsetHeight - window.innerHeight;
 
-      const progress = Math.min(
-        Math.max(-rect.top / scrollableHeight, 0),
-        1
-      );
+      // Horizontal scroll progress, slightly delayed
+      const offsetStart = 0.02; // 2% delay
+      let progress = (-rect.top / scrollableHeight - offsetStart) / (1 - offsetStart);
+      progress = Math.min(Math.max(progress, 0), 1);
 
       const maxTranslate = track.scrollWidth - window.innerWidth;
-
       setTranslateX(progress * maxTranslate);
     };
 
@@ -77,13 +40,12 @@ const ScrollableCardSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-screen h-[350vh] bg-bg-muted" // increased height for 6 cards
+      className="relative w-screen h-[360vh] bg-bg-muted"
     >
-      {/* Sticky viewport */}
-      <div className="sticky top-0 h-screen flex flex-col">
-        
+      <div className="sticky top-24 h-screen flex flex-col"> {/* move everything down a bit */}
+
         {/* Hero */}
-        <div className="pt-24 pb-16 text-center">
+        <div className="pt-18 pb-16 text-center"> {/* changed top padding to 18 */}
           <h1 className="text-5xl lg:text-6xl font-bold text-ghaimuae-primary mb-4">
             Our Services
           </h1>
@@ -93,13 +55,11 @@ const ScrollableCardSection = () => {
         </div>
 
         {/* Horizontal track */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden flex items-start"> {/* align cards to top */}
           <div
             ref={trackRef}
-            className="flex gap-16 px-24 pr-32 h-full" // right padding for last card
-            style={{
-              transform: `translateX(-${translateX}px)`
-            }}
+            className="flex gap-16 px-24 pr-32 h-full" // no negative margin
+            style={{ transform: `translateX(-${translateX}px)` }}
           >
             {cards.map((card, i) => (
               <div
@@ -108,9 +68,9 @@ const ScrollableCardSection = () => {
               >
                 {/* Card inner */}
                 <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
-                  
+
                   {/* Front */}
-                  <div className="absolute inset-0 backface-hidden bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+                  <div className="absolute top-4 left-4 right-4 bottom-4 backface-hidden bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                     <img
                       src={card.img}
                       alt={card.title}
@@ -124,7 +84,7 @@ const ScrollableCardSection = () => {
                   </div>
 
                   {/* Back */}
-                  <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white rounded-2xl shadow-2xl flex flex-col items-center justify-center p-8">
+                  <div className="absolute top-4 left-4 right-4 bottom-4 backface-hidden rotate-y-180 bg-white rounded-2xl shadow-2xl flex flex-col items-center justify-center p-8">
                     <img
                       src={card.img}
                       alt=""
