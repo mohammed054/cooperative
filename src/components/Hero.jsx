@@ -12,6 +12,7 @@ const Hero = () => {
 
   return (
     <section id="hero" className="relative w-screen h-screen overflow-hidden">
+      
       {/* Background Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
@@ -20,21 +21,22 @@ const Hero = () => {
         loop
         playsInline
       >
-        <source src="videos/background.mp4" type="video/mp4" /* Path changed to relative for GitHub Pages compatibility */ />
+        <source src="videos/background.mp4" type="video/mp4" />
       </video>
 
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/40" />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/50" />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 lg:px-8">
+
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-2xl md:text-3xl lg:text-4xl font-bold text-ghaimuae-primary max-w-3xl mx-auto leading-tight mb-8"
+          className="text-2xl md:text-3xl lg:text-4xl font-bold text-white max-w-3xl mx-auto leading-tight mb-8"
         >
-          Premium Event Solutions Built for Scale, Precision, and Impact
+          Premium Event Solutions Designed for Impact and Experience
         </motion.h1>
 
         <motion.div
@@ -44,20 +46,30 @@ const Hero = () => {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <GetStartedButton
-            className="px-10 py-4 text-lg"
+            className="
+              px-10 py-4 text-lg
+              bg-[#2563EB]
+              hover:bg-[#1E40AF]
+              text-white
+              rounded-xl
+              transition-all
+              duration-300
+              shadow-lg
+            "
             onClick={() => scrollToSection('scrollable-cards')}
           />
         </motion.div>
 
-        {/* Scroll down arrow */}
+        {/* Scroll Down Arrow */}
         <motion.div
-          animate={{ y: [0, 10, 0] }}
+          animate={{ y: [0, 12, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer text-white"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer text-white opacity-80 hover:opacity-100 transition"
           onClick={() => scrollToSection('scrollable-cards')}
         >
           <FaArrowDown size={24} />
         </motion.div>
+
       </div>
     </section>
   );
