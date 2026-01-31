@@ -14,10 +14,9 @@ function App() {
       <GhaimAEHeader />
       <Hero />
       <ScrollableCardSection />
-      <ProjectDeck /> {/* Use the correct component here */}
-      <WhyGhaimAE />
-      <GhaimuProcessSection />
+      <ProjectDeck />
       <ClientTrust />
+      <GhaimAEProcessSection />
       <FinalCta />
       <Footer />
     </div>
