@@ -3,7 +3,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaArrowDown } from 'react-icons/fa';
 import GetStartedButton from './GetStartedButton';
-import backgroundVideo from '../assets/videos/background.mp4'; // replace with your video
 
 const Hero = () => {
   const scrollToSection = (sectionId) => {
@@ -21,7 +20,7 @@ const Hero = () => {
         loop
         playsInline
       >
-        <source src={backgroundVideo} type="video/mp4" />
+        <source src="/videos/background.mp4" type="video/mp4" />
       </video>
 
       {/* Dark overlay for readability */}

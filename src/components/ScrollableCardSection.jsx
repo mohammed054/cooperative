@@ -5,31 +5,37 @@ const cards = [
     title: "Event Planning",
     subtitle: "Organize with precision",
     description: "Plan your events with precision.",
-    img: "https://picsum.photos/id/1011/800/600"
+    img: "/images/event planning.png"
   },
   {
     title: "AV Setup",
     subtitle: "High-quality tech",
     description: "High-quality audio-visual equipment.",
-    img: "https://picsum.photos/id/1015/800/600"
+    img: "/images/av-setup.png"
   },
   {
     title: "Seating & Staging",
     subtitle: "Custom arrangements",
     description: "Custom seating arrangements.",
-    img: "https://picsum.photos/id/1016/800/600"
+    img: "/images/seating.png"
   },
   {
     title: "Lighting & Effects",
     subtitle: "Set the mood",
     description: "Mood and theme lighting.",
-    img: "https://picsum.photos/id/1025/800/600"
+    img: "/images/lighting-effects.png"
   },
   {
     title: "Full Production",
     subtitle: "End-to-end solutions",
     description: "End-to-end event solutions.",
-    img: "https://picsum.photos/id/1035/800/600"
+    img: "/images/full-procution.png"
+  },
+  {
+    title: "Always On Time",
+    subtitle: "Precision Scheduling",
+    description: "Never miss a beat—our events run exactly on schedule, every time.",
+    img: "/images/always-on-time.png"
   }
 ];
 
@@ -65,7 +71,7 @@ const ScrollableCardSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-screen h-[300vh] bg-bg-muted"
+      className="relative w-screen h-[350vh] bg-bg-muted" // increased height for 6 cards
     >
       {/* Sticky viewport */}
       <div className="sticky top-0 h-screen flex flex-col">
@@ -84,7 +90,7 @@ const ScrollableCardSection = () => {
         <div className="flex-1 overflow-hidden">
           <div
             ref={trackRef}
-            className="flex gap-16 px-24 pr-40 h-full" // added pr-40 for extra right padding
+            className="flex gap-16 px-24 pr-32 h-full" // right padding for last card
             style={{
               transform: `translateX(-${translateX}px)`
             }}

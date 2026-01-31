@@ -1,6 +1,6 @@
+// src/components/GhaimuHeader.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import logo from '../assets/images/logo.webp';
 import GetStartedButton from './GetStartedButton';
 
 const GhaimuHeader = () => {
@@ -84,7 +84,7 @@ const GhaimuHeader = () => {
             transition={{ duration: 0.2 }}
           >
             <img 
-              src={logo} 
+              src="/images/logo.webp" 
               alt="GHAIM UAE" 
               className="h-10 w-auto"
             />
@@ -134,18 +134,17 @@ const GhaimuHeader = () => {
                 >
                   {item.label}
                   {!item.isButton && (
-                  <motion.span 
-                    className="inline-block text-xl font-bold leading-none w-5 h-5 flex items-center justify-center ml-2" 
-                    animate={{ rotate: hoveredItem === item.label ? 135 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    +
-                  </motion.span>
-                )}
-              </motion.button>
+                    <motion.span 
+                      className="inline-block text-xl font-bold leading-none w-5 h-5 flex items-center justify-center ml-2" 
+                      animate={{ rotate: hoveredItem === item.label ? 135 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      +
+                    </motion.span>
+                  )}
+                </motion.button>
               )
             ))}
-
           </nav>
 
           {/* Mobile Menu Button */}
