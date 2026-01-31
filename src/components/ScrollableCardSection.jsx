@@ -5,7 +5,7 @@ const cards = [
     title: "Event Planning",
     subtitle: "Organize with precision",
     description: "Plan your events with precision.",
-    img: "/images/event planning.png"
+    img: "/images/event%20planning.png"
   },
   {
     title: "AV Setup",
