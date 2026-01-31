@@ -1,10 +1,9 @@
 import React from 'react';
-import GhaimuHeader from './components/GhaimuHeader';
+import GhaimAEHeader from './components/GhaimAEHeader';
 import Hero from './components/Hero';
 import ScrollableCardSection from './components/ScrollableCardSection';
 import ProjectDeck from './components/ProjectDeck';
-import GhaimuAEProcessSection from './components/GhaimuAEProcessSection';
-import GhaimuProcessSection from './components/GhaimuProcessSection';
+import GhaimAEProcessSection from './components/GhaimAEProcessSection';
 import ClientTrust from './components/ClientTrust';
 import FinalCta from './components/FinalCta';
 import Footer from './components/Footer';
@@ -12,11 +11,11 @@ import Footer from './components/Footer';
 function App() {
   return (
     <div className="App">
-      <GhaimuHeader />
+      <GhaimAEHeader />
       <Hero />
       <ScrollableCardSection />
       <ProjectDeck /> {/* Use the correct component here */}
-      <WhyGhaimu />
+      <WhyGhaimAE />
       <GhaimuProcessSection />
       <ClientTrust />
       <FinalCta />
