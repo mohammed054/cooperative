@@ -48,7 +48,7 @@ const ProcessSection = () => {
              <p className="text-body">
                Our streamlined process eliminates the stress of event planning, allowing you to focus on what matters most - your guests and your message.
              </p>
-            
+             
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <motion.button
                 onClick={() => scrollToSection('standards')}
@@ -105,7 +105,7 @@ const ProcessSection = () => {
           >
               <div className="relative">
                 <img
-                  src="/images/process-bg.jpg" /* Using absolute path with base - Vite will handle it correctly */
+                  src="images/process-bg.jpg" /* Path changed to relative for GitHub Pages compatibility */
                   alt="Event setup process"
                   className="rounded-lg shadow-2xl w-full"
                   loading="lazy"

@@ -1,9 +1,9 @@
 import React from 'react';
 import GhaimuHeader from './components/GhaimuHeader';
-import Hero from './components/Hero'; // NEW
-import ScrollableCardSection from './components/ScrollableCardSection'; // NEW
-import SolutionsStack from './components/SolutionsStack';
-import WhyGhaimu from './components/WhyGhaimu';
+import Hero from './components/Hero';
+import ScrollableCardSection from './components/ScrollableCardSection';
+import ProjectDeck from './components/ProjectDeck';
+import GhaimuAEProcessSection from './components/GhaimuAEProcessSection';
 import GhaimuProcessSection from './components/GhaimuProcessSection';
 import ClientTrust from './components/ClientTrust';
 import FinalCta from './components/FinalCta';
@@ -15,7 +15,7 @@ function App() {
       <GhaimuHeader />
       <Hero />
       <ScrollableCardSection />
-      <SolutionsStack />
+      <ProjectDeck /> {/* Use the correct component here */}
       <WhyGhaimu />
       <GhaimuProcessSection />
       <ClientTrust />

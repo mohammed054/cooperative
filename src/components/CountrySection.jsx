@@ -24,7 +24,7 @@ const CountrySection = () => {
           >
             <div className="relative">
 <img
-                src="/images/country-bg.jpg" /* Using absolute path with base - Vite will handle it correctly */
+                src="images/country-bg.jpg" /* Path changed to relative for GitHub Pages compatibility */
                 alt="Nationwide event coverage"
                 className="rounded-lg shadow-2xl w-full"
                 loading="lazy"
@@ -48,12 +48,12 @@ const CountrySection = () => {
               We Do It Across the Country
             </h2>
             <p className="text-light-gray text-lg mb-8 leading-relaxed">
-             Our team provides seamless event setup across cities, ensuring every rental arrives on time and ready. From coast to coast, we bring professional event solutions directly to your venue, no matter the location.
+             Our team provides seamless event setup across cities, ensuring every rental arrives on time and ready. From coast to coast, we bring professional event solutions directly to your venue, no matter location.
              </p>
              <p className="text-body">
                With local partners in every major metropolitan area, we guarantee consistent quality and reliable service for your corporate events, conferences, and special occasions.
              </p>
-            
+             
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
                <motion.button
                  onClick={() => scrollToSection('process')}
@@ -63,15 +63,15 @@ const CountrySection = () => {
                >
                  Learn More
                </motion.button>
-             <motion.button
-               onClick={() => scrollToSection('contact')}
-               className="btn-outline hover-lift"
-                 whileHover={{ scale: 1.05 }}
-                 whileTap={{ scale: 0.95 }}
-               >
-                 <FaEnvelope className="inline mr-2 micro-accent" />
-                 Contact Us
-               </motion.button>
+              <motion.button
+                onClick={() => scrollToSection('contact')}
+                className="btn-outline hover-lift"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <FaEnvelope className="inline mr-2 micro-accent" />
+                  Contact Us
+                </motion.button>
             </div>
 
             {/* Stats */}

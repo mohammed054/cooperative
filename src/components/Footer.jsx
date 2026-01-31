@@ -27,14 +27,14 @@ const Footer = () => {
           >
             <div className="mb-6">
               <img 
-                src="/images/logo.webp" /* Using absolute path with base - Vite will handle it correctly */
+                src="images/logo.webp" /* Path changed to relative for GitHub Pages compatibility */
                 alt="Event Rentals Logo" 
                 className="h-8 w-auto"
                 style={{ maxHeight: '48px' }}
               />
             </div>
             <p className="text-text-muted mb-6 leading-relaxed">
-              Professional event rentals for corporate gatherings, conferences, and special occasions across the country.
+              Professional event rentals for corporate gatherings, conferences, and special occasions across country.
             </p>
             <div className="flex space-x-4">
               <motion.a

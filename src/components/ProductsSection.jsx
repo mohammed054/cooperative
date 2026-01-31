@@ -9,10 +9,10 @@ const products = [
       name: 'Premium Event Package',
       tags: ['500ft²', 'Indoor', 'AV Included'],
       description: 'Complete solution for medium-sized corporate events with full AV support and premium seating arrangements.',
-      // Using absolute path with base - Vite will handle it correctly
-      image: '/images/product-large.jpg',
-      // Using absolute path with base - Vite will handle it correctly
-      smallImage: '/images/product-small.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      image: 'images/product-large.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      smallImage: 'images/product-small.jpg',
       features: [FaUsers, FaWifi, FaCar],
       color: 'gold',
     },
@@ -20,10 +20,10 @@ const products = [
       name: 'Executive Conference Setup',
       tags: ['1000ft²', 'Indoor', 'Premium'],
       description: 'High-end conference setup with luxury seating, advanced presentation systems, and dedicated technical support.',
-      // Using absolute path with base - Vite will handle it correctly
-      image: '/images/product-large.jpg',
-      // Using absolute path with base - Vite will handle it correctly
-      smallImage: '/images/product-small.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      image: 'images/product-large.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      smallImage: 'images/product-small.jpg',
       features: [FaUsers, FaWifi, FaExpand],
       color: 'electric-blue',
     },
@@ -31,10 +31,10 @@ const products = [
       name: 'Outdoor Festival Package',
       tags: ['2000ft²', 'Outdoor', 'All-Weather'],
       description: 'Weather-resistant setup perfect for outdoor corporate events, festivals, and large gatherings.',
-      // Using absolute path with base - Vite will handle it correctly
-      image: '/images/product-large.jpg',
-      // Using absolute path with base - Vite will handle it correctly
-      smallImage: '/images/product-small.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      image: 'images/product-large.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      smallImage: 'images/product-small.jpg',
       features: [FaExpand, FaWifi, FaCar],
       color: 'gold',
     },

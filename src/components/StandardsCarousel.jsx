@@ -13,29 +13,29 @@ const standards = [
       icon: <FaChair className="text-4xl" />,
       title: 'High-quality chairs',
       description: 'Premium seating solutions for professional settings',
-      // Using absolute path with base - Vite will handle it correctly
-      image: '/images/standard-1.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      image: 'images/standard-1.jpg',
     },
     {
       icon: <FaMicrophone className="text-4xl" />,
       title: 'Reliable AV equipment',
       description: 'State-of-the-art audio and visual technology',
-      // Using absolute path with base - Vite will handle it correctly
-      image: '/images/standard-1.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      image: 'images/standard-1.jpg',
     },
     {
       icon: <FaTv className="text-4xl" />,
       title: 'Custom stands',
       description: 'Bespoke display solutions tailored to your needs',
-      // Using absolute path with base - Vite will handle it correctly
-      image: '/images/standard-1.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      image: 'images/standard-1.jpg',
     },
     {
       icon: <FaTools className="text-4xl" />,
       title: 'Full setup support',
       description: 'Professional installation and technical support',
-      // Using absolute path with base - Vite will handle it correctly
-      image: '/images/standard-1.jpg',
+      // Path changed to relative for GitHub Pages compatibility
+      image: 'images/standard-1.jpg',
     },
   ];
 

@@ -84,7 +84,7 @@ const GhaimuHeader = () => {
             transition={{ duration: 0.2 }}
           >
             <img 
-              src="/images/logo.webp" /* Using absolute path with base - Vite will handle it correctly */
+              src="images/logo.webp" /* Path changed to relative for GitHub Pages compatibility */
               alt="GHAIM UAE" 
               className="h-10 w-auto"
             />

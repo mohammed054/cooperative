@@ -5,43 +5,43 @@ const cards = [
     title: "Event Planning",
     subtitle: "Organize with precision",
     description: "Plan your events with precision.",
-    // Using absolute path with base - Vite will handle it correctly
-    img: "/images/event%20planning.png"
+    // Path changed to relative for GitHub Pages compatibility
+    img: "images/event-planning.png"
   },
   {
     title: "AV Setup",
     subtitle: "High-quality tech",
     description: "High-quality audio-visual equipment.",
-    // Using absolute path with base - Vite will handle it correctly
-    img: "/images/av-setup.png"
+    // Path changed to relative for GitHub Pages compatibility
+    img: "images/av-setup.png"
   },
   {
     title: "Seating & Staging",
     subtitle: "Custom arrangements",
     description: "Custom seating arrangements.",
-    // Using absolute path with base - Vite will handle it correctly
-    img: "/images/seating.png"
+    // Path changed to relative for GitHub Pages compatibility
+    img: "images/seating.png"
   },
   {
     title: "Lighting & Effects",
     subtitle: "Set the mood",
     description: "Mood and theme lighting.",
-    // Using absolute path with base - Vite will handle it correctly
-    img: "/images/lighting-effects.png"
+    // Path changed to relative for GitHub Pages compatibility
+    img: "images/lighting-effects.png"
   },
   {
     title: "Full Production",
     subtitle: "End-to-end solutions",
     description: "End-to-end event solutions.",
-    // Using absolute path with base - Vite will handle it correctly
-    img: "/images/full-procution.png"
+    // Path changed to relative for GitHub Pages compatibility
+    img: "images/full-production.png"
   },
   {
     title: "Always On Time",
     subtitle: "Precision Scheduling",
     description: "Never miss a beat—our events run exactly on schedule, every time.",
-    // Using absolute path with base - Vite will handle it correctly
-    img: "/images/always-on-time.png"
+    // Path changed to relative for GitHub Pages compatibility
+    img: "images/always-on-time.png"
   }
 ];
 
