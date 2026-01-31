@@ -9,8 +9,10 @@ const products = [
       name: 'Premium Event Package',
       tags: ['500ft²', 'Indoor', 'AV Included'],
       description: 'Complete solution for medium-sized corporate events with full AV support and premium seating arrangements.',
-      image: '/images/product-large.jpg',
-      smallImage: '/images/product-small.jpg',
+      // Changed to relative path for GitHub Pages compatibility
+      image: '../public/images/product-large.jpg',
+      // Changed to relative path for GitHub Pages compatibility
+      smallImage: '../public/images/product-small.jpg',
       features: [FaUsers, FaWifi, FaCar],
       color: 'gold',
     },
@@ -18,8 +20,10 @@ const products = [
       name: 'Executive Conference Setup',
       tags: ['1000ft²', 'Indoor', 'Premium'],
       description: 'High-end conference setup with luxury seating, advanced presentation systems, and dedicated technical support.',
-      image: '/images/product-large.jpg',
-      smallImage: '/images/product-small.jpg',
+      // Changed to relative path for GitHub Pages compatibility
+      image: '../public/images/product-large.jpg',
+      // Changed to relative path for GitHub Pages compatibility
+      smallImage: '../public/images/product-small.jpg',
       features: [FaUsers, FaWifi, FaExpand],
       color: 'electric-blue',
     },
@@ -27,8 +31,10 @@ const products = [
       name: 'Outdoor Festival Package',
       tags: ['2000ft²', 'Outdoor', 'All-Weather'],
       description: 'Weather-resistant setup perfect for outdoor corporate events, festivals, and large gatherings.',
-      image: '/images/product-large.jpg',
-      smallImage: '/images/product-small.jpg',
+      // Changed to relative path for GitHub Pages compatibility
+      image: '../public/images/product-large.jpg',
+      // Changed to relative path for GitHub Pages compatibility
+      smallImage: '../public/images/product-small.jpg',
       features: [FaExpand, FaWifi, FaCar],
       color: 'gold',
     },

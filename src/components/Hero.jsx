@@ -20,7 +20,7 @@ const Hero = () => {
         loop
         playsInline
       >
-        <source src="/videos/background.mp4" type="video/mp4" />
+        <source src="../public/videos/background.mp4" type="video/mp4" /* Changed to relative path for GitHub Pages compatibility */ />
       </video>
 
       {/* Dark overlay for readability */}

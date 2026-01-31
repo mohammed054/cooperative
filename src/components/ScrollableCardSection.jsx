@@ -5,37 +5,43 @@ const cards = [
     title: "Event Planning",
     subtitle: "Organize with precision",
     description: "Plan your events with precision.",
-    img: "/images/event%20planning.png"
+    // Changed to relative path for GitHub Pages compatibility
+    img: "../public/images/event%20planning.png"
   },
   {
     title: "AV Setup",
     subtitle: "High-quality tech",
     description: "High-quality audio-visual equipment.",
-    img: "/images/av-setup.png"
+    // Changed to relative path for GitHub Pages compatibility
+    img: "../public/images/av-setup.png"
   },
   {
     title: "Seating & Staging",
     subtitle: "Custom arrangements",
     description: "Custom seating arrangements.",
-    img: "/images/seating.png"
+    // Changed to relative path for GitHub Pages compatibility
+    img: "../public/images/seating.png"
   },
   {
     title: "Lighting & Effects",
     subtitle: "Set the mood",
     description: "Mood and theme lighting.",
-    img: "/images/lighting-effects.png"
+    // Changed to relative path for GitHub Pages compatibility
+    img: "../public/images/lighting-effects.png"
   },
   {
     title: "Full Production",
     subtitle: "End-to-end solutions",
     description: "End-to-end event solutions.",
-    img: "/images/full-procution.png"
+    // Changed to relative path for GitHub Pages compatibility
+    img: "../public/images/full-procution.png"
   },
   {
     title: "Always On Time",
     subtitle: "Precision Scheduling",
     description: "Never miss a beat—our events run exactly on schedule, every time.",
-    img: "/images/always-on-time.png"
+    // Changed to relative path for GitHub Pages compatibility
+    img: "../public/images/always-on-time.png"
   }
 ];
 

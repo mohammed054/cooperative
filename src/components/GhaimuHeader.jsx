@@ -84,7 +84,7 @@ const GhaimuHeader = () => {
             transition={{ duration: 0.2 }}
           >
             <img 
-              src="/images/logo.webp" 
+              src="../public/images/logo.webp" /* Changed to relative path for GitHub Pages compatibility */
               alt="GHAIM UAE" 
               className="h-10 w-auto"
             />

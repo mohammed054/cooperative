@@ -24,7 +24,7 @@ const CountrySection = () => {
           >
             <div className="relative">
 <img
-                src="/images/country-bg.jpg"
+                src="../public/images/country-bg.jpg" /* Changed to relative path for GitHub Pages compatibility */
                 alt="Nationwide event coverage"
                 className="rounded-lg shadow-2xl w-full"
                 loading="lazy"
