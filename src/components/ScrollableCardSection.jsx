@@ -52,41 +52,45 @@ const ScrollableCardSection = () => {
       </section>
 
       {/* Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-8 w-full max-w-7xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 px-8 w-full max-w-7xl">
         {cards.map((card, index) => (
           <motion.div
             key={index}
-            className="relative w-full h-96 perspective"
+            className="relative w-full h-full max-h-[70vh] min-h-[360px] perspective"
           >
             {/* Card Inner */}
-            <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d hover:rotate-y-180">
+            <div className="relative w-full h-full transition-all duration-200 transform-style-preserve-3d cursor-pointer group [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:shadow-2xl [@media(hover:hover)]:hover:rotate-y-180 [@media(hover:hover)]:hover:duration-700">
               
               {/* Front */}
-              <div className="absolute w-full h-full backface-hidden bg-white rounded-xl overflow-hidden shadow-xl flex flex-col">
-                <img
-                  src={card.img}
-                  alt={card.title}
-                  className="w-full h-2/3 object-cover"
-                />
-                <div className="p-4 flex flex-col items-center justify-center">
-                  <h3 className="text-2xl font-bold text-ghaimuae-primary mb-2 text-center">
-                    {card.title}
-                  </h3>
+              <div className="absolute w-full h-full backface-hidden bg-white rounded-xl overflow-hidden shadow-xl">
+                <div className="relative w-full h-full">
+                  <img
+                    src={card.img}
+                    alt={card.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-ghaimuae-primary/90 via-ghaimuae-primary/60 to-transparent pt-20 pb-8 px-6">
+                    <h3 className="text-3xl font-bold text-white">
+                      {card.title}
+                    </h3>
+                  </div>
                 </div>
               </div>
 
               {/* Back */}
-              <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-white rounded-xl shadow-xl flex flex-col items-center justify-center p-4">
+              <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-white rounded-xl shadow-xl flex flex-col items-center justify-between p-6">
                 <img
                   src={card.img}
                   alt={card.title}
-                  className="w-3/4 h-40 object-cover rounded-md mb-4"
+                  className="w-3/4 h-40 object-cover rounded-md"
                 />
-                <h3 className="text-xl font-semibold text-ghaimuae-primary mb-2 text-center">
-                  {card.subtitle}
-                </h3>
-                <p className="text-text-muted mb-4 text-center">{card.description}</p>
-                <button className="btn-primary text-sm px-6 py-2">
+                <div className="flex flex-col items-center flex-grow justify-center">
+                  <h3 className="text-2xl font-semibold text-ghaimuae-primary mb-3 text-center">
+                    {card.subtitle}
+                  </h3>
+                  <p className="text-text-muted text-center line-clamp-2">{card.description}</p>
+                </div>
+                <button className="btn-primary text-sm px-6 py-2 mt-4">
                   Learn More
                 </button>
               </div>
