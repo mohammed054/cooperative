@@ -89,7 +89,7 @@ const ScrollableCardSection = () => {
           </h1>
           <p className="text-xl text-text-muted">
             Discover how we can make your events unforgettable
-          </p>
+          </p>    
         </div>
 
         {/* Horizontal track */}

@@ -6,6 +6,9 @@
       import GhaimAEProcessSection from './components/GhaimAEProcessSection';
       import FinalCta from './components/FinalCta';
       import Footer from './components/Footer';
+      import AnimatedArrow from "./components/AnimatedArrow"; 
+      import CurvedArrow from "./components/CurvedArrow";
+  
 
       function App() {
         return (
@@ -13,7 +16,9 @@
             <GhaimAEHeader />
             <Hero />
             <ScrollableCardSection />
+            <AnimatedArrow />
             <ProjectDeck />
+            <CurvedArrow />
             <GhaimAEProcessSection />
             <FinalCta />
             <Footer />
