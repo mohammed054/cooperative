@@ -20,7 +20,7 @@ const Hero = () => {
         loop
         playsInline
       >
-        <source src="../public/videos/background.mp4" type="video/mp4" /* Changed to relative path for GitHub Pages compatibility */ />
+        <source src="/videos/background.mp4" type="video/mp4" /* Using absolute path with base - Vite will handle it correctly */ />
       </video>
 
       {/* Dark overlay for readability */}

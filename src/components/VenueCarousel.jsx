@@ -11,32 +11,32 @@ const VenueCarousel = () => {
 const venues = [
     {
       name: 'Conference Hall',
-      // Changed to relative path for GitHub Pages compatibility
-      image: '../public/images/venue-1.jpg',
+      // Using absolute path with base - Vite will handle it correctly
+      image: '/images/venue-1.jpg',
       description: 'Professional conference spaces with modern amenities',
     },
     {
       name: 'Outdoor Venue',
-      // Changed to relative path for GitHub Pages compatibility
-      image: '../public/images/venue-1.jpg',
+      // Using absolute path with base - Vite will handle it correctly
+      image: '/images/venue-1.jpg',
       description: 'Beautiful outdoor settings for memorable events',
     },
     {
       name: 'Banquet Hall',
-      // Changed to relative path for GitHub Pages compatibility
-      image: '../public/images/venue-1.jpg',
+      // Using absolute path with base - Vite will handle it correctly
+      image: '/images/venue-1.jpg',
       description: 'Elegant banquet halls for sophisticated gatherings',
     },
     {
       name: 'Meeting Room',
-      // Changed to relative path for GitHub Pages compatibility
-      image: '../public/images/venue-1.jpg',
+      // Using absolute path with base - Vite will handle it correctly
+      image: '/images/venue-1.jpg',
       description: 'Intimate meeting rooms for focused discussions',
     },
     {
       name: 'Exhibition Space',
-      // Changed to relative path for GitHub Pages compatibility
-      image: '../public/images/venue-1.jpg',
+      // Using absolute path with base - Vite will handle it correctly
+      image: '/images/venue-1.jpg',
       description: 'Spacious exhibition areas for large events',
     },
   ];

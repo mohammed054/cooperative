@@ -105,7 +105,7 @@ const ProcessSection = () => {
           >
               <div className="relative">
                 <img
-                  src="../public/images/process-bg.jpg" /* Changed to relative path for GitHub Pages compatibility */
+                  src="/images/process-bg.jpg" /* Using absolute path with base - Vite will handle it correctly */
                   alt="Event setup process"
                   className="rounded-lg shadow-2xl w-full"
                   loading="lazy"

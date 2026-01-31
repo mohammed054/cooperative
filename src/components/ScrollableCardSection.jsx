@@ -5,43 +5,43 @@ const cards = [
     title: "Event Planning",
     subtitle: "Organize with precision",
     description: "Plan your events with precision.",
-    // Changed to relative path for GitHub Pages compatibility
-    img: "../public/images/event%20planning.png"
+    // Using absolute path with base - Vite will handle it correctly
+    img: "/images/event%20planning.png"
   },
   {
     title: "AV Setup",
     subtitle: "High-quality tech",
     description: "High-quality audio-visual equipment.",
-    // Changed to relative path for GitHub Pages compatibility
-    img: "../public/images/av-setup.png"
+    // Using absolute path with base - Vite will handle it correctly
+    img: "/images/av-setup.png"
   },
   {
     title: "Seating & Staging",
     subtitle: "Custom arrangements",
     description: "Custom seating arrangements.",
-    // Changed to relative path for GitHub Pages compatibility
-    img: "../public/images/seating.png"
+    // Using absolute path with base - Vite will handle it correctly
+    img: "/images/seating.png"
   },
   {
     title: "Lighting & Effects",
     subtitle: "Set the mood",
     description: "Mood and theme lighting.",
-    // Changed to relative path for GitHub Pages compatibility
-    img: "../public/images/lighting-effects.png"
+    // Using absolute path with base - Vite will handle it correctly
+    img: "/images/lighting-effects.png"
   },
   {
     title: "Full Production",
     subtitle: "End-to-end solutions",
     description: "End-to-end event solutions.",
-    // Changed to relative path for GitHub Pages compatibility
-    img: "../public/images/full-procution.png"
+    // Using absolute path with base - Vite will handle it correctly
+    img: "/images/full-procution.png"
   },
   {
     title: "Always On Time",
     subtitle: "Precision Scheduling",
     description: "Never miss a beat—our events run exactly on schedule, every time.",
-    // Changed to relative path for GitHub Pages compatibility
-    img: "../public/images/always-on-time.png"
+    // Using absolute path with base - Vite will handle it correctly
+    img: "/images/always-on-time.png"
   }
 ];
 

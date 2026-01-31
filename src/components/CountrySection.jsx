@@ -24,7 +24,7 @@ const CountrySection = () => {
           >
             <div className="relative">
 <img
-                src="../public/images/country-bg.jpg" /* Changed to relative path for GitHub Pages compatibility */
+                src="/images/country-bg.jpg" /* Using absolute path with base - Vite will handle it correctly */
                 alt="Nationwide event coverage"
                 className="rounded-lg shadow-2xl w-full"
                 loading="lazy"

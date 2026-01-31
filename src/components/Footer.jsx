@@ -27,7 +27,7 @@ const Footer = () => {
           >
             <div className="mb-6">
               <img 
-                src="../public/images/logo.webp" /* Changed to relative path for GitHub Pages compatibility */
+                src="/images/logo.webp" /* Using absolute path with base - Vite will handle it correctly */
                 alt="Event Rentals Logo" 
                 className="h-8 w-auto"
                 style={{ maxHeight: '48px' }}
