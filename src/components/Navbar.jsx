@@ -1,105 +1,69 @@
-import React, { useState, useEffect } from 'react';
+// src/components/Navbar.jsx
+import React from 'react';
 import { motion } from 'framer-motion';
 
 const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const navItems = [
-    { label: 'Home', section: 'hero' },
-    { label: 'Rentals', section: 'rentals' },
-    { label: 'Process', section: 'process' },
-    { label: 'Testimonials', section: 'testimonials' },
-    { label: 'Call Us', section: 'contact', isButton: true },
-  ];
-
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white shadow-lg' : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="fixed top-0 left-0 w-full z-50">
+      
+      {/* Glass / dark base */}
+      <div className="backdrop-blur-md bg-black/40">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
           {/* Logo */}
-          <motion.div whileHover={{ scale: 1.05 }}>
-            <span
-              className={`text-4xl font-bold transition-colors duration-300 ${
-                scrolled ? 'text-[#4E4F68]' : 'text-white'
-              }`}
-            >
-              GHAIM
-            </span>
-          </motion.div>
+          <div className="text-xl font-bold text-white tracking-wide">
+            GHAIM<span className="text-[#2D2E40]">.</span>
+          </div>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item, index) => (
-              <motion.button
-                key={item.label}
-                onClick={() => scrollToSection(item.section)}
-                className={
-                  item.isButton
-                    ? `
-                      bg-[#2D2E40] text-white
-                      px-8 py-3 font-semibold rounded-full
-                      transition-colors duration-300
-                    `
-                    : `
-                      px-4 py-2 rounded-lg
-                      transition-colors duration-300
-                      ${scrolled ? 'text-[#4E4F68]' : 'text-white'}
-                    `
-                }
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+          {/* Links */}
+          <div className="hidden md:flex items-center gap-8">
+            {['Home', 'Services', 'Process', 'Events', 'Contact'].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="
+                  text-white/80
+                  hover:text-white
+                  transition
+                  duration-200
+                  relative
+                  after:absolute
+                  after:-bottom-1
+                  after:left-0
+                  after:h-[2px]
+                  after:w-0
+                  after:bg-[#2D2E40]
+                  hover:after:w-full
+                  after:transition-all
+                "
               >
-                {item.label}
-              </motion.button>
+                {item}
+              </a>
             ))}
           </div>
 
-          {/* Mobile Menu */}
-          <div className="md:hidden">
-            <button className={`${scrolled ? 'text-[#4E4F68]' : 'text-white'} p-2`}>
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
+          {/* CTA */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="
+              hidden md:block
+              px-6 py-2
+              bg-[#2D2E40]
+              hover:bg-[#1F2030]
+              text-white
+              rounded-lg
+              transition
+              duration-300
+              shadow-md
+            "
+          >
+            Get Started
+          </motion.button>
 
         </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 };
 
