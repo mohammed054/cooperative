@@ -34,7 +34,8 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#2D2E40] max-w-3xl mx-auto leading-tight mb-8"
+          /* Mobile: white for contrast over video; md+: original dark navy */
+          className="text-2xl md:text-3xl lg:text-4xl font-bold text-white md:text-[#2D2E40] max-w-3xl mx-auto leading-tight mb-8"
         >
           Premium Event Solutions Designed for Impact and Experience
         </motion.h1>

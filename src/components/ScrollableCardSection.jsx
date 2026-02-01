@@ -13,7 +13,17 @@ const ScrollableCardSection = () => {
   const trackRef = useRef(null);
   const sectionRef = useRef(null);
   const [translateX, setTranslateX] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Detect mobile vs desktop
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Scroll-driven horizontal translate — runs on BOTH mobile and desktop
   useEffect(() => {
     const onScroll = () => {
       if (!sectionRef.current || !trackRef.current) return;
@@ -24,53 +34,134 @@ const ScrollableCardSection = () => {
       const rect = section.getBoundingClientRect();
       const scrollableHeight = section.offsetHeight - window.innerHeight;
 
-      // Horizontal scroll progress, slightly delayed
-      const offsetStart = 0.02; // 2% delay
+      const offsetStart = 0.02;
       let progress = (-rect.top / scrollableHeight - offsetStart) / (1 - offsetStart);
       progress = Math.min(Math.max(progress, 0), 1);
 
-      const maxTranslate = track.scrollWidth - window.innerWidth;
+      const maxTranslate = track.scrollWidth - track.parentElement.clientWidth;
       setTranslateX(progress * maxTranslate);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isMobile]); // re-attach if layout switches
 
+  /* ─── MOBILE VIEW: scroll-driven horizontal, same mechanism as desktop ─── */
+  if (isMobile) {
+    return (
+      <section
+        ref={sectionRef}
+        className="relative w-full bg-bg-muted"
+        style={{ height: '280vh' }}
+      >
+        <div className="sticky top-20 h-screen flex flex-col">
+
+          {/* Header */}
+          <div className="text-center pt-10 pb-6 px-4">
+            <h1 className="text-3xl font-bold text-ghaimuae-primary mb-2">
+              Our Services
+            </h1>
+            <p className="text-base text-text-muted">
+              Discover how we can make your events unforgettable
+            </p>
+          </div>
+
+          {/* Horizontal track — clipped, translated by scroll */}
+          <div className="flex-1 overflow-hidden flex items-start">
+            <div
+              ref={trackRef}
+              className="flex gap-4 h-full"
+              style={{
+                paddingLeft: '1rem',
+                paddingRight: '1rem',
+                transform: `translateX(-${translateX}px)`,
+              }}
+            >
+              {cards.map((card, i) => (
+                <div
+                  key={i}
+                  className="relative flex-shrink-0 perspective group"
+                  style={{ width: '72vw', maxWidth: '320px', height: '72vh' }}
+                >
+                  <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
+                    {/* Front */}
+                    <div className="absolute inset-0 backface-hidden bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col">
+                      <img
+                        src={card.img}
+                        alt={card.title}
+                        className="h-3/4 w-full object-cover"
+                      />
+                      <div className="flex-1 flex items-center justify-center">
+                        <h3 className="text-xl font-bold text-ghaimuae-primary">
+                          {card.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Back */}
+                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white rounded-2xl shadow-lg flex flex-col items-center justify-center p-5">
+                      <img
+                        src={card.img}
+                        alt=""
+                        className="w-4/5 h-28 object-cover rounded-lg mb-4"
+                      />
+                      <h4 className="text-lg font-semibold mb-1">
+                        {card.subtitle}
+                      </h4>
+                      <p className="text-center text-text-muted text-sm mb-4">
+                        {card.description}
+                      </p>
+                      <button className="btn-primary px-5 py-2 text-sm">
+                        Learn More
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ─── DESKTOP VIEW: sticky horizontal scroll ─── */
   return (
     <section
       ref={sectionRef}
-      className="relative w-screen h-[360vh] bg-bg-muted"
+      className="relative w-screen bg-bg-muted"
+      style={{ height: '420vh' }}
     >
-      <div className="sticky top-24 h-screen flex flex-col"> {/* move everything down a bit */}
+      <div className="sticky top-20 h-screen flex flex-col">
 
-        {/* Hero */}
-        <div className="pt-18 pb-16 text-center"> {/* changed top padding to 18 */}
+        {/* Hero — extra top padding so cards sit lower, giving breathing room before scroll kicks in */}
+        <div className="pt-24 pb-10 text-center">
           <h1 className="text-5xl lg:text-6xl font-bold text-ghaimuae-primary mb-4">
             Our Services
           </h1>
           <p className="text-xl text-text-muted">
             Discover how we can make your events unforgettable
-          </p>    
+          </p>
         </div>
 
         {/* Horizontal track */}
-        <div className="flex-1 overflow-hidden flex items-start"> {/* align cards to top */}
+        <div className="flex-1 overflow-hidden flex items-start">
           <div
             ref={trackRef}
-            className="flex gap-16 px-24 pr-32 h-full" // no negative margin
+            className="flex gap-16 px-24 pr-32 h-full"
             style={{ transform: `translateX(-${translateX}px)` }}
           >
             {cards.map((card, i) => (
               <div
                 key={i}
-                className="relative flex-shrink-0 w-[32vw] h-[70vh] perspective group"
+                className="relative flex-shrink-0 w-[32vw] perspective group"
+                style={{ height: 'calc(100vh - 280px)' }}
               >
                 {/* Card inner */}
                 <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
 
                   {/* Front */}
-                  <div className="absolute top-4 left-4 right-4 bottom-4 backface-hidden bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                     <img
                       src={card.img}
                       alt={card.title}
@@ -84,7 +175,7 @@ const ScrollableCardSection = () => {
                   </div>
 
                   {/* Back */}
-                  <div className="absolute top-4 left-4 right-4 bottom-4 backface-hidden rotate-y-180 bg-white rounded-2xl shadow-2xl flex flex-col items-center justify-center p-8">
+                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden rotate-y-180 bg-white rounded-2xl shadow-2xl flex flex-col items-center justify-center p-8">
                     <img
                       src={card.img}
                       alt=""
@@ -111,5 +202,6 @@ const ScrollableCardSection = () => {
     </section>
   );
 };
+
 
 export default ScrollableCardSection;

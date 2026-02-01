@@ -31,8 +31,8 @@ const CurvedArrow = () => {
       viewBox="0 0 768 432"
       width="768"
       height="432"
-      className="absolute left-1/2 -translate-x-1/2 -translate-y-80 z-50" 
-      // <- adjusted -translate-y-52 to place it higher
+      
+      className="hidden sm:block absolute left-1/2 -translate-x-1/2 -translate-y-80 z-50"
     >
       <path
         ref={pathRef}

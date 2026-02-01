@@ -15,9 +15,9 @@ const Footer = () => {
   };
 
   return (
-    <footer id="contact" className="bg-muted text-primary-text py-16">
+    <footer id="contact" className="bg-muted text-primary-text py-12 lg:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Company Info */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -27,13 +27,13 @@ const Footer = () => {
           >
             <div className="mb-6">
               <img 
-                src="images/logo.webp" /* Path changed to relative for GitHub Pages compatibility */
+                src="images/logo.webp"
                 alt="Event Rentals Logo" 
                 className="h-8 w-auto"
                 style={{ maxHeight: '48px' }}
               />
             </div>
-            <p className="text-text-muted mb-6 leading-relaxed">
+            <p className="text-text-muted mb-6 leading-relaxed text-sm lg:text-base">
               Professional event rentals for corporate gatherings, conferences, and special occasions across country.
             </p>
             <div className="flex space-x-4">
@@ -79,12 +79,12 @@ const Footer = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-primary-text mb-6">Quick Links</h3>
+            <h3 className="text-base lg:text-lg font-semibold text-primary-text mb-4 lg:mb-6">Quick Links</h3>
             <ul className="space-y-3">
               <li>
                 <button
                   onClick={() => scrollToSection('hero')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left"
+                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
                 >
                   Home
                 </button>
@@ -92,7 +92,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => scrollToSection('rentals')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left"
+                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
                 >
                   Rentals
                 </button>
@@ -100,7 +100,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => scrollToSection('process')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left"
+                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
                 >
                   Process
                 </button>
@@ -108,7 +108,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => scrollToSection('testimonials')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left"
+                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
                 >
                   Testimonials
                 </button>
@@ -123,19 +123,19 @@ const Footer = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-primary-text mb-6">Contact Info</h3>
+            <h3 className="text-base lg:text-lg font-semibold text-primary-text mb-4 lg:mb-6">Contact Info</h3>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <FaPhone className="text-primary-accent" />
-                <span className="text-text-muted">+123 456 7890</span>
+                <span className="text-text-muted text-sm lg:text-base">+123 456 7890</span>
               </div>
               <div className="flex items-center space-x-3">
                 <FaEnvelope className="text-primary-accent" />
-                <span className="text-text-muted">info@example.com</span>
+                <span className="text-text-muted text-sm lg:text-base">info@example.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <FaMapMarkerAlt className="text-primary-accent" />
-                <span className="text-text-muted">123 Event St, City</span>
+                <span className="text-text-muted text-sm lg:text-base">123 Event St, City</span>
               </div>
             </div>
           </motion.div>
@@ -147,19 +147,19 @@ const Footer = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-lg font-semibold text-primary-text mb-6">Stay Updated</h3>
-            <p className="text-text-muted mb-6">
+            <h3 className="text-base lg:text-lg font-semibold text-primary-text mb-4 lg:mb-6">Stay Updated</h3>
+            <p className="text-text-muted mb-4 lg:mb-6 text-sm lg:text-base">
               Subscribe to our newsletter for exclusive offers and event planning tips.
             </p>
             <form className="space-y-3">
               <input
                 type="email"
                 placeholder="Your email"
-                className="w-full px-4 py-2 bg-white/50 border border-primary-accent/30 rounded-lg text-primary-text placeholder-text-muted focus:outline-none focus:border-primary-accent transition-colors duration-300"
+                className="w-full px-4 py-2 bg-white/50 border border-primary-accent/30 rounded-lg text-primary-text placeholder-text-muted focus:outline-none focus:border-primary-accent transition-colors duration-300 text-sm lg:text-base"
               />
               <motion.button
                 type="submit"
-                className="w-full bg-primary-accent hover:bg-primary-accent/90 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
+                className="w-full bg-primary-accent hover:bg-primary-accent/90 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm lg:text-base"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -175,20 +175,20 @@ const Footer = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          className="border-t border-primary-accent/20 mt-12 pt-8"
+          className="border-t border-primary-accent/20 mt-10 lg:mt-12 pt-6 lg:pt-8"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-text-muted text-sm mb-4 md:mb-0">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+            <div className="text-text-muted text-xs sm:text-sm">
               © 2026 Event Rentals. All Rights Reserved.
             </div>
-            <div className="flex space-x-6">
-              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-sm">
+            <div className="flex space-x-4 sm:space-x-6">
+              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-xs sm:text-sm">
                 Privacy Policy
               </button>
-              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-sm">
+              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-xs sm:text-sm">
                 Terms of Service
               </button>
-              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-sm">
+              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-xs sm:text-sm">
                 Sitemap
               </button>
             </div>
@@ -198,14 +198,14 @@ const Footer = () => {
         {/* Back to Top Button */}
         <motion.button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-primary-accent hover:bg-primary-accent/90 text-white p-4 rounded-full shadow-lg transition-all duration-300 z-50"
+          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 bg-primary-accent hover:bg-primary-accent/90 text-white p-3 sm:p-4 rounded-full shadow-lg transition-all duration-300 z-50"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
         >
-          <FaArrowUp className="text-xl" />
+          <FaArrowUp className="text-lg sm:text-xl" />
         </motion.button>
       </div>
     </footer>
