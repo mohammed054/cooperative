@@ -37,7 +37,43 @@ const Hero = () => {
           /* Mobile: white for contrast over video; md+: original dark navy */
           className="text-2xl md:text-3xl lg:text-4xl font-bold text-white md:text-[#2D2E40] max-w-3xl mx-auto leading-tight mb-8"
         >
-          Premium Event Solutions Designed for Impact and Experience
+          <motion.span
+            className="relative inline-block"
+            initial="hidden"
+            animate="visible"
+          >
+            Premium
+            <svg
+              viewBox="0 0 200 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute -bottom-3 left-0 w-full h-4"
+            >
+              <motion.path
+                d="M2 4C50 2 150 2 198 4"
+                stroke="#FBBF24"
+                strokeWidth="3"
+                strokeLinecap="round"
+                variants={{
+                  hidden: { pathLength: 0, opacity: 0 },
+                  visible: { pathLength: 1, opacity: 1 },
+                }}
+                transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
+              />
+              <motion.path
+                d="M5 11C50 9 150 9 195 11"
+                stroke="#FBBF24"
+                strokeWidth="3"
+                strokeLinecap="round"
+                variants={{
+                  hidden: { pathLength: 0, opacity: 0 },
+                  visible: { pathLength: 1, opacity: 1 },
+                }}
+                transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
+              />
+            </svg>
+          </motion.span>{" "}
+          Event Solutions Designed for Impact and Experience
         </motion.h1>
 
         <motion.div
