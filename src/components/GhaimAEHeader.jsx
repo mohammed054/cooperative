@@ -6,6 +6,7 @@ const GhaimAEHeader = () => {
   const [isHidden, setIsHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [ready, setReady] = useState(false); // ensures layout calculated before anim
+  const [hoveredItem, setHoveredItem] = useState(null);
   const lastScrollY = useRef(0);
   const scrollTimeoutRef = useRef(null);
 
@@ -117,7 +118,9 @@ const GhaimAEHeader = () => {
                   <motion.button
                     key={item.label}
                     onClick={() => scrollToSection(item.section)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    onHoverStart={() => setHoveredItem(item.label)}
+                    onHoverEnd={() => setHoveredItem(null)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center ${
                       scrolled
                         ? 'text-ghaimuae-light-gray hover:text-black hover:bg-gray-100'
                         : 'text-white hover:bg-white hover:text-black'
@@ -129,6 +132,13 @@ const GhaimAEHeader = () => {
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
                     {item.label}
+                    <motion.span
+                      className="ml-1 inline-block"
+                      animate={{ rotate: hoveredItem === item.label ? 135 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      +
+                    </motion.span>
                   </motion.button>
                 )
               )}
@@ -184,10 +194,10 @@ const GhaimAEHeader = () => {
           {mobileOpen && (
             <motion.div
               initial={{ opacity: 0, maxHeight: 0 }}
-              animate={{ opacity: 1, maxHeight: '500px' }}
+              animate={{ opacity: 1, maxHeight: '85vh' }}
               exit={{ opacity: 0, maxHeight: 0 }}
               transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="md:hidden overflow-hidden"
+              className="md:hidden overflow-y-auto"
               style={{ background: 'white' }}
             >
               <div className="px-5 pt-2 pb-5">

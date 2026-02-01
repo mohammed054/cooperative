@@ -43,7 +43,7 @@ const ProjectDeck = () => {
 
   return (
     <section className={`
-      relative w-screen bg-white
+      relative w-full bg-white overflow-hidden
       flex flex-col items-center
       px-4 py-12 gap-10
       sm:px-8 sm:py-20 sm:gap-16
@@ -102,10 +102,10 @@ const ProjectDeck = () => {
         className="flex-1 text-center lg:text-left max-w-3xl lg:ml-24 space-y-5 mt-6 sm:mt-8 lg:mt-0"
       >
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-ghaimuae-primary">
-          Crafting Exceptional Projects Across UAE
+          Crafting Exceptional Events Across UAE
         </h2>
         <p className="text-base md:text-lg text-text-muted leading-relaxed">
-          We focus exclusively on delivering in rural and urban locations. From coast to desert, HUTS creates beautiful properties through guidance, intent, and care. Have a specific emirate in mind? We've either built there, or will soon.
+          We focus exclusively on delivering in rural and urban locations. From coast to desert, GHAIM creates unforgettable experiences through guidance, intent, and care. Have a specific emirate in mind? We've either operated there, or will soon.
         </p>
         <div className="flex justify-center lg:justify-start">
           <button className="btn-primary px-8 py-3 text-lg">

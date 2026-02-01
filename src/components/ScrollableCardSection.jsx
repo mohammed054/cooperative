@@ -54,7 +54,7 @@ const ScrollableCardSection = () => {
         className="relative w-full bg-bg-muted"
         style={{ height: '280vh' }}
       >
-        <div className="sticky top-20 h-screen flex flex-col">
+        <div className="sticky top-0 h-screen flex flex-col">
 
           {/* Header */}
           <div className="text-center pt-10 pb-6 px-4">
@@ -70,7 +70,7 @@ const ScrollableCardSection = () => {
           <div className="flex-1 overflow-hidden flex items-start">
             <div
               ref={trackRef}
-              className="flex gap-4 h-full"
+              className="flex gap-4 h-full items-center"
               style={{
                 paddingLeft: '1rem',
                 paddingRight: '1rem',
@@ -132,7 +132,7 @@ const ScrollableCardSection = () => {
       className="relative w-screen bg-bg-muted"
       style={{ height: '420vh' }}
     >
-      <div className="sticky top-20 h-screen flex flex-col">
+      <div className="sticky top-0 h-screen flex flex-col">
 
         {/* Hero — extra top padding so cards sit lower, giving breathing room before scroll kicks in */}
         <div className="pt-24 pb-10 text-center">
@@ -148,7 +148,7 @@ const ScrollableCardSection = () => {
         <div className="flex-1 overflow-hidden flex items-start">
           <div
             ref={trackRef}
-            className="flex gap-16 px-24 pr-32 h-full"
+            className="flex gap-16 px-24 pr-32 h-full items-center"
             style={{ transform: `translateX(-${translateX}px)` }}
           >
             {cards.map((card, i) => (

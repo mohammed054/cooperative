@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const GhaimAEProcessSection = () => {
   return (
-    <section className="w-screen bg-bg-muted py-16 lg:py-24">
+    <section id="process" className="w-full bg-bg-muted py-16 lg:py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-10 lg:gap-12">
           
         {/* Left: Text Content */}

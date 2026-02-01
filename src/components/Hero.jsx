@@ -11,7 +11,7 @@ const Hero = () => {
   };
 
   return (
-    <section id="hero" className="relative w-screen h-screen overflow-hidden">
+    <section id="hero" className="relative w-full h-screen overflow-hidden">
       
       {/* Background Video */}
       <video
