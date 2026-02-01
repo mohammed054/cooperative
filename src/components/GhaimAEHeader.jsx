@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const GhaimAEHeader = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [ready, setReady] = useState(false); // ensures layout calculated before anim
+  const lastScrollY = useRef(0);
   const scrollTimeoutRef = useRef(null);
 
   const navItems = [
@@ -16,6 +17,11 @@ const GhaimAEHeader = () => {
     { label: 'Get Started', section: 'get-started', isButton: true },
   ];
 
+  // useLayoutEffect ensures layout is measured before paint
+  useLayoutEffect(() => {
+    setReady(true);
+  }, []);
+
   // Scroll behavior
   useEffect(() => {
     const handleScroll = () => {
@@ -23,11 +29,11 @@ const GhaimAEHeader = () => {
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
 
       scrollTimeoutRef.current = setTimeout(() => {
-        if (currentY > lastScrollY && currentY > 80) setIsHidden(true);
-        else if (currentY < lastScrollY || currentY <= 80) setIsHidden(false);
+        if (currentY > lastScrollY.current && currentY > 80) setIsHidden(true);
+        else if (currentY < lastScrollY.current || currentY <= 80) setIsHidden(false);
 
         setScrolled(currentY > 30);
-        setLastScrollY(currentY);
+        lastScrollY.current = currentY;
       }, 16);
     };
 
@@ -36,7 +42,7 @@ const GhaimAEHeader = () => {
       window.removeEventListener('scroll', handleScroll);
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
-  }, [lastScrollY]);
+  }, []);
 
   // Close mobile menu when resizing above md
   useEffect(() => {
@@ -49,11 +55,8 @@ const GhaimAEHeader = () => {
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (mobileOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
@@ -63,26 +66,29 @@ const GhaimAEHeader = () => {
     setMobileOpen(false);
   };
 
+  if (!ready) return null; // prevent initial mis-render
+
   return (
     <>
       <motion.header
-        initial={{ opacity: 0, y: -20 }}
+        initial={false} // prevent Framer Motion from animating before layout
         animate={{
-          opacity: 1,
           y: isHidden ? -120 : 0,
           transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
         }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
-          scrolled || mobileOpen ? 'bg-white shadow-xl border-b border-gray-200' : 'bg-transparent'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
+          ${scrolled || mobileOpen
+            ? 'bg-white shadow-xl border-b border-gray-200'
+            : 'bg-white bg-opacity-0 backdrop-blur-sm'}
+        `}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center min-h-[72px] w-full">
             {/* Logo */}
-            <motion.div className="flex items-center" whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+            <motion.div className="flex items-center flex-shrink-0" whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
               <img src="images/logo.webp" alt="GHAIM UAE" className="h-10 w-auto" />
               <span
-                className={`ml-3 text-4xl font-bold transition-colors duration-300 ${
+                className={`ml-3 text-2xl sm:text-3xl font-bold transition-colors duration-300 ${
                   scrolled || mobileOpen ? 'text-ghaimuae-primary' : 'text-white'
                 }`}
               >
@@ -128,18 +134,15 @@ const GhaimAEHeader = () => {
               )}
             </nav>
 
-            {/* Mobile Hamburger — redesigned */}
-            <div className="md:hidden flex items-center">
+            {/* Mobile Hamburger */}
+            <div className="md:hidden flex items-center h-full">
               <button
                 className={`relative w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-xl transition-all duration-300 ${
-                  scrolled || mobileOpen
-                    ? 'hover:bg-gray-100'
-                    : 'hover:bg-white/10'
+                  scrolled || mobileOpen ? 'hover:bg-gray-100' : 'hover:bg-white/10'
                 }`}
                 onClick={() => setMobileOpen(!mobileOpen)}
                 aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
               >
-                {/* Three animated bars */}
                 <span
                   className={`block rounded-full transition-all duration-300 ease-in-out ${
                     scrolled || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
@@ -176,7 +179,7 @@ const GhaimAEHeader = () => {
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu — redesigned */}
+        {/* Mobile Dropdown Menu */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
@@ -188,10 +191,8 @@ const GhaimAEHeader = () => {
               style={{ background: 'white' }}
             >
               <div className="px-5 pt-2 pb-5">
-                {/* Divider */}
                 <div className="w-full h-px bg-gray-100 mb-4" />
 
-                {/* Nav links */}
                 <nav className="flex flex-col gap-1">
                   {navItems.filter(item => !item.isButton).map((item, i) => (
                     <motion.button
@@ -205,7 +206,6 @@ const GhaimAEHeader = () => {
                       <span className="text-base font-semibold tracking-tight">
                         {item.label}
                       </span>
-                      {/* Animated arrow */}
                       <svg
                         className="w-4 h-4 text-gray-300 group-hover:text-ghaimuae-primary transition-all duration-300 group-hover:translate-x-1"
                         fill="none"
@@ -218,10 +218,8 @@ const GhaimAEHeader = () => {
                   ))}
                 </nav>
 
-                {/* Divider */}
                 <div className="w-full h-px bg-gray-100 my-4" />
 
-                {/* Get Started CTA */}
                 {navItems.filter(item => item.isButton).map((item) => (
                   <motion.button
                     key={item.label}
@@ -241,7 +239,7 @@ const GhaimAEHeader = () => {
         </AnimatePresence>
       </motion.header>
 
-      {/* Backdrop overlay when mobile menu is open */}
+      {/* Backdrop overlay */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
