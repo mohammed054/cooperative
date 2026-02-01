@@ -35,6 +35,7 @@ const FinalCta = () => {
             transition={{ duration: 0.8 }}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-ghaimuae-white mb-4 lg:mb-8 leading-tight"
           >
+            (THIS IS A PLACEHOLDER CTA SECTION) <p></p>
             Transform Your Business
             <br />
             <span className="text-ghaimuae-light-gray">Start Today</span>
@@ -46,6 +47,7 @@ const FinalCta = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-base sm:text-lg md:text-xl lg:text-2xl text-ghaimuae-light-gray mb-8 lg:mb-16 max-w-4xl mx-auto leading-relaxed"
           >
+            
             Join hundreds of successful businesses that have partnered with GHAIM UAE 
             to achieve operational excellence and sustainable growth. Your transformation journey begins now.
           </motion.p>
