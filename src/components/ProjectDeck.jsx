@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-// Updated project images
 const projects = [
   "images/event1.jpg",
   "images/event2.jpg",
@@ -10,6 +9,15 @@ const projects = [
 
 const ProjectDeck = () => {
   const [stack, setStack] = useState(projects);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile width
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const handleDragEnd = (index) => {
     const updatedStack = [...stack];
@@ -18,31 +26,50 @@ const ProjectDeck = () => {
     setStack(updatedStack);
   };
 
+  // Variants for staggered entrance
+  const stackVariants = {
+    initial: {},
+    animate: {
+      transition: {
+        staggerChildren: 0.15,
+      },
+    },
+  };
+
+  const cardVariants = (rotation, offsetY) => ({
+    initial: { scale: 0.8, y: offsetY - 20, rotate: rotation, opacity: 0 },
+    animate: { scale: 1, y: offsetY, rotate: rotation, opacity: 1, transition: { duration: 0.65, ease: "easeOut" } },
+  });
+
   return (
     <section className={`
       relative w-screen bg-white
       flex flex-col items-center
-      px-4 py-16 gap-10
-      sm:px-8 sm:gap-16 sm:py-24
+      px-4 py-12 gap-10
+      sm:px-8 sm:py-20 sm:gap-16
       lg:flex-row lg:items-center lg:px-28 lg:pt-40 lg:pb-40 lg:gap-48
     `}>
-      {/* Left Stacked Images
-          Mobile:  w-[85vw] h-[85vw]  (fills most of the narrow screen)
-          sm:      w-[420px] h-[420px]
-          md:      w-[500px] h-[500px] (original)
-          lg:      w-[650px] h-[650px] (original)
-      */}
-      <div className={`
-        relative flex-shrink-0
-        w-[85vw] h-[85vw]
-        sm:w-[420px] sm:h-[420px]
-        md:w-[500px] md:h-[500px]
-        lg:w-[650px] lg:h-[650px]
-      `}>
+      {/* Left Stacked Images */}
+      <motion.div
+        className={`
+          relative flex-shrink-0
+          w-[85vw] h-[60vw]
+          sm:w-[420px] sm:h-[420px]
+          md:w-[500px] md:h-[500px]
+          lg:w-[650px] lg:h-[650px]
+        `}
+        variants={stackVariants}
+        initial="initial"
+        animate="animate"
+      >
         {stack.map((img, index) => {
+          const rotation = isMobile
+            ? index === 0 ? 0 : index === 1 ? -6 : 6
+            : index === 0 ? 0 : index === 1 ? -18 : 18;
+          const offsetY = isMobile
+            ? index === 0 ? 0 : index === 1 ? 10 : -10
+            : index === 0 ? 0 : index === 1 ? 40 : -40;
           const zIndex = stack.length - index;
-          const rotation = index === 0 ? 0 : index === 1 ? -18 : 18;
-          const offsetY = index === 0 ? 0 : index === 1 ? 40 : -40;
 
           return (
             <motion.div
@@ -53,15 +80,7 @@ const ProjectDeck = () => {
               style={{ zIndex, cursor: "grab" }}
               className="absolute top-0 left-0 w-full h-full rounded-3xl shadow-2xl"
               whileTap={{ cursor: "grabbing" }}
-              initial={{ scale: 0.9, y: offsetY, rotate: rotation, opacity: 0 }}
-              animate={{
-                scale: index === 0 ? 1 : 0.97,
-                y: offsetY,
-                rotate: rotation,
-                opacity: 1
-              }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.65, ease: "easeOut" }}
+              variants={cardVariants(rotation, offsetY)}
             >
               <img
                 src={img}
@@ -72,18 +91,15 @@ const ProjectDeck = () => {
             </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
-      {/* Right Text Content
-          Mobile:  centered text, normal max-width
-          lg:      left-aligned with ml-24, original max-w-3xl
-      */}
+      {/* Right Text Content */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="flex-1 text-center lg:text-left max-w-3xl lg:ml-24 space-y-5"
+        className="flex-1 text-center lg:text-left max-w-3xl lg:ml-24 space-y-5 mt-6 sm:mt-8 lg:mt-0"
       >
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-ghaimuae-primary">
           Crafting Exceptional Projects Across UAE
