@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { FaQuoteLeft, FaChevronLeft, FaChevronRight, FaStar, FaRegStar } from 'react-icons/fa';
+import { FaQuoteLeft, FaStar, FaRegStar } from 'react-icons/fa';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay, EffectCoverflow } from 'swiper/modules';
 import { useState, useRef, useEffect, useCallback } from 'react';
 
+// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -15,8 +16,8 @@ const TestimonialsSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
-
-  const carouselRef = useRef(null);
+  const [cursorDirection, setCursorDirection] = useState('left');
+  const sectionRef = useRef(null);
 
   const testimonials = [
     {
@@ -57,29 +58,28 @@ const TestimonialsSection = () => {
     }
   ];
 
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2
-  });
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
 
-  // Custom cursor tracking
+  // Track cursor position inside section
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (carouselRef.current && isCarouselHovered) {
-        const rect = carouselRef.current.getBoundingClientRect();
-        setCursorPosition({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
-        });
-      }
-    };
-
-    if (isCarouselHovered) {
-      window.addEventListener('mousemove', handleMouseMove);
-      return () => window.removeEventListener('mousemove', handleMouseMove);
+  const handleMouseMove = (e) => {
+    if (sectionRef.current && isCarouselHovered) {
+      const rect = sectionRef.current.getBoundingClientRect();
+      setCursorPosition({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      });
     }
-  }, [isCarouselHovered]);
+  };
 
+  if (isCarouselHovered) {
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }
+}, [isCarouselHovered]);
+
+
+  // Swiper navigation
   const handlePrev = useCallback(() => {
     if (swiperInstance && !swiperInstance.destroyed) swiperInstance.slidePrev();
   }, [swiperInstance]);
@@ -92,52 +92,53 @@ const TestimonialsSection = () => {
     if (swiperInstance && !swiperInstance.destroyed) swiperInstance.slideToLoop(index);
   }, [swiperInstance]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowLeft') handlePrev();
-      else if (e.key === 'ArrowRight') handleNext();
-    };
-
-    if (swiperInstance) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [swiperInstance, handlePrev, handleNext]);
-
   return (
-    <section className="relative bg-white py-20 md:py-32 overflow-hidden">
-      {/* Custom Cursor */}
+    <section
+      ref={sectionRef}
+      className="relative bg-white py-20 md:py-32 overflow-hidden"
+      onMouseEnter={() => setIsCarouselHovered(true)}
+      onMouseLeave={() => setIsCarouselHovered(false)}
+    >
+      {/* ======================
+          CUSTOM ARROW CURSOR
+          ====================== */}
       <AnimatePresence>
         {isCarouselHovered && (
           <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed pointer-events-none z-50 mix-blend-difference"
+            className="fixed pointer-events-none z-50"
             style={{
-              left: cursorPosition.x + carouselRef.current?.getBoundingClientRect().left,
-              top: cursorPosition.y + carouselRef.current?.getBoundingClientRect().top,
+              left: cursorPosition.x,
+              top: cursorPosition.y,
               transform: 'translate(-50%, -50%)'
             }}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              rotate: cursorDirection === 'left' ? 180 : 0
+            }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
-            <div
-              className={`w-10 h-10 rounded-full border-2 border-white flex items-center justify-center`}
-            >
-              <div
-                className={`w-3 h-3 bg-white rotate-0 transition-transform duration-150 ${
-                  cursorPosition.x < (carouselRef.current?.offsetWidth / 2)
-                    ? 'rotate-45' // Left arrow style
-                    : '-rotate-45' // Right arrow style
-                }`}
-              />
+            <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-[#2D2E40] to-[#4E4F68] rounded-full shadow-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Section Header */}
+      {/* ======================
+          SECTION HEADER
+          ====================== */}
       <div className="container mx-auto px-6 md:px-12 lg:px-20 mb-12 md:mb-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -155,16 +156,16 @@ const TestimonialsSection = () => {
         </motion.div>
       </div>
 
-      {/* Carousel Container */}
+      {/* ======================
+          CAROUSEL
+          ====================== */}
       <motion.div
-        ref={carouselRef}
+        ref={ref}
         initial={{ opacity: 0, y: 40 }}
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className="relative container mx-auto px-6 md:px-12 lg:px-20"
         style={{ cursor: 'none' }}
-        onMouseEnter={() => setIsCarouselHovered(true)}
-        onMouseLeave={() => setIsCarouselHovered(false)}
       >
         <Swiper
           modules={[Navigation, Pagination, Autoplay, EffectCoverflow]}
@@ -172,15 +173,22 @@ const TestimonialsSection = () => {
           slidesPerView={1}
           speed={800}
           effect="coverflow"
-          coverflowEffect={{ rotate: 0, stretch: 0, depth: 100, modifier: 1, slideShadows: false }}
-          autoplay={{ delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
-          loop={true}
-          onSwiper={(swiper) => {
-            setSwiperInstance(swiper);
-            setActiveIndex(swiper.realIndex);
+          coverflowEffect={{
+            rotate: 0,
+            stretch: 0,
+            depth: 100,
+            modifier: 1,
+            slideShadows: false,
           }}
+          autoplay={{ delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+          loop
+          onSwiper={(swiper) => setSwiperInstance(swiper)}
           onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           className="testimonials-swiper pb-4"
+          breakpoints={{
+            640: { spaceBetween: 40 },
+            1024: { spaceBetween: 60 }
+          }}
         >
           {testimonials.map((testimonial) => (
             <SwiperSlide key={testimonial.id}>
@@ -189,10 +197,6 @@ const TestimonialsSection = () => {
           ))}
         </Swiper>
       </motion.div>
-
-      {/* Decorative Backgrounds */}
-      <div className="absolute top-20 left-0 w-96 h-96 bg-[#4E4F68]/5 rounded-full blur-3xl -z-10 animate-pulse" />
-      <div className="absolute bottom-20 right-0 w-96 h-96 bg-[#2D2E40]/5 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDelay: '1s' }} />
     </section>
   );
 };
@@ -201,15 +205,14 @@ const TestimonialCard = ({ testimonial }) => {
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const renderStars = () => {
-    return [...Array(5)].map((_, i) => (
+  const renderStars = () =>
+    [...Array(5)].map((_, i) => (
       <motion.div
         key={i}
         initial={{ opacity: 0, y: -10, rotate: -180 }}
         whileInView={{ opacity: 1, y: 0, rotate: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.3, delay: 0.4 + i * 0.05, type: "spring", stiffness: 200 }}
-        className="relative"
       >
         {i < testimonial.rating ? (
           <FaStar className="w-5 h-5 text-[#2D2E40] drop-shadow-sm" />
@@ -218,28 +221,43 @@ const TestimonialCard = ({ testimonial }) => {
         )}
       </motion.div>
     ));
-  };
 
   return (
     <div className="flex flex-col md:flex-row gap-8 md:gap-12 lg:gap-16 items-center">
-      {/* Content Side */}
-      <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }} className="flex-1 w-full">
-        <div className="relative bg-gradient-to-br from-white via-gray-50/30 to-white rounded-3xl p-8 md:p-10 lg:p-12 shadow-2xl border border-gray-100 hover:border-gray-200 transition-all duration-500 group overflow-hidden">
-          {/* Quote */}
-          <motion.blockquote initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.4 }} className="text-xl md:text-2xl lg:text-3xl text-[#2D2E40] leading-relaxed mb-8 md:mb-10 relative z-10 font-light">
+      <div className="flex-1 w-full">
+        <div className="relative bg-white rounded-3xl p-8 shadow-2xl border border-gray-100 hover:border-gray-200 transition-all duration-500 group overflow-hidden">
+          <div className="absolute -top-4 -right-4 opacity-[0.03] group-hover:opacity-[0.06]">
+            <FaQuoteLeft className="text-[12rem] text-[#2D2E40]" />
+          </div>
+          <div className="flex items-center gap-2 mb-6">{renderStars()}</div>
+          <blockquote className="text-xl md:text-2xl lg:text-3xl text-[#2D2E40] leading-relaxed mb-8 md:mb-10 font-light">
             "{testimonial.quote}"
-          </motion.blockquote>
-          {/* Stars */}
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.3 }} className="flex items-center gap-2 mb-6">
-            <div className="flex gap-1">{renderStars()}</div>
-            <span className="ml-2 text-sm text-[#4E4F68]/60 font-medium">{testimonial.rating}.0</span>
-          </motion.div>
-        </div>
-      </motion.div>
+          </blockquote>
+          <div className="flex items-start gap-4">
+            <div className="relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden ring-4 ring-white shadow-lg">
+              <img
+                src={testimonial.customerImage}
+                alt={testimonial.customerName}
+                className="w-full h-full object-cover"
 
-      {/* Event Image Side */}
-      <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.3 }} className="flex-1 w-full">
-        <div 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-lg md:text-xl font-semibold text-[#2D2E40]">
+                {testimonial.customerName}
+              </h4>
+              <p className="text-sm md:text-base text-[#4E4F68] mb-2 font-medium">{testimonial.customerRole}</p>
+              <div className="flex flex-wrap gap-3 text-xs text-[#4E4F68]/60">
+                <span>{testimonial.company}</span>
+                <span>{testimonial.event}</span>
+                <span>{testimonial.date}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex-1 w-full">
+        <div
           className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] group"
           onMouseEnter={() => setIsImageHovered(true)}
           onMouseLeave={() => setIsImageHovered(false)}
@@ -252,8 +270,9 @@ const TestimonialCard = ({ testimonial }) => {
             className="w-full h-full object-cover"
             onLoad={() => setImageLoaded(true)}
           />
+          {!imageLoaded && <div className="absolute inset-0 bg-gray-200 animate-pulse" />}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
