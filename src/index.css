@@ -106,7 +106,7 @@
   .micro-accent-hover:hover {
     @apply text-micro-accent scale-105 transition-transform duration-300;
   }
-  
+
   .shadow-corporate {
     box-shadow: 0 4px 20px rgba(45, 46, 64, 0.15);
   }
@@ -114,6 +114,531 @@
   .shadow-accent {
     box-shadow: 0 0 20px rgba(225, 145, 188, 0.2);
   }
+/* ================================================
+   TESTIMONIALS SECTION - PROFESSIONAL STYLES
+   ================================================ */
+
+/* Custom Cursor Styles */
+.testimonials-swiper,
+.testimonials-swiper * {
+  cursor: none !important;
+}
+
+/* Swiper Container Enhancements */
+.testimonials-swiper {
+  padding-bottom: 2rem;
+  overflow: visible;
+}
+
+.testimonials-swiper .swiper-wrapper {
+  align-items: center;
+}
+
+.testimonials-swiper .swiper-slide {
+  opacity: 0.4;
+  transform: scale(0.9);
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: blur(2px);
+}
+
+.testimonials-swiper .swiper-slide-active {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+  z-index: 10;
+}
+
+.testimonials-swiper .swiper-slide-prev,
+.testimonials-swiper .swiper-slide-next {
+  opacity: 0.6;
+  transform: scale(0.95);
+  filter: blur(1px);
+}
+
+/* Hide default Swiper navigation */
+.testimonials-swiper .swiper-button-next,
+.testimonials-swiper .swiper-button-prev,
+.testimonials-swiper .swiper-pagination {
+  display: none !important;
+}
+
+/* ================================================
+   PROFESSIONAL ANIMATIONS
+   ================================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* ================================================
+   ENHANCED CARD EFFECTS
+   ================================================ */
+
+.testimonial-card {
+  position: relative;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 50%, #ffffff 100%);
+  border-radius: 1.5rem;
+  padding: 3rem;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(78, 79, 104, 0.1);
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+
+.testimonial-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.7s;
+}
+
+.testimonial-card:hover::before {
+  left: 100%;
+}
+
+.testimonial-card:hover {
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.08),
+    0 20px 25px -5px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(78, 79, 104, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ================================================
+   IMAGE HOVER EFFECTS
+   ================================================ */
+
+.event-image-container {
+  position: relative;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.event-image-container:hover {
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+.event-image-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1.5rem;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #2D2E40, #4E4F68) border-box;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) padding-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.event-image-container:hover::after {
+  opacity: 0.3;
+}
+
+/* ================================================
+   NAVIGATION BUTTON ENHANCEMENTS
+   ================================================ */
+
+.nav-button {
+  position: relative;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2D2E40, #4E4F68);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.nav-button:hover {
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.15),
+    0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.nav-button:hover::before {
+  opacity: 1;
+}
+
+.nav-button:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.nav-button:focus {
+  outline: none;
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.15),
+    0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 0 0 3px rgba(45, 46, 64, 0.1);
+}
+
+/* ================================================
+   PAGINATION DOT ENHANCEMENTS
+   ================================================ */
+
+.pagination-dot {
+  position: relative;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+
+.pagination-dot::before {
+  content: '';
+  position: absolute;
+  inset: -0.25rem;
+  border-radius: 50%;
+  background: rgba(45, 46, 64, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.pagination-dot:hover::before {
+  opacity: 1;
+}
+
+.pagination-dot.active {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: linear-gradient(135deg, #2D2E40, #4E4F68);
+  box-shadow: 0 2px 8px rgba(45, 46, 64, 0.3);
+}
+
+/* ================================================
+   STAR RATING ENHANCEMENTS
+   ================================================ */
+
+.star-rating {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.star-rating svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  transition: all 0.2s;
+}
+
+.star-rating svg:hover {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* ================================================
+   VERIFIED BADGE STYLES
+   ================================================ */
+
+.verified-badge {
+  position: absolute;
+  bottom: -0.25rem;
+  right: -0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  background: linear-gradient(135deg, #2D2E40, #4E4F68);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 2px solid #ffffff;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.verified-badge svg {
+  color: #ffffff;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ================================================
+   PREMIUM BADGE STYLES
+   ================================================ */
+
+.premium-badge {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(78, 79, 104, 0.1);
+}
+
+.premium-badge-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: linear-gradient(135deg, #2D2E40, #4E4F68);
+  border-radius: 50%;
+  animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+/* ================================================
+   PROGRESS BAR STYLES
+   ================================================ */
+
+.progress-bar-container {
+  margin-top: 2rem;
+  max-width: 20rem;
+  margin-left: auto;
+  margin-right: auto;
+  height: 0.25rem;
+  background: rgba(78, 79, 104, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2D2E40, #4E4F68);
+  border-radius: 9999px;
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 10px rgba(45, 46, 64, 0.3);
+}
+
+/* ================================================
+   QUOTE ICON BACKGROUND
+   ================================================ */
+
+.quote-background {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  opacity: 0.03;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+
+.testimonial-card:hover .quote-background {
+  opacity: 0.06;
+}
+
+/* ================================================
+   DECORATIVE ELEMENTS
+   ================================================ */
+
+.decorative-gradient {
+  position: absolute;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.05;
+  animation: pulseGlow 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.decorative-gradient-1 {
+  top: 5rem;
+  left: 0;
+  background: #4E4F68;
+  animation-delay: 0s;
+}
+
+.decorative-gradient-2 {
+  bottom: 5rem;
+  right: 0;
+  background: #2D2E40;
+  animation-delay: 2s;
+}
+
+/* ================================================
+   LOADING STATES
+   ================================================ */
+
+.skeleton-loading {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 50%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 0.5rem;
+}
+
+/* ================================================
+   RESPONSIVE ADJUSTMENTS
+   ================================================ */
+
+@media (max-width: 768px) {
+  .testimonial-card {
+    padding: 2rem;
+  }
+
+  .nav-button {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .decorative-gradient {
+    width: 16rem;
+    height: 16rem;
+  }
+}
+
+/* ================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ================================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #2D2E40;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ================================================
+   PRINT STYLES
+   ================================================ */
+
+@media print {
+  .testimonials-swiper .swiper-slide {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .nav-button,
+  .pagination-dot {
+    display: none !important;
+  }
+}
+
+/* ================================================
+   HIGH CONTRAST MODE SUPPORT
+   ================================================ */
+
+@media (prefers-contrast: high) {
+  .testimonial-card {
+    border: 2px solid #2D2E40;
+  }
+
+  .nav-button {
+    border: 2px solid #2D2E40;
+  }
+}
 
   .btn-arrow-circle {
     @apply w-12 h-12 rounded-full bg-primary-accent text-white flex items-center justify-center transition-all duration-500 p-0 relative overflow-hidden hover:-rotate-45 hover:bg-primary-accent/90;
