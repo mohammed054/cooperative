@@ -26,6 +26,7 @@
     background-color: var(--color-bg-main);
     color: var(--color-primary-text);
     font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
   }
 }
 
