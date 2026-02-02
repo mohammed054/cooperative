@@ -52,18 +52,7 @@ const Hero = () => {
               <motion.path
                 d="M2 4C50 2 150 2 198 4"
                 stroke="#FBBF24"
-                strokeWidth="3"
-                strokeLinecap="round"
-                variants={{
-                  hidden: { pathLength: 0, opacity: 0 },
-                  visible: { pathLength: 1, opacity: 1 },
-                }}
-                transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
-              />
-              <motion.path
-                d="M5 11C50 9 150 9 195 11"
-                stroke="#FBBF24"
-                strokeWidth="3"
+                strokeWidth="8"
                 strokeLinecap="round"
                 variants={{
                   hidden: { pathLength: 0, opacity: 0 },

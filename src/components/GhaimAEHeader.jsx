@@ -71,18 +71,18 @@ const GhaimAEHeader = () => {
 
   return (
     <>
-      <motion.header
-        initial={false} // prevent Framer Motion from animating before layout
-        animate={{
-          y: isHidden ? -120 : 0,
-          transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
-        }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
-          ${scrolled || mobileOpen
-            ? 'bg-white shadow-xl border-b border-gray-200'
-            : 'bg-white bg-opacity-0 backdrop-blur-sm'}
-        `}
-      >
+        <motion.header
+          initial={false}
+          animate={{
+            y: isHidden ? -120 : 0,
+            transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+          }}
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
+            ${scrolled || mobileOpen
+              ? 'bg-white shadow-xl border-b border-gray-200'
+              : 'bg-transparent'}
+          `}
+        >
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center min-h-[72px] w-full">
             {/* Logo */}
