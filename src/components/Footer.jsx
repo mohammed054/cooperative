@@ -195,18 +195,7 @@ const Footer = () => {
           </div>
         </motion.div>
 
-        {/* Back to Top Button */}
-        <motion.button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 bg-primary-accent hover:bg-primary-accent/90 text-white p-3 sm:p-4 rounded-full shadow-lg transition-all duration-300 z-50"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          <FaArrowUp className="text-lg sm:text-xl" />
-        </motion.button>
+
       </div>
     </footer>
   );

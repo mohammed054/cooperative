@@ -107,11 +107,18 @@ const ProjectDeck = () => {
         <p className="text-base md:text-lg text-text-muted leading-relaxed">
           We focus exclusively on delivering in rural and urban locations. From coast to desert, GHAIM creates unforgettable experiences through guidance, intent, and care. Have a specific emirate in mind? We've either operated there, or will soon.
         </p>
-        <div className="flex justify-center lg:justify-start">
-          <button className="btn-primary px-8 py-3 text-lg">
-            See Our Projects
-          </button>
-        </div>
+          <div className="flex justify-center lg:justify-start">
+            <button
+              onClick={() => {
+                const el = document.getElementById("our-projects");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="btn-primary px-8 py-3 text-lg"
+            >
+              See Our Projects
+            </button>
+          </div>
+
       </motion.div>
     </section>
   );
