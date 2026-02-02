@@ -8,7 +8,7 @@
       import Footer from './components/Footer';
       import AnimatedArrow from "./components/AnimatedArrow"; 
       import CurvedArrow from "./components/CurvedArrow";
-  
+      import TestimonialsSection from "./components/TestimonialsSection";
 
       function App() {
         return (
@@ -20,6 +20,7 @@
             <ProjectDeck />
             <CurvedArrow />
             <GhaimAEProcessSection />
+            <TestimonialsSection/>
             <FinalCta />
             <Footer />
           </div>
