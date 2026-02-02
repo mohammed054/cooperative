@@ -129,7 +129,7 @@ const ScrollableCardSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-screen bg-bg-muted"
+      className="relative w-full bg-bg-muted"
       style={{ height: '420vh' }}
     >
       <div className="sticky top-0 h-screen flex flex-col">
