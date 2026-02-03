@@ -2,16 +2,16 @@
 import React from 'react';
 import './GetStartedButton.css';
 
-const GetStartedButton = ({ onClick, disabled = false }) => {
+const GetStartedButton = ({ onClick, disabled = false, label = 'Get Started', className = '' }) => {
   return (
     <div className="button-wrapper">
       {/* --- MAIN BUTTON --- */}
       <button
         onClick={onClick}
         disabled={disabled}
-        className="main-button"
+        className={`main-button ${className}`.trim()}
       >
-        <span className="text">Get Started</span>
+        <span className="text">{label}</span>
         <svg 
           className="scribble-svg" 
           viewBox="0 0 800 600" 

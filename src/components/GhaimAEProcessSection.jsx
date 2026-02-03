@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import ScribbleButton from "./ScribbleButton";
 
 const GhaimAEProcessSection = () => {
   return (
@@ -21,9 +22,9 @@ const GhaimAEProcessSection = () => {
             We handle events differently—think of us as your dedicated partner guiding you from concept to execution. Our people-first process ensures every detail is coordinated, every supplier is aligned, and your event runs flawlessly. It's a start-to-finish approach that's tested, professional, and ensures unforgettable experiences.
           </p>
           <div className="flex justify-center lg:justify-start">
-            <button className="btn-primary px-8 py-3 text-lg">
+            <ScribbleButton className="btn-primary px-8 py-3 text-lg">
               How It Works
-            </button>
+            </ScribbleButton>
           </div>
         </motion.div>
 
@@ -39,6 +40,8 @@ const GhaimAEProcessSection = () => {
             src="images/event-planning-in-action.png"
             alt="Event Planning Illustration"
             className="w-full max-w-sm lg:max-w-lg object-contain rounded-2xl shadow-xl"
+            loading="lazy"
+            decoding="async"
           />
         </motion.div>
 

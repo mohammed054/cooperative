@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import ScribbleButton from "./ScribbleButton";
 
 const projects = [
   "images/event1.jpg",
@@ -8,6 +10,7 @@ const projects = [
 ];
 
 const ProjectDeck = () => {
+  const navigate = useNavigate();
   const [stack, setStack] = useState(projects);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -42,13 +45,16 @@ const ProjectDeck = () => {
   });
 
   return (
-    <section className={`
+    <section
+      id="rentals"
+      className={`
       relative w-full bg-white overflow-hidden
       flex flex-col items-center
       px-4 py-12 gap-10
       sm:px-8 sm:py-20 sm:gap-16
       lg:flex-row lg:items-center lg:px-28 lg:pt-40 lg:pb-40 lg:gap-48
-    `}>
+    `}
+    >
       {/* Left Stacked Images */}
       <motion.div
         className={`
@@ -87,6 +93,8 @@ const ProjectDeck = () => {
                 alt={`Project ${index + 1}`}
                 className="w-full h-full object-cover rounded-3xl select-none pointer-events-none"
                 draggable={false}
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
           );
@@ -108,15 +116,12 @@ const ProjectDeck = () => {
           We focus exclusively on delivering in rural and urban locations. From coast to desert, GHAIM creates unforgettable experiences through guidance, intent, and care. Have a specific emirate in mind? We've either operated there, or will soon.
         </p>
           <div className="flex justify-center lg:justify-start">
-            <button
-              onClick={() => {
-                const el = document.getElementById("our-projects");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
+            <ScribbleButton
+              onClick={() => navigate("/projects")}
               className="btn-primary px-8 py-3 text-lg"
             >
               See Our Projects
-            </button>
+            </ScribbleButton>
           </div>
 
       </motion.div>

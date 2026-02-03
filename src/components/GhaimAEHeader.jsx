@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const GhaimAEHeader = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -14,7 +17,8 @@ const GhaimAEHeader = () => {
     { label: 'Services', section: 'services' },
     { label: 'Rentals', section: 'rentals' },
     { label: 'Process', section: 'process' },
-    { label: 'Coverage', section: 'coverage' },
+    { label: 'Testimonials', section: 'testimonials' },
+    { label: 'Projects', route: '/projects' },
     { label: 'Get Started', section: 'get-started', isButton: true },
   ];
 
@@ -62,8 +66,19 @@ const GhaimAEHeader = () => {
   }, [mobileOpen]);
 
   const scrollToSection = (sectionId) => {
+    if (location.pathname !== '/') {
+      navigate({ pathname: '/', hash: `#${sectionId}` });
+      setMobileOpen(false);
+      return;
+    }
     const element = document.getElementById(sectionId);
     if (element) element.scrollIntoView({ behavior: 'smooth' });
+    else navigate({ hash: `#${sectionId}` });
+    setMobileOpen(false);
+  };
+
+  const goToRoute = (route) => {
+    navigate(route);
     setMobileOpen(false);
   };
 
@@ -113,6 +128,32 @@ const GhaimAEHeader = () => {
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
                     {item.label}
+                  </motion.button>
+                ) : item.route ? (
+                  <motion.button
+                    key={item.label}
+                    onClick={() => goToRoute(item.route)}
+                    onHoverStart={() => setHoveredItem(item.label)}
+                    onHoverEnd={() => setHoveredItem(null)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center ${
+                      scrolled
+                        ? 'text-ghaimuae-light-gray hover:text-black hover:bg-gray-100'
+                        : 'text-white hover:bg-white hover:text-black'
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
+                    {item.label}
+                    <motion.span
+                      className="ml-1 inline-block"
+                      animate={{ rotate: hoveredItem === item.label ? 135 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      +
+                    </motion.span>
                   </motion.button>
                 ) : (
                   <motion.button
@@ -207,7 +248,7 @@ const GhaimAEHeader = () => {
                   {navItems.filter(item => !item.isButton).map((item, i) => (
                     <motion.button
                       key={item.label}
-                      onClick={() => scrollToSection(item.section)}
+                      onClick={() => (item.route ? goToRoute(item.route) : scrollToSection(item.section))}
                       className="w-full text-left px-3 py-3 rounded-xl text-gray-800 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-between group"
                       initial={{ opacity: 0, x: -12 }}
                       animate={{ opacity: 1, x: 0 }}

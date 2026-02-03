@@ -1,9 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaMapMarkerAlt, FaPhone, FaEnvelope, FaArrowUp } from 'react-icons/fa';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const scrollToSection = (sectionId) => {
+    if (location.pathname !== '/') {
+      navigate({ pathname: '/', hash: `#${sectionId}` });
+      return;
+    }
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -15,7 +23,7 @@ const Footer = () => {
   };
 
   return (
-    <footer id="contact" className="bg-muted text-primary-text py-12 lg:py-16">
+    <footer id="site-footer" className="bg-muted text-primary-text py-12 lg:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Company Info */}
@@ -28,13 +36,15 @@ const Footer = () => {
             <div className="mb-6">
               <img 
                 src="images/logo.webp"
-                alt="Event Rentals Logo" 
+                alt="Ghaim UAE Logo" 
                 className="h-8 w-auto"
                 style={{ maxHeight: '48px' }}
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <p className="text-text-muted mb-6 leading-relaxed text-sm lg:text-base">
-              Professional event rentals for corporate gatherings, conferences, and special occasions across country.
+              Premium event rentals and production across the UAE. Corporate, private, and government events delivered with precision and care.
             </p>
             <div className="flex space-x-4">
               <motion.a
@@ -113,6 +123,14 @@ const Footer = () => {
                   Testimonials
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => navigate('/projects')}
+                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
+                >
+                  Projects
+                </button>
+              </li>
             </ul>
           </motion.div>
 
@@ -127,15 +145,15 @@ const Footer = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <FaPhone className="text-primary-accent" />
-                <span className="text-text-muted text-sm lg:text-base">+123 456 7890</span>
+                <span className="text-text-muted text-sm lg:text-base">+971 XX XXX XXXX</span>
               </div>
               <div className="flex items-center space-x-3">
                 <FaEnvelope className="text-primary-accent" />
-                <span className="text-text-muted text-sm lg:text-base">info@example.com</span>
+                <span className="text-text-muted text-sm lg:text-base">info@ghaimuae.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <FaMapMarkerAlt className="text-primary-accent" />
-                <span className="text-text-muted text-sm lg:text-base">123 Event St, City</span>
+                <span className="text-text-muted text-sm lg:text-base">Dubai, United Arab Emirates</span>
               </div>
             </div>
           </motion.div>
@@ -179,7 +197,7 @@ const Footer = () => {
         >
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
             <div className="text-text-muted text-xs sm:text-sm">
-              © 2026 Event Rentals. All Rights Reserved.
+              © 2026 Ghaim UAE. All Rights Reserved.
             </div>
             <div className="flex space-x-4 sm:space-x-6">
               <button className="text-text-muted hover:text-accent transition-colors duration-300 text-xs sm:text-sm">

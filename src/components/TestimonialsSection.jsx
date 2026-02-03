@@ -67,7 +67,7 @@ const TestimonialsSection = () => {
   };
 
   return (
-    <section className="bg-[#F8F9FA] py-24 md:py-32 overflow-hidden select-none">
+    <section id="testimonials" className="bg-[#F8F9FA] py-24 md:py-32 overflow-hidden select-none">
       {/* CUSTOM CURSOR - Fixed to viewport */}
       <AnimatePresence>
         {isHovering && (
@@ -142,6 +142,8 @@ const TestimonialsSection = () => {
                           src={t.customerImage} 
                           className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-lg" 
                           alt={t.customerName} 
+                          loading="lazy"
+                          decoding="async"
                         />
                         <div className="absolute -bottom-1 -right-1 bg-[#2D2E40] text-white p-1 rounded-full">
                           <FaStar size={10} />
@@ -163,6 +165,8 @@ const TestimonialsSection = () => {
                       src={t.eventImage} 
                       className="w-full h-full object-cover" 
                       alt="Event" 
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent lg:hidden" />
                   </div>

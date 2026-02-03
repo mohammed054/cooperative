@@ -20,6 +20,8 @@ const Hero = () => {
         muted
         loop
         playsInline
+        preload="metadata"
+        poster="/images/event1.jpg"
       >
         <source src="videos/background.mp4" type="video/mp4" />
       </video>
@@ -82,7 +84,7 @@ const Hero = () => {
               duration-300
               shadow-lg
             "
-            onClick={() => scrollToSection('scrollable-cards')}
+            onClick={() => scrollToSection('get-started')}
           />
         </motion.div>
 
@@ -91,7 +93,7 @@ const Hero = () => {
           animate={{ y: [0, 12, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer text-white opacity-80 hover:opacity-100 transition"
-          onClick={() => scrollToSection('scrollable-cards')}
+          onClick={() => scrollToSection('services')}
         >
           <FaArrowDown size={24} />
         </motion.div>

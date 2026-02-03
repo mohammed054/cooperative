@@ -44,11 +44,11 @@ export default function OurProjects() {
       : projects.filter((p) => p.category === activeCategory);
 
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div id="our-projects" className="w-full min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative w-full h-[80vh] flex flex-col items-center justify-center bg-gray-100">
-        <h1 className="text-5xl font-bold">Our Projects</h1>
-        <p className="mt-4 text-lg text-gray-600 text-center max-w-xl">
+      <section className="relative w-full h-[80vh] flex flex-col items-center justify-center bg-bg-muted">
+        <h1 className="text-5xl font-bold text-ghaimuae-primary">Our Projects</h1>
+        <p className="mt-4 text-lg text-text-muted text-center max-w-xl">
           From intimate gatherings to grand events, we do it all.
         </p>
       </section>
@@ -59,7 +59,7 @@ export default function OurProjects() {
           <button
             key={cat}
             className={`px-6 py-2 rounded-full border transition ${
-              activeCategory === cat ? "bg-blue-500 text-white" : "border-gray-300 text-gray-700"
+              activeCategory === cat ? "bg-ghaimuae-primary text-white" : "border-gray-300 text-text-muted"
             }`}
             onClick={() => setActiveCategory(cat)}
           >
@@ -79,6 +79,8 @@ export default function OurProjects() {
               src={proj.image}
               alt={proj.title}
               className="w-full h-64 object-cover transition-transform group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center text-center p-4 transition">
               <h2 className="text-white text-xl font-semibold">{proj.title}</h2>
@@ -102,7 +104,13 @@ export default function OurProjects() {
           {projects.map((proj) => (
             <SwiperSlide key={proj.id}>
               <div className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer">
-                <img src={proj.image} alt={proj.title} className="w-full h-64 object-cover" />
+                <img
+                  src={proj.image}
+                  alt={proj.title}
+                  className="w-full h-64 object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-transparent to-transparent p-4">
                   <h3 className="text-white font-semibold">{proj.title}</h3>
                 </div>
@@ -113,12 +121,12 @@ export default function OurProjects() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 text-center bg-blue-50">
-        <h2 className="text-4xl font-bold mb-4">Let’s Make Your Next Event Unforgettable</h2>
-        <p className="text-gray-700 mb-8">
+      <section className="py-20 px-6 text-center bg-bg-muted">
+        <h2 className="text-4xl font-bold mb-4 text-ghaimuae-primary">Let’s Make Your Next Event Unforgettable</h2>
+        <p className="text-text-muted mb-8">
           Get in touch with our team to start planning your dream event today.
         </p>
-        <button className="px-8 py-4 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-600 transition">
+        <button className="px-8 py-4 bg-ghaimuae-primary text-white rounded-full font-semibold hover:bg-ghaimuae-primary/90 transition">
           Book a Consultation
         </button>
       </section>

@@ -50,6 +50,7 @@ const ScrollableCardSection = () => {
   if (isMobile) {
     return (
       <section
+        id="services"
         ref={sectionRef}
         className="relative w-full bg-bg-muted"
         style={{ height: '280vh' }}
@@ -90,6 +91,8 @@ const ScrollableCardSection = () => {
                         src={card.img}
                         alt={card.title}
                         className="h-3/4 w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="flex-1 flex items-center justify-center">
                         <h3 className="text-xl font-bold text-ghaimuae-primary">
@@ -104,6 +107,8 @@ const ScrollableCardSection = () => {
                         src={card.img}
                         alt=""
                         className="w-4/5 h-28 object-cover rounded-lg mb-4"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <h4 className="text-lg font-semibold mb-1">
                         {card.subtitle}
@@ -128,6 +133,7 @@ const ScrollableCardSection = () => {
   /* ─── DESKTOP VIEW: sticky horizontal scroll ─── */
   return (
     <section
+      id="services"
       ref={sectionRef}
       className="relative w-full bg-bg-muted"
       style={{ height: '420vh' }}
@@ -166,6 +172,8 @@ const ScrollableCardSection = () => {
                       src={card.img}
                       alt={card.title}
                       className="h-3/4 w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="flex-1 flex items-center justify-center">
                       <h3 className="text-3xl font-bold text-ghaimuae-primary">
@@ -180,6 +188,8 @@ const ScrollableCardSection = () => {
                       src={card.img}
                       alt=""
                       className="w-4/5 h-48 object-cover rounded-lg mb-6"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <h4 className="text-2xl font-semibold mb-2">
                       {card.subtitle}

@@ -22,7 +22,7 @@ const FinalCta = () => {
 
   return (
     <section 
-      id="contact" 
+      id="get-started" 
       ref={ref}
       className="min-h-screen flex items-center justify-center bg-ghaimuae-primary py-16 lg:py-20"
     >
@@ -35,10 +35,9 @@ const FinalCta = () => {
             transition={{ duration: 0.8 }}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-ghaimuae-white mb-4 lg:mb-8 leading-tight"
           >
-            (THIS IS A PLACEHOLDER CTA SECTION) <p></p>
-            Transform Your Business
+            Let’s Build Your Next Event
             <br />
-            <span className="text-ghaimuae-light-gray">Start Today</span>
+            <span className="text-ghaimuae-light-gray">On Time, On Brand, On Budget</span>
           </motion.h1>
 
           <motion.p
@@ -48,8 +47,7 @@ const FinalCta = () => {
             className="text-base sm:text-lg md:text-xl lg:text-2xl text-ghaimuae-light-gray mb-8 lg:mb-16 max-w-4xl mx-auto leading-relaxed"
           >
             
-            Join hundreds of successful businesses that have partnered with GHAIM UAE 
-            to achieve operational excellence and sustainable growth. Your transformation journey begins now.
+            Share your event goals and we’ll craft a tailored production plan, rental package, and execution timeline that fits your scope and audience.
           </motion.p>
         </motion.div>
 
@@ -61,7 +59,7 @@ const FinalCta = () => {
           className="bg-ghaimuae-white rounded-2xl lg:rounded-3xl p-5 sm:p-8 lg:p-12 shadow-2xl max-w-3xl mx-auto"
         >
           <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-ghaimuae-primary mb-6 lg:mb-8 text-center">
-            Get Started Today
+            Request a Proposal
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -135,11 +133,11 @@ const FinalCta = () => {
                 className="w-full px-4 py-3 border border-ghaimuae-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-ghaimuae-primary focus:border-transparent transition-all duration-200"
               >
                 <option value="">Select a service</option>
-                <option value="corporate">Corporate Services</option>
-                <option value="logistics">Logistics Solutions</option>
-                <option value="infrastructure">Infrastructure Services</option>
-                <option value="custom">Custom Solutions</option>
-                <option value="consultation">Initial Consultation</option>
+                <option value="corporate">Corporate Events</option>
+                <option value="private">Private & Social Events</option>
+                <option value="government">Government & Public Events</option>
+                <option value="rentals">Equipment Rentals Only</option>
+                <option value="consultation">Consultation & Planning</option>
               </select>
             </div>
 
@@ -170,7 +168,7 @@ const FinalCta = () => {
           </form>
 
           <p className="text-center text-ghaimuae-dark-gray/60 text-sm mt-6">
-            * We'll respond within 24 hours. Your information is secure and confidential.
+            * We respond within 24 hours. Your information is secure and confidential.
           </p>
         </motion.div>
 
