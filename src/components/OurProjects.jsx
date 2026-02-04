@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import { Link } from "react-router-dom";
+import PageIntro from "./PageIntro";
 
 export default function OurProjects() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -44,22 +46,29 @@ export default function OurProjects() {
       : projects.filter((p) => p.category === activeCategory);
 
   return (
-    <div id="our-projects" className="w-full min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative w-full h-[80vh] flex flex-col items-center justify-center bg-bg-muted">
-        <h1 className="text-5xl font-bold text-ghaimuae-primary">Our Projects</h1>
-        <p className="mt-4 text-lg text-text-muted text-center max-w-xl">
-          From intimate gatherings to grand events, we do it all.
-        </p>
-      </section>
+    <div id="our-projects" className="w-full min-h-screen bg-surface-3">
+      <PageIntro
+        eyebrow="Projects"
+        title="A gallery of recent rooms and builds."
+        description="Selected visuals from corporate summits, launches, and high‑touch hospitality events across the UAE."
+      >
+        <div className="flex flex-wrap gap-3">
+          <Link to="/contact" className="btn-primary text-sm">
+            Request a proposal
+          </Link>
+          <Link to="/work" className="btn-secondary text-sm">
+            View case studies
+          </Link>
+        </div>
+      </PageIntro>
 
       {/* Categories */}
-      <section className="py-10 px-6 flex justify-center gap-4 flex-wrap">
+      <section className="py-10 px-6 flex justify-center gap-4 flex-wrap bg-surface">
         {categories.map((cat) => (
           <button
             key={cat}
-            className={`px-6 py-2 rounded-full border transition ${
-              activeCategory === cat ? "bg-ghaimuae-primary text-white" : "border-gray-300 text-text-muted"
+            className={`px-6 py-2 rounded-full border transition text-sm font-semibold ${
+              activeCategory === cat ? "bg-ink text-white border-ink" : "border-border text-ink-muted hover:text-ink"
             }`}
             onClick={() => setActiveCategory(cat)}
           >
@@ -69,11 +78,11 @@ export default function OurProjects() {
       </section>
 
       {/* Projects Grid */}
-      <section className="px-6 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="px-6 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 bg-surface">
         {filteredProjects.map((proj) => (
           <div
             key={proj.id}
-            className="relative group overflow-hidden rounded-lg shadow-lg cursor-pointer"
+            className="relative group overflow-hidden rounded-2xl shadow-lg cursor-pointer border border-border"
           >
             <img
               src={proj.image}
@@ -82,7 +91,7 @@ export default function OurProjects() {
               loading="lazy"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center text-center p-4 transition">
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center text-center p-4 transition">
               <h2 className="text-white text-xl font-semibold">{proj.title}</h2>
               <p className="text-white mt-2 text-sm">{proj.description}</p>
             </div>
@@ -91,8 +100,8 @@ export default function OurProjects() {
       </section>
 
       {/* Featured Projects Carousel */}
-      <section className="py-10 px-6">
-        <h2 className="text-3xl font-bold text-center mb-6">Featured Projects</h2>
+      <section className="py-10 px-6 bg-surface-3">
+        <h2 className="text-3xl font-semibold text-center mb-6 text-ink font-serif">Featured projects</h2>
         <Swiper
           spaceBetween={20}
           slidesPerView={1}
@@ -103,7 +112,7 @@ export default function OurProjects() {
         >
           {projects.map((proj) => (
             <SwiperSlide key={proj.id}>
-              <div className="relative rounded-lg overflow-hidden shadow-lg cursor-pointer">
+              <div className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer border border-border bg-surface-2">
                 <img
                   src={proj.image}
                   alt={proj.title}
@@ -111,7 +120,7 @@ export default function OurProjects() {
                   loading="lazy"
                   decoding="async"
                 />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-transparent to-transparent p-4">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-4">
                   <h3 className="text-white font-semibold">{proj.title}</h3>
                 </div>
               </div>
@@ -121,14 +130,14 @@ export default function OurProjects() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 text-center bg-bg-muted">
-        <h2 className="text-4xl font-bold mb-4 text-ghaimuae-primary">Let’s Make Your Next Event Unforgettable</h2>
-        <p className="text-text-muted mb-8">
-          Get in touch with our team to start planning your dream event today.
+      <section className="py-20 px-6 text-center bg-surface">
+        <h2 className="text-4xl font-semibold mb-4 text-ink font-serif">Plan your next event with a calm team.</h2>
+        <p className="text-ink-muted mb-8">
+          Share your dates and priorities. We will respond with a clear scope and timeline.
         </p>
-        <button className="px-8 py-4 bg-ghaimuae-primary text-white rounded-full font-semibold hover:bg-ghaimuae-primary/90 transition">
-          Book a Consultation
-        </button>
+        <Link to="/contact" className="btn-primary px-8 py-4">
+          Book a consultation
+        </Link>
       </section>
     </div>
   );

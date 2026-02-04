@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaMapMarkerAlt, FaPhone, FaEnvelope, FaArrowUp } from 'react-icons/fa';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { FaFacebook, FaInstagram, FaLinkedin, FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { caseStudies, services } from '../data/siteData';
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -23,197 +24,197 @@ const Footer = () => {
   };
 
   return (
-    <footer id="site-footer" className="bg-muted text-primary-text py-12 lg:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          {/* Company Info */}
+    <footer id="site-footer" className="bg-surface py-12 lg:py-16 text-ink">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1fr]">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="mb-6">
-              <img 
+            <div className="flex items-center gap-3">
+              <img
                 src="/cooperative/images/logo.webp"
-                alt="Ghaim UAE Logo" 
-                className="h-8 w-auto"
-                style={{ maxHeight: '48px' }}
+                alt="Ghaim UAE logo"
+                className="h-8 w-auto brightness-0"
                 loading="lazy"
                 decoding="async"
               />
+              <span className="text-lg font-semibold tracking-[0.2em]">GHAIM</span>
             </div>
-            <p className="text-text-muted mb-6 leading-relaxed text-sm lg:text-base">
-              Premium event rentals and production across the UAE. Corporate, private, and government events delivered with precision and care.
+            <p className="mt-4 text-sm text-ink-muted">
+              Event production and curated rentals across the UAE. Senior-led crews, disciplined timelines, and calm show control.
             </p>
-            <div className="flex space-x-4">
+            <div className="mt-6 flex items-center gap-4">
               <motion.a
-                href="#"
-                className="text-text-muted hover:text-primary-accent transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink-muted transition hover:text-ink"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.96 }}
+                aria-label="Facebook"
               >
-                <FaFacebook className="text-xl" />
+                <FaFacebook className="text-lg" />
               </motion.a>
               <motion.a
-                href="#"
-                className="text-text-muted hover:text-primary-accent transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink-muted transition hover:text-ink"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.96 }}
+                aria-label="Instagram"
               >
-                <FaInstagram className="text-xl" />
+                <FaInstagram className="text-lg" />
               </motion.a>
               <motion.a
-                href="#"
-                className="text-text-muted hover:text-primary-accent transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                href="https://www.linkedin.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink-muted transition hover:text-ink"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.96 }}
+                aria-label="LinkedIn"
               >
-                <FaLinkedin className="text-xl" />
-              </motion.a>
-              <motion.a
-                href="#"
-                className="text-text-muted hover:text-primary-accent transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FaTwitter className="text-xl" />
+                <FaLinkedin className="text-lg" />
               </motion.a>
             </div>
           </motion.div>
 
-          {/* Quick Links */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-base lg:text-lg font-semibold text-primary-text mb-4 lg:mb-6">Quick Links</h3>
-            <ul className="space-y-3">
-              <li>
-                <button
-                  onClick={() => scrollToSection('hero')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
-                >
-                  Home
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => scrollToSection('rentals')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
-                >
-                  Rentals
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => scrollToSection('process')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
-                >
-                  Process
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => scrollToSection('testimonials')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
-                >
-                  Testimonials
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => navigate('/projects')}
-                  className="text-light-gray hover:text-gold transition-colors duration-300 text-left text-sm lg:text-base"
-                >
-                  Projects
-                </button>
-              </li>
+            <p className="text-sm font-semibold text-ink">Services</p>
+            <ul className="mt-4 space-y-2 text-sm text-ink-muted">
+              {services.map((service) => (
+                <li key={service.slug}>
+                  <Link to={`/services/${service.slug}`} className="transition hover:text-ink">
+                    {service.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
+            <Link to="/services" className="mt-4 inline-flex text-sm font-semibold text-ink">
+              View all services
+            </Link>
           </motion.div>
 
-          {/* Contact Info */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-base lg:text-lg font-semibold text-primary-text mb-4 lg:mb-6">Contact Info</h3>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <FaPhone className="text-primary-accent" />
-                <span className="text-text-muted text-sm lg:text-base">+971 XX XXX XXXX</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <FaEnvelope className="text-primary-accent" />
-                <span className="text-text-muted text-sm lg:text-base">info@ghaimuae.com</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <FaMapMarkerAlt className="text-primary-accent" />
-                <span className="text-text-muted text-sm lg:text-base">Dubai, United Arab Emirates</span>
-              </div>
-            </div>
+            <p className="text-sm font-semibold text-ink">Work</p>
+            <ul className="mt-4 space-y-2 text-sm text-ink-muted">
+              {caseStudies.map((study) => (
+                <li key={study.slug}>
+                  <Link to={`/work/${study.slug}`} className="transition hover:text-ink">
+                    {study.title}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link to="/projects" className="transition hover:text-ink">
+                  Project gallery
+                </Link>
+              </li>
+            </ul>
+            <Link to="/work" className="mt-4 inline-flex text-sm font-semibold text-ink">
+              View case studies
+            </Link>
           </motion.div>
 
-          {/* Newsletter */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-base lg:text-lg font-semibold text-primary-text mb-4 lg:mb-6">Stay Updated</h3>
-            <p className="text-text-muted mb-4 lg:mb-6 text-sm lg:text-base">
-              Subscribe to our newsletter for exclusive offers and event planning tips.
-            </p>
-            <form className="space-y-3">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="w-full px-4 py-2 bg-white/50 border border-primary-accent/30 rounded-lg text-primary-text placeholder-text-muted focus:outline-none focus:border-primary-accent transition-colors duration-300 text-sm lg:text-base"
-              />
-              <motion.button
-                type="submit"
-                className="w-full bg-primary-accent hover:bg-primary-accent/90 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm lg:text-base"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Subscribe
-              </motion.button>
-            </form>
+            <p className="text-sm font-semibold text-ink">Company</p>
+            <ul className="mt-4 space-y-2 text-sm text-ink-muted">
+              <li>
+                <Link to="/about" className="transition hover:text-ink">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link to="/process" className="transition hover:text-ink">
+                  Process
+                </Link>
+              </li>
+              <li>
+                <Link to="/testimonials" className="transition hover:text-ink">
+                  Testimonials
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="transition hover:text-ink">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link to="/pricing" className="transition hover:text-ink">
+                  Pricing
+                </Link>
+              </li>
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-sm font-semibold text-ink">Contact</p>
+            <div className="mt-4 space-y-3 text-sm text-ink-muted">
+              <div className="flex items-center gap-3">
+                <FaPhone className="text-accent" />
+                <span>+971 4 234 5678</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <FaEnvelope className="text-accent" />
+                <span>hello@ghaimuae.com</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <FaMapMarkerAlt className="text-accent" />
+                <span>Dubai Design District, UAE</span>
+              </div>
+            </div>
+            <button onClick={() => navigate('/contact')} className="btn-primary mt-5 text-sm">
+              Request a proposal
+            </button>
           </motion.div>
         </div>
 
-        {/* Bottom Section */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          className="border-t border-primary-accent/20 mt-10 lg:mt-12 pt-6 lg:pt-8"
+          className="mt-10 border-t border-border pt-6"
         >
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-            <div className="text-text-muted text-xs sm:text-sm">
-              © 2026 Ghaim UAE. All Rights Reserved.
-            </div>
-            <div className="flex space-x-4 sm:space-x-6">
-              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-xs sm:text-sm">
-                Privacy Policy
-              </button>
-              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-xs sm:text-sm">
-                Terms of Service
-              </button>
-              <button className="text-text-muted hover:text-accent transition-colors duration-300 text-xs sm:text-sm">
-                Sitemap
+          <div className="flex flex-col gap-3 text-xs text-ink-muted sm:flex-row sm:items-center sm:justify-between">
+            <p>© 2026 Ghaim UAE. All rights reserved.</p>
+            <div className="flex flex-wrap gap-4">
+              <Link to="/privacy" className="transition hover:text-ink">
+                Privacy policy
+              </Link>
+              <Link to="/terms" className="transition hover:text-ink">
+                Terms of service
+              </Link>
+              <button onClick={() => scrollToSection('get-started')} className="transition hover:text-ink">
+                Start a project
               </button>
             </div>
           </div>
         </motion.div>
-
-
       </div>
     </footer>
   );

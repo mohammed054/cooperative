@@ -1,5 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FaArrowRight, FaChevronLeft, FaChevronRight, FaQuoteLeft } from 'react-icons/fa';
 
 const getInitials = (name) => {
@@ -51,8 +52,16 @@ const TESTIMONIALS = [
   },
 ];
 
-const TestimonialsSection = () => {
+const TestimonialsSection = ({
+  title = 'Trusted by teams who can’t miss.',
+  intro = 'Premium rentals and on‑site production, delivered with calm precision — so you can focus on the room.',
+  showLink = true,
+}) => {
   const shouldReduceMotion = useReducedMotion();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+  const proposalHref = '#get-started';
+  const processHref = isHome ? '#process' : '/process';
   const [activeId, setActiveId] = useState(TESTIMONIALS[0]?.id);
 
   const activeIndex = useMemo(
@@ -76,13 +85,13 @@ const TestimonialsSection = () => {
   };
 
   return (
-    <section id="testimonials" className="relative overflow-hidden bg-white py-24 sm:py-32">
+    <section id="testimonials" className="relative overflow-hidden bg-surface-2 py-24 sm:py-32">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-70"
         style={{
           backgroundImage:
-            'radial-gradient(900px 500px at 50% -10%, rgba(59, 130, 246, 0.14), transparent 60%), radial-gradient(700px 500px at 0% 65%, rgba(225, 145, 188, 0.10), transparent 55%)',
+            'radial-gradient(900px 500px at 50% -10%, rgba(155, 107, 61, 0.16), transparent 60%), radial-gradient(700px 500px at 0% 65%, rgba(0, 0, 0, 0.08), transparent 55%)',
         }}
       />
 
@@ -94,14 +103,14 @@ const TestimonialsSection = () => {
           transition={transition}
           className="max-w-3xl"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-black/60">
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-ink-subtle">
             Testimonials
           </p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-black sm:text-5xl lg:text-6xl">
-            Trusted by teams who can’t miss.
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-ink sm:text-5xl lg:text-6xl font-serif">
+            {title}
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-black/70 sm:text-lg">
-            Premium rentals and on‑site production, delivered with calm precision — so you can focus on the room.
+          <p className="mt-5 text-base leading-relaxed text-ink-muted sm:text-lg">
+            {intro}
           </p>
         </motion.header>
 
@@ -114,34 +123,34 @@ const TestimonialsSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
                 transition={transition}
-                className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.10)]"
+                className="overflow-hidden rounded-3xl border border-border bg-surface-2 shadow-[0_18px_60px_rgba(22,22,22,0.10)]"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12">
                   <div className="p-8 sm:p-10 lg:col-span-7 lg:p-12">
                     <div className="flex items-center justify-between gap-4">
-                      <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-semibold text-black/70">
+                      <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs font-semibold text-ink-muted">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                         Client feedback
                       </div>
-                      <p className="text-xs font-medium text-black/50">
+                      <p className="text-xs font-medium text-ink-subtle">
                         {active?.event} • {active?.location}
                       </p>
                     </div>
 
-                    <FaQuoteLeft className="mt-10 text-4xl text-black/10" aria-hidden="true" />
-                    <blockquote className="mt-6 text-[clamp(1.25rem,2.4vw,2.125rem)] font-medium leading-[1.15] tracking-tight text-black">
+                    <FaQuoteLeft className="mt-10 text-4xl text-ink-subtle opacity-40" aria-hidden="true" />
+                    <blockquote className="mt-6 text-[clamp(1.25rem,2.4vw,2.125rem)] font-medium leading-[1.15] tracking-tight text-ink">
                       {active?.quote}
                     </blockquote>
 
                     <figcaption className="mt-10 flex items-center gap-4">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black text-xs font-semibold text-white">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-ink text-xs font-semibold text-white">
                         {getInitials(active?.name)}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-black">
+                        <p className="truncate text-sm font-semibold text-ink">
                           {active?.name}
                         </p>
-                        <p className="truncate text-sm text-black/60">
+                        <p className="truncate text-sm text-ink-muted">
                           {active?.role} • {active?.company}
                         </p>
                       </div>
@@ -165,7 +174,7 @@ const TestimonialsSection = () => {
                       {(active?.tags ?? []).map((tag) => (
                         <span
                           key={tag}
-                          className="inline-flex items-center rounded-full bg-white/[0.85] px-3 py-1 text-xs font-semibold text-black/70 backdrop-blur"
+                          className="inline-flex items-center rounded-full bg-white/[0.85] px-3 py-1 text-xs font-semibold text-ink-muted backdrop-blur"
                         >
                           {tag}
                         </span>
@@ -189,8 +198,8 @@ const TestimonialsSection = () => {
                       'shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition',
                       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
                       isActive
-                        ? 'border-black bg-black text-white'
-                        : 'border-black/10 bg-white text-black/70 hover:border-black/20 hover:text-black',
+                        ? 'border-ink bg-ink text-white'
+                        : 'border-border bg-surface-2 text-ink-muted hover:border-ink hover:text-ink',
                     ].join(' ')}
                   >
                     {t.company}
@@ -202,7 +211,7 @@ const TestimonialsSection = () => {
 
           <div className="lg:col-span-5">
             <div className="hidden lg:block">
-              <p className="text-sm font-semibold text-black/80">More feedback</p>
+              <p className="text-sm font-semibold text-ink">More feedback</p>
               <div className="mt-4 flex flex-col gap-3" role="tablist" aria-label="Testimonials">
                 {TESTIMONIALS.map((t) => {
                   const isActive = t.id === active?.id;
@@ -213,13 +222,13 @@ const TestimonialsSection = () => {
                       onClick={() => setActiveId(t.id)}
                       role="tab"
                       aria-selected={isActive}
-                      className="group relative w-full overflow-hidden rounded-2xl border border-black/10 bg-white p-5 text-left transition hover:border-black/20 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                      className="group relative w-full overflow-hidden rounded-2xl border border-border bg-surface-2 p-5 text-left transition hover:border-ink hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                     >
                       {isActive && (
                         <motion.div
                           layoutId="testimonialActive"
                           transition={transition}
-                          className="absolute inset-0 bg-black"
+                          className="absolute inset-0 bg-ink"
                         />
                       )}
 
@@ -227,7 +236,7 @@ const TestimonialsSection = () => {
                         <div
                           className={[
                             'flex h-10 w-10 items-center justify-center rounded-full text-xs font-semibold',
-                            isActive ? 'bg-white/[0.12] text-white' : 'bg-black text-white',
+                            isActive ? 'bg-white/[0.12] text-white' : 'bg-ink text-white',
                           ].join(' ')}
                         >
                           {getInitials(t.name)}
@@ -236,7 +245,7 @@ const TestimonialsSection = () => {
                           <p
                             className={[
                               'truncate text-sm font-semibold',
-                              isActive ? 'text-white' : 'text-black',
+                              isActive ? 'text-white' : 'text-ink',
                             ].join(' ')}
                           >
                             {t.name}
@@ -244,7 +253,7 @@ const TestimonialsSection = () => {
                           <p
                             className={[
                               'truncate text-sm',
-                              isActive ? 'text-white/70' : 'text-black/60',
+                              isActive ? 'text-white/70' : 'text-ink-muted',
                             ].join(' ')}
                           >
                             {t.role} • {t.company}
@@ -252,7 +261,7 @@ const TestimonialsSection = () => {
                           <p
                             className={[
                               'mt-3 text-sm leading-relaxed',
-                              isActive ? 'text-white/[0.85]' : 'text-black/70',
+                              isActive ? 'text-white/[0.85]' : 'text-ink-muted',
                             ].join(' ')}
                           >
                             {t.headline}
@@ -265,34 +274,34 @@ const TestimonialsSection = () => {
               </div>
             </div>
 
-            <div className="mt-6 rounded-3xl border border-black/10 bg-white p-6 sm:p-8 lg:mt-0">
-              <p className="text-sm font-semibold text-black/80">Why teams come back</p>
-              <ul className="mt-4 space-y-3 text-sm text-black/70">
+            <div className="mt-6 rounded-3xl border border-border bg-surface-2 p-6 sm:p-8 lg:mt-0">
+              <p className="text-sm font-semibold text-ink">Why teams come back</p>
+              <ul className="mt-4 space-y-3 text-sm text-ink-muted">
                 <li className="flex gap-3">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-black/40" />
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
                   One accountable producer from setup to show‑close
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-black/40" />
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
                   Equipment arrives tested, organized, and event‑ready
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-black/40" />
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
                   Calm crews, clean finishes, zero‑surprise execution
                 </li>
               </ul>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href="#get-started"
-                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-black px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(0,0,0,0.18)] transition hover:shadow-[0_16px_46px_rgba(0,0,0,0.22)]"
+                  href={proposalHref}
+                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(22,22,22,0.18)] transition hover:shadow-[0_16px_46px_rgba(22,22,22,0.22)]"
                 >
                   Request a proposal
                   <FaArrowRight className="transition-transform group-hover:translate-x-0.5" size={14} />
                 </a>
                 <a
-                  href="#process"
-                  className="inline-flex items-center justify-center rounded-full border border-black/[0.15] bg-white px-6 py-3 text-sm font-semibold text-black/80 transition hover:border-black/25 hover:text-black"
+                  href={processHref}
+                  className="inline-flex items-center justify-center rounded-full border border-border bg-surface-2 px-6 py-3 text-sm font-semibold text-ink-muted transition hover:border-ink hover:text-ink"
                 >
                   See how it works
                 </a>
@@ -307,7 +316,7 @@ const TestimonialsSection = () => {
               type="button"
               onClick={goPrev}
               aria-label="Previous testimonial"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/20 hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface-2 text-ink-muted transition hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <FaChevronLeft size={14} />
             </button>
@@ -315,21 +324,23 @@ const TestimonialsSection = () => {
               type="button"
               onClick={goNext}
               aria-label="Next testimonial"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/20 hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface-2 text-ink-muted transition hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <FaChevronRight size={14} />
             </button>
-            <p className="text-sm font-semibold tabular-nums text-black/60">
+            <p className="text-sm font-semibold tabular-nums text-ink-muted">
               {String(activeIndex + 1).padStart(2, '0')} / {String(TESTIMONIALS.length).padStart(2, '0')}
             </p>
           </div>
 
-          <p className="text-sm text-black/60">
-            Need a plan by end of week?{' '}
-            <a href="#get-started" className="font-semibold text-black underline underline-offset-4">
-              We can move fast.
-            </a>
-          </p>
+          {showLink && (
+            <p className="text-sm text-ink-muted">
+              Need a plan by end of week?{' '}
+              <a href={proposalHref} className="font-semibold text-ink underline underline-offset-4">
+                We can move fast.
+              </a>
+            </p>
+          )}
         </div>
       </div>
     </section>

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import PageIntro from '../components/PageIntro';
 
 const Privacy = () => {
@@ -23,6 +24,16 @@ const Privacy = () => {
             <h2 className="text-sm font-semibold text-ink">Contact</h2>
             <p className="mt-3">For questions about your data, email hello@ghaimuae.com.</p>
           </div>
+        </div>
+      </section>
+
+      <section className="bg-surface-3 py-12">
+        <div className="mx-auto max-w-4xl px-4 text-sm text-ink-muted sm:px-6 lg:px-8">
+          Need anything clarified?{' '}
+          <Link to="/contact" className="font-semibold text-ink">
+            Get in touch
+          </Link>
+          .
         </div>
       </section>
     </div>

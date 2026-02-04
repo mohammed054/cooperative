@@ -1,26 +1,57 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FaChevronDown } from 'react-icons/fa';
+import { caseStudies, services } from '../data/siteData';
 
 const GhaimAEHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
-  const [isHidden, setIsHidden] = useState(true);
+  const [isHidden, setIsHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
   const lastScrollY = useRef(0);
   const scrollTimeoutRef = useRef(null);
 
   const navItems = [
-    { label: 'Rentals', section: 'rentals' },
-    { label: 'Process', section: 'process' },
-    { label: 'Testimonials', section: 'testimonials' },
-    { label: 'Projects', route: '/projects' },
-    { label: 'Get Started', section: 'get-started', isButton: true },
+    {
+      label: 'Services',
+      href: '/services',
+      children: services.map((service) => ({
+        label: service.title,
+        description: service.summary,
+        href: `/services/${service.slug}`,
+      })),
+    },
+    {
+      label: 'Work',
+      href: '/work',
+      children: [
+        ...caseStudies.map((study) => ({
+          label: study.title,
+          description: study.location,
+          href: `/work/${study.slug}`,
+        })),
+        {
+          label: 'Project gallery',
+          description: 'Browse production visuals',
+          href: '/projects',
+        },
+      ],
+    },
+    { label: 'Process', href: '/process' },
+    {
+      label: 'Company',
+      href: '/about',
+      children: [
+        { label: 'About', description: 'Our team and principles', href: '/about' },
+        { label: 'Testimonials', description: 'Client feedback', href: '/testimonials' },
+        { label: 'FAQ', description: 'Planning questions', href: '/faq' },
+      ],
+    },
+    { label: 'Pricing', href: '/pricing' },
   ];
 
-  // Scroll behavior
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
@@ -30,7 +61,7 @@ const GhaimAEHeader = () => {
         if (mobileOpen) {
           setIsHidden(false);
         } else if (currentY <= 20) {
-          setIsHidden(true);
+          setIsHidden(false);
         } else if (currentY > lastScrollY.current) {
           setIsHidden(false);
         } else if (currentY < lastScrollY.current) {
@@ -49,36 +80,25 @@ const GhaimAEHeader = () => {
     };
   }, [mobileOpen]);
 
-  // Close mobile menu when resizing above md
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) setMobileOpen(false);
+      if (window.innerWidth >= 1024) setMobileOpen(false);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileOpen) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [mobileOpen]);
 
-  const scrollToSection = (sectionId) => {
-    if (location.pathname !== '/') {
-      navigate({ pathname: '/', hash: `#${sectionId}` });
-      setMobileOpen(false);
-      return;
-    }
-    const element = document.getElementById(sectionId);
-    if (element) element.scrollIntoView({ behavior: 'smooth' });
-    else navigate({ hash: `#${sectionId}` });
-    setMobileOpen(false);
-  };
-
-  const goToRoute = (route) => {
-    navigate(route);
+  const goTo = (href) => {
+    if (!href) return;
+    navigate(href);
     setMobileOpen(false);
   };
 
@@ -87,215 +107,188 @@ const GhaimAEHeader = () => {
 
   return (
     <>
-        <motion.header
-          initial={false}
-          animate={{
-            y: isHidden ? -120 : 0,
-            transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
-          }}
-          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
-            ${!headerIsLight
-              ? 'bg-white shadow-xl border-b border-gray-200'
-              : 'bg-transparent'}
-          `}
-        >
-        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center min-h-[72px] w-full">
-            {/* Logo */}
-            <motion.div className="flex items-center flex-shrink-0" whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-              <img
-                src="/cooperative/images/logo.webp"
-                alt="GHAIM UAE"
-                className={`h-10 w-auto ${headerIsLight ? 'brightness-0 invert' : 'brightness-0'}`}
-              />
-              <span
-                className={`ml-3 text-2xl sm:text-3xl font-bold transition-colors duration-300 ${
-                  headerIsLight ? 'text-white' : 'text-ghaimuae-primary'
-                }`}
-              >
-                GHAIM
-              </span>
-            </motion.div>
+      <motion.header
+        initial={false}
+        animate={{
+          y: isHidden ? -120 : 0,
+          transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+        }}
+        className={[
+          'fixed left-0 right-0 top-0 z-50 transition-all duration-500 ease-out',
+          headerIsLight ? 'bg-transparent' : 'bg-white/95 shadow-lg backdrop-blur border-b border-border',
+        ].join(' ')}
+      >
+        <div className="mx-auto flex min-h-[76px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <Link to="/" className="flex items-center gap-3">
+            <img
+              src="/cooperative/images/logo.webp"
+              alt="Ghaim UAE"
+              className={`h-9 w-auto ${headerIsLight ? 'brightness-0 invert' : 'brightness-0'}`}
+              loading="lazy"
+              decoding="async"
+            />
+            <span className={`text-xl font-semibold tracking-[0.12em] ${headerIsLight ? 'text-white' : 'text-ink'}`}>
+              GHAIM
+            </span>
+          </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
-              {navItems.map((item, index) =>
-                item.isButton ? (
-                  <motion.button
-                    key={item.label}
-                    onClick={() => scrollToSection(item.section)}
-                    className="ml-4 px-5 py-1.5 rounded-lg text-sm font-semibold text-white transition-opacity duration-200 hover:opacity-85"
-                    style={{ background: 'var(--color-primary, #1a1a2e)' }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
+          <nav className="hidden items-center gap-6 lg:flex">
+            {navItems.map((item) => {
+              const hasChildren = Boolean(item.children?.length);
+              return (
+                <div key={item.label} className="group relative">
+                  <Link
+                    to={item.href}
+                    className={[
+                      'inline-flex items-center gap-2 text-sm font-semibold transition',
+                      headerIsLight ? 'text-white/80 hover:text-white' : 'text-ink-muted hover:text-ink',
+                    ].join(' ')}
                   >
                     {item.label}
-                  </motion.button>
-                ) : item.route ? (
-                  <motion.button
-                    key={item.label}
-                    onClick={() => goToRoute(item.route)}
-                    onHoverStart={() => setHoveredItem(item.label)}
-                    onHoverEnd={() => setHoveredItem(null)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center ${
-                      !headerIsLight
-                        ? 'text-ghaimuae-light-gray hover:text-black hover:bg-gray-100'
-                        : 'text-white hover:bg-white hover:text-black'
-                    }`}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    {item.label}
-                    <motion.span
-                      className="ml-1 inline-block"
-                      animate={{ rotate: hoveredItem === item.label ? 135 : 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      +
-                    </motion.span>
-                  </motion.button>
-                ) : (
-                  <motion.button
-                    key={item.label}
-                    onClick={() => scrollToSection(item.section)}
-                    onHoverStart={() => setHoveredItem(item.label)}
-                    onHoverEnd={() => setHoveredItem(null)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center ${
-                      !headerIsLight
-                        ? 'text-ghaimuae-light-gray hover:text-black hover:bg-gray-100'
-                        : 'text-white hover:bg-white hover:text-black'
-                    }`}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    {item.label}
-                    <motion.span
-                      className="ml-1 inline-block"
-                      animate={{ rotate: hoveredItem === item.label ? 135 : 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      +
-                    </motion.span>
-                  </motion.button>
-                )
-              )}
-            </nav>
+                    {hasChildren && (
+                      <FaChevronDown className="text-[10px] opacity-70 transition group-hover:rotate-180" />
+                    )}
+                  </Link>
 
-            {/* Mobile Hamburger */}
-            <div className="md:hidden flex items-center h-full">
-              <button
-                className={`relative w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-xl transition-all duration-300 ${
-                  !headerIsLight || mobileOpen ? 'hover:bg-gray-100' : 'hover:bg-white/10'
-                }`}
-                onClick={() => setMobileOpen(!mobileOpen)}
-                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-              >
-                <span
-                  className={`block rounded-full transition-all duration-300 ease-in-out ${
-                    !headerIsLight || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
-                  }`}
-                  style={{
-                    width: mobileOpen ? '18px' : '22px',
-                    height: '2px',
-                    transform: mobileOpen ? 'translateY(7px) rotate(45deg)' : 'none',
-                  }}
-                />
-                <span
-                  className={`block rounded-full transition-all duration-300 ease-in-out ${
-                    !headerIsLight || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
-                  }`}
-                  style={{
-                    width: '22px',
-                    height: '2px',
-                    opacity: mobileOpen ? 0 : 1,
-                    transform: mobileOpen ? 'scaleX(0)' : 'none',
-                  }}
-                />
-                <span
-                  className={`block rounded-full transition-all duration-300 ease-in-out ${
-                    !headerIsLight || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
-                  }`}
-                  style={{
-                    width: mobileOpen ? '18px' : '22px',
-                    height: '2px',
-                    transform: mobileOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
-                  }}
-                />
-              </button>
-            </div>
-          </div>
+                  {hasChildren && (
+                    <div
+                      className={[
+                        'invisible absolute left-0 top-full z-40 mt-3 w-[320px] rounded-2xl border border-border bg-surface-2 p-4 opacity-0 shadow-[0_18px_50px_rgba(22,22,22,0.18)] transition',
+                        'group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100',
+                      ].join(' ')}
+                    >
+                      <div className="space-y-3">
+                        {item.children.map((child) => (
+                          <button
+                            key={child.href}
+                            type="button"
+                            onClick={() => goTo(child.href)}
+                            className="w-full rounded-xl px-3 py-2 text-left transition hover:bg-surface"
+                          >
+                            <p className="text-sm font-semibold text-ink">{child.label}</p>
+                            <p className="text-xs text-ink-muted">{child.description}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            <button type="button" onClick={() => goTo('/contact')} className="btn-primary text-sm">
+              Contact
+            </button>
+          </nav>
+
+          <button
+            className={`flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full transition ${
+              headerIsLight ? 'text-white hover:bg-white/10' : 'text-ink hover:bg-surface'
+            } lg:hidden`}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+          >
+            <span
+              className={`block h-0.5 w-5 rounded-full transition ${
+                headerIsLight ? 'bg-white' : 'bg-ink'
+              } ${mobileOpen ? 'translate-y-1.5 rotate-45' : ''}`}
+            />
+            <span
+              className={`block h-0.5 w-5 rounded-full transition ${
+                headerIsLight ? 'bg-white' : 'bg-ink'
+              } ${mobileOpen ? 'opacity-0' : ''}`}
+            />
+            <span
+              className={`block h-0.5 w-5 rounded-full transition ${
+                headerIsLight ? 'bg-white' : 'bg-ink'
+              } ${mobileOpen ? '-translate-y-1.5 -rotate-45' : ''}`}
+            />
+          </button>
         </div>
 
-        {/* Mobile Dropdown Menu */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
-              initial={{ opacity: 0, maxHeight: 0 }}
-              animate={{ opacity: 1, maxHeight: '85vh' }}
-              exit={{ opacity: 0, maxHeight: 0 }}
-              transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="md:hidden overflow-y-auto"
-              style={{ background: 'white' }}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="lg:hidden"
             >
-              <div className="px-5 pt-2 pb-5">
-                <div className="w-full h-px bg-gray-100 mb-4" />
+              <div className="border-t border-border bg-surface-2 px-5 pb-6 pt-4">
+                <div className="grid gap-2">
+                  <button onClick={() => goTo('/')} className="text-left text-sm font-semibold text-ink">
+                    Home
+                  </button>
+                  <button onClick={() => goTo('/services')} className="text-left text-sm font-semibold text-ink">
+                    Services
+                  </button>
+                  <button onClick={() => goTo('/work')} className="text-left text-sm font-semibold text-ink">
+                    Work
+                  </button>
+                  <button onClick={() => goTo('/process')} className="text-left text-sm font-semibold text-ink">
+                    Process
+                  </button>
+                  <button onClick={() => goTo('/pricing')} className="text-left text-sm font-semibold text-ink">
+                    Pricing
+                  </button>
+                  <button onClick={() => goTo('/about')} className="text-left text-sm font-semibold text-ink">
+                    About
+                  </button>
+                  <button onClick={() => goTo('/testimonials')} className="text-left text-sm font-semibold text-ink">
+                    Testimonials
+                  </button>
+                  <button onClick={() => goTo('/faq')} className="text-left text-sm font-semibold text-ink">
+                    FAQ
+                  </button>
+                </div>
 
-                <nav className="flex flex-col gap-1">
-                  {navItems.filter(item => !item.isButton).map((item, i) => (
-                    <motion.button
-                      key={item.label}
-                      onClick={() => (item.route ? goToRoute(item.route) : scrollToSection(item.section))}
-                      className="w-full text-left px-3 py-3 rounded-xl text-gray-800 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-between group"
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.25, delay: i * 0.06 }}
-                    >
-                      <span className="text-base font-semibold tracking-tight">
-                        {item.label}
-                      </span>
-                      <svg
-                        className="w-4 h-4 text-gray-300 group-hover:text-ghaimuae-primary transition-all duration-300 group-hover:translate-x-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </motion.button>
-                  ))}
-                </nav>
+                <div className="mt-5 grid gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">Services</p>
+                    <div className="mt-2 grid gap-2">
+                      {services.map((service) => (
+                        <button
+                          key={service.slug}
+                          onClick={() => goTo(`/services/${service.slug}`)}
+                          className="text-left text-sm text-ink-muted hover:text-ink"
+                        >
+                          {service.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                <div className="w-full h-px bg-gray-100 my-4" />
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">Work</p>
+                    <div className="mt-2 grid gap-2">
+                      {caseStudies.map((study) => (
+                        <button
+                          key={study.slug}
+                          onClick={() => goTo(`/work/${study.slug}`)}
+                          className="text-left text-sm text-ink-muted hover:text-ink"
+                        >
+                          {study.title}
+                        </button>
+                      ))}
+                      <button onClick={() => goTo('/projects')} className="text-left text-sm text-ink-muted hover:text-ink">
+                        Project gallery
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-                {navItems.filter(item => item.isButton).map((item) => (
-                  <motion.button
-                    key={item.label}
-                    onClick={() => scrollToSection(item.section)}
-                    className="w-full py-3 rounded-xl text-white font-semibold text-base tracking-tight transition-opacity duration-200 hover:opacity-90"
-                    style={{ background: 'var(--color-primary, #1a1a2e)' }}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.3 }}
-                  >
-                    {item.label}
-                  </motion.button>
-                ))}
+                <div className="mt-6">
+                  <button onClick={() => goTo('/contact')} className="btn-primary w-full text-sm">
+                    Contact
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.header>
 
-      {/* Backdrop overlay */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -303,8 +296,7 @@ const GhaimAEHeader = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 md:hidden"
-            style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(2px)' }}
+            className="fixed inset-0 z-40 bg-black/40 lg:hidden"
             onClick={() => setMobileOpen(false)}
           />
         )}

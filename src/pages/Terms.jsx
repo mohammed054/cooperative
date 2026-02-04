@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import PageIntro from '../components/PageIntro';
 
 const Terms = () => {
@@ -23,6 +24,16 @@ const Terms = () => {
             <h2 className="text-sm font-semibold text-ink">Liability</h2>
             <p className="mt-3">We operate to industry safety standards and maintain appropriate insurance for our services.</p>
           </div>
+        </div>
+      </section>
+
+      <section className="bg-surface-3 py-12">
+        <div className="mx-auto max-w-4xl px-4 text-sm text-ink-muted sm:px-6 lg:px-8">
+          Questions about these terms?{' '}
+          <Link to="/contact" className="font-semibold text-ink">
+            Contact us
+          </Link>
+          .
         </div>
       </section>
     </div>

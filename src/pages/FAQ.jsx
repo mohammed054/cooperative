@@ -1,5 +1,6 @@
 import PageIntro from '../components/PageIntro';
 import { faqItems } from '../data/siteData';
+import { Link } from 'react-router-dom';
 
 const FAQ = () => {
   return (
@@ -25,6 +26,16 @@ const FAQ = () => {
               </details>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="bg-surface-3 py-12">
+        <div className="mx-auto max-w-5xl px-4 text-center text-sm text-ink-muted sm:px-6 lg:px-8">
+          Still need clarity?{' '}
+          <Link to="/contact" className="font-semibold text-ink">
+            Ask our team
+          </Link>
+          .
         </div>
       </section>
     </div>

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FaArrowDown, FaArrowRight } from 'react-icons/fa';
 import ScribbleButton from './ScribbleButton';
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion();
+  const [videoReady, setVideoReady] = useState(false);
   const transition = shouldReduceMotion
     ? { duration: 0 }
     : { duration: 0.75, ease: [0.22, 1, 0.36, 1] };
@@ -15,25 +16,34 @@ const Hero = () => {
 
   return (
     <section id="hero" className="relative h-[100svh] overflow-hidden bg-black">
+      <img
+        src="/cooperative/images/event1.jpg"
+        alt="Event production in the UAE"
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-0' : 'opacity-100'}`}
+        loading="eager"
+        decoding="async"
+      />
       <video
-        className="absolute inset-0 h-full w-full object-cover"
-        autoPlay
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+        autoPlay={!shouldReduceMotion}
         muted
-        loop
+        loop={!shouldReduceMotion}
         playsInline
-        preload="metadata"
+        preload="none"
         poster="/cooperative/images/event1.jpg"
+        onLoadedData={() => setVideoReady(true)}
+        aria-hidden="true"
       >
         <source src="/cooperative/videos/background.mp4" type="video/mp4" />
       </video>
 
-      <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-black/80" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-black/90" />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           backgroundImage:
-            'radial-gradient(900px 520px at 50% 10%, rgba(59, 130, 246, 0.18), transparent 62%), radial-gradient(700px 520px at 0% 70%, rgba(225, 145, 188, 0.12), transparent 58%)',
+            'radial-gradient(900px 520px at 50% 5%, var(--color-video-overlay-accent), transparent 60%), radial-gradient(700px 520px at 0% 70%, rgba(255,255,255,0.08), transparent 58%)',
         }}
       />
 
@@ -44,17 +54,17 @@ const Hero = () => {
           transition={transition}
           className="w-full max-w-3xl"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.18] bg-white/[0.08] px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/90 backdrop-blur">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.2] bg-white/[0.1] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/90 backdrop-blur">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            UAE rentals + production
+            UAE event production
           </div>
 
-          <h1 className="mt-6 text-[clamp(2.6rem,5vw,4.5rem)] font-semibold leading-[1.02] tracking-tight text-white">
-            Event production that looks expensive — and runs on time.
+          <h1 className="mt-6 text-[clamp(2.6rem,5vw,4.5rem)] font-semibold leading-[1.02] tracking-tight text-white font-serif">
+            Production that keeps the room composed.
           </h1>
 
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 sm:text-lg">
-            AV, staging, lighting, seating, and show‑day support. One accountable team, one timeline, zero surprises.
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+            Senior-led crews for AV, staging, lighting, seating, and show‑day control. One accountable team, one timeline, no surprises.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -69,7 +79,7 @@ const Hero = () => {
             <ScribbleButton
               onClick={() => scrollToSection('services')}
               ariaLabel="Explore services"
-              className="inline-flex items-center justify-center rounded-full border border-white/[0.18] bg-white/[0.06] px-7 py-3.5 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/[0.10] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex items-center justify-center rounded-full border border-white/[0.18] bg-white/[0.08] px-7 py-3.5 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/[0.14] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Explore services
             </ScribbleButton>
@@ -82,11 +92,11 @@ const Hero = () => {
             </p>
             <p className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-              White‑glove setup
+              Show‑day command
             </p>
             <p className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-              Show‑day support
+              White‑glove rentals
             </p>
           </div>
         </motion.div>

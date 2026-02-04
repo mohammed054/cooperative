@@ -40,6 +40,25 @@ const Work = () => {
           ))}
         </div>
       </section>
+
+      <section className="bg-surface-3 py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-semibold text-ink font-serif">
+            Planning an event with tight timing?
+          </h2>
+          <p className="mt-4 text-base text-ink-muted">
+            Share your scope and we will respond with a clear plan, timeline, and assigned producer.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link to="/contact" className="btn-primary text-sm">
+              Start a project
+            </Link>
+            <Link to="/projects" className="btn-secondary text-sm">
+              View the gallery
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

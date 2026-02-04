@@ -5,6 +5,19 @@ import Footer from "./components/Footer";
 import OurProjects from "./components/OurProjects";
 import ScrollToTop from "./components/ScrollToTop";
 import Home from "./pages/Home";
+import Services from "./pages/Services";
+import ServiceDetail from "./pages/ServiceDetail";
+import Work from "./pages/Work";
+import CaseStudyDetail from "./pages/CaseStudyDetail";
+import Process from "./pages/Process";
+import About from "./pages/About";
+import Testimonials from "./pages/Testimonials";
+import Pricing from "./pages/Pricing";
+import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -14,8 +27,20 @@ function App() {
       <main id="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/services/:slug" element={<ServiceDetail />} />
+          <Route path="/work" element={<Work />} />
+          <Route path="/work/:slug" element={<CaseStudyDetail />} />
+          <Route path="/process" element={<Process />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/testimonials" element={<Testimonials />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/projects" element={<OurProjects />} />
-          <Route path="*" element={<Home />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

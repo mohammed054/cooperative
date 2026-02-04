@@ -48,7 +48,7 @@ const ProjectDeck = () => {
     <section
       id="rentals"
       className={`
-      relative w-full bg-white overflow-hidden
+      relative w-full bg-surface-2 overflow-hidden
       flex flex-col items-center
       px-4 py-12 gap-10
       sm:px-8 sm:py-20 sm:gap-16
@@ -109,18 +109,18 @@ const ProjectDeck = () => {
         transition={{ duration: 0.8, delay: 0.2 }}
         className="flex-1 text-center lg:text-left max-w-3xl lg:ml-24 space-y-5 mt-6 sm:mt-8 lg:mt-0"
       >
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-ghaimuae-primary">
-          Crafting Exceptional Events Across UAE
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-ink font-serif">
+          Recent rooms built with calm precision.
         </h2>
-        <p className="text-base md:text-lg text-text-muted leading-relaxed">
-          We focus exclusively on delivering in rural and urban locations. From coast to desert, GHAIM creates unforgettable experiences through guidance, intent, and care. Have a specific emirate in mind? We've either operated there, or will soon.
+        <p className="text-base md:text-lg text-ink-muted leading-relaxed">
+          From investor summits to gala nights, we deliver composed production across every emirate. Our team manages the details so your stakeholders only see the final, polished room.
         </p>
           <div className="flex justify-center lg:justify-start">
             <ScribbleButton
-              onClick={() => navigate("/projects")}
+              onClick={() => navigate("/work")}
               className="btn-primary px-8 py-3 text-lg"
             >
-              See Our Projects
+              View case studies
             </ScribbleButton>
           </div>
 

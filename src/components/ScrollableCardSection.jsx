@@ -1,12 +1,49 @@
 import React, { useRef, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const cards = [
-  { title: "Event Planning", subtitle: "Organize with precision", description: "Plan your events with precision.", img: "/cooperative/images/event-planning.png" },
-  { title: "AV Setup", subtitle: "High-quality tech", description: "High-quality audio-visual equipment.", img: "/cooperative/images/av-setup.png" },
-  { title: "Seating & Staging", subtitle: "Custom arrangements", description: "Custom seating arrangements.", img: "/cooperative/images/seating.png" },
-  { title: "Lighting & Effects", subtitle: "Set the mood", description: "Mood and theme lighting.", img: "/cooperative/images/lighting-effects.png" },
-  { title: "Full Production", subtitle: "End-to-end solutions", description: "End-to-end event solutions.", img: "/cooperative/images/full-production.png" },
-  { title: "Always On Time", subtitle: "Precision Scheduling", description: "Never miss a beat—our events run exactly on schedule, every time.", img: "/cooperative/images/always-on-time.png" }
+  {
+    title: "Event Production",
+    subtitle: "Single accountable producer",
+    description: "Scope, vendor alignment, and show control for high‑stakes rooms.",
+    img: "/cooperative/images/event-planning.png",
+    href: "/services/event-production",
+  },
+  {
+    title: "Technical Production",
+    subtitle: "AV, lighting, video systems",
+    description: "Systems design, cueing, and redundancy for complex shows.",
+    img: "/cooperative/images/av-setup.png",
+    href: "/services/technical-production",
+  },
+  {
+    title: "Staging & Scenic",
+    subtitle: "Built to the render",
+    description: "Stage architecture and scenic builds that stay on timeline.",
+    img: "/cooperative/images/seating.png",
+    href: "/services/staging-scenic",
+  },
+  {
+    title: "Furniture & Rentals",
+    subtitle: "Curated inventory",
+    description: "Premium seating, tables, and accessories delivered clean.",
+    img: "/cooperative/images/lighting-effects.png",
+    href: "/services/furniture-rentals",
+  },
+  {
+    title: "Show Control",
+    subtitle: "On‑site command",
+    description: "Dedicated producer and crew to keep the room composed.",
+    img: "/cooperative/images/full-production.png",
+    href: "/process",
+  },
+  {
+    title: "Timing & Logistics",
+    subtitle: "No‑surprise scheduling",
+    description: "Load‑ins, resets, and strike planned around your timeline.",
+    img: "/cooperative/images/always-on-time.png",
+    href: "/process",
+  },
 ];
 
 const ScrollableCardSection = () => {
@@ -59,11 +96,11 @@ const ScrollableCardSection = () => {
 
           {/* Header */}
           <div className="text-center pt-10 pb-6 px-4">
-            <h1 className="text-3xl font-bold text-ghaimuae-primary mb-2">
-              Our Services
+            <h1 className="text-3xl font-semibold text-ink mb-2 font-serif">
+              Services built for high‑stakes rooms
             </h1>
-            <p className="text-base text-text-muted">
-              Discover how we can make your events unforgettable
+            <p className="text-base text-ink-muted">
+              Production, rentals, and on‑site control designed to keep teams aligned.
             </p>
           </div>
 
@@ -86,7 +123,7 @@ const ScrollableCardSection = () => {
                 >
                   <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
                     {/* Front */}
-                    <div className="absolute inset-0 backface-hidden bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col">
+                    <div className="absolute inset-0 backface-hidden bg-surface-2 rounded-2xl shadow-lg overflow-hidden flex flex-col">
                       <img
                         src={card.img}
                         alt={card.title}
@@ -95,14 +132,14 @@ const ScrollableCardSection = () => {
                         decoding="async"
                       />
                       <div className="flex-1 flex items-center justify-center">
-                        <h3 className="text-xl font-bold text-ghaimuae-primary">
+                        <h3 className="text-xl font-semibold text-ink">
                           {card.title}
                         </h3>
                       </div>
                     </div>
 
                     {/* Back */}
-                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white rounded-2xl shadow-lg flex flex-col items-center justify-center p-5">
+                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-surface-2 rounded-2xl shadow-lg flex flex-col items-center justify-center p-5">
                       <img
                         src={card.img}
                         alt=""
@@ -113,12 +150,12 @@ const ScrollableCardSection = () => {
                       <h4 className="text-lg font-semibold mb-1">
                         {card.subtitle}
                       </h4>
-                      <p className="text-center text-text-muted text-sm mb-4">
+                      <p className="text-center text-ink-muted text-sm mb-4">
                         {card.description}
                       </p>
-                      <button className="btn-primary px-5 py-2 text-sm">
-                        Learn More
-                      </button>
+                      <Link className="btn-primary px-5 py-2 text-sm" to={card.href}>
+                        Learn more
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -142,11 +179,11 @@ const ScrollableCardSection = () => {
 
         {/* Hero — extra top padding so cards sit lower, giving breathing room before scroll kicks in */}
         <div className="pt-24 pb-10 text-center">
-          <h1 className="text-5xl lg:text-6xl font-bold text-ghaimuae-primary mb-4">
-            Our Services
+          <h1 className="text-5xl lg:text-6xl font-semibold text-ink mb-4 font-serif">
+            Services built for high‑stakes rooms
           </h1>
-          <p className="text-xl text-text-muted">
-            Discover how we can make your events unforgettable
+          <p className="text-xl text-ink-muted">
+            Production, rentals, and on‑site control designed to keep teams aligned.
           </p>
         </div>
 
@@ -167,7 +204,7 @@ const ScrollableCardSection = () => {
                 <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
 
                   {/* Front */}
-                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden bg-surface-2 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                     <img
                       src={card.img}
                       alt={card.title}
@@ -176,14 +213,14 @@ const ScrollableCardSection = () => {
                       decoding="async"
                     />
                     <div className="flex-1 flex items-center justify-center">
-                      <h3 className="text-3xl font-bold text-ghaimuae-primary">
+                      <h3 className="text-3xl font-semibold text-ink">
                         {card.title}
                       </h3>
                     </div>
                   </div>
 
                   {/* Back */}
-                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden rotate-y-180 bg-white rounded-2xl shadow-2xl flex flex-col items-center justify-center p-8">
+                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden rotate-y-180 bg-surface-2 rounded-2xl shadow-2xl flex flex-col items-center justify-center p-8">
                     <img
                       src={card.img}
                       alt=""
@@ -194,12 +231,12 @@ const ScrollableCardSection = () => {
                     <h4 className="text-2xl font-semibold mb-2">
                       {card.subtitle}
                     </h4>
-                    <p className="text-center text-text-muted mb-6">
+                    <p className="text-center text-ink-muted mb-6">
                       {card.description}
                     </p>
-                    <button className="btn-primary px-8 py-3">
-                      Learn More
-                    </button>
+                    <Link className="btn-primary px-8 py-3" to={card.href}>
+                      Learn more
+                    </Link>
                   </div>
 
                 </div>
