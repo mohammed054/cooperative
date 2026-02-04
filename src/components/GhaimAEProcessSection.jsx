@@ -15,7 +15,7 @@ const GhaimAEProcessSection = () => {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="flex-1 text-center lg:text-left"
+          className="flex-1 lg:flex-[1.35] text-center lg:text-left"
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-ink font-serif mb-4 lg:mb-6">
             A process built around timing, approvals, and calm.
@@ -36,12 +36,12 @@ const GhaimAEProcessSection = () => {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="flex-1 flex justify-center items-center"
+          className="flex-1 lg:flex-[0.65] flex justify-center items-center"
         >
           <img
             src="/cooperative/images/event-planning-in-action.png"
             alt="Event planning in action"
-            className="w-full max-w-sm lg:max-w-lg object-contain rounded-2xl shadow-xl"
+            className="w-full max-w-xs sm:max-w-sm lg:max-w-sm object-contain rounded-2xl shadow-xl"
             loading="lazy"
             decoding="async"
           />

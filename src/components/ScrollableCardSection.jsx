@@ -118,7 +118,7 @@ const ScrollableCardSection = () => {
               {cards.map((card, i) => (
                 <div
                   key={i}
-                  className="relative flex-shrink-0 perspective group"
+                  className="relative flex-shrink-0 perspective group overflow-hidden rounded-2xl"
                   style={{ width: '72vw', maxWidth: '320px', height: '72vh' }}
                 >
                   <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
@@ -127,7 +127,7 @@ const ScrollableCardSection = () => {
                       <img
                         src={card.img}
                         alt={card.title}
-                        className="h-3/4 w-full object-cover"
+                        className="block h-3/4 w-full object-cover"
                         loading="lazy"
                         decoding="async"
                       />
@@ -139,11 +139,11 @@ const ScrollableCardSection = () => {
                     </div>
 
                     {/* Back */}
-                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-surface-2 rounded-2xl shadow-lg flex flex-col items-center justify-center p-5">
+                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-surface-2 rounded-2xl shadow-lg overflow-hidden flex flex-col items-center justify-center p-5">
                       <img
                         src={card.img}
                         alt=""
-                        className="w-4/5 h-28 object-cover rounded-lg mb-4"
+                        className="block w-4/5 h-28 object-cover rounded-lg mb-4"
                         loading="lazy"
                         decoding="async"
                       />
@@ -197,7 +197,7 @@ const ScrollableCardSection = () => {
             {cards.map((card, i) => (
               <div
                 key={i}
-                className="relative flex-shrink-0 w-[32vw] perspective group"
+                className="relative flex-shrink-0 w-[32vw] perspective group overflow-hidden rounded-2xl"
                 style={{ height: 'calc(100vh - 280px)' }}
               >
                 {/* Card inner */}
@@ -208,7 +208,7 @@ const ScrollableCardSection = () => {
                     <img
                       src={card.img}
                       alt={card.title}
-                      className="h-3/4 w-full object-cover"
+                      className="block h-3/4 w-full object-cover"
                       loading="lazy"
                       decoding="async"
                     />
@@ -220,11 +220,11 @@ const ScrollableCardSection = () => {
                   </div>
 
                   {/* Back */}
-                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden rotate-y-180 bg-surface-2 rounded-2xl shadow-2xl flex flex-col items-center justify-center p-8">
+                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden rotate-y-180 bg-surface-2 rounded-2xl shadow-2xl overflow-hidden flex flex-col items-center justify-center p-8">
                     <img
                       src={card.img}
                       alt=""
-                      className="w-4/5 h-48 object-cover rounded-lg mb-6"
+                      className="block w-4/5 h-48 object-cover rounded-lg mb-6"
                       loading="lazy"
                       decoding="async"
                     />

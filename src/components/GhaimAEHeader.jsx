@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaChevronDown } from 'react-icons/fa';
@@ -10,8 +10,10 @@ const GhaimAEHeader = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(null);
   const lastScrollY = useRef(0);
   const scrollTimeoutRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
 
   const navItems = [
     {
@@ -96,11 +98,32 @@ const GhaimAEHeader = () => {
     };
   }, [mobileOpen]);
 
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    };
+  }, []);
+
   const goTo = (href) => {
     if (!href) return;
     navigate(href);
     setMobileOpen(false);
   };
+
+  const openMenu = (label) => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    setActiveMenu(label);
+  };
+
+  const scheduleCloseMenu = () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = setTimeout(() => setActiveMenu(null), 220);
+  };
+
+  const activeItem = useMemo(
+    () => navItems.find((item) => item.label === activeMenu && item.children?.length),
+    [activeMenu, navItems],
+  );
 
   const isHome = location.pathname === '/';
   const headerIsLight = isHome && !scrolled && !mobileOpen;
@@ -117,8 +140,14 @@ const GhaimAEHeader = () => {
           'fixed left-0 right-0 top-0 z-50 transition-all duration-500 ease-out',
           headerIsLight ? 'bg-transparent' : 'bg-white/95 shadow-lg backdrop-blur border-b border-border',
         ].join(' ')}
+        onMouseLeave={scheduleCloseMenu}
+        onMouseEnter={() => {
+          if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+        }}
       >
-        <div className="mx-auto flex min-h-[76px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div
+          className="mx-auto flex min-h-[76px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+        >
           <Link to="/" className="flex items-center gap-3">
             <img
               src="/cooperative/images/logo.webp"
@@ -139,39 +168,24 @@ const GhaimAEHeader = () => {
                 <div key={item.label} className="group relative">
                   <Link
                     to={item.href}
+                    onMouseEnter={() => (hasChildren ? openMenu(item.label) : setActiveMenu(null))}
+                    onFocus={() => (hasChildren ? openMenu(item.label) : setActiveMenu(null))}
                     className={[
                       'inline-flex items-center gap-2 text-sm font-semibold transition',
                       headerIsLight ? 'text-white/80 hover:text-white' : 'text-ink-muted hover:text-ink',
                     ].join(' ')}
+                    aria-expanded={activeMenu === item.label}
                   >
                     {item.label}
                     {hasChildren && (
-                      <FaChevronDown className="text-[10px] opacity-70 transition group-hover:rotate-180" />
+                      <FaChevronDown
+                        className={[
+                          'text-[10px] opacity-70 transition',
+                          activeMenu === item.label ? 'rotate-180' : '',
+                        ].join(' ')}
+                      />
                     )}
                   </Link>
-
-                  {hasChildren && (
-                    <div
-                      className={[
-                        'invisible absolute left-0 top-full z-40 mt-3 w-[320px] rounded-2xl border border-border bg-surface-2 p-4 opacity-0 shadow-[0_18px_50px_rgba(22,22,22,0.18)] transition',
-                        'group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100',
-                      ].join(' ')}
-                    >
-                      <div className="space-y-3">
-                        {item.children.map((child) => (
-                          <button
-                            key={child.href}
-                            type="button"
-                            onClick={() => goTo(child.href)}
-                            className="w-full rounded-xl px-3 py-2 text-left transition hover:bg-surface"
-                          >
-                            <p className="text-sm font-semibold text-ink">{child.label}</p>
-                            <p className="text-xs text-ink-muted">{child.description}</p>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -205,6 +219,55 @@ const GhaimAEHeader = () => {
             />
           </button>
         </div>
+
+        <AnimatePresence>
+          {activeItem && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="hidden lg:block"
+              onMouseEnter={() => openMenu(activeItem.label)}
+              onMouseLeave={scheduleCloseMenu}
+            >
+              <div className="border-t border-border bg-white shadow-[0_18px_50px_rgba(15,23,42,0.12)]">
+                <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:px-8">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">{activeItem.label}</p>
+                    <h3 className="mt-2 text-2xl font-semibold text-ink font-serif">
+                      {activeItem.label === 'Services'
+                        ? 'Build the right production plan for your room.'
+                        : activeItem.label === 'Work'
+                        ? 'Recent rooms, timelines, and outcomes.'
+                        : 'How we operate and support your team.'}
+                    </h3>
+                    <p className="mt-3 text-sm text-ink-muted">
+                      {activeItem.label === 'Services'
+                        ? 'Select a discipline to see scopes, standards, and ideal use cases.'
+                        : activeItem.label === 'Work'
+                        ? 'Browse case studies or jump into the full project gallery.'
+                        : 'Learn about the team, client feedback, and planning essentials.'}
+                    </p>
+                  </div>
+                  <div className="grid gap-3">
+                    {activeItem.children.map((child) => (
+                      <button
+                        key={child.href}
+                        type="button"
+                        onClick={() => goTo(child.href)}
+                        className="w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-left transition hover:border-ink hover:bg-surface-3"
+                      >
+                        <p className="text-sm font-semibold text-ink">{child.label}</p>
+                        <p className="text-xs text-ink-muted">{child.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <AnimatePresence>
           {mobileOpen && (
