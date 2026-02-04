@@ -11,6 +11,7 @@ const GhaimAEHeader = () => {
   const [isHidden, setIsHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
+  const [isHovering, setIsHovering] = useState(false);
   const lastScrollY = useRef(0);
   const scrollTimeoutRef = useRef(null);
   const closeTimeoutRef = useRef(null);
@@ -138,10 +139,14 @@ const GhaimAEHeader = () => {
         }}
         className={[
           'fixed left-0 right-0 top-0 z-50 transition-all duration-500 ease-out',
-          headerIsLight ? 'bg-transparent' : 'bg-white/95 shadow-lg backdrop-blur border-b border-border',
+          isHovering || (!headerIsLight) ? 'bg-white/95 shadow-lg backdrop-blur border-b border-border' : 'bg-transparent',
         ].join(' ')}
-        onMouseLeave={scheduleCloseMenu}
+        onMouseLeave={() => {
+          setIsHovering(false);
+          scheduleCloseMenu();
+        }}
         onMouseEnter={() => {
+          setIsHovering(true);
           if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
         }}
       >
@@ -152,11 +157,11 @@ const GhaimAEHeader = () => {
             <img
               src="/cooperative/images/logo.webp"
               alt="Ghaim UAE"
-              className={`h-9 w-auto ${headerIsLight ? 'brightness-0 invert' : 'brightness-0'}`}
+              className={`h-9 w-auto ${isHovering || (!headerIsLight) ? 'brightness-0' : 'brightness-0 invert'}`}
               loading="lazy"
               decoding="async"
             />
-            <span className={`text-xl font-semibold tracking-[0.12em] ${headerIsLight ? 'text-white' : 'text-ink'}`}>
+            <span className={`text-xl font-semibold tracking-[0.12em] ${isHovering || (!headerIsLight) ? 'text-ink' : 'text-white'}`}>
               GHAIM
             </span>
           </Link>
@@ -172,7 +177,7 @@ const GhaimAEHeader = () => {
                     onFocus={() => (hasChildren ? openMenu(item.label) : setActiveMenu(null))}
                     className={[
                       'inline-flex items-center gap-2 text-sm font-semibold transition',
-                      headerIsLight ? 'text-white/80 hover:text-white' : 'text-ink-muted hover:text-ink',
+                      isHovering || (!headerIsLight) ? 'text-ink-muted hover:text-ink' : 'text-white/80 hover:text-white',
                     ].join(' ')}
                     aria-expanded={activeMenu === item.label}
                   >
@@ -196,7 +201,7 @@ const GhaimAEHeader = () => {
 
           <button
             className={`flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full transition ${
-              headerIsLight ? 'text-white hover:bg-white/10' : 'text-ink hover:bg-surface'
+              isHovering || (!headerIsLight) ? 'text-ink hover:bg-surface' : 'text-white hover:bg-white/10'
             } lg:hidden`}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
