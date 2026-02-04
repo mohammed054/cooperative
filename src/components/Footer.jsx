@@ -35,7 +35,7 @@ const Footer = () => {
           >
             <div className="mb-6">
               <img 
-                src="/images/logo.webp"
+                src="/cooperative/images/logo.webp"
                 alt="Ghaim UAE Logo" 
                 className="h-8 w-auto"
                 style={{ maxHeight: '48px' }}

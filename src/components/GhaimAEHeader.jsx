@@ -6,7 +6,7 @@ const GhaimAEHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
+  const [isHidden, setIsHidden] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const lastScrollY = useRef(0);
@@ -27,8 +27,15 @@ const GhaimAEHeader = () => {
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
 
       scrollTimeoutRef.current = setTimeout(() => {
-        if (currentY > lastScrollY.current && currentY > 80) setIsHidden(true);
-        else if (currentY < lastScrollY.current || currentY <= 80) setIsHidden(false);
+        if (mobileOpen) {
+          setIsHidden(false);
+        } else if (currentY <= 20) {
+          setIsHidden(true);
+        } else if (currentY > lastScrollY.current) {
+          setIsHidden(false);
+        } else if (currentY < lastScrollY.current) {
+          setIsHidden(true);
+        }
 
         setScrolled(currentY > 30);
         lastScrollY.current = currentY;
@@ -40,7 +47,7 @@ const GhaimAEHeader = () => {
       window.removeEventListener('scroll', handleScroll);
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
-  }, []);
+  }, [mobileOpen]);
 
   // Close mobile menu when resizing above md
   useEffect(() => {
@@ -97,7 +104,7 @@ const GhaimAEHeader = () => {
             {/* Logo */}
             <motion.div className="flex items-center flex-shrink-0" whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
               <img
-                src="/images/logo.webp"
+                src="/cooperative/images/logo.webp"
                 alt="GHAIM UAE"
                 className={`h-10 w-auto ${headerIsLight ? 'brightness-0 invert' : 'brightness-0'}`}
               />

@@ -20,7 +20,7 @@ const TESTIMONIALS = [
       'We gave them a complex room layout and a tight timeline. They delivered with zero drama — every cue landed, everything looked premium, and the room opened on time.',
     event: 'Investor summit',
     location: 'Dubai',
-    image: '/images/event1.jpg',
+    image: '/cooperative/images/event1.jpg',
     tags: ['Full production', 'AV + lighting', 'On‑site crew'],
   },
   {
@@ -33,7 +33,7 @@ const TESTIMONIALS = [
       'The logistics were flawless. Equipment arrived tested and organized, the crew communicated clearly, and the setup looked exactly like the render — no last‑minute surprises.',
     event: 'Brand launch',
     location: 'Abu Dhabi',
-    image: '/images/event2.jpg',
+    image: '/cooperative/images/event2.jpg',
     tags: ['Staging + seating', 'Show‑day support', 'White‑glove delivery'],
   },
   {
@@ -46,7 +46,7 @@ const TESTIMONIALS = [
       'They anticipate problems before they happen. The team is proactive, detail‑obsessed, and calm under pressure — exactly the partner you want on event day.',
     event: 'VIP gala',
     location: 'Sharjah',
-    image: '/images/event3.jpg',
+    image: '/cooperative/images/event3.jpg',
     tags: ['Lighting design', 'Backstage ops', 'Client‑ready finish'],
   },
 ];

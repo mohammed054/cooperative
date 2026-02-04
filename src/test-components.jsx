@@ -15,7 +15,7 @@ function TestHero() {
       <motion.h1>Test</motion.h1>
       <FaArrowDown />
       <FaPlay />
-      <LazyLoadImage src="/test.jpg" alt="test" />
+      <LazyLoadImage src="/cooperative/images/event1.jpg" alt="test" />
     </div>
   );
 }

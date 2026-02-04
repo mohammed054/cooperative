@@ -1,15 +1,20 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FaArrowDown, FaArrowRight } from 'react-icons/fa';
+import ScribbleButton from './ScribbleButton';
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion();
   const transition = shouldReduceMotion
     ? { duration: 0 }
     : { duration: 0.75, ease: [0.22, 1, 0.36, 1] };
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <section id="hero" className="relative min-h-[100svh] overflow-hidden bg-black">
+    <section id="hero" className="relative h-[100svh] overflow-hidden bg-black">
       <video
         className="absolute inset-0 h-full w-full object-cover"
         autoPlay
@@ -17,9 +22,9 @@ const Hero = () => {
         loop
         playsInline
         preload="metadata"
-        poster="/images/event1.jpg"
+        poster="/cooperative/images/event1.jpg"
       >
-        <source src="/videos/background.mp4" type="video/mp4" />
+        <source src="/cooperative/videos/background.mp4" type="video/mp4" />
       </video>
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-black/80" />
@@ -32,7 +37,7 @@ const Hero = () => {
         }}
       />
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl items-center px-4 pb-20 pt-28 sm:px-6 sm:pb-24 sm:pt-32 lg:px-8">
+      <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8">
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -53,19 +58,21 @@ const Hero = () => {
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a
-              href="#get-started"
+            <ScribbleButton
+              onClick={() => scrollToSection('get-started')}
+              ariaLabel="Request a proposal"
               className="group inline-flex items-center justify-center gap-3 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black shadow-[0_16px_44px_rgba(0,0,0,0.28)] transition hover:bg-white/90 hover:shadow-[0_18px_54px_rgba(0,0,0,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Request a proposal
               <FaArrowRight className="transition-transform group-hover:translate-x-0.5" size={14} />
-            </a>
-            <a
-              href="#services"
+            </ScribbleButton>
+            <ScribbleButton
+              onClick={() => scrollToSection('services')}
+              ariaLabel="Explore services"
               className="inline-flex items-center justify-center rounded-full border border-white/[0.18] bg-white/[0.06] px-7 py-3.5 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/[0.10] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Explore services
-            </a>
+            </ScribbleButton>
           </div>
 
           <div className="mt-10 flex flex-wrap gap-x-10 gap-y-3 text-sm text-white/70">
@@ -85,15 +92,16 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      <motion.a
-        href="#services"
+      <motion.button
+        type="button"
         aria-label="Scroll to services"
         animate={shouldReduceMotion ? undefined : { y: [0, 10, 0] }}
         transition={shouldReduceMotion ? undefined : { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/[0.16] bg-white/[0.06] p-3 text-white/90 backdrop-blur transition hover:bg-white/[0.10] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        onClick={() => scrollToSection('services')}
       >
         <FaArrowDown size={18} />
-      </motion.a>
+      </motion.button>
     </section>
   );
 };
