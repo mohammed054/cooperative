@@ -37,7 +37,7 @@ const Hero = () => {
         }}
       />
 
-      <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8">
+      <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pb-10 pt-20 sm:px-6 sm:pb-14 sm:pt-24 lg:px-8">
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -57,7 +57,7 @@ const Hero = () => {
             AV, staging, lighting, seating, and show‑day support. One accountable team, one timeline, zero surprises.
           </p>
 
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <ScribbleButton
               onClick={() => scrollToSection('get-started')}
               ariaLabel="Request a proposal"
@@ -75,7 +75,7 @@ const Hero = () => {
             </ScribbleButton>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-x-10 gap-y-3 text-sm text-white/70">
+          <div className="mt-8 flex flex-wrap gap-x-10 gap-y-3 text-sm text-white/70">
             <p className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
               UAE‑wide coverage
