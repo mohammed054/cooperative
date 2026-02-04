@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -8,24 +8,17 @@ const GhaimAEHeader = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [ready, setReady] = useState(false); // ensures layout calculated before anim
   const [hoveredItem, setHoveredItem] = useState(null);
   const lastScrollY = useRef(0);
   const scrollTimeoutRef = useRef(null);
 
   const navItems = [
-    { label: 'Services', section: 'services' },
     { label: 'Rentals', section: 'rentals' },
     { label: 'Process', section: 'process' },
     { label: 'Testimonials', section: 'testimonials' },
     { label: 'Projects', route: '/projects' },
     { label: 'Get Started', section: 'get-started', isButton: true },
   ];
-
-  // useLayoutEffect ensures layout is measured before paint
-  useLayoutEffect(() => {
-    setReady(true);
-  }, []);
 
   // Scroll behavior
   useEffect(() => {
@@ -82,7 +75,8 @@ const GhaimAEHeader = () => {
     setMobileOpen(false);
   };
 
-  if (!ready) return null; // prevent initial mis-render
+  const isHome = location.pathname === '/';
+  const headerIsLight = isHome && !scrolled && !mobileOpen;
 
   return (
     <>
@@ -93,7 +87,7 @@ const GhaimAEHeader = () => {
             transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
           }}
           className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
-            ${scrolled || mobileOpen
+            ${!headerIsLight
               ? 'bg-white shadow-xl border-b border-gray-200'
               : 'bg-transparent'}
           `}
@@ -102,10 +96,14 @@ const GhaimAEHeader = () => {
           <div className="flex justify-between items-center min-h-[72px] w-full">
             {/* Logo */}
             <motion.div className="flex items-center flex-shrink-0" whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-              <img src="images/logo.webp" alt="GHAIM UAE" className="h-10 w-auto" />
+              <img
+                src="/images/logo.webp"
+                alt="GHAIM UAE"
+                className={`h-10 w-auto ${headerIsLight ? 'brightness-0 invert' : 'brightness-0'}`}
+              />
               <span
                 className={`ml-3 text-2xl sm:text-3xl font-bold transition-colors duration-300 ${
-                  scrolled || mobileOpen ? 'text-ghaimuae-primary' : 'text-white'
+                  headerIsLight ? 'text-white' : 'text-ghaimuae-primary'
                 }`}
               >
                 GHAIM
@@ -136,7 +134,7 @@ const GhaimAEHeader = () => {
                     onHoverStart={() => setHoveredItem(item.label)}
                     onHoverEnd={() => setHoveredItem(null)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center ${
-                      scrolled
+                      !headerIsLight
                         ? 'text-ghaimuae-light-gray hover:text-black hover:bg-gray-100'
                         : 'text-white hover:bg-white hover:text-black'
                     }`}
@@ -162,7 +160,7 @@ const GhaimAEHeader = () => {
                     onHoverStart={() => setHoveredItem(item.label)}
                     onHoverEnd={() => setHoveredItem(null)}
                     className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center ${
-                      scrolled
+                      !headerIsLight
                         ? 'text-ghaimuae-light-gray hover:text-black hover:bg-gray-100'
                         : 'text-white hover:bg-white hover:text-black'
                     }`}
@@ -189,14 +187,14 @@ const GhaimAEHeader = () => {
             <div className="md:hidden flex items-center h-full">
               <button
                 className={`relative w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-xl transition-all duration-300 ${
-                  scrolled || mobileOpen ? 'hover:bg-gray-100' : 'hover:bg-white/10'
+                  !headerIsLight || mobileOpen ? 'hover:bg-gray-100' : 'hover:bg-white/10'
                 }`}
                 onClick={() => setMobileOpen(!mobileOpen)}
                 aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
               >
                 <span
                   className={`block rounded-full transition-all duration-300 ease-in-out ${
-                    scrolled || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
+                    !headerIsLight || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
                   }`}
                   style={{
                     width: mobileOpen ? '18px' : '22px',
@@ -206,7 +204,7 @@ const GhaimAEHeader = () => {
                 />
                 <span
                   className={`block rounded-full transition-all duration-300 ease-in-out ${
-                    scrolled || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
+                    !headerIsLight || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
                   }`}
                   style={{
                     width: '22px',
@@ -217,7 +215,7 @@ const GhaimAEHeader = () => {
                 />
                 <span
                   className={`block rounded-full transition-all duration-300 ease-in-out ${
-                    scrolled || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
+                    !headerIsLight || mobileOpen ? 'bg-ghaimuae-primary' : 'bg-white'
                   }`}
                   style={{
                     width: mobileOpen ? '18px' : '22px',

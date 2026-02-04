@@ -1,21 +1,17 @@
-// src/components/Hero.jsx
 import React from 'react';
-import { motion } from 'framer-motion';
-import { FaArrowDown } from 'react-icons/fa';
-import GetStartedButton from './GetStartedButton';
+import { motion, useReducedMotion } from 'framer-motion';
+import { FaArrowDown, FaArrowRight } from 'react-icons/fa';
 
 const Hero = () => {
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) element.scrollIntoView({ behavior: 'smooth' });
-  };
+  const shouldReduceMotion = useReducedMotion();
+  const transition = shouldReduceMotion
+    ? { duration: 0 }
+    : { duration: 0.75, ease: [0.22, 1, 0.36, 1] };
 
   return (
-    <section id="hero" className="relative w-full h-screen overflow-hidden">
-      
-      {/* Background Video */}
+    <section id="hero" className="relative min-h-[100svh] overflow-hidden bg-black">
       <video
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover"
         autoPlay
         muted
         loop
@@ -23,82 +19,81 @@ const Hero = () => {
         preload="metadata"
         poster="/images/event1.jpg"
       >
-        <source src="videos/background.mp4" type="video/mp4" />
+        <source src="/videos/background.mp4" type="video/mp4" />
       </video>
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-black/80" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-80"
+        style={{
+          backgroundImage:
+            'radial-gradient(900px 520px at 50% 10%, rgba(59, 130, 246, 0.18), transparent 62%), radial-gradient(700px 520px at 0% 70%, rgba(225, 145, 188, 0.12), transparent 58%)',
+        }}
+      />
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 lg:px-8">
-
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl items-center px-4 pb-20 pt-28 sm:px-6 sm:pb-24 sm:pt-32 lg:px-8">
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          /* Mobile: white for contrast over video; md+: original dark navy */
-          className="text-2xl md:text-3xl lg:text-4xl font-bold text-white md:text-[#2D2E40] max-w-3xl mx-auto leading-tight mb-8"
+          transition={transition}
+          className="w-full max-w-3xl"
         >
-          <motion.span
-            className="relative inline-block"
-            initial="hidden"
-            animate="visible"
-          >
-            Premium
-            <svg
-              viewBox="0 0 200 15"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute -bottom-3 left-0 w-full h-4"
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.18] bg-white/[0.08] px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/90 backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            UAE rentals + production
+          </div>
+
+          <h1 className="mt-6 text-[clamp(2.6rem,5vw,4.5rem)] font-semibold leading-[1.02] tracking-tight text-white">
+            Event production that looks expensive — and runs on time.
+          </h1>
+
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 sm:text-lg">
+            AV, staging, lighting, seating, and show‑day support. One accountable team, one timeline, zero surprises.
+          </p>
+
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <a
+              href="#get-started"
+              className="group inline-flex items-center justify-center gap-3 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black shadow-[0_16px_44px_rgba(0,0,0,0.28)] transition hover:bg-white/90 hover:shadow-[0_18px_54px_rgba(0,0,0,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              <motion.path
-                d="M2 4C50 2 150 2 198 4"
-                stroke="#FBBF24"
-                strokeWidth="8"
-                strokeLinecap="round"
-                variants={{
-                  hidden: { pathLength: 0, opacity: 0 },
-                  visible: { pathLength: 1, opacity: 1 },
-                }}
-                transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
-              />
-            </svg>
-          </motion.span>{" "}
-          Event Solutions Designed for Impact and Experience
-        </motion.h1>
+              Request a proposal
+              <FaArrowRight className="transition-transform group-hover:translate-x-0.5" size={14} />
+            </a>
+            <a
+              href="#services"
+              className="inline-flex items-center justify-center rounded-full border border-white/[0.18] bg-white/[0.06] px-7 py-3.5 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/[0.10] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              Explore services
+            </a>
+          </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
-          <GetStartedButton
-            className="
-              px-10 py-4 text-lg
-              bg-[#2D2E40]
-              hover:bg-[#1F2030]
-              text-white
-              rounded-xl
-              transition-all
-              duration-300
-              shadow-lg
-            "
-            onClick={() => scrollToSection('get-started')}
-          />
+          <div className="mt-10 flex flex-wrap gap-x-10 gap-y-3 text-sm text-white/70">
+            <p className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
+              UAE‑wide coverage
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
+              White‑glove setup
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
+              Show‑day support
+            </p>
+          </div>
         </motion.div>
-
-        {/* Scroll arrow */}
-        <motion.div
-          animate={{ y: [0, 12, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer text-white opacity-80 hover:opacity-100 transition"
-          onClick={() => scrollToSection('services')}
-        >
-          <FaArrowDown size={24} />
-        </motion.div>
-
       </div>
+
+      <motion.a
+        href="#services"
+        aria-label="Scroll to services"
+        animate={shouldReduceMotion ? undefined : { y: [0, 10, 0] }}
+        transition={shouldReduceMotion ? undefined : { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/[0.16] bg-white/[0.06] p-3 text-white/90 backdrop-blur transition hover:bg-white/[0.10] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+      >
+        <FaArrowDown size={18} />
+      </motion.a>
     </section>
   );
 };

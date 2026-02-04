@@ -1,12 +1,12 @@
 import React, { useRef, useEffect, useState } from "react";
 
 const cards = [
-  { title: "Event Planning", subtitle: "Organize with precision", description: "Plan your events with precision.", img: "images/event-planning.png" },
-  { title: "AV Setup", subtitle: "High-quality tech", description: "High-quality audio-visual equipment.", img: "images/av-setup.png" },
-  { title: "Seating & Staging", subtitle: "Custom arrangements", description: "Custom seating arrangements.", img: "images/seating.png" },
-  { title: "Lighting & Effects", subtitle: "Set the mood", description: "Mood and theme lighting.", img: "images/lighting-effects.png" },
-  { title: "Full Production", subtitle: "End-to-end solutions", description: "End-to-end event solutions.", img: "images/full-production.png" },
-  { title: "Always On Time", subtitle: "Precision Scheduling", description: "Never miss a beat—our events run exactly on schedule, every time.", img: "images/always-on-time.png" }
+  { title: "Event Planning", subtitle: "Organize with precision", description: "Plan your events with precision.", img: "/images/event-planning.png" },
+  { title: "AV Setup", subtitle: "High-quality tech", description: "High-quality audio-visual equipment.", img: "/images/av-setup.png" },
+  { title: "Seating & Staging", subtitle: "Custom arrangements", description: "Custom seating arrangements.", img: "/images/seating.png" },
+  { title: "Lighting & Effects", subtitle: "Set the mood", description: "Mood and theme lighting.", img: "/images/lighting-effects.png" },
+  { title: "Full Production", subtitle: "End-to-end solutions", description: "End-to-end event solutions.", img: "/images/full-production.png" },
+  { title: "Always On Time", subtitle: "Precision Scheduling", description: "Never miss a beat—our events run exactly on schedule, every time.", img: "/images/always-on-time.png" }
 ];
 
 const ScrollableCardSection = () => {

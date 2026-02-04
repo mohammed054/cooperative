@@ -37,7 +37,7 @@ const GhaimAEProcessSection = () => {
           className="flex-1 flex justify-center items-center"
         >
           <img
-            src="images/event-planning-in-action.png"
+            src="/images/event-planning-in-action.png"
             alt="Event Planning Illustration"
             className="w-full max-w-sm lg:max-w-lg object-contain rounded-2xl shadow-xl"
             loading="lazy"

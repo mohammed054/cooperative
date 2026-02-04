@@ -1,5 +1,6 @@
 import React from "react";
 import Hero from "../components/Hero";
+import TrustBar from "../components/TrustBar";
 import ScrollableCardSection from "../components/ScrollableCardSection";
 import ProjectDeck from "../components/ProjectDeck";
 import GhaimAEProcessSection from "../components/GhaimAEProcessSection";
@@ -12,6 +13,7 @@ const Home = () => {
   return (
     <div className="App">
       <Hero />
+      <TrustBar />
       <ScrollableCardSection />
       <AnimatedArrow />
       <ProjectDeck />

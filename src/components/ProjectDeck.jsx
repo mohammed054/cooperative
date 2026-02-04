@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import ScribbleButton from "./ScribbleButton";
 
 const projects = [
-  "images/event1.jpg",
-  "images/event2.jpg",
-  "images/event3.jpg"
+  "/images/event1.jpg",
+  "/images/event2.jpg",
+  "/images/event3.jpg"
 ];
 
 const ProjectDeck = () => {
