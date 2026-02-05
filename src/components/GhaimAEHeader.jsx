@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaChevronDown } from 'react-icons/fa';
 import { caseStudies, services } from '../data/siteData';
+import { assetUrl } from '../lib/assetUrl';
+import ScribbleButton from './ScribbleButton';
 
 const GhaimAEHeader = () => {
   const navigate = useNavigate();
@@ -155,7 +157,7 @@ const GhaimAEHeader = () => {
         >
           <Link to="/" className="flex items-center gap-3">
             <img
-              src="/cooperative/images/logo.webp"
+              src={assetUrl('images/logo.webp')}
               alt="Ghaim UAE"
               className={`h-9 w-auto ${isHovering || (!headerIsLight) ? 'brightness-0' : 'brightness-0 invert'}`}
               loading="lazy"
@@ -194,9 +196,9 @@ const GhaimAEHeader = () => {
                 </div>
               );
             })}
-            <button type="button" onClick={() => goTo('/contact')} className="btn-primary text-sm">
+            <ScribbleButton to="/contact" className="btn-primary text-sm">
               Contact
-            </button>
+            </ScribbleButton>
           </nav>
 
           <button
@@ -347,9 +349,9 @@ const GhaimAEHeader = () => {
                 </div>
 
                 <div className="mt-6">
-                  <button onClick={() => goTo('/contact')} className="btn-primary w-full text-sm">
+                  <ScribbleButton to="/contact" onClick={() => setMobileOpen(false)} className="btn-primary w-full text-sm">
                     Contact
-                  </button>
+                  </ScribbleButton>
                 </div>
               </div>
             </motion.div>

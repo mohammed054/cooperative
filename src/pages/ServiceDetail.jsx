@@ -1,7 +1,8 @@
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import PageIntro from '../components/PageIntro';
 import { caseStudies, services } from '../data/siteData';
 import NotFound from './NotFound';
+import ScribbleButton from '../components/ScribbleButton';
 
 const ServiceDetail = () => {
   const { slug } = useParams();
@@ -21,12 +22,12 @@ const ServiceDetail = () => {
         description={service.description}
       >
         <div className="flex flex-wrap gap-3">
-          <Link to="/contact" className="btn-primary text-sm">
+          <ScribbleButton to="/contact" className="btn-primary text-sm">
             Request a proposal
-          </Link>
-          <Link to="/services" className="btn-secondary text-sm">
+          </ScribbleButton>
+          <ScribbleButton to="/services" className="btn-secondary text-sm">
             View all services
-          </Link>
+          </ScribbleButton>
         </div>
       </PageIntro>
 
@@ -87,12 +88,12 @@ const ServiceDetail = () => {
               <div>
                 <h2 className="text-2xl font-semibold text-ink">{relatedCase.title}</h2>
                 <p className="mt-4 text-sm text-ink-muted">{relatedCase.summary}</p>
-                <Link
+                <ScribbleButton
                   to={`/work/${relatedCase.slug}`}
                   className="btn-secondary mt-6 inline-flex text-sm"
                 >
                   Read the case study
-                </Link>
+                </ScribbleButton>
               </div>
             </div>
           </div>

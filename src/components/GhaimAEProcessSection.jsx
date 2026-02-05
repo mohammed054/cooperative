@@ -1,10 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 import ScribbleButton from "./ScribbleButton";
-import { useNavigate } from "react-router-dom";
+import { assetUrl } from "../lib/assetUrl";
 
 const GhaimAEProcessSection = () => {
-  const navigate = useNavigate();
   return (
     <section id="process" className="w-full bg-surface py-16 lg:py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-10 lg:gap-12">
@@ -24,7 +23,7 @@ const GhaimAEProcessSection = () => {
             We stay close to the run‑of‑show, approvals, and vendor alignment so your team can stay focused on the room. The goal is a composed event with no last‑minute surprises.
           </p>
           <div className="flex justify-center lg:justify-start">
-            <ScribbleButton onClick={() => navigate("/process")} className="btn-primary px-8 py-3 text-lg">
+            <ScribbleButton to="/process" className="btn-primary px-8 py-3 text-lg">
               How we work
             </ScribbleButton>
           </div>
@@ -39,7 +38,7 @@ const GhaimAEProcessSection = () => {
           className="flex-1 lg:flex-[0.65] flex justify-center items-center"
         >
           <img
-            src="/cooperative/images/event-planning-in-action.png"
+            src={assetUrl("images/event-planning-in-action.png")}
             alt="Event planning in action"
             className="w-full max-w-xs sm:max-w-sm lg:max-w-sm object-contain rounded-2xl shadow-xl"
             loading="lazy"

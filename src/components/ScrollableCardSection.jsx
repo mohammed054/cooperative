@@ -1,47 +1,48 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { assetUrl } from "../lib/assetUrl";
+import ScribbleButton from "./ScribbleButton";
 
 const cards = [
   {
     title: "Event Production",
     subtitle: "Single accountable producer",
     description: "Scope, vendor alignment, and show control for high‑stakes rooms.",
-    img: "/cooperative/images/event-planning.png",
+    img: assetUrl("images/event-planning.png"),
     href: "/services/event-production",
   },
   {
     title: "Technical Production",
     subtitle: "AV, lighting, video systems",
     description: "Systems design, cueing, and redundancy for complex shows.",
-    img: "/cooperative/images/av-setup.png",
+    img: assetUrl("images/av-setup.png"),
     href: "/services/technical-production",
   },
   {
     title: "Staging & Scenic",
     subtitle: "Built to the render",
     description: "Stage architecture and scenic builds that stay on timeline.",
-    img: "/cooperative/images/seating.png",
+    img: assetUrl("images/seating.png"),
     href: "/services/staging-scenic",
   },
   {
     title: "Furniture & Rentals",
     subtitle: "Curated inventory",
     description: "Premium seating, tables, and accessories delivered clean.",
-    img: "/cooperative/images/lighting-effects.png",
+    img: assetUrl("images/lighting-effects.png"),
     href: "/services/furniture-rentals",
   },
   {
     title: "Show Control",
     subtitle: "On‑site command",
     description: "Dedicated producer and crew to keep the room composed.",
-    img: "/cooperative/images/full-production.png",
+    img: assetUrl("images/full-production.png"),
     href: "/process",
   },
   {
     title: "Timing & Logistics",
     subtitle: "No‑surprise scheduling",
     description: "Load‑ins, resets, and strike planned around your timeline.",
-    img: "/cooperative/images/always-on-time.png",
+    img: assetUrl("images/always-on-time.png"),
     href: "/process",
   },
 ];
@@ -153,9 +154,9 @@ const ScrollableCardSection = () => {
                       <p className="text-center text-ink-muted text-sm mb-4">
                         {card.description}
                       </p>
-                      <Link className="btn-primary px-5 py-2 text-sm" to={card.href}>
+                      <ScribbleButton className="btn-primary px-5 py-2 text-sm" to={card.href}>
                         Learn more
-                      </Link>
+                      </ScribbleButton>
                     </div>
                   </div>
                 </div>
@@ -234,9 +235,9 @@ const ScrollableCardSection = () => {
                     <p className="text-center text-ink-muted mb-6">
                       {card.description}
                     </p>
-                    <Link className="btn-primary px-8 py-3" to={card.href}>
+                    <ScribbleButton className="btn-primary px-8 py-3" to={card.href}>
                       Learn more
-                    </Link>
+                    </ScribbleButton>
                   </div>
 
                 </div>

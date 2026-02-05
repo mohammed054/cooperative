@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageIntro from '../components/PageIntro';
 import { caseStudies } from '../data/siteData';
+import ScribbleButton from '../components/ScribbleButton';
 
 const Work = () => {
   return (
@@ -50,12 +51,12 @@ const Work = () => {
             Share your scope and we will respond with a clear plan, timeline, and assigned producer.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link to="/contact" className="btn-primary text-sm">
+            <ScribbleButton to="/contact" className="btn-primary text-sm">
               Start a project
-            </Link>
-            <Link to="/projects" className="btn-secondary text-sm">
+            </ScribbleButton>
+            <ScribbleButton to="/projects" className="btn-secondary text-sm">
               View the gallery
-            </Link>
+            </ScribbleButton>
           </div>
         </div>
       </section>

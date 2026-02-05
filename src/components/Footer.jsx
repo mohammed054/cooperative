@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { FaFacebook, FaInstagram, FaLinkedin, FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { caseStudies, services } from '../data/siteData';
+import { assetUrl } from '../lib/assetUrl';
+import ScribbleButton from './ScribbleButton';
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ const Footer = () => {
           >
             <div className="flex items-center gap-3">
               <img
-                src="/cooperative/images/logo.webp"
+                src={assetUrl('images/logo.webp')}
                 alt="Ghaim UAE logo"
                 className="h-8 w-auto brightness-0"
                 loading="lazy"
@@ -187,9 +189,9 @@ const Footer = () => {
                 <span>Dubai Design District, UAE</span>
               </div>
             </div>
-            <button onClick={() => navigate('/contact')} className="btn-primary mt-5 text-sm">
+            <ScribbleButton to="/contact" className="btn-primary mt-5 text-sm">
               Request a proposal
-            </button>
+            </ScribbleButton>
           </motion.div>
         </div>
 

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageIntro from '../components/PageIntro';
 import { services } from '../data/siteData';
+import ScribbleButton from '../components/ScribbleButton';
 
 const Services = () => {
   const highlights = [
@@ -17,12 +18,12 @@ const Services = () => {
         description="From full event production to highly technical shows, we build the right team for the scope and stay accountable through show-close."
       >
         <div className="flex flex-wrap gap-3">
-          <Link to="/contact" className="btn-primary text-sm">
+          <ScribbleButton to="/contact" className="btn-primary text-sm">
             Request a proposal
-          </Link>
-          <Link to="/work" className="btn-secondary text-sm">
+          </ScribbleButton>
+          <ScribbleButton to="/work" className="btn-secondary text-sm">
             View recent work
-          </Link>
+          </ScribbleButton>
         </div>
       </PageIntro>
 

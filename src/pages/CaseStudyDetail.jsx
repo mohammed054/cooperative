@@ -1,7 +1,8 @@
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import PageIntro from '../components/PageIntro';
 import { caseStudies } from '../data/siteData';
 import NotFound from './NotFound';
+import ScribbleButton from '../components/ScribbleButton';
 
 const CaseStudyDetail = () => {
   const { slug } = useParams();
@@ -19,12 +20,12 @@ const CaseStudyDetail = () => {
         description={study.summary}
       >
         <div className="flex flex-wrap gap-3">
-          <Link to="/contact" className="btn-primary text-sm">
+          <ScribbleButton to="/contact" className="btn-primary text-sm">
             Discuss your event
-          </Link>
-          <Link to="/work" className="btn-secondary text-sm">
+          </ScribbleButton>
+          <ScribbleButton to="/work" className="btn-secondary text-sm">
             Back to work
-          </Link>
+          </ScribbleButton>
         </div>
       </PageIntro>
 

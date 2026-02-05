@@ -2,8 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/webp" href="/images/logo.webp" />
+    <link rel="icon" type="image/webp" href="%BASE_URL%images/logo.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // GitHub Pages SPA deep-link support (pairs with public/404.html).
+      (function (l) {
+        if (l.search && l.search[1] === '/') {
+          var decoded = l.search
+            .slice(1)
+            .split('&')
+            .map(function (s) {
+              return s.replace(/~and~/g, '&');
+            })
+            .join('?');
+          window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+        }
+      })(window.location);
+    </script>
     <title>Ghaim UAE | Premium Event Rentals & Production</title>
     <meta
       name="description"
@@ -19,7 +34,7 @@
       content="Premium event rentals, production, and full-service execution across the UAE."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/images/event1.jpg" />
+    <meta property="og:image" content="%BASE_URL%images/event1.jpg" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
@@ -29,7 +44,7 @@
       name="twitter:description"
       content="Premium event rentals, production, and full-service execution across the UAE."
     />
-    <meta name="twitter:image" content="/images/event1.jpg" />
+    <meta name="twitter:image" content="%BASE_URL%images/event1.jpg" />
 
     <!-- Structured Data -->
     <script type="application/ld+json">

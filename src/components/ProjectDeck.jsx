@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import ScribbleButton from "./ScribbleButton";
+import { assetUrl } from "../lib/assetUrl";
 
 const projects = [
-  "/cooperative/images/event1.jpg",
-  "/cooperative/images/event2.jpg",
-  "/cooperative/images/event3.jpg"
+  assetUrl("images/event1.jpg"),
+  assetUrl("images/event2.jpg"),
+  assetUrl("images/event3.jpg"),
 ];
 
 const ProjectDeck = () => {
-  const navigate = useNavigate();
   const [stack, setStack] = useState(projects);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -117,7 +116,7 @@ const ProjectDeck = () => {
         </p>
           <div className="flex justify-center lg:justify-start">
             <ScribbleButton
-              onClick={() => navigate("/work")}
+              to="/work"
               className="btn-primary px-8 py-3 text-lg"
             >
               View case studies

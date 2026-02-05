@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import ScribbleButton from '../components/ScribbleButton';
 
 const NotFound = () => {
   return (
@@ -12,12 +12,12 @@ const NotFound = () => {
           The link may be outdated or the page has moved. Use the links below to get back on track.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link to="/" className="btn-primary text-sm">
+          <ScribbleButton to="/" className="btn-primary text-sm">
             Back to home
-          </Link>
-          <Link to="/contact" className="btn-secondary text-sm">
+          </ScribbleButton>
+          <ScribbleButton to="/contact" className="btn-secondary text-sm">
             Contact us
-          </Link>
+          </ScribbleButton>
         </div>
       </section>
     </div>

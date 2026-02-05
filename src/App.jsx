@@ -20,8 +20,10 @@ import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 function App() {
+  const basename = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <ScrollToTop />
       <GhaimAEHeader />
       <main id="main-content">

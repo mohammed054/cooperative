@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaArrowDown, FaPlay } from 'react-icons/fa';
 import LazyLoadImage from 'react-lazy-load-image-component';
+import { assetUrl } from './lib/assetUrl';
 
 console.log('motion:', typeof motion);
 console.log('motion.h1:', typeof motion.h1);
@@ -15,7 +16,7 @@ function TestHero() {
       <motion.h1>Test</motion.h1>
       <FaArrowDown />
       <FaPlay />
-      <LazyLoadImage src="/cooperative/images/event1.jpg" alt="test" />
+      <LazyLoadImage src={assetUrl('images/event1.jpg')} alt="test" />
     </div>
   );
 }

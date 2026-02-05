@@ -1,6 +1,6 @@
 import PageIntro from '../components/PageIntro';
 import { engagementModels } from '../data/siteData';
-import { Link } from 'react-router-dom';
+import ScribbleButton from '../components/ScribbleButton';
 
 const Pricing = () => {
   return (
@@ -10,9 +10,9 @@ const Pricing = () => {
         title="Clear scopes, flexible engagement."
         description="We tailor every proposal to the event, but our engagement models keep expectations clear and approvals fast."
       >
-        <Link to="/contact" className="btn-primary text-sm">
+        <ScribbleButton to="/contact" className="btn-primary text-sm">
           Request a proposal
-        </Link>
+        </ScribbleButton>
       </PageIntro>
 
       <section className="bg-surface py-16 sm:py-20">

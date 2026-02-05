@@ -1,3 +1,5 @@
+import { assetUrl } from '../lib/assetUrl';
+
 export const services = [
   {
     slug: 'event-production',
@@ -123,7 +125,7 @@ export const caseStudies = [
       { label: 'Room resets', value: '3' },
     ],
     services: ['Event Production', 'Technical Production', 'Furniture & Rentals'],
-    image: '/cooperative/images/event1.jpg',
+    image: assetUrl('images/event1.jpg'),
   },
   {
     slug: 'prestige-brand-launch',
@@ -146,7 +148,7 @@ export const caseStudies = [
       { label: 'Rehearsals', value: '2' },
     ],
     services: ['Technical Production', 'Staging & Scenic'],
-    image: '/cooperative/images/event2.jpg',
+    image: assetUrl('images/event2.jpg'),
   },
   {
     slug: 'elite-vip-gala',
@@ -169,7 +171,7 @@ export const caseStudies = [
       { label: 'VIP guests', value: '150' },
     ],
     services: ['Staging & Scenic', 'Event Production'],
-    image: '/cooperative/images/event3.jpg',
+    image: assetUrl('images/event3.jpg'),
   },
 ];
 

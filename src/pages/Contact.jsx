@@ -1,4 +1,5 @@
 import PageIntro from '../components/PageIntro';
+import ScribbleButton from '../components/ScribbleButton';
 
 const Contact = () => {
   return (
@@ -78,9 +79,9 @@ const Contact = () => {
               />
             </label>
 
-            <button type="submit" className="btn-primary mt-6 text-sm">
+            <ScribbleButton type="submit" showArrow={false} className="btn-primary mt-6 text-sm">
               Send request
-            </button>
+            </ScribbleButton>
             <p className="mt-3 text-xs text-ink-subtle">We respond within 24 hours.</p>
           </form>
 

@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import { Link } from "react-router-dom";
 import PageIntro from "./PageIntro";
+import { assetUrl } from "../lib/assetUrl";
+import ScribbleButton from "./ScribbleButton";
 
 export default function OurProjects() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -14,28 +15,28 @@ export default function OurProjects() {
       id: 1,
       title: "Luxury Wedding",
       category: "Weddings",
-      image: "/cooperative/images/event1.jpg",
+      image: assetUrl("images/event1.jpg"),
       description: "Elegant wedding with 500+ guests and stunning decor",
     },
     {
       id: 2,
       title: "Corporate Gala",
       category: "Corporate",
-      image: "/cooperative/images/event2.jpg",
+      image: assetUrl("images/event2.jpg"),
       description: "Exclusive gala dinner for top executives",
     },
     {
       id: 3,
       title: "Birthday Bash",
       category: "Birthday",
-      image: "/cooperative/images/event3.jpg",
+      image: assetUrl("images/event3.jpg"),
       description: "Fun and colorful themed birthday celebration",
     },
     {
       id: 4,
       title: "Product Launch",
       category: "Product Launch",
-      image: "/cooperative/images/event1.jpg",
+      image: assetUrl("images/event1.jpg"),
       description: "Innovative product reveal with VIP guests",
     },
   ];
@@ -53,12 +54,12 @@ export default function OurProjects() {
         description="Selected visuals from corporate summits, launches, and high‑touch hospitality events across the UAE."
       >
         <div className="flex flex-wrap gap-3">
-          <Link to="/contact" className="btn-primary text-sm">
+          <ScribbleButton to="/contact" className="btn-primary text-sm">
             Request a proposal
-          </Link>
-          <Link to="/work" className="btn-secondary text-sm">
+          </ScribbleButton>
+          <ScribbleButton to="/work" className="btn-secondary text-sm">
             View case studies
-          </Link>
+          </ScribbleButton>
         </div>
       </PageIntro>
 
@@ -135,9 +136,9 @@ export default function OurProjects() {
         <p className="text-ink-muted mb-8">
           Share your dates and priorities. We will respond with a clear scope and timeline.
         </p>
-        <Link to="/contact" className="btn-primary px-8 py-4">
+        <ScribbleButton to="/contact" className="btn-primary px-8 py-4">
           Book a consultation
-        </Link>
+        </ScribbleButton>
       </section>
     </div>
   );

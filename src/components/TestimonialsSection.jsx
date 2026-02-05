@@ -1,7 +1,9 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FaArrowRight, FaChevronLeft, FaChevronRight, FaQuoteLeft } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from 'react-icons/fa';
+import { assetUrl } from '../lib/assetUrl';
+import ScribbleButton from './ScribbleButton';
 
 const getInitials = (name) => {
   const parts = String(name).trim().split(/\s+/).filter(Boolean);
@@ -21,7 +23,7 @@ const TESTIMONIALS = [
       'We gave them a complex room layout and a tight timeline. They delivered with zero drama — every cue landed, everything looked premium, and the room opened on time.',
     event: 'Investor summit',
     location: 'Dubai',
-    image: '/cooperative/images/event1.jpg',
+    image: assetUrl('images/event1.jpg'),
     tags: ['Full production', 'AV + lighting', 'On‑site crew'],
   },
   {
@@ -34,7 +36,7 @@ const TESTIMONIALS = [
       'The logistics were flawless. Equipment arrived tested and organized, the crew communicated clearly, and the setup looked exactly like the render — no last‑minute surprises.',
     event: 'Brand launch',
     location: 'Abu Dhabi',
-    image: '/cooperative/images/event2.jpg',
+    image: assetUrl('images/event2.jpg'),
     tags: ['Staging + seating', 'Show‑day support', 'White‑glove delivery'],
   },
   {
@@ -47,7 +49,7 @@ const TESTIMONIALS = [
       'They anticipate problems before they happen. The team is proactive, detail‑obsessed, and calm under pressure — exactly the partner you want on event day.',
     event: 'VIP gala',
     location: 'Sharjah',
-    image: '/cooperative/images/event3.jpg',
+    image: assetUrl('images/event3.jpg'),
     tags: ['Lighting design', 'Backstage ops', 'Client‑ready finish'],
   },
 ];
@@ -62,6 +64,7 @@ const TestimonialsSection = ({
   const isHome = location.pathname === '/';
   const proposalHref = '#get-started';
   const processHref = isHome ? '#process' : '/process';
+  const isProcessAnchor = String(processHref).startsWith('#');
   const [activeId, setActiveId] = useState(TESTIMONIALS[0]?.id);
 
   const activeIndex = useMemo(
@@ -292,19 +295,29 @@ const TestimonialsSection = ({
               </ul>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <a
+                <ScribbleButton
                   href={proposalHref}
-                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(22,22,22,0.18)] transition hover:shadow-[0_16px_46px_rgba(22,22,22,0.22)]"
+                  showArrow={false}
+                  className="inline-flex items-center justify-center gap-3 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(22,22,22,0.18)] transition hover:shadow-[0_16px_46px_rgba(22,22,22,0.22)]"
                 >
                   Request a proposal
-                  <FaArrowRight className="transition-transform group-hover:translate-x-0.5" size={14} />
-                </a>
-                <a
-                  href={processHref}
-                  className="inline-flex items-center justify-center rounded-full border border-border bg-surface-2 px-6 py-3 text-sm font-semibold text-ink-muted transition hover:border-ink hover:text-ink"
-                >
-                  See how it works
-                </a>
+                </ScribbleButton>
+
+                {isProcessAnchor ? (
+                  <ScribbleButton
+                    href={processHref}
+                    className="inline-flex items-center justify-center rounded-full border border-border bg-surface-2 px-6 py-3 text-sm font-semibold text-ink-muted transition hover:border-ink hover:text-ink"
+                  >
+                    See how it works
+                  </ScribbleButton>
+                ) : (
+                  <ScribbleButton
+                    to={processHref}
+                    className="inline-flex items-center justify-center rounded-full border border-border bg-surface-2 px-6 py-3 text-sm font-semibold text-ink-muted transition hover:border-ink hover:text-ink"
+                  >
+                    See how it works
+                  </ScribbleButton>
+                )}
               </div>
             </div>
           </div>

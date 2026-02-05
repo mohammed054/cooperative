@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import PageIntro from '../components/PageIntro';
+import ScribbleButton from '../components/ScribbleButton';
 
 const Process = () => {
   const steps = [
@@ -34,9 +34,9 @@ const Process = () => {
         title="A disciplined process that keeps the room calm."
         description="We run every project with tight approvals, clear handoffs, and a focused crew. The goal is simple: keep the timeline clean and the experience premium."
       >
-        <Link to="/contact" className="btn-primary text-sm">
+        <ScribbleButton to="/contact" className="btn-primary text-sm">
           Start a project
-        </Link>
+        </ScribbleButton>
       </PageIntro>
 
       <section className="bg-surface py-16 sm:py-20">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FaArrowDown, FaArrowRight } from 'react-icons/fa';
 import ScribbleButton from './ScribbleButton';
+import { assetUrl } from '../lib/assetUrl';
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion();
@@ -17,7 +18,7 @@ const Hero = () => {
   return (
     <section id="hero" className="relative h-[100svh] overflow-hidden bg-black">
       <img
-        src="/cooperative/images/event1.jpg"
+        src={assetUrl('images/event1.jpg')}
         alt="Event production in the UAE"
         className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-0' : 'opacity-100'}`}
         loading="eager"
@@ -30,11 +31,11 @@ const Hero = () => {
         loop={!shouldReduceMotion}
         playsInline
         preload="none"
-        poster="/cooperative/images/event1.jpg"
+        poster={assetUrl('images/event1.jpg')}
         onLoadedData={() => setVideoReady(true)}
         aria-hidden="true"
       >
-        <source src="/cooperative/videos/background.mp4" type="video/mp4" />
+        <source src={assetUrl('videos/background.mp4')} type="video/mp4" />
       </video>
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-black/90" />
