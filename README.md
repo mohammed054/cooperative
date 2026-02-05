@@ -1,109 +1,111 @@
-# Ghaim UAE - Event Rental & Management Platform
+# Site Overview: Ghaim UAE Event Production
 
-A premium React.js website showcasing corporate event services, equipment rentals, and venue solutions across the UAE.
+## Purpose
+Ghaim UAE is a premium event production company based in Dubai that provides high-end production services for corporate events, government summits, and luxury hospitality events across the UAE. The website serves as a professional portfolio and lead generation platform to attract high-value clients who need reliable, premium event production services.
 
-## 🚀 Quick Start
+## Brand Tone and Personality
+- **Professional**: Sophisticated and business-focused
+- **Premium**: High-end, luxury positioning
+- **Reliable**: Emphasis on precision and dependability
+- **Calm**: Stress-free event management approach
+- **Trustworthy**: Corporate and government clientele focus
 
-```bash
-npm install
-npm run dev
-```
+## Color Palette
+- **Primary Text**: #1c1c1c (Deep charcoal/black)
+- **Accent Blue**: #3b82f6 (Professional blue)
+- **Accent Strong**: #2563eb (Darker blue for emphasis)
+- **Surface Colors**: 
+  - #f6f7f9 (Light gray background)
+  - #ffffff (White)
+  - #eef1f6 (Soft gray)
+- **Borders**: rgba(28, 28, 28, 0.12) (Subtle borders)
+- **Muted Text**: #5c6470 (Secondary text)
 
-## 📋 Available Scripts
+## Typography
+- **Headings**: Fraunces font (serif) - elegant and premium feel
+- **Body Text**: Manrope font (sans-serif) - clean and modern
+- **Font Weights**: 500-600 for headings, 400 for body text
+- **Letter Spacing**: -0.01em to -0.02em for tight, professional appearance
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Create optimized production build  
-- `npm run preview` - Preview production build locally
-- `npm run lint` - Run ESLint code quality checks
+## Spacing and Layout Philosophy
+- **Consistent Spacing**: Uses a 8px base unit system (space-1 through space-8)
+- **Generous White Space**: Clean, uncluttered layouts
+- **Responsive Design**: Mobile-first approach with careful breakpoint management
+- **Section Spacing**: 64px-128px between major sections
+- **Card Spacing**: 24px-32px padding within components
 
-## 🛠️ Tech Stack & Frameworks
+## Button and Interaction Style
+- **Primary Buttons**: Blue background with white text, rounded corners, subtle shadow
+- **Secondary Buttons**: Transparent with blue border, hover effects
+- **Scribble Buttons**: Hand-drawn style with animated underline effects
+- **Hover States**: Scale transforms and color changes
+- **Focus States**: Blue outline for accessibility
 
-### Core Technologies
-- **React 19.2.0** - Modern UI framework with concurrent features
-- **Vite 7.2.4** - Lightning-fast build tool and dev server
-- **Tailwind CSS 3.4.19** - Utility-first CSS framework with PostCSS
-- **ESLint 9.39.1** - Code quality and consistency enforcement
+## Animation and Motion Style
+- **Subtle Transitions**: 0.3-0.6 second durations
+- **Smooth Scrolling**: Eased scroll behavior throughout
+- **Hover Effects**: Scale transforms and color shifts
+- **Entrance Animations**: Fade-in and slide effects for content
+- **Scroll-Triggered**: Horizontal card sections with scroll-driven animations
+- **Loading States**: Skeleton loaders and shimmer effects
 
-### Animation & UI Libraries
-- **Framer Motion 12.29.2** - Production-ready animation library
-- **React Intersection Observer 10.0.2** - Scroll-triggered animations
-- **Swiper 12.1.0** - Modern touch slider with hardware acceleration
-- **React Icons 5.5.0** - Comprehensive icon component library
+## Page Structure
 
-### Development Experience
-- **Hot Module Replacement** - Instant component updates during development
-- **ESLint Integration** - Automated code quality checks
-- **Optimized Builds** - Automatic tree-shaking and minification
-- **TypeScript Support** - Type safety via @types packages
+### Home Page
+- **Hero Section**: Full-screen video background with overlay text
+- **Services Overview**: Scrollable card section with 3D flip effects
+- **Project Showcase**: Stacked image deck with interactive elements
+- **Process Section**: Timeline and methodology explanation
+- **Testimonials**: Client feedback with professional styling
+- **Final CTA**: Contact form and call-to-action
 
-## 🎨 Design System Overview
+### Services Pages
+- **Service Categories**: Event Production, Technical Production, Staging & Scenic, Furniture & Rentals
+- **Individual Service Pages**: Detailed descriptions, inclusions, ideal use cases
+- **Case Studies**: Real project examples with results and statistics
 
-### Color Palette
-- **Primary**: Charcoal/Dark Navy (#1a1a2e, #16213e) - Professional base
-- **Backgrounds**: White (#ffffff), Light Gray (#f8f9fa) - Clean canvas
-- **Accent**: Light Blue - Brand consistency from logo
-- **Micro-accent**: Pink - Subtle separators and decorative elements
-- **Typography**: Dark charcoal (#333333) body, lighter hierarchy text
+### Work/Portfolio
+- **Case Studies**: Detailed project breakdowns with challenges, approaches, and results
+- **Project Gallery**: Visual showcase of completed events
+- **Client Testimonials**: Professional feedback and endorsements
 
-### UI Components
-- **Responsive Navigation**: Transparent header with mobile hamburger menu
-- **Hero Section**: Full viewport with video background and centered CTA
-- **Scroll-Snap Sections**: Immersive full-screen content presentation
-- **Card Components**: Service showcases with hover animations
-- **Testimonials**: Customer feedback with company attribution
-- **CTA Sections**: Strategic conversion points throughout user journey
+### Company Pages
+- **About**: Team introduction and company values
+- **Process**: Step-by-step methodology explanation
+- **FAQ**: Common questions and answers
+- **Contact**: Inquiry form and contact information
 
-### Interactive Features
-- **Smooth Scrolling**: Native browser optimization with scroll-snap
-- **Intersection Observer**: Content animations on scroll
-- **Hover States**: Professional micro-interactions on all interactive elements
-- **Mobile-First**: Touch-optimized interactions and gestures
-- **Responsive Design**: Adaptive layouts from mobile to desktop
+## Component Philosophy
+- **Reusable Components**: Header, Footer, Buttons, Cards consistently used
+- **Custom Components**: Specialized components for unique interactions
+- **Modular Design**: Components designed for flexibility and reuse
+- **Performance Focused**: Lazy loading and optimized assets
+- **Accessibility**: Proper ARIA labels and keyboard navigation
 
-## 🏗️ Architecture Overview
+## Mobile-First Responsive Approach
+- **Breakpoints**: Careful consideration of mobile, tablet, and desktop layouts
+- **Touch-Friendly**: Large tap targets and swipe interactions
+- **Performance**: Optimized images and assets for mobile
+- **Navigation**: Hamburger menu for mobile, full navigation for desktop
 
-The application follows a component-based architecture with modular sections:
+## Overall UX Principles
+- **Fast Loading**: Optimized assets and efficient code
+- **Intuitive Navigation**: Clear menu structure and breadcrumbs
+- **Professional Presentation**: High-quality imagery and clean layouts
+- **Trust Building**: Testimonials, case studies, and professional design
+- **Lead Generation**: Clear calls-to-action and contact opportunities
+- **Accessibility**: WCAG compliant with proper contrast and keyboard navigation
 
-1. **Header/Navigation** - Global navigation with mobile responsiveness
-2. **Hero Section** - Video background with primary value proposition
-3. **Service Categories** - Scrollable event types and rental categories
-4. **Process Flow** - Step-by-step service explanation
-5. **Featured Projects** - Dynamic portfolio showcase
-6. **Testimonials** - Social proof and customer validation
-7. **Call-to-Action** - Conversion-focused final section
-8. **Footer** - Multi-column information architecture
+## What NOT to Change Without Brand Approval
+- **Color Palette**: Do not modify primary brand colors
+- **Typography**: Do not change font families or weights
+- **Logo Usage**: Do not alter logo placement or styling
+- **Brand Voice**: Maintain professional, premium tone
+- **Core Navigation**: Do not restructure main menu items
+- **Contact Information**: Do not modify contact details or forms
+- **Legal Pages**: Do not alter Privacy Policy or Terms of Service
+- **Testimonials**: Do not modify client feedback content
+- **Case Study Content**: Do not change project details or results
+- **Brand Imagery**: Do not replace hero images or key visual assets
 
-## 📁 Project Structure
-
-```
-src/
-├── components/          # React UI components
-├── hooks/              # Custom React hooks
-├── App.jsx             # Main application component
-├── main.jsx            # Application entry point
-├── App.css             # Global component styles
-└── index.css           # Base CSS variables and utilities
-```
-
-## 🎯 Performance Features
-
-- **Bundle Optimization**: Automatic code splitting and tree-shaking
-- **Image Optimization**: Compressed media assets with lazy loading
-- **Animation Performance**: Hardware-accelerated transforms
-- **Development Speed**: Instant HMR with Vite
-- **Production Ready**: Optimized static assets in dist/
-
-## 📖 Documentation
-
-For detailed website structure, component breakdown, and implementation details, see **[WEBSITE_STRUCTURE.md](./WEBSITE_STRUCTURE.md)**.
-
----
-
-## Development Notes
-
-This project uses modern React patterns and best practices:
-- Functional components with hooks
-- CSS-in-JS via Tailwind utility classes
-- Component composition and reusability
-- Performance-conscious animation implementation
-- Mobile-first responsive design principles
+This website represents a premium brand identity that should be maintained consistently across all updates and modifications.

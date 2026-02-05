@@ -85,7 +85,7 @@ const CaseStudyDetail = () => {
             <ul className="mt-3 space-y-2 text-sm text-ink">
               {study.results.map((item) => (
                 <li key={item} className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-accent" />
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
                   {item}
                 </li>
               ))}

@@ -21,17 +21,17 @@
   --color-surface-2: #ffffff;
   --color-surface-3: #eef1f6;
   --color-border: rgba(28, 28, 28, 0.12);
-  --color-accent: #3b82f6;
-  --color-accent-strong: #2563eb;
-  --color-accent-soft: rgba(59, 130, 246, 0.12);
+  --color-accent: #1a1a1a;
+  --color-accent-strong: #0f0f0f;
+  --color-accent-soft: rgba(26, 26, 26, 0.12);
   --color-video-overlay-strong: rgba(7, 9, 12, 0.78);
   --color-video-overlay-soft: rgba(7, 9, 12, 0.48);
-  --color-video-overlay-accent: rgba(59, 130, 246, 0.22);
+  --color-video-overlay-accent: rgba(26, 26, 26, 0.22);
   --color-primary-text: var(--color-ink);
   --color-primary-accent: var(--color-ink);
   --color-link-hover: var(--color-ink);
   --color-navbar-scrolled: var(--color-surface-2);
-  --color-micro-accent: var(--color-accent);
+  --color-micro-accent: var(--color-ink);
   --color-bg-main: var(--color-surface-2);
   --color-bg-muted: var(--color-surface);
   --color-bg-soft: var(--color-surface-3);
@@ -56,7 +56,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
   }
 
@@ -78,11 +78,11 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(22,22,22,0.18)] transition hover:bg-accent-strong hover:shadow-[0_16px_42px_rgba(22,22,22,0.22)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-surface-2 shadow-[0_12px_30px_rgba(22,22,22,0.18)] transition hover:bg-ink-muted hover:shadow-[0_16px_42px_rgba(22,22,22,0.22)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-border bg-transparent px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-border bg-transparent px-6 py-3 text-sm font-semibold text-ink-muted transition hover:border-ink-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink;
   }
 
   .btn-outline {
@@ -127,7 +127,7 @@
   }
   
   .dot-active {
-    @apply w-2 h-2 rounded-full bg-micro-accent;
+    @apply w-2 h-2 rounded-full bg-ink;
   }
   
   .hover-underline {
@@ -136,7 +136,7 @@
   
   .hover-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-full h-0.5 bg-primary-accent transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-ink transition-all duration-300;
   }
   
   .hover-lift {
@@ -144,23 +144,23 @@
   }
   
   .accent-border {
-    @apply border-l-4 border-primary-accent;
+    @apply border-l-4 border-ink;
   }
   
   .accent-text {
-    @apply text-primary-accent;
+    @apply text-ink;
   }
   
   .accent-bg {
-    @apply bg-accent-soft;
+    @apply bg-surface-3;
   }
   
   .micro-accent {
-    @apply text-micro-accent font-semibold;
+    @apply text-ink font-semibold;
   }
   
   .micro-accent-hover:hover {
-    @apply text-micro-accent scale-105 transition-transform duration-300;
+    @apply text-ink scale-105 transition-transform duration-300;
   }
 
   .shadow-corporate {
@@ -168,7 +168,7 @@
   }
   
   .shadow-accent {
-    box-shadow: 0 0 20px rgba(225, 145, 188, 0.2);
+    box-shadow: 0 0 20px rgba(28, 28, 28, 0.1);
   }
 /* ================================================
    TESTIMONIALS SECTION - PROFESSIONAL STYLES
@@ -665,7 +665,7 @@
 
 /* Focus visible for keyboard navigation */
 *:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 
@@ -712,7 +712,7 @@
 }
 
   .btn-arrow-circle {
-    @apply w-12 h-12 rounded-full bg-primary-accent text-white flex items-center justify-center transition-all duration-500 p-0 relative overflow-hidden hover:-rotate-45 hover:bg-primary-accent;
+    @apply w-12 h-12 rounded-full bg-ink text-white flex items-center justify-center transition-all duration-500 p-0 relative overflow-hidden hover:-rotate-45 hover:bg-ink-muted;
   }
   .btn-arrow-circle:hover::before {
     content: '';

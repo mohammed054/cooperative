@@ -177,15 +177,15 @@ const Footer = () => {
             <p className="text-sm font-semibold text-ink">Contact</p>
             <div className="mt-4 space-y-3 text-sm text-ink-muted">
               <div className="flex items-center gap-3">
-                <FaPhone className="text-accent" />
+                <FaPhone className="text-ink" />
                 <span>+971 4 234 5678</span>
               </div>
               <div className="flex items-center gap-3">
-                <FaEnvelope className="text-accent" />
+                <FaEnvelope className="text-ink" />
                 <span>hello@ghaimuae.com</span>
               </div>
               <div className="flex items-center gap-3">
-                <FaMapMarkerAlt className="text-accent" />
+                <FaMapMarkerAlt className="text-ink" />
                 <span>Dubai Design District, UAE</span>
               </div>
             </div>

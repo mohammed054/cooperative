@@ -25,7 +25,7 @@ const Pricing = () => {
                 <ul className="mt-4 space-y-2 text-sm text-ink">
                   {model.details.map((detail) => (
                     <li key={detail} className="flex gap-3">
-                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-accent" />
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
                       {detail}
                     </li>
                   ))}

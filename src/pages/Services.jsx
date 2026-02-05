@@ -61,8 +61,8 @@ const Services = () => {
           </div>
           <ul className="space-y-4 rounded-3xl border border-border bg-surface-2 p-6 text-sm text-ink">
             {highlights.map((item) => (
-              <li key={item} className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-accent" />
+                <li key={item} className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
                 {item}
               </li>
             ))}

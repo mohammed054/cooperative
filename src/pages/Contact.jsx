@@ -19,7 +19,7 @@ const Contact = () => {
                 <input
                   type="text"
                   name="name"
-                  className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
+                  className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none"
                   placeholder="Your name"
                   required
                 />
@@ -29,7 +29,7 @@ const Contact = () => {
                 <input
                   type="text"
                   name="company"
-                  className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
+                  className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none"
                   placeholder="Company name"
                 />
               </label>
@@ -41,7 +41,7 @@ const Contact = () => {
                 <input
                   type="email"
                   name="email"
-                  className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
+                  className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none"
                   placeholder="you@company.com"
                   required
                 />
@@ -51,7 +51,7 @@ const Contact = () => {
                 <input
                   type="tel"
                   name="phone"
-                  className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
+                  className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none"
                   placeholder="+971"
                 />
               </label>
@@ -62,7 +62,7 @@ const Contact = () => {
               <input
                 type="text"
                 name="date"
-                className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
+                className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none"
                 placeholder="Dates, venue, and city"
                 required
               />
@@ -73,7 +73,7 @@ const Contact = () => {
               <textarea
                 name="scope"
                 rows="4"
-                className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-accent focus:outline-none"
+                className="mt-2 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none"
                 placeholder="Tell us about your event goals and production needs."
                 required
               />

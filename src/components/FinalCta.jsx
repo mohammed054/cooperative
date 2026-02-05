@@ -73,7 +73,7 @@ const FinalCta = () => {
                   id="name"
                   name="name"
                   required
-                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent transition-all duration-200"
                   placeholder="Full name"
                 />
               </div>
@@ -87,7 +87,7 @@ const FinalCta = () => {
                   id="company"
                   name="company"
                   required
-                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent transition-all duration-200"
                   placeholder="Company name"
                 />
               </div>
@@ -103,7 +103,7 @@ const FinalCta = () => {
                   id="email"
                   name="email"
                   required
-                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent transition-all duration-200"
                   placeholder="name@company.com"
                 />
               </div>
@@ -116,7 +116,7 @@ const FinalCta = () => {
                   type="tel"
                   id="phone"
                   name="phone"
-                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent transition-all duration-200"
                   placeholder="+971 XX XXX XXXX"
                 />
               </div>
@@ -130,8 +130,8 @@ const FinalCta = () => {
                 id="service"
                 name="service"
                 required
-                className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
-              >
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-surface-3 text-ink focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent transition-all duration-200"
+                >
                 <option value="">Select a service</option>
                 <option value="event-production">Event production</option>
                 <option value="technical-production">Technical production</option>
