@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import PageIntro from '../components/PageIntro';
-import { caseStudies } from '../data/siteData';
+import { caseStudies, services } from '../data/siteData';
 import NotFound from './NotFound';
 import ScribbleButton from '../components/ScribbleButton';
 
@@ -48,14 +48,25 @@ const CaseStudyDetail = () => {
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">Services</p>
               <div className="mt-2 flex flex-wrap gap-2">
-                {study.services.map((service) => (
-                  <span
-                    key={service}
-                    className="rounded-full border border-border bg-surface-3 px-3 py-1 text-xs font-semibold text-ink"
-                  >
-                    {service}
-                  </span>
-                ))}
+                {study.services.map((serviceName) => {
+                  const service = services.find(s => s.title === serviceName);
+                  return service ? (
+                    <ScribbleButton
+                      key={service.slug}
+                      to={`/services/${service.slug}`}
+                      className="rounded-full border border-border bg-surface-3 px-3 py-1 text-xs font-semibold text-ink hover:border-ink hover:text-ink"
+                    >
+                      {serviceName}
+                    </ScribbleButton>
+                  ) : (
+                    <span
+                      key={serviceName}
+                      className="rounded-full border border-border bg-surface-3 px-3 py-1 text-xs font-semibold text-ink"
+                    >
+                      {serviceName}
+                    </span>
+                  );
+                })}
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -90,6 +101,36 @@ const CaseStudyDetail = () => {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Related Case Studies */}
+      <section className="bg-surface py-16 sm:py-20">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-semibold text-ink">Related projects</h2>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {caseStudies
+              .filter(cs => cs.slug !== study.slug)
+              .slice(0, 3)
+              .map(relatedStudy => (
+                <div key={relatedStudy.slug} className="rounded-3xl border border-border bg-surface-2 p-6">
+                  <h3 className="text-lg font-semibold text-ink">{relatedStudy.title}</h3>
+                  <p className="mt-2 text-sm text-ink-muted">{relatedStudy.location}</p>
+                  <p className="mt-3 text-sm text-ink">{relatedStudy.summary}</p>
+                  <ScribbleButton
+                    to={`/work/${relatedStudy.slug}`}
+                    className="btn-secondary mt-4 text-sm"
+                  >
+                    View case study
+                  </ScribbleButton>
+                </div>
+              ))}
+          </div>
+          <div className="mt-10 text-center">
+            <ScribbleButton to="/work" className="btn-outline">
+              View all projects
+            </ScribbleButton>
           </div>
         </div>
       </section>

@@ -722,6 +722,31 @@
     @apply flex items-center justify-center;
   }
 
+  /* Breadcrumb Navigation Styles */
+  .breadcrumb-nav {
+    @apply py-4 px-6 bg-surface border-b border-border;
+  }
+
+  .breadcrumb-list {
+    @apply flex items-center gap-2 text-sm;
+  }
+
+  .breadcrumb-item {
+    @apply flex items-center gap-2;
+  }
+
+  .breadcrumb-item a {
+    @apply text-ink-muted hover:text-ink transition-colors duration-200;
+  }
+
+  .breadcrumb-separator {
+    @apply text-ink-subtle;
+  }
+
+  .breadcrumb-current {
+    @apply text-ink font-medium;
+  }
+
   /* Flip card styles */
   .perspective {
     perspective: 1000px;

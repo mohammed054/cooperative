@@ -4,6 +4,7 @@ import GhaimAEHeader from "./components/GhaimAEHeader";
 import Footer from "./components/Footer";
 import OurProjects from "./components/OurProjects";
 import ScrollToTop from "./components/ScrollToTop";
+import Breadcrumbs from "./components/Breadcrumbs";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
@@ -26,6 +27,7 @@ function App() {
     <BrowserRouter basename={basename}>
       <ScrollToTop />
       <GhaimAEHeader />
+      <Breadcrumbs />
       <main id="main-content">
         <Routes>
           <Route path="/" element={<Home />} />

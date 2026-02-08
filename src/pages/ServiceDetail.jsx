@@ -99,6 +99,29 @@ const ServiceDetail = () => {
           </div>
         </section>
       )}
+
+      {/* Related Services */}
+      <section className="border-t border-border bg-surface-3 py-16 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-semibold text-ink">Other services</h2>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {services
+              .filter(s => s.slug !== service.slug)
+              .map(relatedService => (
+                <div key={relatedService.slug} className="rounded-3xl border border-border bg-surface-2 p-6">
+                  <h3 className="text-lg font-semibold text-ink">{relatedService.title}</h3>
+                  <p className="mt-2 text-sm text-ink-muted">{relatedService.summary}</p>
+                  <ScribbleButton
+                    to={`/services/${relatedService.slug}`}
+                    className="btn-secondary mt-4 text-sm"
+                  >
+                    Learn more
+                  </ScribbleButton>
+                </div>
+              ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

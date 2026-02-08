@@ -311,6 +311,12 @@ const GhaimAEHeader = () => {
                   <button onClick={() => goTo('/faq')} className="text-left text-sm font-semibold text-ink">
                     FAQ
                   </button>
+                  <button onClick={() => goTo('/privacy')} className="text-left text-sm font-semibold text-ink">
+                    Privacy
+                  </button>
+                  <button onClick={() => goTo('/terms')} className="text-left text-sm font-semibold text-ink">
+                    Terms
+                  </button>
                 </div>
 
                 <div className="mt-5 grid gap-4">
