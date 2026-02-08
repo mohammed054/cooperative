@@ -1,88 +1,90 @@
-import React, { useRef, useEffect, useState } from "react";
-import { assetUrl } from "../lib/assetUrl";
-import ScribbleButton from "./ScribbleButton";
+import React, { useRef, useEffect, useState } from 'react'
+import { assetUrl } from '../lib/assetUrl'
+import ScribbleButton from './ScribbleButton'
 
 const cards = [
   {
-    title: "Event Production",
-    subtitle: "Single accountable producer",
-    description: "Scope, vendor alignment, and show control for high‑stakes rooms.",
-    img: assetUrl("images/event-planning.png"),
-    href: "/services/event-production",
+    title: 'Event Production',
+    subtitle: 'Single accountable producer',
+    description:
+      'Scope, vendor alignment, and show control for high‑stakes rooms.',
+    img: assetUrl('images/event-planning.png'),
+    href: '/services/event-production',
   },
   {
-    title: "Technical Production",
-    subtitle: "AV, lighting, video systems",
-    description: "Systems design, cueing, and redundancy for complex shows.",
-    img: assetUrl("images/av-setup.png"),
-    href: "/services/technical-production",
+    title: 'Technical Production',
+    subtitle: 'AV, lighting, video systems',
+    description: 'Systems design, cueing, and redundancy for complex shows.',
+    img: assetUrl('images/av-setup.png'),
+    href: '/services/technical-production',
   },
   {
-    title: "Staging & Scenic",
-    subtitle: "Built to the render",
-    description: "Stage architecture and scenic builds that stay on timeline.",
-    img: assetUrl("images/seating.png"),
-    href: "/services/staging-scenic",
+    title: 'Staging & Scenic',
+    subtitle: 'Built to the render',
+    description: 'Stage architecture and scenic builds that stay on timeline.',
+    img: assetUrl('images/seating.png'),
+    href: '/services/staging-scenic',
   },
   {
-    title: "Furniture & Rentals",
-    subtitle: "Curated inventory",
-    description: "Premium seating, tables, and accessories delivered clean.",
-    img: assetUrl("images/lighting-effects.png"),
-    href: "/services/furniture-rentals",
+    title: 'Furniture & Rentals',
+    subtitle: 'Curated inventory',
+    description: 'Premium seating, tables, and accessories delivered clean.',
+    img: assetUrl('images/lighting-effects.png'),
+    href: '/services/furniture-rentals',
   },
   {
-    title: "Show Control",
-    subtitle: "On‑site command",
-    description: "Dedicated producer and crew to keep the room composed.",
-    img: assetUrl("images/full-production.png"),
-    href: "/process",
+    title: 'Show Control',
+    subtitle: 'On‑site command',
+    description: 'Dedicated producer and crew to keep the room composed.',
+    img: assetUrl('images/full-production.png'),
+    href: '/process',
   },
   {
-    title: "Timing & Logistics",
-    subtitle: "No‑surprise scheduling",
-    description: "Load‑ins, resets, and strike planned around your timeline.",
-    img: assetUrl("images/always-on-time.png"),
-    href: "/process",
+    title: 'Timing & Logistics',
+    subtitle: 'No‑surprise scheduling',
+    description: 'Load‑ins, resets, and strike planned around your timeline.',
+    img: assetUrl('images/always-on-time.png'),
+    href: '/process',
   },
-];
+]
 
 const ScrollableCardSection = () => {
-  const trackRef = useRef(null);
-  const sectionRef = useRef(null);
-  const [translateX, setTranslateX] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const trackRef = useRef(null)
+  const sectionRef = useRef(null)
+  const [translateX, setTranslateX] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Detect mobile vs desktop
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   // Scroll-driven horizontal translate — runs on BOTH mobile and desktop
   useEffect(() => {
     const onScroll = () => {
-      if (!sectionRef.current || !trackRef.current) return;
+      if (!sectionRef.current || !trackRef.current) return
 
-      const section = sectionRef.current;
-      const track = trackRef.current;
+      const section = sectionRef.current
+      const track = trackRef.current
 
-      const rect = section.getBoundingClientRect();
-      const scrollableHeight = section.offsetHeight - window.innerHeight;
+      const rect = section.getBoundingClientRect()
+      const scrollableHeight = section.offsetHeight - window.innerHeight
 
-      const offsetStart = 0.02;
-      let progress = (-rect.top / scrollableHeight - offsetStart) / (1 - offsetStart);
-      progress = Math.min(Math.max(progress, 0), 1);
+      const offsetStart = 0.02
+      let progress =
+        (-rect.top / scrollableHeight - offsetStart) / (1 - offsetStart)
+      progress = Math.min(Math.max(progress, 0), 1)
 
-      const maxTranslate = track.scrollWidth - track.parentElement.clientWidth;
-      setTranslateX(progress * maxTranslate);
-    };
+      const maxTranslate = track.scrollWidth - track.parentElement.clientWidth
+      setTranslateX(progress * maxTranslate)
+    }
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [isMobile]); // re-attach if layout switches
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [isMobile]) // re-attach if layout switches
 
   /* ─── MOBILE VIEW: scroll-driven horizontal, same mechanism as desktop ─── */
   if (isMobile) {
@@ -94,14 +96,14 @@ const ScrollableCardSection = () => {
         style={{ height: '280vh' }}
       >
         <div className="sticky top-0 h-screen flex flex-col">
-
           {/* Header */}
           <div className="text-center pt-10 pb-6 px-4">
             <h1 className="text-3xl font-semibold text-ink mb-2 font-serif">
               Services built for high‑stakes rooms
             </h1>
             <p className="text-base text-ink-muted">
-              Production, rentals, and on‑site control designed to keep teams aligned.
+              Production, rentals, and on‑site control designed to keep teams
+              aligned.
             </p>
           </div>
 
@@ -154,7 +156,10 @@ const ScrollableCardSection = () => {
                       <p className="text-center text-ink-muted text-sm mb-4">
                         {card.description}
                       </p>
-                      <ScribbleButton className="btn-primary px-5 py-2 text-sm" to={card.href}>
+                      <ScribbleButton
+                        className="btn-primary px-5 py-2 text-sm"
+                        to={card.href}
+                      >
                         Learn more
                       </ScribbleButton>
                     </div>
@@ -165,7 +170,7 @@ const ScrollableCardSection = () => {
           </div>
         </div>
       </section>
-    );
+    )
   }
 
   /* ─── DESKTOP VIEW: sticky horizontal scroll ─── */
@@ -177,14 +182,14 @@ const ScrollableCardSection = () => {
       style={{ height: '420vh' }}
     >
       <div className="sticky top-0 h-screen flex flex-col">
-
         {/* Hero — extra top padding so cards sit lower, giving breathing room before scroll kicks in */}
         <div className="pt-24 pb-10 text-center">
           <h1 className="text-5xl lg:text-6xl font-semibold text-ink mb-4 font-serif">
             Services built for high‑stakes rooms
           </h1>
           <p className="text-xl text-ink-muted">
-            Production, rentals, and on‑site control designed to keep teams aligned.
+            Production, rentals, and on‑site control designed to keep teams
+            aligned.
           </p>
         </div>
 
@@ -203,7 +208,6 @@ const ScrollableCardSection = () => {
               >
                 {/* Card inner */}
                 <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
-
                   {/* Front */}
                   <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden bg-surface-2 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                     <img
@@ -235,21 +239,21 @@ const ScrollableCardSection = () => {
                     <p className="text-center text-ink-muted mb-6">
                       {card.description}
                     </p>
-                    <ScribbleButton className="btn-primary px-8 py-3" to={card.href}>
+                    <ScribbleButton
+                      className="btn-primary px-8 py-3"
+                      to={card.href}
+                    >
                       Learn more
                     </ScribbleButton>
                   </div>
-
                 </div>
               </div>
             ))}
           </div>
         </div>
-
       </div>
     </section>
-  );
-};
+  )
+}
 
-
-export default ScrollableCardSection;
+export default ScrollableCardSection

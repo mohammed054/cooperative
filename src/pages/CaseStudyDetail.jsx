@@ -1,15 +1,15 @@
-import { useParams } from 'react-router-dom';
-import PageIntro from '../components/PageIntro';
-import { caseStudies, services } from '../data/siteData';
-import NotFound from './NotFound';
-import ScribbleButton from '../components/ScribbleButton';
+import { useParams } from 'react-router-dom'
+import PageIntro from '../components/PageIntro'
+import { caseStudies, services } from '../data/siteData'
+import NotFound from './NotFound'
+import ScribbleButton from '../components/ScribbleButton'
 
 const CaseStudyDetail = () => {
-  const { slug } = useParams();
-  const study = caseStudies.find((item) => item.slug === slug);
+  const { slug } = useParams()
+  const study = caseStudies.find(item => item.slug === slug)
 
   if (!study) {
-    return <NotFound />;
+    return <NotFound />
   }
 
   return (
@@ -42,14 +42,18 @@ const CaseStudyDetail = () => {
           </div>
           <div className="space-y-6">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">Location</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
+                Location
+              </p>
               <p className="mt-2 text-sm text-ink">{study.location}</p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">Services</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
+                Services
+              </p>
               <div className="mt-2 flex flex-wrap gap-2">
-                {study.services.map((serviceName) => {
-                  const service = services.find(s => s.title === serviceName);
+                {study.services.map(serviceName => {
+                  const service = services.find(s => s.title === serviceName)
                   return service ? (
                     <ScribbleButton
                       key={service.slug}
@@ -65,15 +69,22 @@ const CaseStudyDetail = () => {
                     >
                       {serviceName}
                     </span>
-                  );
+                  )
                 })}
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
-              {study.stats.map((stat) => (
-                <div key={stat.label} className="rounded-2xl border border-border bg-surface-3 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-ink-subtle">{stat.label}</p>
-                  <p className="mt-2 text-lg font-semibold text-ink">{stat.value}</p>
+              {study.stats.map(stat => (
+                <div
+                  key={stat.label}
+                  className="rounded-2xl border border-border bg-surface-3 p-4"
+                >
+                  <p className="text-xs uppercase tracking-[0.2em] text-ink-subtle">
+                    {stat.label}
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-ink">
+                    {stat.value}
+                  </p>
                 </div>
               ))}
             </div>
@@ -94,7 +105,7 @@ const CaseStudyDetail = () => {
           <div className="rounded-3xl border border-border bg-surface-2 p-6">
             <p className="eyebrow">Results</p>
             <ul className="mt-3 space-y-2 text-sm text-ink">
-              {study.results.map((item) => (
+              {study.results.map(item => (
                 <li key={item} className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
                   {item}
@@ -114,10 +125,19 @@ const CaseStudyDetail = () => {
               .filter(cs => cs.slug !== study.slug)
               .slice(0, 3)
               .map(relatedStudy => (
-                <div key={relatedStudy.slug} className="rounded-3xl border border-border bg-surface-2 p-6">
-                  <h3 className="text-lg font-semibold text-ink">{relatedStudy.title}</h3>
-                  <p className="mt-2 text-sm text-ink-muted">{relatedStudy.location}</p>
-                  <p className="mt-3 text-sm text-ink">{relatedStudy.summary}</p>
+                <div
+                  key={relatedStudy.slug}
+                  className="rounded-3xl border border-border bg-surface-2 p-6"
+                >
+                  <h3 className="text-lg font-semibold text-ink">
+                    {relatedStudy.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-ink-muted">
+                    {relatedStudy.location}
+                  </p>
+                  <p className="mt-3 text-sm text-ink">
+                    {relatedStudy.summary}
+                  </p>
                   <ScribbleButton
                     to={`/work/${relatedStudy.slug}`}
                     className="btn-secondary mt-4 text-sm"
@@ -135,7 +155,7 @@ const CaseStudyDetail = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default CaseStudyDetail;
+export default CaseStudyDetail

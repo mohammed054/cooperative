@@ -1,29 +1,29 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from 'react'
 
 const CurvedArrow = () => {
-  const pathRef = useRef(null);
-  const [pathLength, setPathLength] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const pathRef = useRef(null)
+  const [pathLength, setPathLength] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     if (pathRef.current) {
-      const length = pathRef.current.getTotalLength();
-      setPathLength(length);
-      pathRef.current.style.strokeDasharray = length;
-      pathRef.current.style.strokeDashoffset = length;
+      const length = pathRef.current.getTotalLength()
+      setPathLength(length)
+      pathRef.current.style.strokeDasharray = length
+      pathRef.current.style.strokeDashoffset = length
     }
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => setIsVisible(entry.isIntersecting));
+      entries => {
+        entries.forEach(entry => setIsVisible(entry.isIntersecting))
       },
       { threshold: 0.1 }
-    );
+    )
 
-    if (pathRef.current) observer.observe(pathRef.current);
+    if (pathRef.current) observer.observe(pathRef.current)
 
-    return () => observer.disconnect();
-  }, []);
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <svg
@@ -31,7 +31,6 @@ const CurvedArrow = () => {
       viewBox="0 0 768 432"
       width="768"
       height="432"
-      
       className="hidden sm:block absolute left-1/2 -translate-x-1/2 -translate-y-80 z-50"
     >
       <path
@@ -96,11 +95,11 @@ z"
         style={{
           strokeDasharray: pathLength,
           strokeDashoffset: isVisible ? 0 : pathLength,
-          transition: "stroke-dashoffset 1.5s ease-in-out",
+          transition: 'stroke-dashoffset 1.5s ease-in-out',
         }}
       />
     </svg>
-  );
-};
+  )
+}
 
-export default CurvedArrow;
+export default CurvedArrow

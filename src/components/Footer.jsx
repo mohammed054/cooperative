@@ -1,29 +1,36 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { FaFacebook, FaInstagram, FaLinkedin, FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { caseStudies, services } from '../data/siteData';
-import { assetUrl } from '../lib/assetUrl';
-import ScribbleButton from './ScribbleButton';
+import React from 'react'
+import { motion } from 'framer-motion'
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaEnvelope,
+} from 'react-icons/fa'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { caseStudies, services } from '../data/siteData'
+import { assetUrl } from '../lib/assetUrl'
+import ScribbleButton from './ScribbleButton'
 
 const Footer = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const scrollToSection = (sectionId) => {
+  const scrollToSection = sectionId => {
     if (location.pathname !== '/') {
-      navigate({ pathname: '/', hash: `#${sectionId}` });
-      return;
+      navigate({ pathname: '/', hash: `#${sectionId}` })
+      return
     }
-    const element = document.getElementById(sectionId);
+    const element = document.getElementById(sectionId)
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: 'smooth' })
     }
-  };
+  }
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <footer id="site-footer" className="bg-surface py-12 lg:py-16 text-ink">
@@ -43,10 +50,13 @@ const Footer = () => {
                 loading="lazy"
                 decoding="async"
               />
-              <span className="text-lg font-semibold tracking-[0.2em]">GHAIM</span>
+              <span className="text-lg font-semibold tracking-[0.2em]">
+                GHAIM
+              </span>
             </div>
             <p className="mt-4 text-sm text-ink-muted">
-              Event production and curated rentals across the UAE. Senior-led crews, disciplined timelines, and calm show control.
+              Event production and curated rentals across the UAE. Senior-led
+              crews, disciplined timelines, and calm show control.
             </p>
             <div className="mt-6 flex items-center gap-4">
               <motion.a
@@ -93,15 +103,21 @@ const Footer = () => {
           >
             <p className="text-sm font-semibold text-ink">Services</p>
             <ul className="mt-4 space-y-2 text-sm text-ink-muted">
-              {services.map((service) => (
+              {services.map(service => (
                 <li key={service.slug}>
-                  <Link to={`/services/${service.slug}`} className="transition hover:text-ink">
+                  <Link
+                    to={`/services/${service.slug}`}
+                    className="transition hover:text-ink"
+                  >
                     {service.title}
                   </Link>
                 </li>
               ))}
             </ul>
-            <Link to="/services" className="mt-4 inline-flex text-sm font-semibold text-ink">
+            <Link
+              to="/services"
+              className="mt-4 inline-flex text-sm font-semibold text-ink"
+            >
               View all services
             </Link>
           </motion.div>
@@ -114,9 +130,12 @@ const Footer = () => {
           >
             <p className="text-sm font-semibold text-ink">Work</p>
             <ul className="mt-4 space-y-2 text-sm text-ink-muted">
-              {caseStudies.map((study) => (
+              {caseStudies.map(study => (
                 <li key={study.slug}>
-                  <Link to={`/work/${study.slug}`} className="transition hover:text-ink">
+                  <Link
+                    to={`/work/${study.slug}`}
+                    className="transition hover:text-ink"
+                  >
                     {study.title}
                   </Link>
                 </li>
@@ -127,7 +146,10 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
-            <Link to="/work" className="mt-4 inline-flex text-sm font-semibold text-ink">
+            <Link
+              to="/work"
+              className="mt-4 inline-flex text-sm font-semibold text-ink"
+            >
               View case studies
             </Link>
           </motion.div>
@@ -211,7 +233,10 @@ const Footer = () => {
               <Link to="/terms" className="transition hover:text-ink">
                 Terms of service
               </Link>
-              <button onClick={() => scrollToSection('get-started')} className="transition hover:text-ink">
+              <button
+                onClick={() => scrollToSection('get-started')}
+                className="transition hover:text-ink"
+              >
                 Start a project
               </button>
             </div>
@@ -219,7 +244,7 @@ const Footer = () => {
         </motion.div>
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer

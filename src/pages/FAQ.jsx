@@ -1,6 +1,6 @@
-import PageIntro from '../components/PageIntro';
-import { faqItems } from '../data/siteData';
-import { Link } from 'react-router-dom';
+import PageIntro from '../components/PageIntro'
+import { faqItems } from '../data/siteData'
+import { Link } from 'react-router-dom'
 
 const FAQ = () => {
   return (
@@ -14,7 +14,7 @@ const FAQ = () => {
       <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-4">
-            {faqItems.map((item) => (
+            {faqItems.map(item => (
               <details
                 key={item.question}
                 className="rounded-3xl border border-border bg-surface-3 p-6"
@@ -39,7 +39,7 @@ const FAQ = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default FAQ;
+export default FAQ

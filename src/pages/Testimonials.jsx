@@ -1,6 +1,6 @@
-import PageIntro from '../components/PageIntro';
-import TestimonialsSection from '../components/TestimonialsSection';
-import FinalCta from '../components/FinalCta';
+import PageIntro from '../components/PageIntro'
+import TestimonialsSection from '../components/TestimonialsSection'
+import FinalCta from '../components/FinalCta'
 
 const Testimonials = () => {
   return (
@@ -17,7 +17,7 @@ const Testimonials = () => {
       />
       <FinalCta />
     </div>
-  );
-};
+  )
+}
 
-export default Testimonials;
+export default Testimonials

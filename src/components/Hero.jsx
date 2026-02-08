@@ -1,23 +1,30 @@
-import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { FaArrowDown, FaArrowRight } from 'react-icons/fa';
-import ScribbleButton from './ScribbleButton';
-import { assetUrl } from '../lib/assetUrl';
+import React, { useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { FaArrowDown, FaArrowRight } from 'react-icons/fa'
+import ScribbleButton from './ScribbleButton'
+import { assetUrl } from '../lib/assetUrl'
 
 const Hero = () => {
-  const shouldReduceMotion = useReducedMotion();
-  const [videoReady, setVideoReady] = useState(false);
+  const shouldReduceMotion = useReducedMotion()
+  const [videoReady, setVideoReady] = useState(false)
   const transition = shouldReduceMotion
     ? { duration: 0 }
-    : { duration: 0.75, ease: [0.22, 1, 0.36, 1] };
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) element.scrollIntoView({ behavior: 'smooth' });
-  };
+    : { duration: 0.75, ease: [0.22, 1, 0.36, 1] }
+  const scrollToSection = sectionId => {
+    const element = document.getElementById(sectionId)
+    if (element) element.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
-<section id="hero" className="relative h-[100svh] overflow-hidden bg-black" style={{ contain: 'layout paint' }}>
-      <div className="absolute inset-0 w-full h-full" style={{ aspectRatio: '16/9' }}>
+    <section
+      id="hero"
+      className="relative h-[100svh] overflow-hidden bg-black"
+      style={{ contain: 'layout paint' }}
+    >
+      <div
+        className="absolute inset-0 w-full h-full"
+        style={{ aspectRatio: '16/9' }}
+      >
         <img
           src={assetUrl('images/event1.jpg')}
           alt="Event production in the UAE"
@@ -56,7 +63,10 @@ const Hero = () => {
         }}
       />
 
-<div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pb-10 pt-20 sm:px-6 sm:pb-14 sm:pt-24 lg:px-8" style={{ contain: 'layout' }}>
+      <div
+        className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pb-10 pt-20 sm:px-6 sm:pb-14 sm:pt-24 lg:px-8"
+        style={{ contain: 'layout' }}
+      >
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -74,7 +84,8 @@ const Hero = () => {
           </h1>
 
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-            Senior-led crews for AV, staging, lighting, seating, and show‑day control. One accountable team, one timeline, no surprises.
+            Senior-led crews for AV, staging, lighting, seating, and show‑day
+            control. One accountable team, one timeline, no surprises.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -84,7 +95,10 @@ const Hero = () => {
               className="group inline-flex items-center justify-center gap-3 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black shadow-[0_16px_44px_rgba(0,0,0,0.28)] transition hover:bg-white/90 hover:shadow-[0_18px_54px_rgba(0,0,0,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Request a proposal
-              <FaArrowRight className="transition-transform group-hover:translate-x-0.5" size={14} />
+              <FaArrowRight
+                className="transition-transform group-hover:translate-x-0.5"
+                size={14}
+              />
             </ScribbleButton>
             <ScribbleButton
               onClick={() => scrollToSection('services')}
@@ -116,14 +130,18 @@ const Hero = () => {
         type="button"
         aria-label="Scroll to services"
         animate={shouldReduceMotion ? undefined : { y: [0, 10, 0] }}
-        transition={shouldReduceMotion ? undefined : { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+        transition={
+          shouldReduceMotion
+            ? undefined
+            : { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }
+        }
         className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/[0.16] bg-white/[0.06] p-3 text-white/90 backdrop-blur transition hover:bg-white/[0.10] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         onClick={() => scrollToSection('services')}
       >
         <FaArrowDown size={18} />
       </motion.button>
     </section>
-  );
-};
+  )
+}
 
-export default Hero;
+export default Hero

@@ -1,4 +1,4 @@
-import ScribbleButton from '../components/ScribbleButton';
+import ScribbleButton from '../components/ScribbleButton'
 
 const NotFound = () => {
   return (
@@ -9,7 +9,8 @@ const NotFound = () => {
           This page does not exist.
         </h1>
         <p className="text-base text-ink-muted">
-          The link may be outdated or the page has moved. Use the links below to get back on track.
+          The link may be outdated or the page has moved. Use the links below to
+          get back on track.
         </p>
         <div className="flex flex-wrap gap-3">
           <ScribbleButton to="/" className="btn-primary text-sm">
@@ -21,7 +22,7 @@ const NotFound = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default NotFound;
+export default NotFound

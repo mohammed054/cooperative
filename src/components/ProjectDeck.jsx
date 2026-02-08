@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import ScribbleButton from "./ScribbleButton";
-import { assetUrl } from "../lib/assetUrl";
+import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import ScribbleButton from './ScribbleButton'
+import { assetUrl } from '../lib/assetUrl'
 
 const projects = [
-  assetUrl("images/event1.jpg"),
-  assetUrl("images/event2.jpg"),
-  assetUrl("images/event3.jpg"),
-];
+  assetUrl('images/event1.jpg'),
+  assetUrl('images/event2.jpg'),
+  assetUrl('images/event3.jpg'),
+]
 
 const ProjectDeck = () => {
-  const [stack, setStack] = useState(projects);
-  const [isMobile, setIsMobile] = useState(false);
+  const [stack, setStack] = useState(projects)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Detect mobile width
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    const checkMobile = () => setIsMobile(window.innerWidth < 640)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
-  const handleDragEnd = (index) => {
-    const updatedStack = [...stack];
-    const [dragged] = updatedStack.splice(index, 1);
-    updatedStack.push(dragged);
-    setStack(updatedStack);
-  };
+  const handleDragEnd = index => {
+    const updatedStack = [...stack]
+    const [dragged] = updatedStack.splice(index, 1)
+    updatedStack.push(dragged)
+    setStack(updatedStack)
+  }
 
   // Variants for staggered entrance
   const stackVariants = {
@@ -36,12 +36,18 @@ const ProjectDeck = () => {
         staggerChildren: 0.15,
       },
     },
-  };
+  }
 
   const cardVariants = (rotation, offsetY) => ({
     initial: { scale: 0.8, y: offsetY - 20, rotate: rotation, opacity: 0 },
-    animate: { scale: 1, y: offsetY, rotate: rotation, opacity: 1, transition: { duration: 0.65, ease: "easeOut" } },
-  });
+    animate: {
+      scale: 1,
+      y: offsetY,
+      rotate: rotation,
+      opacity: 1,
+      transition: { duration: 0.65, ease: 'easeOut' },
+    },
+  })
 
   return (
     <section
@@ -69,12 +75,28 @@ const ProjectDeck = () => {
       >
         {stack.map((img, index) => {
           const rotation = isMobile
-            ? index === 0 ? 0 : index === 1 ? -6 : 6
-            : index === 0 ? 0 : index === 1 ? -18 : 18;
+            ? index === 0
+              ? 0
+              : index === 1
+                ? -6
+                : 6
+            : index === 0
+              ? 0
+              : index === 1
+                ? -18
+                : 18
           const offsetY = isMobile
-            ? index === 0 ? 0 : index === 1 ? 10 : -10
-            : index === 0 ? 0 : index === 1 ? 40 : -40;
-          const zIndex = stack.length - index;
+            ? index === 0
+              ? 0
+              : index === 1
+                ? 10
+                : -10
+            : index === 0
+              ? 0
+              : index === 1
+                ? 40
+                : -40
+          const zIndex = stack.length - index
 
           return (
             <motion.div
@@ -82,9 +104,9 @@ const ProjectDeck = () => {
               drag
               dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
               onDragEnd={() => handleDragEnd(index)}
-              style={{ zIndex, cursor: "grab" }}
+              style={{ zIndex, cursor: 'grab' }}
               className="absolute top-0 left-0 w-full h-full rounded-3xl shadow-2xl"
-              whileTap={{ cursor: "grabbing" }}
+              whileTap={{ cursor: 'grabbing' }}
               variants={cardVariants(rotation, offsetY)}
             >
               <img
@@ -96,7 +118,7 @@ const ProjectDeck = () => {
                 decoding="async"
               />
             </motion.div>
-          );
+          )
         })}
       </motion.div>
 
@@ -112,20 +134,18 @@ const ProjectDeck = () => {
           Recent rooms built with calm precision.
         </h2>
         <p className="text-base md:text-lg text-ink-muted leading-relaxed">
-          From investor summits to gala nights, we deliver composed production across every emirate. Our team manages the details so your stakeholders only see the final, polished room.
+          From investor summits to gala nights, we deliver composed production
+          across every emirate. Our team manages the details so your
+          stakeholders only see the final, polished room.
         </p>
-          <div className="flex justify-center lg:justify-start">
-            <ScribbleButton
-              to="/work"
-              className="btn-primary px-8 py-3 text-lg"
-            >
-              View case studies
-            </ScribbleButton>
-          </div>
-
+        <div className="flex justify-center lg:justify-start">
+          <ScribbleButton to="/work" className="btn-primary px-8 py-3 text-lg">
+            View case studies
+          </ScribbleButton>
+        </div>
       </motion.div>
     </section>
-  );
-};
+  )
+}
 
-export default ProjectDeck;
+export default ProjectDeck

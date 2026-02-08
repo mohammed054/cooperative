@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
-import PageIntro from '../components/PageIntro';
-import { caseStudies } from '../data/siteData';
-import ScribbleButton from '../components/ScribbleButton';
+import { Link } from 'react-router-dom'
+import PageIntro from '../components/PageIntro'
+import { caseStudies } from '../data/siteData'
+import ScribbleButton from '../components/ScribbleButton'
 
 const Work = () => {
   return (
@@ -14,7 +14,7 @@ const Work = () => {
 
       <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
-          {caseStudies.map((study) => (
+          {caseStudies.map(study => (
             <Link
               key={study.slug}
               to={`/work/${study.slug}`}
@@ -30,8 +30,12 @@ const Work = () => {
                 />
               </div>
               <div className="p-6">
-                <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">{study.location}</p>
-                <h2 className="mt-3 text-xl font-semibold text-ink">{study.title}</h2>
+                <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
+                  {study.location}
+                </p>
+                <h2 className="mt-3 text-xl font-semibold text-ink">
+                  {study.title}
+                </h2>
                 <p className="mt-3 text-sm text-ink-muted">{study.summary}</p>
                 <span className="mt-6 inline-flex text-sm font-semibold text-ink">
                   View case study
@@ -48,7 +52,8 @@ const Work = () => {
             Planning an event with tight timing?
           </h2>
           <p className="mt-4 text-base text-ink-muted">
-            Share your scope and we will respond with a clear plan, timeline, and assigned producer.
+            Share your scope and we will respond with a clear plan, timeline,
+            and assigned producer.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <ScribbleButton to="/contact" className="btn-primary text-sm">
@@ -61,7 +66,7 @@ const Work = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default Work;
+export default Work

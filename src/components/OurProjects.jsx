@@ -1,50 +1,56 @@
 // src/components/OurProjects.jsx
-import React, { useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import PageIntro from "./PageIntro";
-import { assetUrl } from "../lib/assetUrl";
-import ScribbleButton from "./ScribbleButton";
+import React, { useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/css'
+import PageIntro from './PageIntro'
+import { assetUrl } from '../lib/assetUrl'
+import ScribbleButton from './ScribbleButton'
 
 export default function OurProjects() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState('All')
 
-  const categories = ["All", "Weddings", "Corporate", "Birthday", "Product Launch"];
+  const categories = [
+    'All',
+    'Weddings',
+    'Corporate',
+    'Birthday',
+    'Product Launch',
+  ]
   const projects = [
     {
       id: 1,
-      title: "Luxury Wedding",
-      category: "Weddings",
-      image: assetUrl("images/event1.jpg"),
-      description: "Elegant wedding with 500+ guests and stunning decor",
+      title: 'Luxury Wedding',
+      category: 'Weddings',
+      image: assetUrl('images/event1.jpg'),
+      description: 'Elegant wedding with 500+ guests and stunning decor',
     },
     {
       id: 2,
-      title: "Corporate Gala",
-      category: "Corporate",
-      image: assetUrl("images/event2.jpg"),
-      description: "Exclusive gala dinner for top executives",
+      title: 'Corporate Gala',
+      category: 'Corporate',
+      image: assetUrl('images/event2.jpg'),
+      description: 'Exclusive gala dinner for top executives',
     },
     {
       id: 3,
-      title: "Birthday Bash",
-      category: "Birthday",
-      image: assetUrl("images/event3.jpg"),
-      description: "Fun and colorful themed birthday celebration",
+      title: 'Birthday Bash',
+      category: 'Birthday',
+      image: assetUrl('images/event3.jpg'),
+      description: 'Fun and colorful themed birthday celebration',
     },
     {
       id: 4,
-      title: "Product Launch",
-      category: "Product Launch",
-      image: assetUrl("images/event1.jpg"),
-      description: "Innovative product reveal with VIP guests",
+      title: 'Product Launch',
+      category: 'Product Launch',
+      image: assetUrl('images/event1.jpg'),
+      description: 'Innovative product reveal with VIP guests',
     },
-  ];
+  ]
 
   const filteredProjects =
-    activeCategory === "All"
+    activeCategory === 'All'
       ? projects
-      : projects.filter((p) => p.category === activeCategory);
+      : projects.filter(p => p.category === activeCategory)
 
   return (
     <div id="our-projects" className="w-full min-h-screen bg-surface-3">
@@ -65,11 +71,13 @@ export default function OurProjects() {
 
       {/* Categories */}
       <section className="py-10 px-6 flex justify-center gap-4 flex-wrap bg-surface">
-        {categories.map((cat) => (
+        {categories.map(cat => (
           <button
             key={cat}
             className={`px-6 py-2 rounded-full border transition text-sm font-semibold ${
-              activeCategory === cat ? "bg-ink text-white border-ink" : "border-border text-ink-muted hover:text-ink"
+              activeCategory === cat
+                ? 'bg-ink text-white border-ink'
+                : 'border-border text-ink-muted hover:text-ink'
             }`}
             onClick={() => setActiveCategory(cat)}
           >
@@ -80,7 +88,7 @@ export default function OurProjects() {
 
       {/* Projects Grid */}
       <section className="px-6 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 bg-surface">
-        {filteredProjects.map((proj) => (
+        {filteredProjects.map(proj => (
           <div
             key={proj.id}
             className="relative group overflow-hidden rounded-2xl shadow-lg cursor-pointer border border-border"
@@ -102,7 +110,9 @@ export default function OurProjects() {
 
       {/* Featured Projects Carousel */}
       <section className="py-10 px-6 bg-surface-3">
-        <h2 className="text-3xl font-semibold text-center mb-6 text-ink font-serif">Featured projects</h2>
+        <h2 className="text-3xl font-semibold text-center mb-6 text-ink font-serif">
+          Featured projects
+        </h2>
         <Swiper
           spaceBetween={20}
           slidesPerView={1}
@@ -111,7 +121,7 @@ export default function OurProjects() {
             1024: { slidesPerView: 3 },
           }}
         >
-          {projects.map((proj) => (
+          {projects.map(proj => (
             <SwiperSlide key={proj.id}>
               <div className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer border border-border bg-surface-2">
                 <img
@@ -132,14 +142,17 @@ export default function OurProjects() {
 
       {/* CTA Section */}
       <section className="py-20 px-6 text-center bg-surface">
-        <h2 className="text-4xl font-semibold mb-4 text-ink font-serif">Plan your next event with a calm team.</h2>
+        <h2 className="text-4xl font-semibold mb-4 text-ink font-serif">
+          Plan your next event with a calm team.
+        </h2>
         <p className="text-ink-muted mb-8">
-          Share your dates and priorities. We will respond with a clear scope and timeline.
+          Share your dates and priorities. We will respond with a clear scope
+          and timeline.
         </p>
         <ScribbleButton to="/contact" className="btn-primary px-8 py-4">
           Book a consultation
         </ScribbleButton>
       </section>
     </div>
-  );
+  )
 }

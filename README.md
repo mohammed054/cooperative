@@ -1,111 +1,345 @@
-# Site Overview: Ghaim UAE Event Production
+# Ghaim UAE - Production Website
 
-## Purpose
-Ghaim UAE is a premium event production company based in Dubai that provides high-end production services for corporate events, government summits, and luxury hospitality events across the UAE. The website serves as a professional portfolio and lead generation platform to attract high-value clients who need reliable, premium event production services.
+> Premium event production company based in Dubai, providing high-end event services for corporate events, government summits, and luxury hospitality events across the UAE.
 
-## Brand Tone and Personality
-- **Professional**: Sophisticated and business-focused
-- **Premium**: High-end, luxury positioning
-- **Reliable**: Emphasis on precision and dependability
-- **Calm**: Stress-free event management approach
-- **Trustworthy**: Corporate and government clientele focus
+## 🚀 Quick Start
 
-## Color Palette
-- **Primary Text**: #1c1c1c (Deep charcoal/black)
-- **Accent Blue**: #3b82f6 (Professional blue)
-- **Accent Strong**: #2563eb (Darker blue for emphasis)
-- **Surface Colors**: 
-  - #f6f7f9 (Light gray background)
-  - #ffffff (White)
-  - #eef1f6 (Soft gray)
-- **Borders**: rgba(28, 28, 28, 0.12) (Subtle borders)
-- **Muted Text**: #5c6470 (Secondary text)
+```bash
+# Clone the repository
+git clone https://github.com/your-org/cooperative.git
+cd cooperative
 
-## Typography
-- **Headings**: Fraunces font (serif) - elegant and premium feel
-- **Body Text**: Manrope font (sans-serif) - clean and modern
-- **Font Weights**: 500-600 for headings, 400 for body text
-- **Letter Spacing**: -0.01em to -0.02em for tight, professional appearance
+# Install dependencies
+npm install
 
-## Spacing and Layout Philosophy
-- **Consistent Spacing**: Uses a 8px base unit system (space-1 through space-8)
-- **Generous White Space**: Clean, uncluttered layouts
-- **Responsive Design**: Mobile-first approach with careful breakpoint management
-- **Section Spacing**: 64px-128px between major sections
-- **Card Spacing**: 24px-32px padding within components
+# Copy environment variables
+cp .env.example .env.local
 
-## Button and Interaction Style
-- **Primary Buttons**: Blue background with white text, rounded corners, subtle shadow
-- **Secondary Buttons**: Transparent with blue border, hover effects
-- **Scribble Buttons**: Hand-drawn style with animated underline effects
-- **Hover States**: Scale transforms and color changes
-- **Focus States**: Blue outline for accessibility
+# Start development server
+npm run dev
+```
 
-## Animation and Motion Style
-- **Subtle Transitions**: 0.3-0.6 second durations
-- **Smooth Scrolling**: Eased scroll behavior throughout
-- **Hover Effects**: Scale transforms and color shifts
-- **Entrance Animations**: Fade-in and slide effects for content
-- **Scroll-Triggered**: Horizontal card sections with scroll-driven animations
-- **Loading States**: Skeleton loaders and shimmer effects
+## 📋 Prerequisites
 
-## Page Structure
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher  
+- **Git**: For version control
+- **Modern Browser**: Chrome 90+, Firefox 88+, Safari 14+
 
-### Home Page
-- **Hero Section**: Full-screen video background with overlay text
-- **Services Overview**: Scrollable card section with 3D flip effects
-- **Project Showcase**: Stacked image deck with interactive elements
-- **Process Section**: Timeline and methodology explanation
-- **Testimonials**: Client feedback with professional styling
-- **Final CTA**: Contact form and call-to-action
+## 🛠️ Development Setup
 
-### Services Pages
-- **Service Categories**: Event Production, Technical Production, Staging & Scenic, Furniture & Rentals
-- **Individual Service Pages**: Detailed descriptions, inclusions, ideal use cases
-- **Case Studies**: Real project examples with results and statistics
+### 1. Environment Configuration
+```bash
+# Copy the environment template
+cp .env.example .env.local
 
-### Work/Portfolio
-- **Case Studies**: Detailed project breakdowns with challenges, approaches, and results
-- **Project Gallery**: Visual showcase of completed events
-- **Client Testimonials**: Professional feedback and endorsements
+# Edit .env.local with your configuration
+# Add your Google Analytics 4 Measurement ID
+# Add your Sentry DSN for error monitoring
+```
 
-### Company Pages
-- **About**: Team introduction and company values
-- **Process**: Step-by-step methodology explanation
-- **FAQ**: Common questions and answers
-- **Contact**: Inquiry form and contact information
+### 2. Install Dependencies
+```bash
+# Install all dependencies
+npm install
 
-## Component Philosophy
-- **Reusable Components**: Header, Footer, Buttons, Cards consistently used
-- **Custom Components**: Specialized components for unique interactions
-- **Modular Design**: Components designed for flexibility and reuse
-- **Performance Focused**: Lazy loading and optimized assets
-- **Accessibility**: Proper ARIA labels and keyboard navigation
+# Verify installation
+npm run lint
+npm run build
+```
 
-## Mobile-First Responsive Approach
-- **Breakpoints**: Careful consideration of mobile, tablet, and desktop layouts
-- **Touch-Friendly**: Large tap targets and swipe interactions
-- **Performance**: Optimized images and assets for mobile
-- **Navigation**: Hamburger menu for mobile, full navigation for desktop
+### 3. Development Commands
+```bash
+# Start development server (http://localhost:5173)
+npm run dev
 
-## Overall UX Principles
-- **Fast Loading**: Optimized assets and efficient code
-- **Intuitive Navigation**: Clear menu structure and breadcrumbs
-- **Professional Presentation**: High-quality imagery and clean layouts
-- **Trust Building**: Testimonials, case studies, and professional design
-- **Lead Generation**: Clear calls-to-action and contact opportunities
-- **Accessibility**: WCAG compliant with proper contrast and keyboard navigation
+# Run linting and formatting
+npm run lint          # Check for code issues
+npm run lint:fix       # Auto-fix linting issues
+npm run format         # Format code with Prettier
+npm run format:check   # Check code formatting
 
-## What NOT to Change Without Brand Approval
-- **Color Palette**: Do not modify primary brand colors
-- **Typography**: Do not change font families or weights
-- **Logo Usage**: Do not alter logo placement or styling
-- **Brand Voice**: Maintain professional, premium tone
-- **Core Navigation**: Do not restructure main menu items
-- **Contact Information**: Do not modify contact details or forms
-- **Legal Pages**: Do not alter Privacy Policy or Terms of Service
-- **Testimonials**: Do not modify client feedback content
-- **Case Study Content**: Do not change project details or results
-- **Brand Imagery**: Do not replace hero images or key visual assets
+# Build for production
+npm run build          # Build production version
+npm run preview         # Preview production build locally
+```
 
-This website represents a premium brand identity that should be maintained consistently across all updates and modifications.
+## 🏗️ Project Structure
+
+```
+src/
+├── components/          # Reusable React components
+│   ├── Button.jsx      # Button variants (primary, secondary, etc.)
+│   ├── HeaderDesktop.jsx # Desktop navigation
+│   ├── HeaderMobile.jsx # Mobile navigation  
+│   ├── MegaMenu.jsx   # Dropdown navigation menu
+│   └── ...
+├── context/            # React contexts
+│   └── AnalyticsContext.jsx
+├── hooks/              # Custom React hooks
+│   ├── useAnalytics.js  # Google Analytics 4 tracking
+│   └── useFocusTrap.js # Accessibility focus management
+├── pages/              # Page components
+│   ├── Home.jsx        # Homepage
+│   ├── Services.jsx    # Services listing
+│   └── ...
+├── utils/              # Utility functions
+│   ├── errorMonitoring.js # Sentry error tracking
+│   └── healthCheck.js   # Health check utilities
+└── styles/             # Global styles
+    └── index.css
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+```bash
+# Analytics Configuration
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# Error Monitoring
+VITE_SENTRY_DSN=https://XXXXXXXXXX.ingest.sentry.io/XXXXX
+
+# Application Version
+VITE_APP_VERSION=1.0.0
+```
+
+### Build Configuration
+- **Vite**: Build tool and development server
+- **React 19**: UI framework
+- **Tailwind CSS**: Utility-first CSS framework
+- **TypeScript Ready**: Configured for future migration
+- **ESLint + Prettier**: Code quality tools
+
+## 📊 Analytics & Monitoring
+
+### Google Analytics 4
+- **Page Views**: Automatic tracking on route changes
+- **Events**: Button clicks, form submissions, downloads
+- **Performance**: Core Web Vitals monitoring
+- **Goals**: Conversion funnel tracking
+
+### Error Monitoring (Sentry)
+- **JavaScript Errors**: Automatic error capture
+- **Performance**: Transaction monitoring
+- **User Context**: Track user sessions
+- **Releases**: Error tracking by version
+
+### Health Monitoring
+- **Uptime**: External monitoring via UptimeRobot
+- **Performance**: Core Web Vitals
+- **Security**: Automated vulnerability scanning
+- **API Health**: Custom health check endpoints
+
+## 🚀 Deployment
+
+### Automated CI/CD Pipeline
+```bash
+# Main branch → Production
+git push main
+
+# Develop branch → Staging  
+git push develop
+```
+
+### Environments
+- **Development**: Local development
+- **Staging**: `develop` branch deployment
+- **Production**: `main` branch deployment
+
+### Build Process
+1. **Code Quality**: Linting and formatting checks
+2. **Security**: Vulnerability scanning
+3. **Build**: Production optimization
+4. **Upload**: GitHub Pages deployment
+5. **Release**: Automated version tagging
+
+## 🔧 Development Guidelines
+
+### Code Standards
+- **ESLint**: Enforces code quality
+- **Prettier**: Consistent formatting
+- **Component Structure**: Single responsibility principle
+- **Accessibility**: WCAG 2.1 AA compliance
+- **Performance**: Optimized for Core Web Vitals
+
+### Component Development
+```jsx
+// Example: Using analytics tracking
+import { useAnalyticsContext } from '../context/AnalyticsContext'
+
+const MyComponent = () => {
+  const { trackCTAClick } = useAnalyticsContext()
+  
+  return (
+    <Button 
+      onClick={() => trackCTAClick('Contact', 'Header')}
+      analyticsLabel="header-contact"
+    >
+      Contact Us
+    </Button>
+  )
+}
+```
+
+### Git Workflow
+```bash
+# Create feature branch
+git checkout -b feature/new-feature
+
+# Make changes and commit
+git add .
+git commit -m "feat: add new feature"
+
+# Push and create PR
+git push origin feature/new-feature
+```
+
+## 🧪 Testing
+
+### Code Quality
+```bash
+# Run all quality checks
+npm run lint          # Check for issues
+npm run format:check   # Verify formatting
+npm run build         # Test build process
+```
+
+### Manual Testing
+- **Responsive**: Test mobile, tablet, desktop
+- **Accessibility**: Keyboard navigation, screen readers
+- **Performance**: Load times, Core Web Vitals
+- **Cross-browser**: Chrome, Firefox, Safari, Edge
+
+## 🔍 Debugging
+
+### Development
+- **React DevTools**: Component inspection
+- **Network Tab**: API request monitoring
+- **Console**: Error and warning tracking
+- **Performance Tab**: Runtime performance analysis
+
+### Production
+- **Sentry Dashboard**: Error monitoring and debugging
+- **Google Analytics**: User behavior analysis
+- **Lighthouse**: Performance and accessibility audits
+- **Status Page**: Service availability monitoring
+
+## 📋 Tasks & Scripts
+
+### Available Scripts
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Check code quality
+npm run lint:fix     # Auto-fix issues
+npm run format       # Format code
+npm run format:check # Check formatting
+```
+
+### Common Development Tasks
+```bash
+# Add new page
+1. Create component in src/pages/
+2. Add route in src/App.jsx
+3. Update navigation data if needed
+4. Test responsive behavior
+
+# Add new component  
+1. Create in src/components/
+2. Export in index file if needed
+3. Add documentation comments
+4. Test accessibility
+
+# Update analytics
+1. Import useAnalyticsContext
+2. Add tracking events as needed
+3. Test in development console
+4. Verify in production
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+**Build Fails**:
+```bash
+# Clear dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Check for Node version conflicts
+node --version  # Should be v18+
+```
+
+**Analytics Not Working**:
+```bash
+# Check environment variables
+echo $VITE_GA_MEASUREMENT_ID
+
+# Verify browser console for errors
+# Check network tab for failed requests
+```
+
+**Development Server Issues**:
+```bash
+# Check port availability
+netstat -an | grep 5173
+
+# Clear Vite cache
+rm -rf .vite
+```
+
+## 🔒 Security
+
+### Implementation
+- **Content Security Policy**: Configured headers
+- **Dependency Scanning**: Automated in CI/CD
+- **Environment Variables**: Secured in GitHub Secrets
+- **Input Validation**: Form data sanitization
+- **HTTPS Enforcement**: Production HTTPS only
+
+### Best Practices
+- Regular security updates (`npm audit`)
+- Code review for all changes
+- Minimal data collection
+- Privacy-first analytics implementation
+
+## 📄 Documentation
+
+- **Component Documentation**: JSDoc comments
+- **API Documentation**: Component props and methods
+- **Deployment Guide**: Step-by-step instructions
+- **Monitoring Setup**: Analytics and error tracking
+- **Backup Strategy**: Recovery procedures documented
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+## 📞 Support
+
+### Technical Support
+- **Documentation**: Check this README first
+- **Issues**: [GitHub Issues](https://github.com/your-org/cooperative/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-org/cooperative/discussions)
+
+### Emergency Contacts
+- **Production Issues**: Contact DevOps team
+- **Security Issues**: Report to security@ghaim-uae.com
+- **General Inquiries**: hello@ghaim-uae.com
+
+---
+
+## 📄 License
+
+This project is proprietary to Ghaim UAE. All rights reserved.
+
+---
+
+**Last Updated**: December 2024
+**Version**: 1.0.0

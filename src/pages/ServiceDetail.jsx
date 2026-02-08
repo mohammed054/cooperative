@@ -1,18 +1,20 @@
-import { useParams } from 'react-router-dom';
-import PageIntro from '../components/PageIntro';
-import { caseStudies, services } from '../data/siteData';
-import NotFound from './NotFound';
-import ScribbleButton from '../components/ScribbleButton';
+import { useParams } from 'react-router-dom'
+import PageIntro from '../components/PageIntro'
+import { caseStudies, services } from '../data/siteData'
+import NotFound from './NotFound'
+import ScribbleButton from '../components/ScribbleButton'
 
 const ServiceDetail = () => {
-  const { slug } = useParams();
-  const service = services.find((item) => item.slug === slug);
+  const { slug } = useParams()
+  const service = services.find(item => item.slug === slug)
 
   if (!service) {
-    return <NotFound />;
+    return <NotFound />
   }
 
-  const relatedCase = caseStudies.find((study) => study.slug === service.relatedCase);
+  const relatedCase = caseStudies.find(
+    study => study.slug === service.relatedCase
+  )
 
   return (
     <div className="bg-surface-3">
@@ -34,9 +36,11 @@ const ServiceDetail = () => {
       <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
           <div className="rounded-3xl border border-border bg-surface-3 p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">What's included</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
+              What's included
+            </p>
             <ul className="mt-4 space-y-3 text-sm text-ink">
-              {service.includes.map((item) => (
+              {service.includes.map(item => (
                 <li key={item} className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
                   {item}
@@ -46,9 +50,11 @@ const ServiceDetail = () => {
           </div>
 
           <div className="rounded-3xl border border-border bg-surface-3 p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">Ideal for</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
+              Ideal for
+            </p>
             <ul className="mt-4 space-y-3 text-sm text-ink">
-              {service.idealFor.map((item) => (
+              {service.idealFor.map(item => (
                 <li key={item} className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
                   {item}
@@ -58,9 +64,11 @@ const ServiceDetail = () => {
           </div>
 
           <div className="rounded-3xl border border-border bg-surface-3 p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">Delivery standards</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
+              Delivery standards
+            </p>
             <ul className="mt-4 space-y-3 text-sm text-ink">
-              {service.standards.map((item) => (
+              {service.standards.map(item => (
                 <li key={item} className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
                   {item}
@@ -86,8 +94,12 @@ const ServiceDetail = () => {
                 />
               </div>
               <div>
-                <h2 className="text-2xl font-semibold text-ink">{relatedCase.title}</h2>
-                <p className="mt-4 text-sm text-ink-muted">{relatedCase.summary}</p>
+                <h2 className="text-2xl font-semibold text-ink">
+                  {relatedCase.title}
+                </h2>
+                <p className="mt-4 text-sm text-ink-muted">
+                  {relatedCase.summary}
+                </p>
                 <ScribbleButton
                   to={`/work/${relatedCase.slug}`}
                   className="btn-secondary mt-6 inline-flex text-sm"
@@ -108,9 +120,16 @@ const ServiceDetail = () => {
             {services
               .filter(s => s.slug !== service.slug)
               .map(relatedService => (
-                <div key={relatedService.slug} className="rounded-3xl border border-border bg-surface-2 p-6">
-                  <h3 className="text-lg font-semibold text-ink">{relatedService.title}</h3>
-                  <p className="mt-2 text-sm text-ink-muted">{relatedService.summary}</p>
+                <div
+                  key={relatedService.slug}
+                  className="rounded-3xl border border-border bg-surface-2 p-6"
+                >
+                  <h3 className="text-lg font-semibold text-ink">
+                    {relatedService.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-ink-muted">
+                    {relatedService.summary}
+                  </p>
                   <ScribbleButton
                     to={`/services/${relatedService.slug}`}
                     className="btn-secondary mt-4 text-sm"
@@ -123,7 +142,7 @@ const ServiceDetail = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default ServiceDetail;
+export default ServiceDetail

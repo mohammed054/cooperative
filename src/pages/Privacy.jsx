@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import PageIntro from '../components/PageIntro';
+import { Link } from 'react-router-dom'
+import PageIntro from '../components/PageIntro'
 
 const Privacy = () => {
   return (
@@ -13,16 +13,26 @@ const Privacy = () => {
       <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-4xl space-y-6 px-4 text-sm text-ink-muted sm:px-6 lg:px-8">
           <div className="rounded-3xl border border-border bg-surface-3 p-6">
-            <h2 className="text-sm font-semibold text-ink">Information we collect</h2>
-            <p className="mt-3">Contact details, event requirements, and any files you share for planning purposes.</p>
+            <h2 className="text-sm font-semibold text-ink">
+              Information we collect
+            </h2>
+            <p className="mt-3">
+              Contact details, event requirements, and any files you share for
+              planning purposes.
+            </p>
           </div>
           <div className="rounded-3xl border border-border bg-surface-3 p-6">
             <h2 className="text-sm font-semibold text-ink">How we use it</h2>
-            <p className="mt-3">To prepare proposals, coordinate production services, and communicate about your event.</p>
+            <p className="mt-3">
+              To prepare proposals, coordinate production services, and
+              communicate about your event.
+            </p>
           </div>
           <div className="rounded-3xl border border-border bg-surface-3 p-6">
             <h2 className="text-sm font-semibold text-ink">Contact</h2>
-            <p className="mt-3">For questions about your data, email hello@ghaimuae.com.</p>
+            <p className="mt-3">
+              For questions about your data, email hello@ghaimuae.com.
+            </p>
           </div>
         </div>
       </section>
@@ -37,7 +47,7 @@ const Privacy = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default Privacy;
+export default Privacy

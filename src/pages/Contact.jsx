@@ -1,5 +1,5 @@
-import PageIntro from '../components/PageIntro';
-import ScribbleButton from '../components/ScribbleButton';
+import PageIntro from '../components/PageIntro'
+import ScribbleButton from '../components/ScribbleButton'
 
 const Contact = () => {
   return (
@@ -79,10 +79,16 @@ const Contact = () => {
               />
             </label>
 
-            <ScribbleButton type="submit" showArrow={false} className="btn-primary mt-6 text-sm">
+            <ScribbleButton
+              type="submit"
+              showArrow={false}
+              className="btn-primary mt-6 text-sm"
+            >
               Send request
             </ScribbleButton>
-            <p className="mt-3 text-xs text-ink-subtle">We respond within 24 hours.</p>
+            <p className="mt-3 text-xs text-ink-subtle">
+              We respond within 24 hours.
+            </p>
           </form>
 
           <div className="space-y-6">
@@ -93,18 +99,22 @@ const Contact = () => {
             </div>
             <div className="rounded-3xl border border-border bg-surface-3 p-6">
               <p className="text-sm font-semibold text-ink">Office</p>
-              <p className="mt-2 text-sm text-ink-muted">Dubai Design District</p>
+              <p className="mt-2 text-sm text-ink-muted">
+                Dubai Design District
+              </p>
               <p className="text-sm text-ink-muted">United Arab Emirates</p>
             </div>
             <div className="rounded-3xl border border-border bg-surface-3 p-6">
               <p className="text-sm font-semibold text-ink">Availability</p>
-              <p className="mt-2 text-sm text-ink-muted">Monday-Saturday - 9am-7pm</p>
+              <p className="mt-2 text-sm text-ink-muted">
+                Monday-Saturday - 9am-7pm
+              </p>
             </div>
           </div>
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default Contact;
+export default Contact

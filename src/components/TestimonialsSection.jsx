@@ -1,16 +1,16 @@
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from 'react-icons/fa';
-import { assetUrl } from '../lib/assetUrl';
-import ScribbleButton from './ScribbleButton';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from 'react-icons/fa'
+import { assetUrl } from '../lib/assetUrl'
+import ScribbleButton from './ScribbleButton'
 
-const getInitials = (name) => {
-  const parts = String(name).trim().split(/\s+/).filter(Boolean);
-  const first = parts[0]?.[0] ?? '';
-  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? '' : '';
-  return (first + last).toUpperCase();
-};
+const getInitials = name => {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean)
+  const first = parts[0]?.[0] ?? ''
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : ''
+  return (first + last).toUpperCase()
+}
 
 const TESTIMONIALS = [
   {
@@ -52,43 +52,51 @@ const TESTIMONIALS = [
     image: assetUrl('images/event3.jpg'),
     tags: ['Lighting design', 'Backstage ops', 'Client‑ready finish'],
   },
-];
+]
 
 const TestimonialsSection = ({
   title = 'Trusted by teams who can’t miss.',
   intro = 'Premium rentals and on‑site production, delivered with calm precision — so you can focus on the room.',
   showLink = true,
 }) => {
-  const shouldReduceMotion = useReducedMotion();
-  const location = useLocation();
-  const isHome = location.pathname === '/';
-  const proposalHref = '#get-started';
-  const processHref = isHome ? '#process' : '/process';
-  const isProcessAnchor = String(processHref).startsWith('#');
-  const [activeId, setActiveId] = useState(TESTIMONIALS[0]?.id);
+  const shouldReduceMotion = useReducedMotion()
+  const location = useLocation()
+  const isHome = location.pathname === '/'
+  const proposalHref = '#get-started'
+  const processHref = isHome ? '#process' : '/process'
+  const isProcessAnchor = String(processHref).startsWith('#')
+  const [activeId, setActiveId] = useState(TESTIMONIALS[0]?.id)
 
   const activeIndex = useMemo(
-    () => Math.max(0, TESTIMONIALS.findIndex((t) => t.id === activeId)),
-    [activeId],
-  );
-  const active = TESTIMONIALS[activeIndex] ?? TESTIMONIALS[0];
+    () =>
+      Math.max(
+        0,
+        TESTIMONIALS.findIndex(t => t.id === activeId)
+      ),
+    [activeId]
+  )
+  const active = TESTIMONIALS[activeIndex] ?? TESTIMONIALS[0]
 
   const transition = shouldReduceMotion
     ? { duration: 0 }
-    : { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
+    : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }
 
   const goPrev = () => {
-    const nextIndex = (activeIndex - 1 + TESTIMONIALS.length) % TESTIMONIALS.length;
-    setActiveId(TESTIMONIALS[nextIndex]?.id);
-  };
+    const nextIndex =
+      (activeIndex - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
+    setActiveId(TESTIMONIALS[nextIndex]?.id)
+  }
 
   const goNext = () => {
-    const nextIndex = (activeIndex + 1) % TESTIMONIALS.length;
-    setActiveId(TESTIMONIALS[nextIndex]?.id);
-  };
+    const nextIndex = (activeIndex + 1) % TESTIMONIALS.length
+    setActiveId(TESTIMONIALS[nextIndex]?.id)
+  }
 
   return (
-    <section id="testimonials" className="relative overflow-hidden bg-surface-2 py-24 sm:py-32">
+    <section
+      id="testimonials"
+      className="relative overflow-hidden bg-surface-2 py-24 sm:py-32"
+    >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-70"
@@ -124,7 +132,9 @@ const TestimonialsSection = ({
                 key={active?.id}
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
+                exit={
+                  shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }
+                }
                 transition={transition}
                 className="overflow-hidden rounded-3xl border border-border bg-surface-2 shadow-[0_18px_60px_rgba(22,22,22,0.10)]"
               >
@@ -140,7 +150,10 @@ const TestimonialsSection = ({
                       </p>
                     </div>
 
-                    <FaQuoteLeft className="mt-10 text-4xl text-ink-subtle opacity-40" aria-hidden="true" />
+                    <FaQuoteLeft
+                      className="mt-10 text-4xl text-ink-subtle opacity-40"
+                      aria-hidden="true"
+                    />
                     <blockquote className="mt-6 text-[clamp(1.25rem,2.4vw,2.125rem)] font-medium leading-[1.15] tracking-tight text-ink">
                       {active?.quote}
                     </blockquote>
@@ -174,7 +187,7 @@ const TestimonialsSection = ({
                     <div className="absolute inset-0 bg-gradient-to-tr from-black/50 via-black/10 to-transparent" />
 
                     <div className="absolute bottom-5 left-5 right-5 flex flex-wrap gap-2">
-                      {(active?.tags ?? []).map((tag) => (
+                      {(active?.tags ?? []).map(tag => (
                         <span
                           key={tag}
                           className="inline-flex items-center rounded-full bg-white/[0.85] px-3 py-1 text-xs font-semibold text-ink-muted backdrop-blur"
@@ -189,8 +202,8 @@ const TestimonialsSection = ({
             </AnimatePresence>
 
             <div className="mt-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-              {TESTIMONIALS.map((t) => {
-                const isActive = t.id === active?.id;
+              {TESTIMONIALS.map(t => {
+                const isActive = t.id === active?.id
                 return (
                   <button
                     key={t.id}
@@ -207,7 +220,7 @@ const TestimonialsSection = ({
                   >
                     {t.company}
                   </button>
-                );
+                )
               })}
             </div>
           </div>
@@ -215,9 +228,13 @@ const TestimonialsSection = ({
           <div className="lg:col-span-5">
             <div className="hidden lg:block">
               <p className="text-sm font-semibold text-ink">More feedback</p>
-              <div className="mt-4 flex flex-col gap-3" role="tablist" aria-label="Testimonials">
-                {TESTIMONIALS.map((t) => {
-                  const isActive = t.id === active?.id;
+              <div
+                className="mt-4 flex flex-col gap-3"
+                role="tablist"
+                aria-label="Testimonials"
+              >
+                {TESTIMONIALS.map(t => {
+                  const isActive = t.id === active?.id
                   return (
                     <button
                       key={t.id}
@@ -239,7 +256,9 @@ const TestimonialsSection = ({
                         <div
                           className={[
                             'flex h-10 w-10 items-center justify-center rounded-full text-xs font-semibold',
-                            isActive ? 'bg-white/[0.12] text-white' : 'bg-ink text-white',
+                            isActive
+                              ? 'bg-white/[0.12] text-white'
+                              : 'bg-ink text-white',
                           ].join(' ')}
                         >
                           {getInitials(t.name)}
@@ -272,13 +291,15 @@ const TestimonialsSection = ({
                         </div>
                       </div>
                     </button>
-                  );
+                  )
                 })}
               </div>
             </div>
 
             <div className="mt-6 rounded-3xl border border-border bg-surface-2 p-6 sm:p-8 lg:mt-0">
-              <p className="text-sm font-semibold text-ink">Why teams come back</p>
+              <p className="text-sm font-semibold text-ink">
+                Why teams come back
+              </p>
               <ul className="mt-4 space-y-3 text-sm text-ink-muted">
                 <li className="flex gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
@@ -342,14 +363,18 @@ const TestimonialsSection = ({
               <FaChevronRight size={14} />
             </button>
             <p className="text-sm font-semibold tabular-nums text-ink-muted">
-              {String(activeIndex + 1).padStart(2, '0')} / {String(TESTIMONIALS.length).padStart(2, '0')}
+              {String(activeIndex + 1).padStart(2, '0')} /{' '}
+              {String(TESTIMONIALS.length).padStart(2, '0')}
             </p>
           </div>
 
           {showLink && (
             <p className="text-sm text-ink-muted">
               Need a plan by end of week?{' '}
-              <a href={proposalHref} className="font-semibold text-ink underline underline-offset-4">
+              <a
+                href={proposalHref}
+                className="font-semibold text-ink underline underline-offset-4"
+              >
                 We can move fast.
               </a>
             </p>
@@ -357,7 +382,7 @@ const TestimonialsSection = ({
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default TestimonialsSection;
+export default TestimonialsSection

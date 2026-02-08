@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'
 
 const SkipToContent = () => {
-  const handleSkip = (e) => {
-    e.preventDefault();
-    const mainContent = document.getElementById('main-content');
+  const handleSkip = e => {
+    e.preventDefault()
+    const mainContent = document.getElementById('main-content')
     if (mainContent) {
-      mainContent.focus();
-      mainContent.scrollIntoView();
+      mainContent.focus()
+      mainContent.scrollIntoView()
     }
-  };
+  }
 
   return (
     <a
@@ -26,7 +26,7 @@ const SkipToContent = () => {
     >
       Skip to main content
     </a>
-  );
-};
+  )
+}
 
-export default SkipToContent;
+export default SkipToContent
