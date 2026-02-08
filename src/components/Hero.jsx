@@ -16,27 +16,35 @@ const Hero = () => {
   };
 
   return (
-    <section id="hero" className="relative h-[100svh] overflow-hidden bg-black">
-      <img
-        src={assetUrl('images/event1.jpg')}
-        alt="Event production in the UAE"
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-0' : 'opacity-100'}`}
-        loading="eager"
-        decoding="async"
-      />
-      <video
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
-        autoPlay={!shouldReduceMotion}
-        muted
-        loop={!shouldReduceMotion}
-        playsInline
-        preload="none"
-        poster={assetUrl('images/event1.jpg')}
-        onLoadedData={() => setVideoReady(true)}
-        aria-hidden="true"
-      >
-        <source src={assetUrl('videos/background.mp4')} type="video/mp4" />
-      </video>
+<section id="hero" className="relative h-[100svh] overflow-hidden bg-black" style={{ contain: 'layout paint' }}>
+      <div className="absolute inset-0 w-full h-full" style={{ aspectRatio: '16/9' }}>
+        <img
+          src={assetUrl('images/event1.jpg')}
+          alt="Event production in the UAE"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-0' : 'opacity-100'}`}
+          loading="eager"
+          decoding="async"
+          width="1920"
+          height="1080"
+          style={{ contain: 'layout' }}
+        />
+        <video
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+          autoPlay={!shouldReduceMotion}
+          muted
+          loop={!shouldReduceMotion}
+          playsInline
+          preload="none"
+          poster={assetUrl('images/event1.jpg')}
+          onLoadedData={() => setVideoReady(true)}
+          aria-hidden="true"
+          width="1920"
+          height="1080"
+          style={{ contain: 'layout' }}
+        >
+          <source src={assetUrl('videos/background.mp4')} type="video/mp4" />
+        </video>
+      </div>
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-black/90" />
       <div
@@ -48,12 +56,13 @@ const Hero = () => {
         }}
       />
 
-      <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pb-10 pt-20 sm:px-6 sm:pb-14 sm:pt-24 lg:px-8">
+<div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pb-10 pt-20 sm:px-6 sm:pb-14 sm:pt-24 lg:px-8" style={{ contain: 'layout' }}>
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={transition}
           className="w-full max-w-3xl"
+          style={{ contain: 'layout style' }}
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.2] bg-white/[0.1] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/90 backdrop-blur">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />

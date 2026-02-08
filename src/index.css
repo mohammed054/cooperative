@@ -1,4 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600&display=swap');
+
+/* Font loading optimization */
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 500 600;
+  font-display: swap;
+  src: local('Fraunces Medium'), local('Fraunces SemiBold');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 500 600;
+  font-display: swap;
+  src: local('Manrope Regular'), local('Manrope Medium'), local('Manrope SemiBold');
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -41,6 +58,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    contain: layout style;
   }
   
   body {
@@ -53,6 +71,7 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden; /* Prevent horizontal scrolling */
+    contain: layout style paint;
   }
 
   :focus-visible {
@@ -64,7 +83,7 @@
     scroll-margin-top: 96px;
   }
 
-  h1,
+h1,
   h2,
   h3,
   h4,
@@ -72,6 +91,7 @@
   h6 {
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
+    contain: layout style;
   }
 
 }
@@ -625,6 +645,28 @@
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
   border-radius: 0.5rem;
+  contain: layout style;
+}
+
+/* Hero section layout stability */
+#hero {
+  contain: layout style paint;
+  content-visibility: auto;
+}
+
+#hero img,
+#hero video {
+  contain: layout;
+  will-change: opacity;
+}
+
+/* Page intro layout stability */
+.page-intro {
+  contain: layout style;
+}
+
+.page-intro h1 {
+  contain: layout style;
 }
 
 /* ================================================
