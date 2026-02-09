@@ -19,14 +19,14 @@ export default defineConfig(({ mode }) => ({
           name: '1.0.0',
         },
         
-        // Authentication
-        authToken: undefined, // Will be set via environment variable in CI/CD
+        // Authentication - use environment variable
+        authToken: process.env.SENTRY_AUTH_TOKEN,
       
-      // Source maps
-      sourcemaps: {
-        assets: ['./dist/assets'],
-        ignore: ['node_modules'],
-      },
+        // Source maps
+        sourcemaps: {
+          assets: ['./dist/assets'],
+          ignore: ['node_modules'],
+        },
     }),
   ],
   build: {

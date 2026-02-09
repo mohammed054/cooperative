@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AnalyticsProvider } from './context/AnalyticsContext'
 import GhaimAEHeader from './components/GhaimAEHeader'
 import Footer from './components/Footer'
 import OurProjects from './components/OurProjects'
@@ -28,28 +29,30 @@ function App() {
     <BrowserRouter basename={basename}>
       <ScrollToTop />
       <SkipToContent />
-      <GhaimAEHeader />
-      <Breadcrumbs />
-      <main id="main-content" tabIndex={-1}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/services/:slug" element={<ServiceDetail />} />
-          <Route path="/work" element={<Work />} />
-          <Route path="/work/:slug" element={<CaseStudyDetail />} />
-          <Route path="/process" element={<Process />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/testimonials" element={<Testimonials />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/projects" element={<OurProjects />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
+      <AnalyticsProvider>
+        <GhaimAEHeader />
+        <Breadcrumbs />
+        <main id="main-content" tabIndex={-1}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/services/:slug" element={<ServiceDetail />} />
+            <Route path="/work" element={<Work />} />
+            <Route path="/work/:slug" element={<CaseStudyDetail />} />
+            <Route path="/process" element={<Process />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/testimonials" element={<Testimonials />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/projects" element={<OurProjects />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+        <Footer />
+      </AnalyticsProvider>
     </BrowserRouter>
   )
 }

@@ -13,8 +13,6 @@ history.scrollRestoration = 'manual'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AnalyticsProvider>
-      <App />
-    </AnalyticsProvider>
+    <App />
   </StrictMode>
 )

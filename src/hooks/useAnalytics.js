@@ -4,13 +4,14 @@ import { useEffect } from 'react'
 export const useRouterAnalytics = () => {
   // Initialize analytics on mount
   useEffect(() => {
-    if (!GA_MEASUREMENT_ID || typeof window.gtag !== 'function') {
+    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
+    if (!measurementId || typeof window.gtag !== 'function') {
       return
     }
 
     // Configure GA4 if not already configured
     if (window.gtag) {
-      window.gtag('config', GA_MEASUREMENT_ID, {
+      window.gtag('config', measurementId, {
         page_location: window.location.href,
         page_title: document.title,
         debug_mode: import.meta.env.DEV,
@@ -25,7 +26,8 @@ export const useRouterAnalytics = () => {
     label,
     value
   ) => {
-    if (!GA_MEASUREMENT_ID) return
+    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
+    if (!measurementId) return
 
     window.gtag('event', action, {
       event_category: category,
@@ -35,9 +37,10 @@ export const useRouterAnalytics = () => {
   }
 
   const trackPageView = (path, title) => {
-    if (!GA_MEASUREMENT_ID) return
+    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
+    if (!measurementId) return
 
-    window.gtag('config', GA_MEASUREMENT_ID, {
+    window.gtag('config', measurementId, {
       page_location: `${window.location.origin}${path}`,
       page_title: title || document.title,
     })
@@ -98,13 +101,14 @@ export const useRouterAnalytics = () => {
 export const useAnalytics = () => {
   // Initialize analytics on mount
   useEffect(() => {
-    if (!GA_MEASUREMENT_ID || typeof window.gtag !== 'function') {
+    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
+    if (!measurementId || typeof window.gtag !== 'function') {
       return
     }
 
     // Configure GA4 if not already configured
     if (window.gtag) {
-      window.gtag('config', GA_MEASUREMENT_ID, {
+      window.gtag('config', measurementId, {
         page_location: window.location.href,
         page_title: document.title,
         debug_mode: import.meta.env.DEV,
@@ -119,7 +123,8 @@ export const useAnalytics = () => {
     label,
     value
   ) => {
-    if (!GA_MEASUREMENT_ID) return
+    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
+    if (!measurementId) return
 
     window.gtag('event', action, {
       event_category: category,
@@ -129,9 +134,10 @@ export const useAnalytics = () => {
   }
 
   const trackPageView = (path, title) => {
-    if (!GA_MEASUREMENT_ID) return
+    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
+    if (!measurementId) return
 
-    window.gtag('config', GA_MEASUREMENT_ID, {
+    window.gtag('config', measurementId, {
       page_location: `${window.location.origin}${path}`,
       page_title: title || document.title,
     })

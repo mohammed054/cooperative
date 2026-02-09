@@ -56,6 +56,19 @@
     />
     <meta name="twitter:image" content="%BASE_URL%images/event1.jpg" />
 
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX', {
+        page_title: document.title,
+        page_location: window.location.href,
+        debug_mode: true
+      });
+    </script>
+
     <!-- Structured Data -->
     <script type="application/ld+json">
       {
