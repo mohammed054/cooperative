@@ -157,7 +157,7 @@ const GhaimAEHeader = () => {
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
     setActiveMenu(label)
   }
-
+  alert("isthisworking");
   const scheduleCloseMenu = () => {
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
     closeTimeoutRef.current = setTimeout(() => setActiveMenu(null), 220)
