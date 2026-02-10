@@ -32,12 +32,13 @@ export const MegaMenu = ({
       <div className="border-t border-border bg-white shadow-[0_18px_50px_rgba(15,23,42,0.12)]">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           {/* Mega Menu Header */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.2, delay: 0.03 }}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6"
+          >
             <div className="lg:col-span-2">
               <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
                 {activeItem.label}
@@ -195,7 +196,7 @@ export const MegaMenu = ({
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Menu Items Grid */}
           <motion.div
@@ -245,12 +246,13 @@ export const MegaMenu = ({
           </motion.div>
 
           {/* Footer */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.2, delay: 0.09 }}
-            className="mt-6 pt-4 border-t border-border flex items-center justify-between">
+            className="mt-6 pt-4 border-t border-border flex items-center justify-between"
+          >
             <p className="text-xs text-ink-muted">
               {activeItem.label === 'Services' &&
                 'Need help choosing? Contact our team'}
