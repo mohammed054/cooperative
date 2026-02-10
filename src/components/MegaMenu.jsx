@@ -17,10 +17,14 @@ export const MegaMenu = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+      transition={{
+        duration: 0.25,
+        ease: [0.16, 1, 0.3, 1],
+        staggerChildren: 0.02,
+      }}
       className="hidden lg:block"
       onMouseEnter={() => setActiveMenu(activeItem.label)}
       onMouseLeave={() => setActiveMenu(null)}
@@ -28,7 +32,12 @@ export const MegaMenu = ({
       <div className="border-t border-border bg-white shadow-[0_18px_50px_rgba(15,23,42,0.12)]">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           {/* Mega Menu Header */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2, delay: 0.03 }}
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div className="lg:col-span-2">
               <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
                 {activeItem.label}
@@ -189,7 +198,11 @@ export const MegaMenu = ({
           </div>
 
           {/* Menu Items Grid */}
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2, delay: 0.06 }}
             className={`grid gap-3 ${
               activeItem.children.length <= 4
                 ? 'grid-cols-1 md:grid-cols-2'
@@ -229,10 +242,15 @@ export const MegaMenu = ({
                 <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
               </button>
             ))}
-          </div>
+          </motion.div>
 
           {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
+          <motion.div 
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2, delay: 0.09 }}
+            className="mt-6 pt-4 border-t border-border flex items-center justify-between">
             <p className="text-xs text-ink-muted">
               {activeItem.label === 'Services' &&
                 'Need help choosing? Contact our team'}
@@ -250,7 +268,7 @@ export const MegaMenu = ({
             >
               Get in touch →
             </button>
-          </div>
+          </motion.div>
         </div>
       </div>
     </motion.div>

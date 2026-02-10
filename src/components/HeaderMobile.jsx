@@ -1,4 +1,5 @@
 import { FaSearch } from 'react-icons/fa'
+import { AnimatePresence } from 'framer-motion'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 import { ButtonLink } from './Button'
 import { SearchButton } from './SearchButton'
@@ -58,14 +59,21 @@ export const HeaderMobile = ({
   }
 
   return (
-    <>
+    <AnimatePresence>
       {/* Mobile Menu */}
-      <div
+      <motion.div
         ref={mobileMenuRef}
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
         aria-labelledby="mobile-menu-title"
+        initial={{ x: '100%', opacity: 0 }}
+        animate={{ x: '0%', opacity: 1 }}
+        exit={{ x: '100%', opacity: 0 }}
+        transition={{ 
+          duration: 0.3, 
+          ease: [0.16, 1, 0.3, 1]
+        }}
         className="border-t border-border bg-surface-2 px-5 pb-6 pt-4 lg:hidden"
       >
         <h2 id="mobile-menu-title" className="sr-only">
@@ -73,7 +81,12 @@ export const HeaderMobile = ({
         </h2>
 
         {/* Main Navigation */}
-        <div className="grid gap-2 mb-5">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2, delay: 0.05 }}
+          className="grid gap-2 mb-5">
           <button
             onClick={() => goTo('/')}
             className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
@@ -199,7 +212,12 @@ export const HeaderMobile = ({
         </div>
 
         {/* Services Section */}
-        <div className="mb-5">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2, delay: 0.08 }}
+          className="mb-5">
           <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
             Services
           </p>
@@ -226,7 +244,12 @@ export const HeaderMobile = ({
         </div>
 
         {/* Work Section */}
-        <div className="mb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2, delay: 0.11 }}
+          className="mb-6">
           <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
             Work
           </p>
@@ -265,7 +288,11 @@ export const HeaderMobile = ({
           </div>
         </div>
 
-        <div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2, delay: 0.14 }}>
           <ScribbleButton
             to="/contact"
             onClick={() => setMobileOpen(false)}
@@ -278,8 +305,8 @@ export const HeaderMobile = ({
           >
             Contact
           </ScribbleButton>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Close Menu Button */}
       <button
@@ -316,6 +343,6 @@ export const HeaderMobile = ({
           } -translate-y-1.5 -rotate-45`}
         />
       </button>
-    </>
+    </AnimatePresence>
   )
 }

@@ -60,6 +60,7 @@ export const HeaderDesktop = ({
               <Link
                 to={item.href}
                 onFocus={() => setActiveMenu(null)}
+                onClick={() => setActiveMenu(null)}
                 className={`inline-flex items-center gap-2 text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary outline-none relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-0.5 ${
                   isHovering || !headerIsLight
                     ? isActive
@@ -80,7 +81,10 @@ export const HeaderDesktop = ({
 
       {/* Search Button */}
       <SearchButton
-        onClick={() => setSearchOpen(true)}
+        onClick={() => {
+          setActiveMenu(null)
+          setSearchOpen(true)
+        }}
         isLight={headerIsLight && !isHovering}
       />
 

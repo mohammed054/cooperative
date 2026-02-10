@@ -150,6 +150,7 @@ const GhaimAEHeader = () => {
   const goTo = href => {
     if (!href) return
     setMobileOpen(false)
+    setActiveMenu(null)
     navigate(href)
   }
 
@@ -160,7 +161,7 @@ const GhaimAEHeader = () => {
 
   const scheduleCloseMenu = () => {
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
-    closeTimeoutRef.current = setTimeout(() => setActiveMenu(null), 220)
+    closeTimeoutRef.current = setTimeout(() => setActiveMenu(null), 150)
   }
 
   const handleDropdownKeydown = (e, item) => {
@@ -407,19 +408,28 @@ const GhaimAEHeader = () => {
       </motion.header>
 
       {/* Mobile Backdrop */}
-      {mobileOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            transition={{
+              duration: 0.35,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Search Modal */}
-      <Search isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      <AnimatePresence>
+        {searchOpen && (
+          <Search isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+        )}
+      </AnimatePresence>
     </>
   )
 }
