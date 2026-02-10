@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AnalyticsProvider } from './context/AnalyticsContext'
+import { AnalyticsProvider } from './context'
 import GhaimAEHeader from './components/GhaimAEHeader'
 import Footer from './components/Footer'
 import OurProjects from './components/OurProjects'

@@ -1,16 +1,7 @@
-import React, { createContext, useContext } from 'react'
+import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useRouterAnalytics } from '../hooks/useAnalytics'
-
-const AnalyticsContext = createContext()
-
-export const useAnalyticsContext = () => {
-  const context = useContext(AnalyticsContext)
-  if (!context) {
-    throw new Error('useAnalyticsContext must be used within AnalyticsProvider')
-  }
-  return context
-}
+import { AnalyticsContext } from '../context/AnalyticsContextCore'
 
 export const AnalyticsProvider = ({ children }) => {
   const location = useLocation()
@@ -21,7 +12,7 @@ export const AnalyticsProvider = ({ children }) => {
     if (!analytics) return
 
     analytics.trackPageView(location.pathname, document.title)
-  }, [location.pathname])
+  }, [location.pathname, analytics])
 
   return (
     <AnalyticsContext.Provider value={analytics}>
