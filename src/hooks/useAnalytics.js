@@ -20,12 +20,7 @@ export const useRouterAnalytics = () => {
   }, [])
 
   // Event tracking functions
-  const trackEvent = (
-    action,
-    category = 'User Interaction',
-    label,
-    value
-  ) => {
+  const trackEvent = (action, category = 'User Interaction', label, value) => {
     const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
     if (!measurementId) return
 
@@ -46,16 +41,12 @@ export const useRouterAnalytics = () => {
     })
   }
 
-  const trackCTAClick = (
-    ctaText,
-    ctaLocation,
-    destination
-  ) => {
+  const trackCTAClick = (ctaText, ctaLocation, destination) => {
     trackEvent('cta_click', 'Engagement', ctaLocation, 1)
-    
+
     // Also track as a custom event for better funnel analysis
     trackEvent('funnel_step', 'Conversion', `${ctaLocation}: ${ctaText}`, 1)
-    
+
     if (destination) {
       trackEvent('outbound_click', 'Navigation', destination, 1)
     }
@@ -63,7 +54,7 @@ export const useRouterAnalytics = () => {
 
   const trackFormSubmission = (formName, success) => {
     trackEvent('form_submit', 'Engagement', formName, success ? 1 : 0)
-    
+
     if (success) {
       trackEvent('lead_generated', 'Conversion', formName, 1)
     }
@@ -117,12 +108,7 @@ export const useAnalytics = () => {
   }, [])
 
   // Event tracking functions
-  const trackEvent = (
-    action,
-    category = 'User Interaction',
-    label,
-    value
-  ) => {
+  const trackEvent = (action, category = 'User Interaction', label, value) => {
     const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
     if (!measurementId) return
 
@@ -143,16 +129,12 @@ export const useAnalytics = () => {
     })
   }
 
-  const trackCTAClick = (
-    ctaText,
-    ctaLocation,
-    destination
-  ) => {
+  const trackCTAClick = (ctaText, ctaLocation, destination) => {
     trackEvent('cta_click', 'Engagement', ctaLocation, 1)
-    
+
     // Also track as a custom event for better funnel analysis
     trackEvent('funnel_step', 'Conversion', `${ctaLocation}: ${ctaText}`, 1)
-    
+
     if (destination) {
       trackEvent('outbound_click', 'Navigation', destination, 1)
     }
@@ -160,7 +142,7 @@ export const useAnalytics = () => {
 
   const trackFormSubmission = (formName, success) => {
     trackEvent('form_submit', 'Engagement', formName, success ? 1 : 0)
-    
+
     if (success) {
       trackEvent('lead_generated', 'Conversion', formName, 1)
     }

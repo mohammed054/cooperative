@@ -99,7 +99,7 @@ export const ButtonLink = ({
     </>
   )
 
-  const handleClick = (e) => {
+  const handleClick = e => {
     // Track analytics
     if (analyticsLabel) {
       trackCTAClick(
@@ -108,7 +108,7 @@ export const ButtonLink = ({
         to || href
       )
     }
-    
+
     // Call original onClick
     if (onClick) onClick(e)
   }

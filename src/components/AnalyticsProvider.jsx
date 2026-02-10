@@ -19,7 +19,7 @@ export const AnalyticsProvider = ({ children }) => {
   // Track page changes when route changes
   React.useEffect(() => {
     if (!analytics) return
-    
+
     analytics.trackPageView(location.pathname, document.title)
   }, [location.pathname])
 

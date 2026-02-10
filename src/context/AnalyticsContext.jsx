@@ -1,1 +1,4 @@
-export { AnalyticsProvider, useAnalyticsContext } from '../components/AnalyticsProvider'
+export {
+  AnalyticsProvider,
+  useAnalyticsContext,
+} from '../components/AnalyticsProvider'

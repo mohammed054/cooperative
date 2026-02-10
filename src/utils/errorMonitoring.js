@@ -11,7 +11,7 @@ const initErrorMonitoring = () => {
     dsn: import.meta.env.VITE_SENTRY_DSN,
     environment: import.meta.env.MODE,
     tracesSampleRate: import.meta.env.PROD ? 0.1 : 1.0, // 10% sampling in production
-    
+
     // Performance monitoring
     integrations: [
       Sentry.browserTracingIntegration(),
@@ -20,30 +20,30 @@ const initErrorMonitoring = () => {
         blockAllMedia: false,
       }),
     ],
-    
+
     // Error classification
     beforeSend(event) {
       // Filter out certain errors
       if (event.exception) {
         const error = event.exception.values?.[0]
-        
+
         // Ignore certain types of errors
         if (error?.value?.includes('Non-Error promise rejection')) {
           return null
         }
-        
+
         // Ignore network errors that are expected
         if (error?.value?.includes('NetworkError')) {
           return null
         }
       }
-      
+
       return event
     },
-    
+
     // Release tracking
     release: import.meta.env.VITE_APP_VERSION || '1.0.0',
-    
+
     // User context (will be set when user identifies)
     initialScope: {
       tags: {
@@ -57,10 +57,10 @@ const initErrorMonitoring = () => {
 
 // Error tracking utilities
 export const trackError = (error, context = {}) => {
-  Sentry.withScope((scope) => {
+  Sentry.withScope(scope => {
     scope.setTag('context', context.context || 'unknown')
     scope.setExtra('additionalInfo', context.additionalInfo || {})
-    
+
     if (error instanceof Error) {
       Sentry.captureException(error)
     } else {
@@ -69,7 +69,7 @@ export const trackError = (error, context = {}) => {
   })
 }
 
-export const trackUserFeedback = (feedback) => {
+export const trackUserFeedback = feedback => {
   Sentry.captureMessage('User Feedback', {
     level: 'info',
     tags: {
@@ -83,9 +83,9 @@ export const trackUserFeedback = (feedback) => {
   })
 }
 
-export const setUserContext = (user) => {
+export const setUserContext = user => {
   if (!import.meta.env.VITE_SENTRY_DSN) return
-  
+
   Sentry.setUser({
     id: user.id,
     email: user.email,
@@ -101,18 +101,18 @@ export const clearUserContext = () => {
 // Performance tracking
 export const trackPerformance = (transactionName, data = {}) => {
   if (!import.meta.env.VITE_SENTRY_DSN) return
-  
+
   // Start a performance span
   const span = Sentry.startSpan({
     name: transactionName,
     op: 'navigation',
   })
-  
+
   // Add data to span
   Object.keys(data).forEach(key => {
     span.setAttribute(key, data[key])
   })
-  
+
   return span
 }
 

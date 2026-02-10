@@ -2,24 +2,24 @@
 export const config = {
   // Application status
   healthy: true,
-  
+
   // Version information
   version: '1.0.0',
   environment: import.meta.env.MODE,
-  
+
   // Dependencies status
   dependencies: {
     react: '19.2.0',
     'react-router-dom': '7.9.1',
     'framer-motion': '12.29.2',
   },
-  
+
   // Monitoring endpoints
   uptime: {
     url: 'https://ghaim-uae.com',
     statusPage: 'https://status.ghaim-uae.com',
   },
-  
+
   // Performance thresholds
   performance: {
     responseTime: 2000, // ms
@@ -28,10 +28,10 @@ export const config = {
   },
 }
 
-  // Express.js handler (if using Node.js server)
+// Express.js handler (if using Node.js server)
 export const healthCheckHandler = (req, res) => {
   const startTime = Date.now()
-  
+
   // Basic health check
   const health = {
     status: 'healthy',
@@ -40,19 +40,19 @@ export const healthCheckHandler = (req, res) => {
     environment: config.environment,
     responseTime: Date.now() - startTime,
   }
-  
+
   // Detailed health check for monitoring
   if (req.query.detailed === 'true') {
     health.dependencies = config.dependencies
     health.performance = config.performance
   }
-  
+
   // Check if application is actually healthy
   if (!config.healthy) {
     health.status = 'unhealthy'
     return res.status(503).json(health)
   }
-  
+
   res.status(200).json(health)
 }
 
@@ -64,7 +64,7 @@ export const checkApplicationHealth = () => {
     version: config.version,
     environment: config.environment,
   }
-  
+
   // Check critical features
   try {
     // Check if React is loaded
@@ -74,7 +74,7 @@ export const checkApplicationHealth = () => {
       health.react = 'error'
       health.status = 'degraded'
     }
-    
+
     // Check if Router is working
     if (typeof window !== 'undefined' && window.location) {
       health.router = 'functional'
@@ -82,7 +82,7 @@ export const checkApplicationHealth = () => {
       health.router = 'error'
       health.status = 'degraded'
     }
-    
+
     // Check localStorage
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
@@ -94,12 +94,12 @@ export const checkApplicationHealth = () => {
         health.status = 'degraded'
       }
     }
-    
+
     // Check network connectivity
     if (typeof window !== 'undefined' && navigator.onLine !== undefined) {
       health.connectivity = navigator.onLine ? 'online' : 'offline'
     }
-    
+
     // Check performance
     if (typeof window !== 'undefined' && window.performance) {
       const navigation = window.performance.getEntriesByType('navigation')[0]
@@ -108,17 +108,16 @@ export const checkApplicationHealth = () => {
           duration: Math.round(navigation.loadEventEnd - navigation.fetchStart),
           threshold: config.performance.responseTime,
         }
-        
+
         if (health.pageLoad.duration > config.performance.responseTime) {
           health.status = 'slow'
         }
       }
     }
-    
   } catch (error) {
     health.status = 'error'
     health.error = error.message
   }
-  
+
   return health
 }
