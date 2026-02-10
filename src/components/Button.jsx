@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FaArrowRight } from 'react-icons/fa'
-import { useAnalyticsContext } from '../context/AnalyticsContext'
+import { useAnalyticsContext } from '../context'
 
 export const BaseButton = ({
   children,

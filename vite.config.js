@@ -4,30 +4,37 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 const repoName = 'cooperative'
 
+// Check if Sentry auth token is available
+const sentryAuthToken = process?.env?.SENTRY_AUTH_TOKEN
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   // GitHub Pages serves this repo at https://<user>.github.io/<repoName>/
   base: mode === 'production' ? `/${repoName}/` : '/',
   plugins: [
     react(),
-    sentryVitePlugin({
-      org: 'ghaim-uae', // Replace with your organization
-      project: 'ghaim-uae-website', // Replace with your project name
+    ...(sentryAuthToken
+      ? [
+          sentryVitePlugin({
+            org: 'ghaim-uae', // Replace with your organization
+            project: 'ghaim-uae-website', // Replace with your project name
 
-      // Only generate source maps and upload in production
-      release: {
-        name: '1.0.0',
-      },
+            // Only generate source maps and upload in production
+            release: {
+              name: '1.0.0',
+            },
 
-      // Authentication - use environment variable
-      authToken: import.meta.env.SENTRY_AUTH_TOKEN,
+            // Authentication - use environment variable
+            authToken: sentryAuthToken,
 
-      // Source maps
-      sourcemaps: {
-        assets: ['./dist/assets'],
-        ignore: ['node_modules'],
-      },
-    }),
+            // Source maps
+            sourcemaps: {
+              assets: ['./dist/assets'],
+              ignore: ['node_modules'],
+            },
+          }),
+        ]
+      : []),
   ],
   build: {
     outDir: 'dist',
