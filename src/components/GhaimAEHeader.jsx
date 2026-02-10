@@ -149,8 +149,8 @@ const GhaimAEHeader = () => {
 
   const goTo = href => {
     if (!href) return
-    navigate(href)
     setMobileOpen(false)
+    navigate(href)
   }
 
   const openMenu = label => {
