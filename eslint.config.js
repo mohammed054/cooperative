@@ -8,7 +8,8 @@ export default [
     ignores: ['dist', 'node_modules', 'docs', 'scripts'],
   },
   {
-    files: ['**/*.{js,jsx}'],
+    // Browser configuration for app files
+    files: ['src/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2024,
       globals: globals.browser,
@@ -16,9 +17,9 @@ export default [
         ecmaVersion: 'latest',
         sourceType: 'module',
         ecmaFeatures: {
-          jsx: true
-        }
-      }
+          jsx: true,
+        },
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
@@ -38,8 +39,26 @@ export default [
     },
     settings: {
       react: {
-        version: 'detect'
-      }
-    }
+        version: 'detect',
+      },
+    },
+  },
+  {
+    // Node.js configuration for build files
+    files: ['*.js', 'scripts/**/*.js', 'vite.config.js'],
+    languageOptions: {
+      ecmaVersion: 2024,
+      globals: globals.node,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'no-unused-vars': 'off',
+      'no-debugger': 'error',
+      'no-console': 'warn',
+      'no-alert': 'error',
+    },
   },
 ]
