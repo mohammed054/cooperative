@@ -40,5 +40,17 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: true, // Enable source maps for Sentry
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          motion: ['framer-motion'],
+          sentry: ['@sentry/react'],
+          ui: ['react-icons/fa'],
+          search: ['fuse.js'],
+          carousel: ['swiper'],
+        },
+      },
+    },
   },
 }))
