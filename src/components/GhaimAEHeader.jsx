@@ -17,8 +17,11 @@ const GhaimAEHeader = () => {
   const [activeMenu, setActiveMenu] = useState(null)
   const [isHovering, setIsHovering] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const lastScrollY = useRef(0)
-  const scrollTimeoutRef = useRef(null)
+  const lastScrollYRef = useRef(0)
+  const scrollRafRef = useRef(null)
+  const hiddenRef = useRef(false)
+  const scrolledRef = useRef(false)
+  const mobileOpenRef = useRef(false)
   const closeTimeoutRef = useRef(null)
   const mobileMenuButtonRef = useRef(null)
 
@@ -73,31 +76,60 @@ const GhaimAEHeader = () => {
   )
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+    const TOP_THRESHOLD = 4
+    const DELTA_THRESHOLD = 6
 
-      scrollTimeoutRef.current = setTimeout(() => {
-        if (mobileOpen) {
-          setIsHidden(false)
-        } else if (currentY <= 20) {
-          setIsHidden(false)
-        } else if (currentY > lastScrollY.current) {
-          setIsHidden(false)
-        } else if (currentY < lastScrollY.current) {
-          setIsHidden(true)
-        }
+    const applyScrollState = () => {
+      const currentY = Math.max(window.scrollY, 0)
+      const delta = currentY - lastScrollYRef.current
+      const absDelta = Math.abs(delta)
+      const nextScrolled = currentY > TOP_THRESHOLD
+      let nextHidden = hiddenRef.current
 
-        setScrolled(currentY > 30)
-        lastScrollY.current = currentY
-      }, 16)
+      if (mobileOpenRef.current || currentY <= TOP_THRESHOLD) {
+        nextHidden = false
+      } else if (absDelta >= DELTA_THRESHOLD) {
+        nextHidden = delta > 0
+      }
+
+      if (nextHidden !== hiddenRef.current) {
+        hiddenRef.current = nextHidden
+        setIsHidden(nextHidden)
+      }
+
+      if (nextScrolled !== scrolledRef.current) {
+        scrolledRef.current = nextScrolled
+        setScrolled(nextScrolled)
+      }
+
+      lastScrollYRef.current = currentY
+      scrollRafRef.current = null
     }
+
+    const handleScroll = () => {
+      if (scrollRafRef.current !== null) return
+      scrollRafRef.current = requestAnimationFrame(applyScrollState)
+    }
+
+    lastScrollYRef.current = Math.max(window.scrollY, 0)
+    scrolledRef.current = lastScrollYRef.current > TOP_THRESHOLD
+    hiddenRef.current = false
+    setScrolled(scrolledRef.current)
+    setIsHidden(false)
 
     window.addEventListener('scroll', handleScroll, { passive: true })
+
     return () => {
       window.removeEventListener('scroll', handleScroll)
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+      if (scrollRafRef.current !== null) {
+        cancelAnimationFrame(scrollRafRef.current)
+      }
     }
+  }, [])
+
+  useEffect(() => {
+    mobileOpenRef.current = mobileOpen
+    if (mobileOpen) hiddenRef.current = false
   }, [mobileOpen])
 
   useEffect(() => {
@@ -331,14 +363,16 @@ const GhaimAEHeader = () => {
       <motion.header
         initial={false}
         animate={{
-          y: isHidden ? -120 : 0,
-          transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+          y: isHidden ? '-100%' : '0%',
+          opacity: isHidden ? 0 : 1,
         }}
+        transition={{ duration: 0.26, ease: [0.33, 1, 0.68, 1] }}
         className={[
-          'fixed left-0 right-0 top-0 z-50 transition-all duration-500 ease-out',
+          'fixed left-0 right-0 top-0 z-50 border-b will-change-transform',
+          'transition-[background-color,box-shadow,backdrop-filter] duration-300 ease-out',
           isHovering || !headerIsLight
-            ? 'bg-white/95 shadow-lg backdrop-blur border-b border-border'
-            : 'bg-transparent',
+            ? 'bg-white/95 border-border shadow-lg backdrop-blur'
+            : 'bg-transparent border-transparent shadow-none backdrop-blur-0',
         ].join(' ')}
         onMouseLeave={() => {
           setIsHovering(false)
@@ -396,14 +430,10 @@ const GhaimAEHeader = () => {
 
         <MegaMenu
           activeItem={activeItem}
-          isActivePage={isActivePage}
           goTo={goTo}
           setActiveMenu={setActiveMenu}
           handleQuickActionKeydown={handleQuickActionKeydown}
-          handleDropdownKeydown={handleDropdownKeydown}
           handleDropdownItemKeydown={handleDropdownItemKeydown}
-          isHovering={isHovering}
-          headerIsLight={headerIsLight}
         />
       </motion.header>
 

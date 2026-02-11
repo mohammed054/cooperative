@@ -1,8 +1,6 @@
 import { FaSearch } from 'react-icons/fa'
-import { AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useFocusTrap } from '../hooks/useFocusTrap'
-import { ButtonLink } from './Button'
-import { SearchButton } from './SearchButton'
 import ScribbleButton from './ScribbleButton'
 
 export const HeaderMobile = ({

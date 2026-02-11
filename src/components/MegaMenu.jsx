@@ -1,17 +1,13 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { FaChevronDown, FaSearch } from 'react-icons/fa'
 import { ButtonLink } from './Button'
 
 export const MegaMenu = ({
   activeItem,
-  isActivePage,
   goTo,
   setActiveMenu,
   handleQuickActionKeydown,
-  handleDropdownKeydown,
   handleDropdownItemKeydown,
-  isHovering,
-  headerIsLight,
 }) => {
   if (!activeItem) return null
 

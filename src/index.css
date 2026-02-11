@@ -59,7 +59,6 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    contain: layout style;
   }
 
   body {
@@ -72,7 +71,6 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden; /* Prevent horizontal scrolling */
-    contain: layout style paint;
   }
 
   :focus-visible {
@@ -92,7 +90,6 @@
   h6 {
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
-    contain: layout style;
   }
 }
 
@@ -643,27 +640,6 @@
     contain: layout style;
   }
 
-  /* Hero section layout stability */
-  #hero {
-    contain: layout style paint;
-    content-visibility: auto;
-  }
-
-  #hero img,
-  #hero video {
-    contain: layout;
-    will-change: opacity;
-  }
-
-  /* Page intro layout stability */
-  .page-intro {
-    contain: layout style;
-  }
-
-  .page-intro h1 {
-    contain: layout style;
-  }
-
   /* ================================================
    RESPONSIVE ADJUSTMENTS
    ================================================ */
@@ -786,7 +762,7 @@
 
   /* Flip card styles */
   .perspective {
-    perspective: 1000px;
+    perspective: 1200px;
   }
 
   .backface-hidden {
@@ -800,20 +776,4 @@
   .rotate-y-180 {
     transform: rotateY(180deg);
   }
-}
-/* === 3D CARD FLIP SUPPORT === */
-.perspective {
-  perspective: 1200px;
-}
-
-.preserve-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.rotate-y-180 {
-  transform: rotateY(180deg);
 }

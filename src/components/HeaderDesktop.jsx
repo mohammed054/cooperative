@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { FaChevronDown } from 'react-icons/fa'
-import { ButtonLink } from './Button'
 import { SearchButton } from './SearchButton'
 import ScribbleButton from './ScribbleButton'
 
