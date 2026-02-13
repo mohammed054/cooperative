@@ -21,8 +21,8 @@ npm run dev
 
 ## 📋 Prerequisites
 
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher  
+- **Node.js**: v20.19.0 or higher
+- **npm**: v10.0.0 or higher  
 - **Git**: For version control
 - **Modern Browser**: Chrome 90+, Firefox 88+, Safari 14+
 
@@ -36,6 +36,7 @@ cp .env.example .env.local
 # Edit .env.local with your configuration
 # Add your Google Analytics 4 Measurement ID
 # Add your Sentry DSN for error monitoring
+# Add your lead webhook URL for form submissions
 ```
 
 ### 2. Install Dependencies
@@ -55,6 +56,7 @@ npm run dev
 
 # Run linting and formatting
 npm run lint          # Check for code issues
+npm run test:run      # Run unit tests
 npm run lint:fix       # Auto-fix linting issues
 npm run format         # Format code with Prettier
 npm run format:check   # Check code formatting
@@ -100,6 +102,10 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 # Error Monitoring
 VITE_SENTRY_DSN=https://XXXXXXXXXX.ingest.sentry.io/XXXXX
 
+# Lead Capture
+VITE_LEAD_WEBHOOK_URL=https://your-webhook-endpoint.example.com
+VITE_LEAD_WEBHOOK_KEY=optional_webhook_key
+
 # Application Version
 VITE_APP_VERSION=1.0.0
 ```
@@ -135,26 +141,22 @@ VITE_APP_VERSION=1.0.0
 
 ### Automated CI/CD Pipeline
 ```bash
-# Main branch → Production
-git push main
+# Pull request / main push -> lint + test + build
+git push feature/your-branch
 
-# Develop branch → Staging  
-git push develop
+# Main branch -> Production deploy
+git push main
 ```
 
 ### Environments
 - **Development**: Local development
-- **Staging**: `develop` branch deployment
 - **Production**: `main` branch deployment
 
 ### Build Process
 1. **Code Quality**: Linting and formatting checks
-2. **Security**: Vulnerability scanning
+2. **Tests**: Unit tests via Vitest
 3. **Build**: Production optimization
 4. **Upload**: GitHub Pages deployment
-5. **Release**: Automated version tagging
-
-## 🔧 Development Guidelines
 
 ### Code Standards
 - **ESLint**: Enforces code quality
@@ -201,6 +203,7 @@ git push origin feature/new-feature
 ```bash
 # Run all quality checks
 npm run lint          # Check for issues
+npm run test:run      # Run unit tests
 npm run format:check   # Verify formatting
 npm run build         # Test build process
 ```
@@ -234,6 +237,8 @@ npm run build        # Build for production
 npm run preview      # Preview production build
 npm run lint         # Check code quality
 npm run lint:fix     # Auto-fix issues
+npm run test         # Watch tests
+npm run test:run     # Run tests once
 npm run format       # Format code
 npm run format:check # Check formatting
 ```
@@ -343,3 +348,6 @@ This project is proprietary to Ghaim UAE. All rights reserved.
 
 **Last Updated**: December 2024
 **Version**: 1.0.0
+
+
+

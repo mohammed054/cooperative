@@ -1,177 +1,135 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
-// Analytics hook for components within Router context
-export const useRouterAnalytics = () => {
-  // Initialize analytics on mount
-  useEffect(() => {
-    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
-    if (!measurementId || typeof window.gtag !== 'function') {
-      return
-    }
+const GA_INIT_FLAG = '__ga4Initialized'
 
-    // Configure GA4 if not already configured
-    if (window.gtag) {
-      window.gtag('config', measurementId, {
-        page_location: window.location.href,
-        page_title: document.title,
-        debug_mode: import.meta.env.DEV,
-      })
-    }
-  }, [])
+const getMeasurementId = () => {
+  const value = import.meta.env.VITE_GA_MEASUREMENT_ID
+  return typeof value === 'string' ? value.trim() : ''
+}
 
-  // Event tracking functions
-  const trackEvent = (action, category = 'User Interaction', label, value) => {
-    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
-    if (!measurementId) return
+const ensureAnalyticsLoaded = measurementId => {
+  if (!measurementId || typeof window === 'undefined') return false
 
-    window.gtag('event', action, {
+  window.dataLayer = window.dataLayer || []
+  if (typeof window.gtag !== 'function') {
+    window.gtag = (...args) => window.dataLayer.push(args)
+  }
+
+  const scriptId = `ga4-script-${measurementId}`
+  const existingScript = document.getElementById(scriptId)
+  if (!existingScript) {
+    const script = document.createElement('script')
+    script.id = scriptId
+    script.async = true
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+    document.head.appendChild(script)
+  }
+
+  if (!window[GA_INIT_FLAG]) {
+    window.gtag('js', new Date())
+    window.gtag('config', measurementId, {
+      send_page_view: false,
+      debug_mode: import.meta.env.DEV,
+    })
+    window[GA_INIT_FLAG] = true
+  }
+
+  return true
+}
+
+const trackWithGtag = (measurementId, command, ...args) => {
+  if (!measurementId || typeof window === 'undefined') return
+  if (typeof window.gtag !== 'function') return
+  window.gtag(command, ...args)
+}
+
+const createAnalyticsApi = measurementId => ({
+  trackEvent: (action, category = 'User Interaction', label, value) => {
+    trackWithGtag(measurementId, 'event', action, {
       event_category: category,
       event_label: label,
       value,
     })
-  }
-
-  const trackPageView = (path, title) => {
-    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
-    if (!measurementId) return
-
-    window.gtag('config', measurementId, {
-      page_location: `${window.location.origin}${path}`,
+  },
+  trackPageView: (path, title) => {
+    const pagePath = path || window.location.pathname
+    trackWithGtag(measurementId, 'event', 'page_view', {
       page_title: title || document.title,
+      page_location: `${window.location.origin}${pagePath}`,
+      page_path: pagePath,
     })
-  }
+  },
+  trackCTAClick: (ctaText, ctaLocation, destination) => {
+    trackWithGtag(measurementId, 'event', 'cta_click', {
+      event_category: 'Engagement',
+      event_label: ctaLocation,
+      cta_text: ctaText,
+      destination,
+      value: 1,
+    })
 
-  const trackCTAClick = (ctaText, ctaLocation, destination) => {
-    trackEvent('cta_click', 'Engagement', ctaLocation, 1)
-
-    // Also track as a custom event for better funnel analysis
-    trackEvent('funnel_step', 'Conversion', `${ctaLocation}: ${ctaText}`, 1)
-
-    if (destination) {
-      trackEvent('outbound_click', 'Navigation', destination, 1)
-    }
-  }
-
-  const trackFormSubmission = (formName, success) => {
-    trackEvent('form_submit', 'Engagement', formName, success ? 1 : 0)
+    trackWithGtag(measurementId, 'event', 'funnel_step', {
+      event_category: 'Conversion',
+      event_label: `${ctaLocation}: ${ctaText}`,
+      value: 1,
+    })
+  },
+  trackFormSubmission: (formName, success) => {
+    trackWithGtag(measurementId, 'event', 'form_submit', {
+      event_category: 'Engagement',
+      event_label: formName,
+      value: success ? 1 : 0,
+    })
 
     if (success) {
-      trackEvent('lead_generated', 'Conversion', formName, 1)
-    }
-  }
-
-  const trackDownload = (fileName, fileType) => {
-    trackEvent('file_download', 'Engagement', `${fileName} (${fileType})`, 1)
-  }
-
-  const trackVideoPlay = (videoTitle, videoUrl) => {
-    trackEvent('video_start', 'Media', videoTitle, 1)
-  }
-
-  const trackSearch = (searchTerm, resultsCount) => {
-    trackEvent('search', 'Navigation', searchTerm, resultsCount)
-  }
-
-  const trackError = (errorName, errorMessage, errorContext) => {
-    trackEvent('error', 'System', `${errorName}: ${errorMessage}`, 1)
-  }
-
-  return {
-    trackEvent,
-    trackPageView,
-    trackCTAClick,
-    trackFormSubmission,
-    trackDownload,
-    trackVideoPlay,
-    trackSearch,
-    trackError,
-  }
-}
-
-// Simple analytics hook for non-router components
-export const useAnalytics = () => {
-  // Initialize analytics on mount
-  useEffect(() => {
-    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
-    if (!measurementId || typeof window.gtag !== 'function') {
-      return
-    }
-
-    // Configure GA4 if not already configured
-    if (window.gtag) {
-      window.gtag('config', measurementId, {
-        page_location: window.location.href,
-        page_title: document.title,
-        debug_mode: import.meta.env.DEV,
+      trackWithGtag(measurementId, 'event', 'lead_generated', {
+        event_category: 'Conversion',
+        event_label: formName,
+        value: 1,
       })
     }
-  }, [])
-
-  // Event tracking functions
-  const trackEvent = (action, category = 'User Interaction', label, value) => {
-    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
-    if (!measurementId) return
-
-    window.gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value,
+  },
+  trackDownload: (fileName, fileType) => {
+    trackWithGtag(measurementId, 'event', 'file_download', {
+      event_category: 'Engagement',
+      event_label: `${fileName} (${fileType})`,
+      value: 1,
     })
-  }
-
-  const trackPageView = (path, title) => {
-    const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID
-    if (!measurementId) return
-
-    window.gtag('config', measurementId, {
-      page_location: `${window.location.origin}${path}`,
-      page_title: title || document.title,
+  },
+  trackVideoPlay: videoTitle => {
+    trackWithGtag(measurementId, 'event', 'video_start', {
+      event_category: 'Media',
+      event_label: videoTitle,
+      value: 1,
     })
-  }
+  },
+  trackSearch: (searchTerm, resultsCount) => {
+    trackWithGtag(measurementId, 'event', 'search', {
+      event_category: 'Navigation',
+      event_label: searchTerm,
+      value: resultsCount,
+    })
+  },
+  trackError: (errorName, errorMessage, errorContext) => {
+    trackWithGtag(measurementId, 'event', 'error', {
+      event_category: 'System',
+      event_label: `${errorName}: ${errorMessage}`,
+      error_context: errorContext,
+      value: 1,
+    })
+  },
+})
 
-  const trackCTAClick = (ctaText, ctaLocation, destination) => {
-    trackEvent('cta_click', 'Engagement', ctaLocation, 1)
+const useAnalyticsBase = () => {
+  const measurementId = useMemo(() => getMeasurementId(), [])
 
-    // Also track as a custom event for better funnel analysis
-    trackEvent('funnel_step', 'Conversion', `${ctaLocation}: ${ctaText}`, 1)
+  useEffect(() => {
+    ensureAnalyticsLoaded(measurementId)
+  }, [measurementId])
 
-    if (destination) {
-      trackEvent('outbound_click', 'Navigation', destination, 1)
-    }
-  }
-
-  const trackFormSubmission = (formName, success) => {
-    trackEvent('form_submit', 'Engagement', formName, success ? 1 : 0)
-
-    if (success) {
-      trackEvent('lead_generated', 'Conversion', formName, 1)
-    }
-  }
-
-  const trackDownload = (fileName, fileType) => {
-    trackEvent('file_download', 'Engagement', `${fileName} (${fileType})`, 1)
-  }
-
-  const trackVideoPlay = (videoTitle, videoUrl) => {
-    trackEvent('video_start', 'Media', videoTitle, 1)
-  }
-
-  const trackSearch = (searchTerm, resultsCount) => {
-    trackEvent('search', 'Navigation', searchTerm, resultsCount)
-  }
-
-  const trackError = (errorName, errorMessage, errorContext) => {
-    trackEvent('error', 'System', `${errorName}: ${errorMessage}`, 1)
-  }
-
-  return {
-    trackEvent,
-    trackPageView,
-    trackCTAClick,
-    trackFormSubmission,
-    trackDownload,
-    trackVideoPlay,
-    trackSearch,
-    trackError,
-  }
+  return useMemo(() => createAnalyticsApi(measurementId), [measurementId])
 }
+
+export const useRouterAnalytics = () => useAnalyticsBase()
+
+export const useAnalytics = () => useAnalyticsBase()

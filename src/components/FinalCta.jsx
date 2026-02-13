@@ -1,12 +1,15 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
+import { useLeadSubmission } from '../hooks/useLeadSubmission'
 
 const FinalCta = () => {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
+  const { submit, isSubmitting, isSuccess, isError, feedbackMessage } =
+    useLeadSubmission({ formName: 'homepage-final-cta' })
 
   const scrollToSection = sectionId => {
     const element = document.getElementById(sectionId)
@@ -17,8 +20,9 @@ const FinalCta = () => {
     }
   }
 
-  const handleSubmit = e => {
-    e.preventDefault()
+  const handleSubmit = async event => {
+    event.preventDefault()
+    await submit(event.currentTarget)
   }
 
   return (
@@ -176,18 +180,33 @@ const FinalCta = () => {
               ></textarea>
             </div>
 
+            <input
+              type="text"
+              name="website"
+              autoComplete="off"
+              tabIndex={-1}
+              className="hidden"
+            />
+
             <div className="flex items-center justify-center">
               <motion.button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full md:w-auto px-12 py-4 bg-accent text-white font-semibold rounded-lg hover:bg-accent-strong transition-all duration-200 text-lg shadow-lg"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Submit Request
+                {isSubmitting ? 'Submitting...' : 'Submit Request'}
               </motion.button>
             </div>
           </form>
 
+          <p
+            className={`text-center text-sm mt-4 ${isError ? 'text-red-700' : isSuccess ? 'text-emerald-700' : 'text-ink-muted'}`}
+            aria-live="polite"
+          >
+            {feedbackMessage || ''}
+          </p>
           <p className="text-center text-ink-muted text-sm mt-6">
             * We respond within 24 hours. Your information is secure and
             confidential.

@@ -1,7 +1,16 @@
 import PageIntro from '../components/PageIntro'
 import ScribbleButton from '../components/ScribbleButton'
+import { useLeadSubmission } from '../hooks/useLeadSubmission'
 
 const Contact = () => {
+  const { submit, isSubmitting, isSuccess, isError, feedbackMessage } =
+    useLeadSubmission({ formName: 'contact-page-form' })
+
+  const handleSubmit = async event => {
+    event.preventDefault()
+    await submit(event.currentTarget)
+  }
+
   return (
     <div className="bg-surface-3">
       <PageIntro
@@ -12,7 +21,10 @@ const Contact = () => {
 
       <section className="bg-surface py-16 sm:py-20">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
-          <form className="rounded-3xl border border-border bg-surface-3 p-6">
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-3xl border border-border bg-surface-3 p-6"
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm text-ink">
                 Full name
@@ -79,14 +91,29 @@ const Contact = () => {
               />
             </label>
 
+            <input
+              type="text"
+              name="website"
+              autoComplete="off"
+              tabIndex={-1}
+              className="hidden"
+            />
+
             <ScribbleButton
               type="submit"
               showArrow={false}
+              disabled={isSubmitting}
               className="btn-primary mt-6 text-sm"
             >
-              Send request
+              {isSubmitting ? 'Sending...' : 'Send request'}
             </ScribbleButton>
-            <p className="mt-3 text-xs text-ink-subtle">
+            <p
+              className={`mt-3 text-xs ${isError ? 'text-red-700' : isSuccess ? 'text-emerald-700' : 'text-ink-subtle'}`}
+              aria-live="polite"
+            >
+              {feedbackMessage || ''}
+            </p>
+            <p className="mt-2 text-xs text-ink-subtle">
               We respond within 24 hours.
             </p>
           </form>

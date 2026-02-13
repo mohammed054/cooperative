@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { FaArrowRight } from 'react-icons/fa'
+import { AnalyticsContext } from '../context/AnalyticsContextCore'
 import './ScribbleButton.css'
 
 const ScribbleButton = ({
@@ -15,8 +16,10 @@ const ScribbleButton = ({
   rel,
   showArrow,
   arrowSize = 14,
+  analyticsLabel,
   ...rest
 }) => {
+  const analytics = useContext(AnalyticsContext)
   const isLink = Boolean(to)
   const isAnchor = Boolean(href)
   const Component = isLink ? Link : isAnchor ? 'a' : 'button'
@@ -25,8 +28,22 @@ const ScribbleButton = ({
     showArrow ??
     ((isLink || isAnchor) && !(isAnchor && String(href).startsWith('#')))
 
+  const handleClick = event => {
+    const destination = to || href
+    const textLabel =
+      typeof children === 'string' ? children : analyticsLabel || 'CTA'
+
+    if (analytics && (analyticsLabel || destination)) {
+      analytics.trackCTAClick?.(textLabel, analyticsLabel || 'scribble-button', destination)
+    }
+
+    if (onClick) {
+      onClick(event)
+    }
+  }
+
   const sharedProps = {
-    onClick,
+    onClick: handleClick,
     'aria-label': ariaLabel,
     className: [`scribble-button`, computedShowArrow ? 'group' : '', className]
       .filter(Boolean)

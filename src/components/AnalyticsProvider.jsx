@@ -11,8 +11,9 @@ export const AnalyticsProvider = ({ children }) => {
   React.useEffect(() => {
     if (!analytics) return
 
-    analytics.trackPageView(location.pathname, document.title)
-  }, [location.pathname, analytics])
+    const pathWithQuery = `${location.pathname}${location.search || ''}`
+    analytics.trackPageView(pathWithQuery, document.title)
+  }, [location.pathname, location.search, analytics])
 
   return (
     <AnalyticsContext.Provider value={analytics}>

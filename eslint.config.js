@@ -45,7 +45,7 @@ export default [
   },
   {
     // Node.js configuration for build files
-    files: ['*.js', 'scripts/**/*.js', 'vite.config.js'],
+    files: ['*.js', 'scripts/**/*.js', 'vite.config.js', 'vitest.config.js'],
     languageOptions: {
       ecmaVersion: 2024,
       globals: globals.node,
@@ -59,6 +59,16 @@ export default [
       'no-debugger': 'error',
       'no-console': 'warn',
       'no-alert': 'error',
+    },
+  },
+  {
+    files: ['src/**/*.test.{js,jsx}', 'src/**/*.spec.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.vitest,
+      },
     },
   },
 ]
