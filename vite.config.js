@@ -42,6 +42,18 @@ export default defineConfig(({ mode }) => ({
     sourcemap: true, // Enable source maps for Sentry
     rollupOptions: {
       output: {
+        // GitHub Pages caches index and assets for a short period.
+        // Stable filenames avoid temporary 404s from stale HTML requesting
+        // old hashed chunks after each deploy.
+        entryFileNames: 'assets/index.js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: assetInfo => {
+          const assetName = assetInfo?.name || ''
+          if (assetName.endsWith('.css')) {
+            return 'assets/index.css'
+          }
+          return 'assets/[name][extname]'
+        },
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           motion: ['framer-motion'],
