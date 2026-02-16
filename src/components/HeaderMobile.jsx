@@ -70,7 +70,7 @@ export const HeaderMobile = ({
     <>
       {/* Mobile Header - Fixed at top, 64px height */}
       <header className="fixed top-0 left-0 right-0 z-40 lg:hidden">
-        <div className={`flex items-center justify-between h-16 px-4 transition-colors duration-300 ${
+        <div className={`flex items-center justify-end h-16 px-4 transition-colors duration-300 ${
           mobileOpen ? 'bg-white' : 'bg-transparent'
         }`}>
           {/* Hamburger Button Right */}
