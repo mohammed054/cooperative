@@ -73,24 +73,6 @@ export const HeaderMobile = ({
         <div className={`flex items-center justify-between h-16 px-4 transition-colors duration-300 ${
           mobileOpen ? 'bg-white' : 'bg-transparent'
         }`}>
-          {/* Logo Left */}
-          <button
-            onClick={() => goTo('/')}
-            className="flex items-center gap-3"
-            aria-label="Home"
-          >
-            <img
-              src={assetUrl('images/logo.webp')}
-              alt="Ghaim UAE"
-              className="h-7 w-auto"
-              loading="lazy"
-              decoding="async"
-            />
-            <span className="text-lg font-semibold tracking-[0.12em] text-ink">
-              GHAIM
-            </span>
-          </button>
-
           {/* Hamburger Button Right */}
           <button
             ref={mobileMenuButtonRef}
