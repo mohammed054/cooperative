@@ -724,6 +724,47 @@
     }
   }
 
+  /* ================================================
+   SCROLLABLE CARDS OPTIMIZATION
+   ================================================ */
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+  }
+
+  /* Performance optimizations for scrollable sections */
+  .scrollable-card-section {
+    will-change: transform;
+    contain: layout style paint;
+  }
+
+  .card-image {
+    will-change: auto;
+    image-rendering: -webkit-optimize-contrast;
+  }
+
+  /* Remove heavy animations and shadows for better performance */
+  .card {
+    box-shadow: none;
+    border: 1px solid var(--color-border);
+    transition: border-color 0.2s ease;
+  }
+
+  .card:hover {
+    border-color: var(--color-ink);
+  }
+
+  /* Optimize scroll performance */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
   .btn-arrow-circle {
     @apply w-12 h-12 rounded-full bg-ink text-white flex items-center justify-center transition-all duration-500 p-0 relative overflow-hidden hover:-rotate-45 hover:bg-ink-muted;
   }

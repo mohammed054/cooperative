@@ -1,274 +1,495 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
 import { assetUrl } from '../lib/assetUrl'
-
-const ArrowIcon = ({ isOpen }) => (
-  <motion.svg
-    width="20"
-    height="20"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    animate={{ rotate: isOpen ? 180 : 0 }}
-    transition={{ duration: 0.2 }}
-  >
-    <path
-      d="M5 7.5L10 12.5L15 7.5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </motion.svg>
-)
-
-const XIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M18 6L6 18M6 6L18 18"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-const HamburgerIcon = ({ isOpen }) => (
-  <div className="flex flex-col justify-center items-center gap-[5px] w-10 h-10">
-    <span
-      className={`block h-0.5 w-5 rounded-full transition-colors ${
-        isOpen ? 'rotate-45 translate-y-1.5' : ''
-      } ${isOpen ? '' : 'bg-current'}`}
-    />
-    <span
-      className={`block h-0.5 w-5 rounded-full transition-colors ${
-        isOpen ? 'opacity-0' : ''
-      } ${isOpen ? '' : 'bg-current'}`}
-    />
-    <span
-      className={`block h-0.5 w-5 rounded-full transition-colors ${
-        isOpen ? '-rotate-45 -translate-y-1.5' : ''
-      } ${isOpen ? '' : 'bg-current'}`}
-    />
-  </div>
-)
-
-const MobileNavItem = ({
-  label,
-  href,
-  onClick,
-  isActive,
-  hasChildren,
-  isOpen,
-  onToggle,
-  children,
-}) => {
-  const handlePress = () => {
-    if (hasChildren) {
-      onToggle()
-    } else if (onClick) {
-      onClick(href)
-    }
-  }
-
-  return (
-    <div className="mb-2">
-      <button
-        onClick={handlePress}
-        className={`w-full min-h-[48px] flex items-center justify-between px-4 rounded-lg text-left transition-colors ${
-          isActive ? 'bg-ink/5 text-ink' : 'text-ink hover:bg-ink/[0.03]'
-        }`}
-        style={{ fontSize: '18px', fontWeight: 600 }}
-        aria-current={isActive ? 'page' : undefined}
-        aria-expanded={hasChildren ? isOpen : undefined}
-      >
-        <span>{label}</span>
-        {hasChildren && <ArrowIcon isOpen={isOpen} />}
-      </button>
-
-      <AnimatePresence>
-        {hasChildren && isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="pt-2 pb-2">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
-const SubLink = ({ label, href, onClick, isActive }) => (
-  <button
-    onClick={() => onClick(href)}
-    className={`w-full min-h-[44px] flex items-center pl-8 pr-4 rounded-md text-left transition-colors ${
-      isActive
-        ? 'bg-ink/5 text-ink'
-        : 'text-ink-muted hover:bg-ink/[0.03] hover:text-ink'
-    }`}
-    style={{ fontSize: '16px', fontWeight: 500 }}
-    aria-current={isActive ? 'page' : undefined}
-  >
-    {label}
-  </button>
-)
+import { services } from '../data/siteData'
 
 export const HeaderMobile = ({
   mobileOpen,
   setMobileOpen,
   headerIsLight,
   mobileMenuButtonRef,
-  services,
-  caseStudies,
   isActivePage,
   goTo,
-  setSearchOpen,
   location,
 }) => {
-  const [servicesOpen, setServicesOpen] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [openAccordions, setOpenAccordions] = useState(new Set())
+  const closeBtnRef = useRef(null)
 
-  const handleClose = () => {
-    setMobileOpen(false)
-    setServicesOpen(false)
-  }
+  // Handle focus management
+  useEffect(() => {
+    if (mobileOpen && closeBtnRef.current) {
+      closeBtnRef.current.focus()
+    }
+  }, [mobileOpen])
 
-  const handleOverlayClick = () => {
-    handleClose()
-  }
-
-  const mainNavItems = [
-    { label: 'Services', href: '/services', hasChildren: true },
-    { label: 'Work', href: '/work', hasChildren: false },
-    { label: 'Process', href: '/process', hasChildren: false },
-    { label: 'Pricing', href: '/pricing', hasChildren: false },
-    { label: 'Company', href: '/about', hasChildren: false },
-    { label: 'Contact', href: '/contact', hasChildren: false },
-  ]
-
-  const handleNavClick = href => {
-    handleClose()
-    if (href) {
-      goTo(href)
+  const handleHamburgerClick = () => {
+    if (isAnimating) return
+    setIsAnimating(true)
+    setMobileOpen(!mobileOpen)
+    // Reset accordions when opening/closing
+    if (!mobileOpen) {
+      setOpenAccordions(new Set())
     }
   }
 
-  if (!mobileOpen) {
-    return (
-      <button
-        ref={mobileMenuButtonRef}
-        className={`flex lg:hidden items-center justify-center w-11 h-11 rounded-full transition-colors ${
-          headerIsLight
-            ? 'text-white hover:bg-white/10'
-            : 'text-ink hover:bg-surface'
-        }`}
-        onClick={() => setMobileOpen(true)}
-        aria-label="Open menu"
-        aria-expanded={false}
-      >
-        <HamburgerIcon isOpen={false} />
-      </button>
-    )
+  const handleCloseClick = () => {
+    if (isAnimating) return
+    setIsAnimating(true)
+    setMobileOpen(false)
+    setOpenAccordions(new Set())
   }
 
-  return (
-    <AnimatePresence>
-      {/* Overlay */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-        onClick={handleOverlayClick}
-        aria-hidden="true"
-      />
+  // Reset animation state when animation ends
+  useEffect(() => {
+    if (!mobileOpen) {
+      const timer = setTimeout(() => setIsAnimating(false), 300)
+      return () => clearTimeout(timer)
+    }
+  }, [mobileOpen])
 
-      {/* Drawer */}
-      <motion.div
-        initial={{ x: '100%' }}
-        animate={{ x: '0%' }}
-        exit={{ x: '100%' }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
-        className="fixed top-0 right-0 h-full w-[85vw] max-w-[420px] bg-white z-50 lg:hidden flex flex-col"
-        style={{ boxShadow: '-4px 0 24px rgba(0,0,0,0.15)' }}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Mobile navigation"
-      >
-        {/* Top Section */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-border flex-shrink-0">
-          <Link to="/" onClick={handleClose} className="flex items-center">
+  const handleKeyDown = (e, action) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      action()
+    }
+  }
+
+  const toggleAccordion = (label) => {
+    const newAccordions = new Set(openAccordions)
+    if (newAccordions.has(label)) {
+      newAccordions.delete(label)
+    } else {
+      newAccordions.add(label)
+    }
+    setOpenAccordions(newAccordions)
+  }
+
+  const isAccordionOpen = (label) => openAccordions.has(label)
+
+  return (
+    <>
+      {/* Mobile Header - Fixed at top, 64px height */}
+      <header className="fixed top-0 left-0 right-0 z-40 lg:hidden">
+        <div className={`flex items-center justify-between h-16 px-4 transition-colors duration-300 ${
+          mobileOpen ? 'bg-white' : 'bg-transparent'
+        }`}>
+          {/* Logo Left */}
+          <button
+            onClick={() => goTo('/')}
+            className="flex items-center gap-3"
+            aria-label="Home"
+          >
             <img
               src={assetUrl('images/logo.webp')}
               alt="Ghaim UAE"
               className="h-7 w-auto"
               loading="lazy"
+              decoding="async"
             />
-          </Link>
+            <span className="text-lg font-semibold tracking-[0.12em] text-ink">
+              GHAIM
+            </span>
+          </button>
+
+          {/* Hamburger Button Right */}
           <button
-            onClick={handleClose}
-            className="flex items-center justify-center w-11 h-11 rounded-full text-ink hover:bg-surface transition-colors"
-            aria-label="Close menu"
+            ref={mobileMenuButtonRef}
+            className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            onClick={handleHamburgerClick}
+            onKeyDown={(e) => handleKeyDown(e, handleHamburgerClick)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-drawer"
+            style={{ 
+              minHeight: '44px',
+              minWidth: '44px'
+            }}
           >
-            <XIcon />
+            <div className="flex flex-col items-center justify-center gap-1.5">
+              <span
+                className={`block h-0.5 w-6 rounded-full transition-transform duration-300 ${
+                  mobileOpen ? 'translate-y-2 rotate-45' : ''
+                }`}
+                style={{ 
+                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c'
+                }}
+              />
+              <span
+                className={`block h-0.5 w-6 rounded-full transition-opacity duration-300 ${
+                  mobileOpen ? 'opacity-0' : ''
+                }`}
+                style={{ 
+                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c'
+                }}
+              />
+              <span
+                className={`block h-0.5 w-6 rounded-full transition-transform duration-300 ${
+                  mobileOpen ? '-translate-y-2 -rotate-45' : ''
+                }`}
+                style={{ 
+                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c'
+                }}
+              />
+            </div>
+          </button>
+        </div>
+      </header>
+
+      {/* Drawer Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-200"
+          onClick={handleCloseClick}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile Drawer */}
+      <div
+        id="mobile-drawer"
+        className={`fixed top-0 right-0 h-screen w-[85vw] max-w-[420px] bg-white z-50 transform transition-transform duration-280 ease-out ${
+          mobileOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{
+          boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)'
+        }}
+        onAnimationEnd={() => setIsAnimating(false)}
+      >
+        {/* Drawer Header */}
+        <div className="flex items-center justify-between h-16 px-4 border-b border-border/50">
+          {/* Logo */}
+          <button
+            onClick={() => goTo('/')}
+            className="flex items-center gap-3"
+            aria-label="Home"
+          >
+            <img
+              src={assetUrl('images/logo.webp')}
+              alt="Ghaim UAE"
+              className="h-7 w-auto"
+              loading="lazy"
+              decoding="async"
+            />
+            <span className="text-lg font-semibold tracking-[0.12em] text-ink">
+              GHAIM
+            </span>
+          </button>
+
+          {/* Close Button */}
+          <button
+            ref={closeBtnRef}
+            className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            onClick={handleCloseClick}
+            onKeyDown={(e) => handleKeyDown(e, handleCloseClick)}
+            aria-label="Close menu"
+            style={{ 
+              minHeight: '44px',
+              minWidth: '44px'
+            }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="text-ink"
+            >
+              <path
+                d="M6 6l12 12M18 6L6 18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-4 pt-3 pb-4">
-          {mainNavItems.map(item => (
-            <MobileNavItem
-              key={item.label}
-              label={item.label}
-              href={item.href}
-              onClick={handleNavClick}
-              isActive={isActivePage(item.href)}
-              hasChildren={item.hasChildren}
-              isOpen={item.hasChildren && servicesOpen}
-              onToggle={() => setServicesOpen(!servicesOpen)}
-            >
-              {item.label === 'Services' && (
-                <div className="space-y-1">
-                  {services.map(service => (
-                    <SubLink
-                      key={service.slug}
-                      label={service.title}
-                      href={`/services/${service.slug}`}
-                      onClick={handleNavClick}
-                      isActive={
-                        location.pathname === `/services/${service.slug}`
-                      }
+        <div className="max-h-[calc(100vh-64px)] overflow-y-auto">
+          <nav className="p-6" aria-label="Mobile navigation">
+            {/* Main Navigation Items */}
+            <div className="space-y-2">
+              {/* Services Accordion */}
+              <div>
+                <button
+                  onClick={() => toggleAccordion('Services')}
+                  className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-between ${
+                    isActivePage('/services')
+                      ? 'text-ink bg-surface'
+                      : 'text-ink hover:bg-surface'
+                  }`}
+                  aria-expanded={isAccordionOpen('Services')}
+                  aria-controls="services-submenu"
+                  style={{
+                    minHeight: '48px',
+                    fontSize: '18px'
+                  }}
+                >
+                  <span>Services</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className={`transition-transform duration-200 ${
+                      isAccordionOpen('Services') ? 'rotate-180' : ''
+                    }`}
+                  >
+                    <path
+                      d="M6 9l6 6 6-6"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
-                  ))}
+                  </svg>
+                </button>
+                
+                {/* Services Submenu */}
+                <div
+                  id="services-submenu"
+                  className="overflow-hidden transition-all duration-200 ease-out"
+                  style={{
+                    maxHeight: isAccordionOpen('Services') ? '500px' : '0',
+                    opacity: isAccordionOpen('Services') ? '1' : '0'
+                  }}
+                >
+                  <div className="space-y-2 mt-2 pl-4">
+                    {services.map((service) => (
+                      <button
+                        key={service.slug}
+                        onClick={() => {
+                          goTo(`/services/${service.slug}`)
+                          setMobileOpen(false)
+                        }}
+                        className={`w-full text-left text-base font-medium py-3 px-4 rounded-lg transition-colors ${
+                          location.pathname === `/services/${service.slug}`
+                            ? 'text-ink bg-surface'
+                            : 'text-ink-muted hover:text-ink hover:bg-surface'
+                        }`}
+                        aria-current={location.pathname === `/services/${service.slug}` ? 'page' : undefined}
+                        style={{
+                          minHeight: '44px',
+                          fontSize: '16px',
+                          paddingLeft: '32px'
+                        }}
+                      >
+                        {service.title}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              )}
-            </MobileNavItem>
-          ))}
+              </div>
+
+              {/* Work */}
+              <button
+                onClick={() => {
+                  goTo('/work')
+                  setMobileOpen(false)
+                }}
+                className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors ${
+                  isActivePage('/work')
+                    ? 'text-ink bg-surface'
+                    : 'text-ink hover:bg-surface'
+                }`}
+                aria-current={isActivePage('/work') ? 'page' : undefined}
+                style={{
+                  minHeight: '48px',
+                  fontSize: '18px'
+                }}
+              >
+                Work
+              </button>
+
+              {/* Process */}
+              <button
+                onClick={() => {
+                  goTo('/process')
+                  setMobileOpen(false)
+                }}
+                className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors ${
+                  isActivePage('/process')
+                    ? 'text-ink bg-surface'
+                    : 'text-ink hover:bg-surface'
+                }`}
+                aria-current={isActivePage('/process') ? 'page' : undefined}
+                style={{
+                  minHeight: '48px',
+                  fontSize: '18px'
+                }}
+              >
+                Process
+              </button>
+
+              {/* Pricing */}
+              <button
+                onClick={() => {
+                  goTo('/pricing')
+                  setMobileOpen(false)
+                }}
+                className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors ${
+                  isActivePage('/pricing')
+                    ? 'text-ink bg-surface'
+                    : 'text-ink hover:bg-surface'
+                }`}
+                aria-current={isActivePage('/pricing') ? 'page' : undefined}
+                style={{
+                  minHeight: '48px',
+                  fontSize: '18px'
+                }}
+              >
+                Pricing
+              </button>
+
+              {/* Company Accordion */}
+              <div>
+                <button
+                  onClick={() => toggleAccordion('Company')}
+                  className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-between ${
+                    isActivePage('/about')
+                      ? 'text-ink bg-surface'
+                      : 'text-ink hover:bg-surface'
+                  }`}
+                  aria-expanded={isAccordionOpen('Company')}
+                  aria-controls="company-submenu"
+                  style={{
+                    minHeight: '48px',
+                    fontSize: '18px'
+                  }}
+                >
+                  <span>Company</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className={`transition-transform duration-200 ${
+                      isAccordionOpen('Company') ? 'rotate-180' : ''
+                    }`}
+                  >
+                    <path
+                      d="M6 9l6 6 6-6"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                
+                {/* Company Submenu */}
+                <div
+                  id="company-submenu"
+                  className="overflow-hidden transition-all duration-200 ease-out"
+                  style={{
+                    maxHeight: isAccordionOpen('Company') ? '300px' : '0',
+                    opacity: isAccordionOpen('Company') ? '1' : '0'
+                  }}
+                >
+                  <div className="space-y-2 mt-2 pl-4">
+                    <button
+                      onClick={() => {
+                        goTo('/about')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full text-left text-base font-medium py-3 px-4 rounded-lg transition-colors ${
+                        location.pathname === '/about'
+                          ? 'text-ink bg-surface'
+                          : 'text-ink-muted hover:text-ink hover:bg-surface'
+                      }`}
+                      aria-current={location.pathname === '/about' ? 'page' : undefined}
+                      style={{
+                        minHeight: '44px',
+                        fontSize: '16px',
+                        paddingLeft: '32px'
+                      }}
+                    >
+                      About
+                    </button>
+                    <button
+                      onClick={() => {
+                        goTo('/testimonials')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full text-left text-base font-medium py-3 px-4 rounded-lg transition-colors ${
+                        location.pathname === '/testimonials'
+                          ? 'text-ink bg-surface'
+                          : 'text-ink-muted hover:text-ink hover:bg-surface'
+                      }`}
+                      aria-current={location.pathname === '/testimonials' ? 'page' : undefined}
+                      style={{
+                        minHeight: '44px',
+                        fontSize: '16px',
+                        paddingLeft: '32px'
+                      }}
+                    >
+                      Testimonials
+                    </button>
+                    <button
+                      onClick={() => {
+                        goTo('/faq')
+                        setMobileOpen(false)
+                      }}
+                      className={`w-full text-left text-base font-medium py-3 px-4 rounded-lg transition-colors ${
+                        location.pathname === '/faq'
+                          ? 'text-ink bg-surface'
+                          : 'text-ink-muted hover:text-ink hover:bg-surface'
+                      }`}
+                      aria-current={location.pathname === '/faq' ? 'page' : undefined}
+                      style={{
+                        minHeight: '44px',
+                        fontSize: '16px',
+                        paddingLeft: '32px'
+                      }}
+                    >
+                      FAQ
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact */}
+              <button
+                onClick={() => {
+                  goTo('/contact')
+                  setMobileOpen(false)
+                }}
+                className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors ${
+                  isActivePage('/contact')
+                    ? 'text-ink bg-surface'
+                    : 'text-ink hover:bg-surface'
+                }`}
+                aria-current={isActivePage('/contact') ? 'page' : undefined}
+                style={{
+                  minHeight: '48px',
+                  fontSize: '18px'
+                }}
+              >
+                Contact
+              </button>
+            </div>
+          </nav>
         </div>
 
-        {/* Bottom Sticky CTA */}
-        <div className="flex-shrink-0 px-4 pb-6 pt-2 border-t border-border">
+        {/* Sticky CTA */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-border/50">
           <button
-            onClick={() => handleNavClick('/contact')}
-            className="w-full h-12 rounded-xl bg-ink text-white font-semibold text-base transition-colors hover:bg-ink-muted"
+            onClick={() => {
+              goTo('/contact')
+              setMobileOpen(false)
+            }}
+            className="w-full h-12 bg-ink text-white text-base font-semibold rounded-lg hover:bg-ink-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            aria-current={location.pathname === '/contact' ? 'page' : undefined}
+            style={{
+              minHeight: '48px',
+              fontSize: '16px'
+            }}
           >
-            Contact Us
+            Contact
           </button>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+    </>
   )
 }

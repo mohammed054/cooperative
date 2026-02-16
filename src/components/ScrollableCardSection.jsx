@@ -62,29 +62,42 @@ const ScrollableCardSection = () => {
     return () => window.removeEventListener('resize', check)
   }, [])
 
-  // Scroll-driven horizontal translate — runs on BOTH mobile and desktop
+  // Optimized scroll-driven horizontal translate
   useEffect(() => {
+    let ticking = false
+    
     const onScroll = () => {
       if (!sectionRef.current || !trackRef.current) return
+      
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const section = sectionRef.current
+          const track = trackRef.current
+          const container = track.parentElement
 
-      const section = sectionRef.current
-      const track = trackRef.current
+          if (!container) return
 
-      const rect = section.getBoundingClientRect()
-      const scrollableHeight = section.offsetHeight - window.innerHeight
+          const rect = section.getBoundingClientRect()
+          const scrollableHeight = Math.max(0, section.offsetHeight - window.innerHeight)
 
-      const offsetStart = 0.02
-      let progress =
-        (-rect.top / scrollableHeight - offsetStart) / (1 - offsetStart)
-      progress = Math.min(Math.max(progress, 0), 1)
+          const offsetStart = 0.02
+          let progress = 0
+          
+          if (scrollableHeight > 0) {
+            progress = Math.max(0, Math.min(1, (-rect.top / scrollableHeight - offsetStart) / (1 - offsetStart)))
+          }
 
-      const maxTranslate = track.scrollWidth - track.parentElement.clientWidth
-      setTranslateX(progress * maxTranslate)
+          const maxTranslate = Math.max(0, track.scrollWidth - container.clientWidth)
+          setTranslateX(progress * maxTranslate)
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [isMobile]) // re-attach if layout switches
+  }, [isMobile])
 
   /* ─── MOBILE VIEW: scroll-driven horizontal, same mechanism as desktop ─── */
   if (isMobile) {
@@ -107,57 +120,43 @@ const ScrollableCardSection = () => {
             </p>
           </div>
 
-          {/* Horizontal track — clipped, translated by scroll */}
-          <div className="flex-1 overflow-hidden flex items-start">
+          {/* Horizontal track — simple overflow-x scroll */}
+          <div className="flex-1 overflow-x-auto overflow-y-hidden snap-x snap-mandatory scrollbar-hide">
             <div
               ref={trackRef}
-              className="flex gap-4 h-full items-center"
+              className="flex gap-4 h-full items-start py-8"
               style={{
                 paddingLeft: '1rem',
                 paddingRight: '1rem',
-                transform: `translateX(-${translateX}px)`,
+                transform: `translateX(${translateX}px)`,
               }}
             >
               {cards.map((card, i) => (
                 <div
                   key={i}
-                  className="relative flex-shrink-0 perspective group overflow-hidden rounded-2xl"
-                  style={{ width: '72vw', maxWidth: '320px', height: '72vh' }}
+                  className="flex-shrink-0 snap-center"
+                  style={{ width: '72vw', maxWidth: '320px' }}
                 >
-                  <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
-                    {/* Front */}
-                    <div className="absolute inset-0 backface-hidden bg-surface-2 rounded-2xl shadow-lg overflow-hidden flex flex-col">
-                      <img
-                        src={card.img}
-                        alt={card.title}
-                        className="block h-3/4 w-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div className="flex-1 flex items-center justify-center">
-                        <h3 className="text-xl font-semibold text-ink">
-                          {card.title}
-                        </h3>
-                      </div>
-                    </div>
-
-                    {/* Back */}
-                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-surface-2 rounded-2xl shadow-lg overflow-hidden flex flex-col items-center justify-center p-5">
-                      <img
-                        src={card.img}
-                        alt=""
-                        className="block w-4/5 h-28 object-cover rounded-lg mb-4"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <h4 className="text-lg font-semibold mb-1">
+                  <div className="bg-white rounded-xl border border-border/50 overflow-hidden">
+                    <img
+                      src={card.img}
+                      alt={card.title}
+                      className="w-full h-48 object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-ink mb-1">
+                        {card.title}
+                      </h3>
+                      <p className="text-sm text-ink-muted mb-3">
                         {card.subtitle}
-                      </h4>
-                      <p className="text-center text-ink-muted text-sm mb-4">
+                      </p>
+                      <p className="text-sm text-ink-muted mb-4 line-clamp-3">
                         {card.description}
                       </p>
                       <ScribbleButton
-                        className="btn-primary px-5 py-2 text-sm"
+                        className="btn-primary w-full text-sm"
                         to={card.href}
                       >
                         Learn more
@@ -194,53 +193,38 @@ const ScrollableCardSection = () => {
         </div>
 
         {/* Horizontal track */}
-        <div className="flex-1 overflow-hidden flex items-start">
+        <div className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-hide">
           <div
             ref={trackRef}
-            className="flex gap-16 px-24 pr-32 h-full items-center"
-            style={{ transform: `translateX(-${translateX}px)` }}
+            className="flex gap-16 px-24 pr-32 h-full items-start py-8"
+            style={{ transform: `translateX(${translateX}px)` }}
           >
             {cards.map((card, i) => (
               <div
                 key={i}
-                className="relative flex-shrink-0 w-[32vw] perspective group overflow-hidden rounded-2xl"
-                style={{ height: 'calc(100vh - 280px)' }}
+                className="flex-shrink-0"
+                style={{ width: '32vw', maxWidth: '500px' }}
               >
-                {/* Card inner */}
-                <div className="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d group-hover:rotate-y-180">
-                  {/* Front */}
-                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden bg-surface-2 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-                    <img
-                      src={card.img}
-                      alt={card.title}
-                      className="block h-3/4 w-full object-cover"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="flex-1 flex items-center justify-center">
-                      <h3 className="text-3xl font-semibold text-ink">
-                        {card.title}
-                      </h3>
-                    </div>
-                  </div>
-
-                  {/* Back */}
-                  <div className="absolute top-2 left-4 right-4 bottom-2 backface-hidden rotate-y-180 bg-surface-2 rounded-2xl shadow-2xl overflow-hidden flex flex-col items-center justify-center p-8">
-                    <img
-                      src={card.img}
-                      alt=""
-                      className="block w-4/5 h-48 object-cover rounded-lg mb-6"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <h4 className="text-2xl font-semibold mb-2">
+                <div className="bg-white rounded-xl border border-border/50 overflow-hidden">
+                  <img
+                    src={card.img}
+                    alt={card.title}
+                    className="w-full h-64 object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div className="p-6">
+                    <h3 className="text-2xl font-semibold text-ink mb-2">
+                      {card.title}
+                    </h3>
+                    <p className="text-sm text-ink-muted mb-3">
                       {card.subtitle}
-                    </h4>
-                    <p className="text-center text-ink-muted mb-6">
+                    </p>
+                    <p className="text-sm text-ink-muted mb-6 line-clamp-4">
                       {card.description}
                     </p>
                     <ScribbleButton
-                      className="btn-primary px-8 py-3"
+                      className="btn-primary w-full"
                       to={card.href}
                     >
                       Learn more

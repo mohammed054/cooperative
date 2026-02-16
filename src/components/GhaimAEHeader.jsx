@@ -419,11 +419,8 @@ const GhaimAEHeader = () => {
             setMobileOpen={setMobileOpen}
             headerIsLight={headerIsLight}
             mobileMenuButtonRef={mobileMenuButtonRef}
-            services={services}
-            caseStudies={caseStudies}
             isActivePage={isActivePage}
             goTo={goTo}
-            setSearchOpen={setSearchOpen}
             location={location}
           />
         </div>
