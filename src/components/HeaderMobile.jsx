@@ -68,7 +68,7 @@ export const HeaderMobile = ({
   return (
     <>
       {/* Mobile Header - Fixed at top, 64px height */}
-      <header className="fixed top-0 left-0 right-0 z-40 lg:hidden">
+      <header className="fixed top-0 left-0 right-0 z-[60] lg:hidden">
         <div className={`flex items-center justify-end h-16 px-4 transition-colors duration-300 ${
           mobileOpen ? 'bg-white/95 backdrop-blur-sm border-b border-border/50' : 'bg-transparent'
         }`}>
@@ -121,8 +121,8 @@ export const HeaderMobile = ({
       {/* Drawer Overlay - Full screen coverage */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-200 cursor-pointer"
-          onClick={handleCloseClick}
+          className="fixed inset-0 bg-black/40 z-[45] transition-opacity duration-200 cursor-pointer"
+          onMouseDown={handleCloseClick}
           aria-hidden="true"
         />
       )}
@@ -130,13 +130,14 @@ export const HeaderMobile = ({
       {/* Mobile Drawer */}
       <div
         id="mobile-drawer"
-        className={`fixed top-0 right-0 h-screen w-[85vw] max-w-[420px] bg-white z-50 transform transition-transform duration-280 ease-out ${
+        className={`fixed top-0 right-0 h-screen w-[85vw] max-w-[420px] bg-white z-[60] transform transition-transform duration-280 ease-out ${
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{
           boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)'
         }}
         onAnimationEnd={() => setIsAnimating(false)}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-border/50">
@@ -189,7 +190,7 @@ export const HeaderMobile = ({
         </div>
 
         {/* Scrollable Content */}
-        <div className="max-h-[calc(100vh-64px)] overflow-y-auto">
+        <div className="max-h-[calc(100vh-64px-120px)] overflow-y-auto">
           <nav className="p-6" aria-label="Mobile navigation">
             {/* Main Navigation Items */}
             <div className="space-y-2">
@@ -455,8 +456,11 @@ export const HeaderMobile = ({
           </nav>
         </div>
 
-        {/* Sticky CTA */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-border/50">
+        {/* Sticky CTA - Anchors the layout at bottom */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-border/50"
+          style={{ paddingBottom: '24px', paddingTop: '24px' }}
+        >
           <button
             onClick={() => {
               goTo('/contact')
