@@ -383,7 +383,7 @@ const GhaimAEHeader = () => {
           if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
         }}
       >
-        <div className="mx-auto flex min-h-[76px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-[64px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-3">
             <img
               src={assetUrl('images/logo.webp')}
@@ -436,23 +436,6 @@ const GhaimAEHeader = () => {
           handleDropdownItemKeydown={handleDropdownItemKeydown}
         />
       </motion.header>
-
-      {/* Mobile Backdrop */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-            transition={{
-              duration: 0.35,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            onClick={() => setMobileOpen(false)}
-          />
-        )}
-      </AnimatePresence>
 
       {/* Search Modal */}
       <AnimatePresence>

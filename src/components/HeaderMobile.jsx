@@ -1,7 +1,130 @@
-import { FaSearch } from 'react-icons/fa'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useFocusTrap } from '../hooks/useFocusTrap'
-import ScribbleButton from './ScribbleButton'
+import { Link } from 'react-router-dom'
+import { assetUrl } from '../lib/assetUrl'
+
+const ArrowIcon = ({ isOpen }) => (
+  <motion.svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    animate={{ rotate: isOpen ? 180 : 0 }}
+    transition={{ duration: 0.2 }}
+  >
+    <path
+      d="M5 7.5L10 12.5L15 7.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </motion.svg>
+)
+
+const XIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M18 6L6 18M6 6L18 18"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+const HamburgerIcon = ({ isOpen }) => (
+  <div className="flex flex-col justify-center items-center gap-[5px] w-10 h-10">
+    <span
+      className={`block h-0.5 w-5 rounded-full transition-colors ${
+        isOpen ? 'rotate-45 translate-y-1.5' : ''
+      } ${isOpen ? '' : 'bg-current'}`}
+    />
+    <span
+      className={`block h-0.5 w-5 rounded-full transition-colors ${
+        isOpen ? 'opacity-0' : ''
+      } ${isOpen ? '' : 'bg-current'}`}
+    />
+    <span
+      className={`block h-0.5 w-5 rounded-full transition-colors ${
+        isOpen ? '-rotate-45 -translate-y-1.5' : ''
+      } ${isOpen ? '' : 'bg-current'}`}
+    />
+  </div>
+)
+
+const MobileNavItem = ({
+  label,
+  href,
+  onClick,
+  isActive,
+  hasChildren,
+  isOpen,
+  onToggle,
+  children,
+}) => {
+  const handlePress = () => {
+    if (hasChildren) {
+      onToggle()
+    } else if (onClick) {
+      onClick(href)
+    }
+  }
+
+  return (
+    <div className="mb-2">
+      <button
+        onClick={handlePress}
+        className={`w-full min-h-[48px] flex items-center justify-between px-4 rounded-lg text-left transition-colors ${
+          isActive ? 'bg-ink/5 text-ink' : 'text-ink hover:bg-ink/[0.03]'
+        }`}
+        style={{ fontSize: '18px', fontWeight: 600 }}
+        aria-current={isActive ? 'page' : undefined}
+        aria-expanded={hasChildren ? isOpen : undefined}
+      >
+        <span>{label}</span>
+        {hasChildren && <ArrowIcon isOpen={isOpen} />}
+      </button>
+
+      <AnimatePresence>
+        {hasChildren && isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2 pb-2">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+const SubLink = ({ label, href, onClick, isActive }) => (
+  <button
+    onClick={() => onClick(href)}
+    className={`w-full min-h-[44px] flex items-center pl-8 pr-4 rounded-md text-left transition-colors ${
+      isActive
+        ? 'bg-ink/5 text-ink'
+        : 'text-ink-muted hover:bg-ink/[0.03] hover:text-ink'
+    }`}
+    style={{ fontSize: '16px', fontWeight: 500 }}
+    aria-current={isActive ? 'page' : undefined}
+  >
+    {label}
+  </button>
+)
 
 export const HeaderMobile = ({
   mobileOpen,
@@ -15,336 +138,137 @@ export const HeaderMobile = ({
   setSearchOpen,
   location,
 }) => {
-  const { containerRef: mobileMenuRef } = useFocusTrap(mobileOpen)
+  const [servicesOpen, setServicesOpen] = useState(false)
+
+  const handleClose = () => {
+    setMobileOpen(false)
+    setServicesOpen(false)
+  }
+
+  const handleOverlayClick = () => {
+    handleClose()
+  }
+
+  const mainNavItems = [
+    { label: 'Services', href: '/services', hasChildren: true },
+    { label: 'Work', href: '/work', hasChildren: false },
+    { label: 'Process', href: '/process', hasChildren: false },
+    { label: 'Pricing', href: '/pricing', hasChildren: false },
+    { label: 'Company', href: '/about', hasChildren: false },
+    { label: 'Contact', href: '/contact', hasChildren: false },
+  ]
+
+  const handleNavClick = href => {
+    handleClose()
+    if (href) {
+      goTo(href)
+    }
+  }
 
   if (!mobileOpen) {
     return (
       <button
         ref={mobileMenuButtonRef}
-        className={`flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full transition ${
+        className={`flex lg:hidden items-center justify-center w-11 h-11 rounded-full transition-colors ${
           headerIsLight
             ? 'text-white hover:bg-white/10'
             : 'text-ink hover:bg-surface'
-        } lg:hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary outline-none`}
-        onClick={() => setMobileOpen(!mobileOpen)}
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            setMobileOpen(!mobileOpen)
-          }
-        }}
-        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-        aria-expanded={mobileOpen}
-        aria-controls="mobile-menu"
+        }`}
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open menu"
+        aria-expanded={false}
       >
-        <span
-          className={`block h-0.5 w-5 rounded-full transition ${
-            headerIsLight ? 'bg-white' : 'bg-ink'
-          } ${mobileOpen ? 'translate-y-1.5 rotate-45' : ''}`}
-        />
-        <span
-          className={`block h-0.5 w-5 rounded-full transition ${
-            headerIsLight ? 'bg-white' : 'bg-ink'
-          } ${mobileOpen ? 'opacity-0' : ''}`}
-        />
-        <span
-          className={`block h-0.5 w-5 rounded-full transition ${
-            headerIsLight ? 'bg-white' : 'bg-ink'
-          } ${mobileOpen ? '-translate-y-1.5 -rotate-45' : ''}`}
-        />
+        <HamburgerIcon isOpen={false} />
       </button>
     )
   }
 
   return (
     <AnimatePresence>
-      {/* Mobile Menu */}
+      {/* Overlay */}
       <motion.div
-        ref={mobileMenuRef}
-        id="mobile-menu"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+        onClick={handleOverlayClick}
+        aria-hidden="true"
+      />
+
+      {/* Drawer */}
+      <motion.div
+        initial={{ x: '100%' }}
+        animate={{ x: '0%' }}
+        exit={{ x: '100%' }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
+        className="fixed top-0 right-0 h-full w-[85vw] max-w-[420px] bg-white z-50 lg:hidden flex flex-col"
+        style={{ boxShadow: '-4px 0 24px rgba(0,0,0,0.15)' }}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="mobile-menu-title"
-        initial={{ x: '100%', opacity: 0 }}
-        animate={{ x: '0%', opacity: 1 }}
-        exit={{ x: '100%', opacity: 0 }}
-        transition={{
-          duration: 0.3,
-          ease: [0.16, 1, 0.3, 1],
-        }}
-        className="border-t border-border bg-surface-2 px-5 pb-6 pt-4 lg:hidden"
+        aria-label="Mobile navigation"
       >
-        <h2 id="mobile-menu-title" className="sr-only">
-          Mobile navigation menu
-        </h2>
+        {/* Top Section */}
+        <div className="flex items-center justify-between h-16 px-4 border-b border-border flex-shrink-0">
+          <Link to="/" onClick={handleClose} className="flex items-center">
+            <img
+              src={assetUrl('images/logo.webp')}
+              alt="Ghaim UAE"
+              className="h-7 w-auto"
+              loading="lazy"
+            />
+          </Link>
+          <button
+            onClick={handleClose}
+            className="flex items-center justify-center w-11 h-11 rounded-full text-ink hover:bg-surface transition-colors"
+            aria-label="Close menu"
+          >
+            <XIcon />
+          </button>
+        </div>
 
-        {/* Main Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.2, delay: 0.05 }}
-          className="grid gap-2 mb-5"
-        >
-          <button
-            onClick={() => goTo('/')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/') ? 'page' : undefined}
-          >
-            Home
-          </button>
-          <button
-            onClick={() => goTo('/services')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/services')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/services') ? 'page' : undefined}
-          >
-            Services
-          </button>
-          <button
-            onClick={() => goTo('/work')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/work')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/work') ? 'page' : undefined}
-          >
-            Work
-          </button>
-          <button
-            onClick={() => goTo('/process')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/process')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/process') ? 'page' : undefined}
-          >
-            Process
-          </button>
-          <button
-            onClick={() => goTo('/pricing')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/pricing')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/pricing') ? 'page' : undefined}
-          >
-            Pricing
-          </button>
-          <button
-            onClick={() => goTo('/about')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/about')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/about') ? 'page' : undefined}
-          >
-            About
-          </button>
-          <button
-            onClick={() => goTo('/testimonials')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/testimonials')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/testimonials') ? 'page' : undefined}
-          >
-            Testimonials
-          </button>
-          <button
-            onClick={() => goTo('/faq')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/faq')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/faq') ? 'page' : undefined}
-          >
-            FAQ
-          </button>
-          <button
-            onClick={() => goTo('/privacy')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/privacy')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/privacy') ? 'page' : undefined}
-          >
-            Privacy
-          </button>
-          <button
-            onClick={() => goTo('/terms')}
-            className={`text-left text-sm font-semibold transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-              isActivePage('/terms')
-                ? 'text-primary bg-primary/10'
-                : 'text-ink hover:text-primary'
-            }`}
-            aria-current={isActivePage('/terms') ? 'page' : undefined}
-          >
-            Terms
-          </button>
-
-          {/* Mobile Search Button */}
-          <button
-            onClick={() => {
-              setMobileOpen(false)
-              setSearchOpen(true)
-            }}
-            className="flex items-center gap-2 text-sm font-semibold text-ink hover:text-primary transition-colors rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 mt-2"
-          >
-            <FaSearch className="text-xs" />
-            <span>Search Site</span>
-          </button>
-        </motion.div>
-
-        {/* Services Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.2, delay: 0.08 }}
-          className="mb-5"
-        >
-          <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
-            Services
-          </p>
-          <div className="mt-2 grid gap-2">
-            {services.map(service => (
-              <button
-                key={service.slug}
-                onClick={() => goTo(`/services/${service.slug}`)}
-                className={`text-left text-sm transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-                  location.pathname === `/services/${service.slug}`
-                    ? 'text-primary bg-primary/10'
-                    : 'text-ink-muted hover:text-primary'
-                }`}
-                aria-current={
-                  location.pathname === `/services/${service.slug}`
-                    ? 'page'
-                    : undefined
-                }
-              >
-                {service.title}
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Work Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.2, delay: 0.11 }}
-          className="mb-6"
-        >
-          <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
-            Work
-          </p>
-          <div className="mt-2 grid gap-2">
-            {caseStudies.map(study => (
-              <button
-                key={study.slug}
-                onClick={() => goTo(`/work/${study.slug}`)}
-                className={`text-left text-sm transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-                  location.pathname === `/work/${study.slug}`
-                    ? 'text-primary bg-primary/10'
-                    : 'text-ink-muted hover:text-primary'
-                }`}
-                aria-current={
-                  location.pathname === `/work/${study.slug}`
-                    ? 'page'
-                    : undefined
-                }
-              >
-                {study.title}
-              </button>
-            ))}
-            <button
-              onClick={() => goTo('/projects')}
-              className={`text-left text-sm transition rounded-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 outline-none px-2 py-1 ${
-                location.pathname === '/projects'
-                  ? 'text-primary bg-primary/10'
-                  : 'text-ink-muted hover:text-primary'
-              }`}
-              aria-current={
-                location.pathname === '/projects' ? 'page' : undefined
-              }
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 pt-3 pb-4">
+          {mainNavItems.map(item => (
+            <MobileNavItem
+              key={item.label}
+              label={item.label}
+              href={item.href}
+              onClick={handleNavClick}
+              isActive={isActivePage(item.href)}
+              hasChildren={item.hasChildren}
+              isOpen={item.hasChildren && servicesOpen}
+              onToggle={() => setServicesOpen(!servicesOpen)}
             >
-              Project gallery
-            </button>
-          </div>
-        </motion.div>
+              {item.label === 'Services' && (
+                <div className="space-y-1">
+                  {services.map(service => (
+                    <SubLink
+                      key={service.slug}
+                      label={service.title}
+                      href={`/services/${service.slug}`}
+                      onClick={handleNavClick}
+                      isActive={
+                        location.pathname === `/services/${service.slug}`
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </MobileNavItem>
+          ))}
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.2, delay: 0.14 }}
-        >
-          <ScribbleButton
-            to="/contact"
-            onClick={() => setMobileOpen(false)}
-            className={`btn-primary w-full text-sm rounded-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary outline-none ${
-              location.pathname === '/contact'
-                ? 'ring-2 ring-offset-2 ring-primary'
-                : ''
-            }`}
-            aria-current={location.pathname === '/contact' ? 'page' : undefined}
+        {/* Bottom Sticky CTA */}
+        <div className="flex-shrink-0 px-4 pb-6 pt-2 border-t border-border">
+          <button
+            onClick={() => handleNavClick('/contact')}
+            className="w-full h-12 rounded-xl bg-ink text-white font-semibold text-base transition-colors hover:bg-ink-muted"
           >
-            Contact
-          </ScribbleButton>
-        </motion.div>
+            Contact Us
+          </button>
+        </div>
       </motion.div>
-
-      {/* Close Menu Button */}
-      <button
-        ref={mobileMenuButtonRef}
-        className={`flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full transition lg:hidden ${
-          headerIsLight
-            ? 'text-white hover:bg-white/10'
-            : 'text-ink hover:bg-surface'
-        } focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary outline-none`}
-        onClick={() => setMobileOpen(false)}
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            setMobileOpen(false)
-          }
-        }}
-        aria-label="Close menu"
-        aria-expanded={mobileOpen}
-        aria-controls="mobile-menu"
-      >
-        <span
-          className={`block h-0.5 w-5 rounded-full transition ${
-            headerIsLight ? 'bg-white' : 'bg-ink'
-          } translate-y-1.5 rotate-45`}
-        />
-        <span
-          className={`block h-0.5 w-5 rounded-full transition ${
-            headerIsLight ? 'bg-white' : 'bg-ink'
-          } opacity-0`}
-        />
-        <span
-          className={`block h-0.5 w-5 rounded-full transition ${
-            headerIsLight ? 'bg-white' : 'bg-ink'
-          } -translate-y-1.5 -rotate-45`}
-        />
-      </button>
     </AnimatePresence>
   )
 }
