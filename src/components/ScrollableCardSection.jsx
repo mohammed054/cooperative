@@ -88,7 +88,7 @@ const ScrollableCardSection = () => {
           }
 
           const maxTranslate = Math.max(0, track.scrollWidth - container.clientWidth)
-          setTranslateX(progress * maxTranslate)
+          setTranslateX(-progress * maxTranslate)
           ticking = false
         })
         ticking = true
