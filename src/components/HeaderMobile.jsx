@@ -33,7 +33,6 @@ export const HeaderMobile = ({
   }
 
   const handleCloseClick = () => {
-    if (isAnimating) return
     setIsAnimating(true)
     setMobileOpen(false)
     setOpenAccordions(new Set())
