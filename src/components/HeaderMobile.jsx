@@ -70,12 +70,12 @@ export const HeaderMobile = ({
       {/* Mobile Header - Fixed at top, 64px height */}
       <header className="fixed top-0 left-0 right-0 z-40 lg:hidden">
         <div className={`flex items-center justify-end h-16 px-4 transition-colors duration-300 ${
-          mobileOpen ? 'bg-white' : 'bg-transparent'
+          mobileOpen ? 'bg-white/95 backdrop-blur-sm border-b border-border/50' : 'bg-transparent'
         }`}>
           {/* Hamburger Button Right */}
           <button
             ref={mobileMenuButtonRef}
-            className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 hover:bg-surface/50 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             onClick={handleHamburgerClick}
             onKeyDown={(e) => handleKeyDown(e, handleHamburgerClick)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
@@ -88,15 +88,16 @@ export const HeaderMobile = ({
           >
             <div className="flex flex-col items-center justify-center gap-1.5">
               <span
-                className={`block h-0.5 w-6 rounded-full transition-transform duration-300 ${
+                className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? 'translate-y-2 rotate-45' : ''
                 }`}
                 style={{ 
-                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c'
+                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c',
+                  transformOrigin: 'center'
                 }}
               />
               <span
-                className={`block h-0.5 w-6 rounded-full transition-opacity duration-300 ${
+                className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? 'opacity-0' : ''
                 }`}
                 style={{ 
@@ -104,11 +105,12 @@ export const HeaderMobile = ({
                 }}
               />
               <span
-                className={`block h-0.5 w-6 rounded-full transition-transform duration-300 ${
+                className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? '-translate-y-2 -rotate-45' : ''
                 }`}
                 style={{ 
-                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c'
+                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c',
+                  transformOrigin: 'center'
                 }}
               />
             </div>
@@ -116,10 +118,10 @@ export const HeaderMobile = ({
         </div>
       </header>
 
-      {/* Drawer Overlay */}
+      {/* Drawer Overlay - Full screen coverage */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-200"
+          className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-200 cursor-pointer"
           onClick={handleCloseClick}
           aria-hidden="true"
         />
