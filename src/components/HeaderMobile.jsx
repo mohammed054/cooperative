@@ -14,6 +14,7 @@ export const HeaderMobile = ({
   const [isAnimating, setIsAnimating] = useState(false)
   const [openAccordions, setOpenAccordions] = useState(new Set())
   const closeBtnRef = useRef(null)
+  const drawerRef = useRef(null)
 
   // Handle focus management
   useEffect(() => {
@@ -46,6 +47,30 @@ export const HeaderMobile = ({
     }
   }, [mobileOpen])
 
+  // Handle click outside to close drawer
+  useEffect(() => {
+    if (!mobileOpen) return
+
+    const handleClickOutside = e => {
+      // Check if click is inside drawer
+      if (drawerRef.current && drawerRef.current.contains(e.target)) {
+        return
+      }
+      // Check if click is on hamburger button
+      if (
+        mobileMenuButtonRef.current &&
+        mobileMenuButtonRef.current.contains(e.target)
+      ) {
+        return
+      }
+      // Click is outside, close the menu
+      handleCloseClick()
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [mobileOpen])
+
   const handleKeyDown = (e, action) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
@@ -53,7 +78,7 @@ export const HeaderMobile = ({
     }
   }
 
-  const toggleAccordion = (label) => {
+  const toggleAccordion = label => {
     const newAccordions = new Set(openAccordions)
     if (newAccordions.has(label)) {
       newAccordions.delete(label)
@@ -63,27 +88,31 @@ export const HeaderMobile = ({
     setOpenAccordions(newAccordions)
   }
 
-  const isAccordionOpen = (label) => openAccordions.has(label)
+  const isAccordionOpen = label => openAccordions.has(label)
 
   return (
     <>
       {/* Mobile Header - Fixed at top, 64px height */}
       <header className="fixed top-0 left-0 right-0 z-[60] lg:hidden">
-        <div className={`flex items-center justify-end h-16 px-4 transition-colors duration-300 ${
-          mobileOpen ? 'bg-white/95 backdrop-blur-sm border-b border-border/50' : 'bg-transparent'
-        }`}>
+        <div
+          className={`flex items-center justify-end h-16 px-4 transition-colors duration-300 ${
+            mobileOpen
+              ? 'bg-white/95 backdrop-blur-sm border-b border-border/50'
+              : 'bg-transparent'
+          }`}
+        >
           {/* Hamburger Button Right */}
           <button
             ref={mobileMenuButtonRef}
             className="flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 hover:bg-surface/50 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             onClick={handleHamburgerClick}
-            onKeyDown={(e) => handleKeyDown(e, handleHamburgerClick)}
+            onKeyDown={e => handleKeyDown(e, handleHamburgerClick)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
             aria-controls="mobile-drawer"
-            style={{ 
+            style={{
               minHeight: '44px',
-              minWidth: '44px'
+              minWidth: '44px',
             }}
           >
             <div className="flex flex-col items-center justify-center gap-1.5">
@@ -91,26 +120,26 @@ export const HeaderMobile = ({
                 className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? 'translate-y-2 rotate-45' : ''
                 }`}
-                style={{ 
+                style={{
                   backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c',
-                  transformOrigin: 'center'
+                  transformOrigin: 'center',
                 }}
               />
               <span
                 className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? 'opacity-0' : ''
                 }`}
-                style={{ 
-                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c'
+                style={{
+                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c',
                 }}
               />
               <span
                 className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? '-translate-y-2 -rotate-45' : ''
                 }`}
-                style={{ 
+                style={{
                   backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c',
-                  transformOrigin: 'center'
+                  transformOrigin: 'center',
                 }}
               />
             </div>
@@ -129,15 +158,16 @@ export const HeaderMobile = ({
 
       {/* Mobile Drawer */}
       <div
+        ref={drawerRef}
         id="mobile-drawer"
         className={`fixed top-0 right-0 h-screen w-[85vw] max-w-[420px] bg-white z-[60] transform transition-transform duration-280 ease-out ${
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{
-          boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)'
+          boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)',
         }}
         onAnimationEnd={() => setIsAnimating(false)}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-border/50">
@@ -164,11 +194,11 @@ export const HeaderMobile = ({
             ref={closeBtnRef}
             className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             onClick={handleCloseClick}
-            onKeyDown={(e) => handleKeyDown(e, handleCloseClick)}
+            onKeyDown={e => handleKeyDown(e, handleCloseClick)}
             aria-label="Close menu"
-            style={{ 
+            style={{
               minHeight: '44px',
-              minWidth: '44px'
+              minWidth: '44px',
             }}
           >
             <svg
@@ -207,7 +237,7 @@ export const HeaderMobile = ({
                   aria-controls="services-submenu"
                   style={{
                     minHeight: '48px',
-                    fontSize: '18px'
+                    fontSize: '18px',
                   }}
                 >
                   <span>Services</span>
@@ -229,18 +259,18 @@ export const HeaderMobile = ({
                     />
                   </svg>
                 </button>
-                
+
                 {/* Services Submenu */}
                 <div
                   id="services-submenu"
                   className="overflow-hidden transition-all duration-200 ease-out"
                   style={{
                     maxHeight: isAccordionOpen('Services') ? '500px' : '0',
-                    opacity: isAccordionOpen('Services') ? '1' : '0'
+                    opacity: isAccordionOpen('Services') ? '1' : '0',
                   }}
                 >
                   <div className="space-y-2 mt-2 pl-4">
-                    {services.map((service) => (
+                    {services.map(service => (
                       <button
                         key={service.slug}
                         onClick={() => {
@@ -252,11 +282,15 @@ export const HeaderMobile = ({
                             ? 'text-ink bg-surface'
                             : 'text-ink-muted hover:text-ink hover:bg-surface'
                         }`}
-                        aria-current={location.pathname === `/services/${service.slug}` ? 'page' : undefined}
+                        aria-current={
+                          location.pathname === `/services/${service.slug}`
+                            ? 'page'
+                            : undefined
+                        }
                         style={{
                           minHeight: '44px',
                           fontSize: '16px',
-                          paddingLeft: '32px'
+                          paddingLeft: '32px',
                         }}
                       >
                         {service.title}
@@ -280,7 +314,7 @@ export const HeaderMobile = ({
                 aria-current={isActivePage('/work') ? 'page' : undefined}
                 style={{
                   minHeight: '48px',
-                  fontSize: '18px'
+                  fontSize: '18px',
                 }}
               >
                 Work
@@ -300,7 +334,7 @@ export const HeaderMobile = ({
                 aria-current={isActivePage('/process') ? 'page' : undefined}
                 style={{
                   minHeight: '48px',
-                  fontSize: '18px'
+                  fontSize: '18px',
                 }}
               >
                 Process
@@ -320,7 +354,7 @@ export const HeaderMobile = ({
                 aria-current={isActivePage('/pricing') ? 'page' : undefined}
                 style={{
                   minHeight: '48px',
-                  fontSize: '18px'
+                  fontSize: '18px',
                 }}
               >
                 Pricing
@@ -339,7 +373,7 @@ export const HeaderMobile = ({
                   aria-controls="company-submenu"
                   style={{
                     minHeight: '48px',
-                    fontSize: '18px'
+                    fontSize: '18px',
                   }}
                 >
                   <span>Company</span>
@@ -361,14 +395,14 @@ export const HeaderMobile = ({
                     />
                   </svg>
                 </button>
-                
+
                 {/* Company Submenu */}
                 <div
                   id="company-submenu"
                   className="overflow-hidden transition-all duration-200 ease-out"
                   style={{
                     maxHeight: isAccordionOpen('Company') ? '300px' : '0',
-                    opacity: isAccordionOpen('Company') ? '1' : '0'
+                    opacity: isAccordionOpen('Company') ? '1' : '0',
                   }}
                 >
                   <div className="space-y-2 mt-2 pl-4">
@@ -382,11 +416,13 @@ export const HeaderMobile = ({
                           ? 'text-ink bg-surface'
                           : 'text-ink-muted hover:text-ink hover:bg-surface'
                       }`}
-                      aria-current={location.pathname === '/about' ? 'page' : undefined}
+                      aria-current={
+                        location.pathname === '/about' ? 'page' : undefined
+                      }
                       style={{
                         minHeight: '44px',
                         fontSize: '16px',
-                        paddingLeft: '32px'
+                        paddingLeft: '32px',
                       }}
                     >
                       About
@@ -401,11 +437,15 @@ export const HeaderMobile = ({
                           ? 'text-ink bg-surface'
                           : 'text-ink-muted hover:text-ink hover:bg-surface'
                       }`}
-                      aria-current={location.pathname === '/testimonials' ? 'page' : undefined}
+                      aria-current={
+                        location.pathname === '/testimonials'
+                          ? 'page'
+                          : undefined
+                      }
                       style={{
                         minHeight: '44px',
                         fontSize: '16px',
-                        paddingLeft: '32px'
+                        paddingLeft: '32px',
                       }}
                     >
                       Testimonials
@@ -420,11 +460,13 @@ export const HeaderMobile = ({
                           ? 'text-ink bg-surface'
                           : 'text-ink-muted hover:text-ink hover:bg-surface'
                       }`}
-                      aria-current={location.pathname === '/faq' ? 'page' : undefined}
+                      aria-current={
+                        location.pathname === '/faq' ? 'page' : undefined
+                      }
                       style={{
                         minHeight: '44px',
                         fontSize: '16px',
-                        paddingLeft: '32px'
+                        paddingLeft: '32px',
                       }}
                     >
                       FAQ
@@ -447,7 +489,7 @@ export const HeaderMobile = ({
                 aria-current={isActivePage('/contact') ? 'page' : undefined}
                 style={{
                   minHeight: '48px',
-                  fontSize: '18px'
+                  fontSize: '18px',
                 }}
               >
                 Contact
@@ -457,7 +499,7 @@ export const HeaderMobile = ({
         </div>
 
         {/* Sticky CTA - Anchors the layout at bottom */}
-        <div 
+        <div
           className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-border/50"
           style={{ paddingBottom: '24px', paddingTop: '24px' }}
         >
@@ -470,7 +512,7 @@ export const HeaderMobile = ({
             aria-current={location.pathname === '/contact' ? 'page' : undefined}
             style={{
               minHeight: '48px',
-              fontSize: '16px'
+              fontSize: '16px',
             }}
           >
             Contact
