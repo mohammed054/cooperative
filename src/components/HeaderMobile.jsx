@@ -2,6 +2,82 @@ import { useState, useRef, useEffect } from 'react'
 import { assetUrl } from '../lib/assetUrl'
 import { services } from '../data/siteData'
 
+// ─────────────────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────────────────
+
+/** Single tappable nav row — brand colors, luxury spacing */
+const NavRow = ({ label, href, isSub = false, isActive, onClick }) => (
+  <button
+    onClick={onClick}
+    aria-current={isActive ? 'page' : undefined}
+    className={`w-full text-left font-medium rounded-lg transition-colors
+      ${isSub
+        ? `py-2.5 px-4 text-base ${isActive ? 'text-ink bg-surface' : 'text-ink-muted hover:text-ink hover:bg-surface'}`
+        : `py-3 px-4 text-lg ${isActive ? 'text-ink bg-surface' : 'text-ink hover:bg-surface'}`
+      }`}
+    style={{
+      minHeight: isSub ? '44px' : '48px',
+      paddingLeft: isSub ? '32px' : '16px',
+      letterSpacing: '0.02em',
+    }}
+  >
+    {label}
+  </button>
+)
+
+/** Accordion section — brand colors, elegant plus/minus toggle */
+const AccordionSection = ({ label, isOpen, onToggle, isActive, ariaControlsId, children }) => (
+  <div>
+    <button
+      onClick={onToggle}
+      aria-expanded={isOpen}
+      aria-controls={ariaControlsId}
+      className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg
+        flex items-center justify-between transition-colors
+        ${isActive ? 'text-ink bg-surface' : 'text-ink hover:bg-surface'}`}
+      style={{ minHeight: '48px', letterSpacing: '0.02em' }}
+    >
+      <span>{label}</span>
+
+      {/* Plus → × morph — more refined than a plain chevron */}
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+        fill="none"
+        style={{
+          flexShrink: 0,
+          transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+          transition: 'transform 0.3s cubic-bezier(0.16,1,0.3,1)',
+          opacity: 0.45,
+        }}
+      >
+        <line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </button>
+
+    <div
+      id={ariaControlsId}
+      style={{
+        overflow: 'hidden',
+        maxHeight: isOpen ? '600px' : '0px',
+        opacity: isOpen ? 1 : 0,
+        transition: 'max-height 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.25s ease',
+      }}
+    >
+      <div className="mt-1 pl-2 space-y-1 pb-2">
+        {children}
+      </div>
+    </div>
+  </div>
+)
+
+// ─────────────────────────────────────────────────────────
+// Main component
+// ─────────────────────────────────────────────────────────
+
 export const HeaderMobile = ({
   mobileOpen,
   setMobileOpen,
@@ -16,17 +92,14 @@ export const HeaderMobile = ({
   const closeBtnRef = useRef(null)
   const drawerRef = useRef(null)
 
-  /** ---------------- Focus on close button when drawer opens ---------------- */
   useEffect(() => {
     if (mobileOpen && closeBtnRef.current) closeBtnRef.current.focus()
   }, [mobileOpen])
 
-  /** ---------------- Handle hamburger toggle ---------------- */
   const toggleMobileMenu = () => {
     if (isAnimating) return
     setIsAnimating(true)
     setMobileOpen(prev => !prev)
-
     if (!mobileOpen) setOpenAccordions(new Set())
   }
 
@@ -36,150 +109,107 @@ export const HeaderMobile = ({
     setOpenAccordions(new Set())
   }
 
-  /** ---------------- Reset animation state after drawer closes ---------------- */
   useEffect(() => {
     if (!mobileOpen) {
-      const timer = setTimeout(() => setIsAnimating(false), 300)
-      return () => clearTimeout(timer)
+      const t = setTimeout(() => setIsAnimating(false), 320)
+      return () => clearTimeout(t)
     }
   }, [mobileOpen])
 
-  /** ---------------- Click outside drawer to close ---------------- */
   useEffect(() => {
     if (!mobileOpen) return
-
-    const handleClickOutside = e => {
-      if (
-        drawerRef.current?.contains(e.target) ||
-        mobileMenuButtonRef.current?.contains(e.target)
-      ) return
+    const handle = e => {
+      if (drawerRef.current?.contains(e.target) || mobileMenuButtonRef.current?.contains(e.target)) return
       handleClose()
     }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
   }, [mobileOpen])
 
-  /** ---------------- Keyboard accessibility ---------------- */
-  const handleKeyDown = (e, action) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      action()
-    }
-  }
-
-  /** ---------------- Accordion state ---------------- */
   const toggleAccordion = label => {
-    const newAccordions = new Set(openAccordions)
-    if (newAccordions.has(label)) newAccordions.delete(label)
-    else newAccordions.add(label)
-    setOpenAccordions(newAccordions)
+    const next = new Set(openAccordions)
+    next.has(label) ? next.delete(label) : next.add(label)
+    setOpenAccordions(next)
   }
 
-  const isAccordionOpen = label => openAccordions.has(label)
-
-  /** ---------------- Reusable navigation button ---------------- */
-  const NavButton = ({ label, href, isSub = false }) => (
-    <button
-      onClick={() => {
-        goTo(href)
-        setMobileOpen(false)
-      }}
-      className={`w-full text-left font-medium rounded-lg transition-colors py-3 px-4 ${
-        isActivePage(href)
-          ? 'text-ink bg-surface'
-          : isSub
-          ? 'text-ink-muted hover:text-ink hover:bg-surface'
-          : 'text-ink hover:bg-surface'
-      }`}
-      aria-current={isActivePage(href) ? 'page' : undefined}
-      style={{
-        minHeight: isSub ? '44px' : '48px',
-        fontSize: isSub ? '16px' : '18px',
-        paddingLeft: isSub ? '32px' : '16px',
-      }}
-    >
-      {label}
-    </button>
-  )
+  const navigateTo = href => {
+    goTo(href)
+    setMobileOpen(false)
+  }
 
   return (
     <>
-      {/* ---------- Mobile Header ---------- */}
-      <header className="fixed top-0 left-0 right-0 z-[60] lg:hidden">
-        <div
-          className={`flex items-center justify-end h-16 px-4 transition-colors duration-300 ${
-            mobileOpen
-              ? 'bg-white/95 backdrop-blur-sm border-b border-border/50'
-              : 'bg-transparent'
-          }`}
-        >
-          {/* Hamburger */}
-          <button
-            ref={mobileMenuButtonRef}
-            onClick={toggleMobileMenu}
-            onKeyDown={e => handleKeyDown(e, toggleMobileMenu)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-drawer"
-            className="flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 hover:bg-surface/50 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            style={{ minHeight: '44px', minWidth: '44px' }}
-          >
-            <div className="flex flex-col items-center justify-center gap-1.5">
-              <span
-                className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
-                  mobileOpen ? 'translate-y-2 rotate-45' : ''
-                }`}
-                style={{ backgroundColor: '#1c1c1c', transformOrigin: 'center' }}
-              />
-              <span
-                className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
-                  mobileOpen ? 'opacity-0' : ''
-                }`}
-                style={{ backgroundColor: '#1c1c1c' }}
-              />
-              <span
-                className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
-                  mobileOpen ? '-translate-y-2 -rotate-45' : ''
-                }`}
-                style={{ backgroundColor: '#1c1c1c', transformOrigin: 'center' }}
-              />
-            </div>
-          </button>
+      {/* ── Hamburger button ── */}
+      <button
+        ref={mobileMenuButtonRef}
+        onClick={toggleMobileMenu}
+        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={mobileOpen}
+        aria-controls="mobile-drawer"
+        className="flex lg:hidden h-11 w-11 items-center justify-center rounded-full
+          transition-all duration-200 hover:bg-surface/50
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        style={{ minHeight: '44px', minWidth: '44px' }}
+      >
+        {/* Three bars — asymmetric widths for a refined feel; original colors */}
+        <div className="flex flex-col items-center justify-center gap-[5px]">
+          {[0, 1, 2].map(i => (
+            <span
+              key={i}
+              style={{
+                display: 'block',
+                height: '1.5px',
+                // Middle bar slightly shorter — subtle luxury detail
+                width: i === 1 ? (mobileOpen ? '24px' : '14px') : '20px',
+                borderRadius: '2px',
+                backgroundColor: headerIsLight && !mobileOpen ? '#ffffff' : '#1c1c1c',
+                transformOrigin: 'center',
+                transition: 'transform 0.32s cubic-bezier(0.16,1,0.3,1), opacity 0.22s, width 0.3s, background-color 0.3s',
+                transform: mobileOpen
+                  ? i === 0 ? 'translateY(6.5px) rotate(45deg)'
+                  : i === 1 ? 'scaleX(0)'
+                  : 'translateY(-6.5px) rotate(-45deg)'
+                  : 'none',
+                opacity: mobileOpen && i === 1 ? 0 : 1,
+              }}
+            />
+          ))}
         </div>
-      </header>
+      </button>
 
-      {/* ---------- Overlay ---------- */}
+      {/* ── Overlay ── */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-[45] transition-opacity duration-200 cursor-pointer"
           onMouseDown={handleClose}
           aria-hidden="true"
+          className="fixed inset-0 z-[45] bg-black/40 transition-opacity duration-200 cursor-pointer"
         />
       )}
 
-      {/* ---------- Mobile Drawer ---------- */}
+      {/* ── Drawer ── */}
       <div
         ref={drawerRef}
         id="mobile-drawer"
-        className={`fixed top-0 right-0 h-screen w-[85vw] max-w-[420px] bg-white z-[60] transform transition-transform duration-280 ease-out ${
-          mobileOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-        style={{ boxShadow: '-4px 0 24px rgba(0,0,0,0.15)' }}
-        onAnimationEnd={() => setIsAnimating(false)}
         onClick={e => e.stopPropagation()}
+        className="fixed top-0 right-0 h-screen w-[85vw] max-w-[420px] bg-white z-[60] flex flex-col"
+        style={{
+          transform: mobileOpen ? 'translateX(0)' : 'translateX(102%)',
+          transition: 'transform 0.38s cubic-bezier(0.16,1,0.3,1)',
+          boxShadow: '-8px 0 48px rgba(0,0,0,0.15)',
+        }}
+        onAnimationEnd={() => setIsAnimating(false)}
       >
-        {/* Drawer Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-border/50">
+        {/* ─ Drawer header ─ */}
+        <div className="flex items-center justify-between h-16 px-4 border-b border-border/50 flex-shrink-0">
           <button
-            onClick={() => goTo('/')}
-            className="flex items-center gap-3"
+            onClick={() => navigateTo('/')}
             aria-label="Home"
+            className="flex items-center gap-3"
           >
             <img
               src={assetUrl('images/logo.webp')}
               alt="Ghaim UAE"
-              className="h-7 w-auto"
+              className="h-7 w-auto brightness-0"
               loading="lazy"
               decoding="async"
             />
@@ -191,132 +221,80 @@ export const HeaderMobile = ({
           <button
             ref={closeBtnRef}
             onClick={handleClose}
-            onKeyDown={e => handleKeyDown(e, handleClose)}
-            className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label="Close menu"
+            className="flex h-11 w-11 items-center justify-center rounded-full
+              transition-colors hover:bg-surface
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             style={{ minHeight: '44px', minWidth: '44px' }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M6 6l12 12M18 6L6 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
         </div>
 
-        {/* Scrollable Navigation */}
-        <div className="max-h-[calc(100vh-64px-120px)] overflow-y-auto">
-          <nav className="p-6" aria-label="Mobile navigation">
-            <div className="space-y-2">
-              {/* Services Accordion */}
-              <div>
-                <button
-                  onClick={() => toggleAccordion('Services')}
-                  className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg flex items-center justify-between transition-colors ${
-                    isActivePage('/services') ? 'text-ink bg-surface' : 'text-ink hover:bg-surface'
-                  }`}
-                  aria-expanded={isAccordionOpen('Services')}
-                  aria-controls="services-submenu"
-                  style={{ minHeight: '48px', fontSize: '18px' }}
-                >
-                  <span>Services</span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    className={`transition-transform duration-200 ${isAccordionOpen('Services') ? 'rotate-180' : ''}`}
-                    fill="none"
-                  >
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
+        {/* ─ Scrollable nav area ─ */}
+        <div className="flex-1 overflow-y-auto">
+          <nav className="p-4 pt-5" aria-label="Mobile navigation">
+            <div className="space-y-1">
 
-                <div
-                  id="services-submenu"
-                  className="overflow-hidden transition-all duration-200 ease-out"
-                  style={{
-                    maxHeight: isAccordionOpen('Services') ? '500px' : '0',
-                    opacity: isAccordionOpen('Services') ? '1' : '0',
-                  }}
-                >
-                  <div className="space-y-2 mt-2 pl-4">
-                    {services.map(service => (
-                      <NavButton
-                        key={service.slug}
-                        label={service.title}
-                        href={`/services/${service.slug}`}
-                        isSub
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {/* Services accordion */}
+              <AccordionSection
+                label="Services"
+                isOpen={openAccordions.has('Services')}
+                onToggle={() => toggleAccordion('Services')}
+                isActive={isActivePage('/services')}
+                ariaControlsId="services-submenu"
+              >
+                {services.map(service => (
+                  <NavRow
+                    key={service.slug}
+                    label={service.title}
+                    href={`/services/${service.slug}`}
+                    isSub
+                    isActive={isActivePage(`/services/${service.slug}`)}
+                    onClick={() => navigateTo(`/services/${service.slug}`)}
+                  />
+                ))}
+              </AccordionSection>
 
-              {/* Other Nav Links */}
-              <NavButton label="Work" href="/work" />
-              <NavButton label="Process" href="/process" />
-              <NavButton label="Pricing" href="/pricing" />
+              <NavRow label="Work"    isActive={isActivePage('/work')}    onClick={() => navigateTo('/work')} />
+              <NavRow label="Process" isActive={isActivePage('/process')} onClick={() => navigateTo('/process')} />
+              <NavRow label="Pricing" isActive={isActivePage('/pricing')} onClick={() => navigateTo('/pricing')} />
 
-              {/* Company Accordion */}
-              <div>
-                <button
-                  onClick={() => toggleAccordion('Company')}
-                  className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg flex items-center justify-between transition-colors ${
-                    isActivePage('/about') ? 'text-ink bg-surface' : 'text-ink hover:bg-surface'
-                  }`}
-                  aria-expanded={isAccordionOpen('Company')}
-                  aria-controls="company-submenu"
-                  style={{ minHeight: '48px', fontSize: '18px' }}
-                >
-                  <span>Company</span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    className={`transition-transform duration-200 ${isAccordionOpen('Company') ? 'rotate-180' : ''}`}
-                    fill="none"
-                  >
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
+              {/* Company accordion */}
+              <AccordionSection
+                label="Company"
+                isOpen={openAccordions.has('Company')}
+                onToggle={() => toggleAccordion('Company')}
+                isActive={isActivePage('/about')}
+                ariaControlsId="company-submenu"
+              >
+                <NavRow label="About"        isSub isActive={isActivePage('/about')}        onClick={() => navigateTo('/about')} />
+                <NavRow label="Testimonials" isSub isActive={isActivePage('/testimonials')} onClick={() => navigateTo('/testimonials')} />
+                <NavRow label="FAQ"          isSub isActive={isActivePage('/faq')}          onClick={() => navigateTo('/faq')} />
+              </AccordionSection>
 
-                <div
-                  id="company-submenu"
-                  className="overflow-hidden transition-all duration-200 ease-out"
-                  style={{
-                    maxHeight: isAccordionOpen('Company') ? '300px' : '0',
-                    opacity: isAccordionOpen('Company') ? '1' : '0',
-                  }}
-                >
-                  <div className="space-y-2 mt-2 pl-4">
-                    <NavButton label="About" href="/about" isSub />
-                    <NavButton label="Testimonials" href="/testimonials" isSub />
-                    <NavButton label="FAQ" href="/faq" isSub />
-                  </div>
-                </div>
-              </div>
-
-              <NavButton label="Contact" href="/contact" />
             </div>
           </nav>
         </div>
 
-        {/* Sticky CTA */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-border/50" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
+        {/* ─ Sticky CTA — original brand styles ─ */}
+        <div className="flex-shrink-0 p-6 bg-white border-t border-border/50">
           <button
-            onClick={() => {
-              goTo('/contact')
-              setMobileOpen(false)
-            }}
-            className="w-full h-12 bg-ink text-white text-base font-semibold rounded-lg hover:bg-ink-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            aria-current={location.pathname === '/contact' ? 'page' : undefined}
-            style={{ minHeight: '48px', fontSize: '16px' }}
+            onClick={() => navigateTo('/contact')}
+            aria-current={location?.pathname === '/contact' ? 'page' : undefined}
+            className="w-full h-12 bg-ink text-white text-sm font-semibold rounded-lg
+              transition-colors hover:bg-ink-muted
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
+              flex items-center justify-center gap-2"
+            style={{ minHeight: '48px', letterSpacing: '0.04em' }}
           >
-            Contact
+            Get in touch
+            {/* Thin arrow — adds luxury directionality */}
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="opacity-60">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
         </div>
       </div>
