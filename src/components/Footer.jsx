@@ -1,248 +1,331 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import {
-  FaFacebook,
-  FaInstagram,
-  FaLinkedin,
-  FaMapMarkerAlt,
-  FaPhone,
-  FaEnvelope,
-} from 'react-icons/fa'
+import React, { useRef } from 'react'
+import { motion, useInView, useReducedMotion } from 'framer-motion'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { caseStudies, services } from '../data/siteData'
 import { assetUrl } from '../lib/assetUrl'
-import ScribbleButton from './ScribbleButton'
 
-const Footer = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
+// ── Inline SVG social icons — no icon library ─────────────
+const IconFacebook = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+const IconInstagram = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" />
+    <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+  </svg>
+)
+const IconLinkedIn = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="4" cy="4" r="2" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+)
 
-  const scrollToSection = sectionId => {
-    if (location.pathname !== '/') {
-      navigate({ pathname: '/', hash: `#${sectionId}` })
-      return
-    }
-    const element = document.getElementById(sectionId)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
-    }
+// ── Footer link ───────────────────────────────────────────
+const FooterLink = ({ to, href, onClick, children }) => {
+  const base = {
+    fontSize: '13px',
+    color: '#888',
+    textDecoration: 'none',
+    transition: 'color 0.2s ease',
+    display: 'block',
+    padding: '3px 0',
+    minHeight: '28px',
   }
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  const handlers = {
+    onMouseEnter: e => { e.currentTarget.style.color = '#1c1c1c' },
+    onMouseLeave: e => { e.currentTarget.style.color = '#888' },
+  }
+
+  if (to) return <Link to={to} style={base} {...handlers}>{children}</Link>
+  if (href) return <a href={href} style={base} {...handlers}>{children}</a>
+  return <button onClick={onClick} style={{ ...base, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }} {...handlers}>{children}</button>
+}
+
+// ── Column heading ────────────────────────────────────────
+const ColHeading = ({ children }) => (
+  <p style={{
+    fontSize: '10px',
+    fontWeight: 600,
+    letterSpacing: '0.18em',
+    textTransform: 'uppercase',
+    color: '#1c1c1c',
+    marginBottom: '14px',
+  }}>
+    {children}
+  </p>
+)
+
+// ── Main component ────────────────────────────────────────
+const Footer = () => {
+  const shouldReduceMotion = useReducedMotion()
+  const navigate  = useNavigate()
+  const location  = useLocation()
+  const ref       = useRef(null)
+  const inView    = useInView(ref, { once: true, margin: '-5% 0px' })
+
+  const scrollToSection = id => {
+    if (location.pathname !== '/') { navigate({ pathname: '/', hash: `#${id}` }); return }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const containerVariants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+  }
+  const itemVariants = shouldReduceMotion ? {} : {
+    hidden: { opacity: 0, y: 10 },
+    show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
   }
 
   return (
-    <footer id="site-footer" className="bg-surface py-12 lg:py-16 text-ink">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1fr]">
+    <footer id="site-footer" ref={ref} style={{ background: '#fff', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+
+      <style>{`
+        .footer-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 36px 24px;
+        }
+        @media (min-width: 768px) {
+          .footer-grid {
+            grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+            gap: 0 40px;
+          }
+        }
+      `}</style>
+
+      <motion.div
+        variants={containerVariants}
+        initial={shouldReduceMotion ? false : 'hidden'}
+        animate={inView ? 'show' : 'hidden'}
+        style={{ maxWidth: '1280px', margin: '0 auto', padding: '56px 20px 40px' }}
+        className="sm:px-6 lg:px-8"
+      >
+
+        {/* ── Main grid ── */}
+        <div className="footer-grid">
+
+          {/* Brand — full width on mobile */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            variants={itemVariants}
+            style={{ gridColumn: '1 / -1' }}
+            className="md:col-auto"
           >
-            <div className="flex items-center gap-3">
+            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <img
                 src={assetUrl('images/logo.webp')}
-                alt="Ghaim UAE logo"
-                className="h-8 w-auto brightness-0"
+                alt="Ghaim UAE"
+                style={{ height: '28px', width: 'auto', filter: 'brightness(0)' }}
                 loading="lazy"
                 decoding="async"
               />
-              <span className="text-lg font-semibold tracking-[0.2em]">
+              <span style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#1c1c1c' }}>
                 GHAIM
               </span>
-            </div>
-            <p className="mt-4 text-sm text-ink-muted">
-              Event production and curated rentals across the UAE. Senior-led
-              crews, disciplined timelines, and calm show control.
+            </Link>
+
+            <p style={{ marginTop: '14px', fontSize: '13px', color: '#888', lineHeight: 1.6, maxWidth: '260px' }}>
+              Event production and curated rentals across the UAE. Senior-led crews, disciplined timelines, calm show control.
             </p>
-            <div className="mt-6 flex items-center gap-4">
-              <motion.a
-                href="https://www.facebook.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-ink-muted transition hover:text-ink"
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.96 }}
-                aria-label="Facebook"
-              >
-                <FaFacebook className="text-lg" />
-              </motion.a>
-              <motion.a
-                href="https://www.instagram.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-ink-muted transition hover:text-ink"
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.96 }}
-                aria-label="Instagram"
-              >
-                <FaInstagram className="text-lg" />
-              </motion.a>
-              <motion.a
-                href="https://www.linkedin.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-ink-muted transition hover:text-ink"
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.96 }}
-                aria-label="LinkedIn"
-              >
-                <FaLinkedin className="text-lg" />
-              </motion.a>
+
+            {/* Social icons */}
+            <div style={{ display: 'flex', gap: '16px', marginTop: '20px' }}>
+              {[
+                { href: 'https://facebook.com',  label: 'Facebook',  Icon: IconFacebook  },
+                { href: 'https://instagram.com', label: 'Instagram', Icon: IconInstagram },
+                { href: 'https://linkedin.com',  label: 'LinkedIn',  Icon: IconLinkedIn  },
+              ].map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    border: '1px solid rgba(0,0,0,0.1)',
+                    color: '#888',
+                    textDecoration: 'none',
+                    transition: 'border-color 0.22s, color 0.22s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#1c1c1c'; e.currentTarget.style.color = '#1c1c1c' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.color = '#888' }}
+                >
+                  <Icon />
+                </a>
+              ))}
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-sm font-semibold text-ink">Services</p>
-            <ul className="mt-4 space-y-2 text-sm text-ink-muted">
-              {services.map(service => (
-                <li key={service.slug}>
-                  <Link
-                    to={`/services/${service.slug}`}
-                    className="transition hover:text-ink"
-                  >
-                    {service.title}
-                  </Link>
+          {/* Services */}
+          <motion.div variants={itemVariants}>
+            <ColHeading>Services</ColHeading>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {services.map(s => (
+                <li key={s.slug}>
+                  <FooterLink to={`/services/${s.slug}`}>{s.title}</FooterLink>
                 </li>
               ))}
+              <li style={{ marginTop: '10px' }}>
+                <FooterLink to="/services">
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#1c1c1c' }}>All services →</span>
+                </FooterLink>
+              </li>
             </ul>
-            <Link
-              to="/services"
-              className="mt-4 inline-flex text-sm font-semibold text-ink"
-            >
-              View all services
-            </Link>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-sm font-semibold text-ink">Work</p>
-            <ul className="mt-4 space-y-2 text-sm text-ink-muted">
-              {caseStudies.map(study => (
-                <li key={study.slug}>
-                  <Link
-                    to={`/work/${study.slug}`}
-                    className="transition hover:text-ink"
-                  >
-                    {study.title}
-                  </Link>
+          {/* Work */}
+          <motion.div variants={itemVariants}>
+            <ColHeading>Work</ColHeading>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {caseStudies.map(s => (
+                <li key={s.slug}>
+                  <FooterLink to={`/work/${s.slug}`}>{s.title}</FooterLink>
                 </li>
               ))}
               <li>
-                <Link to="/projects" className="transition hover:text-ink">
-                  Project gallery
-                </Link>
+                <FooterLink to="/projects">Project gallery</FooterLink>
               </li>
-            </ul>
-            <Link
-              to="/work"
-              className="mt-4 inline-flex text-sm font-semibold text-ink"
-            >
-              View case studies
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-sm font-semibold text-ink">Company</p>
-            <ul className="mt-4 space-y-2 text-sm text-ink-muted">
-              <li>
-                <Link to="/about" className="transition hover:text-ink">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link to="/process" className="transition hover:text-ink">
-                  Process
-                </Link>
-              </li>
-              <li>
-                <Link to="/testimonials" className="transition hover:text-ink">
-                  Testimonials
-                </Link>
-              </li>
-              <li>
-                <Link to="/faq" className="transition hover:text-ink">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link to="/pricing" className="transition hover:text-ink">
-                  Pricing
-                </Link>
+              <li style={{ marginTop: '10px' }}>
+                <FooterLink to="/work">
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#1c1c1c' }}>Case studies →</span>
+                </FooterLink>
               </li>
             </ul>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-sm font-semibold text-ink">Contact</p>
-            <div className="mt-4 space-y-3 text-sm text-ink-muted">
-              <div className="flex items-center gap-3">
-                <FaPhone className="text-ink" />
-                <span>+971 4 234 5678</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <FaEnvelope className="text-ink" />
-                <span>hello@ghaimuae.com</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <FaMapMarkerAlt className="text-ink" />
-                <span>Dubai Design District, UAE</span>
-              </div>
+          {/* Company */}
+          <motion.div variants={itemVariants}>
+            <ColHeading>Company</ColHeading>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {[
+                { to: '/about',        label: 'About'        },
+                { to: '/process',      label: 'Process'      },
+                { to: '/testimonials', label: 'Testimonials' },
+                { to: '/faq',          label: 'FAQ'          },
+                { to: '/pricing',      label: 'Pricing'      },
+              ].map(({ to, label }) => (
+                <li key={to}><FooterLink to={to}>{label}</FooterLink></li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Contact */}
+          <motion.div variants={itemVariants}>
+            <ColHeading>Contact</ColHeading>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+              {[
+                { href: 'tel:+97142345678',          label: '+971 4 234 5678'        },
+                { href: 'mailto:hello@ghaimuae.com', label: 'hello@ghaimuae.com'     },
+                { href: null,                         label: 'Dubai Design District'  },
+              ].map(({ href, label }) => (
+                href
+                  ? <a key={label} href={href} style={{ fontSize: '13px', color: '#888', textDecoration: 'none', transition: 'color 0.2s', minHeight: '28px', display: 'block', padding: '3px 0' }}
+                      onMouseEnter={e => { e.currentTarget.style.color = '#1c1c1c' }}
+                      onMouseLeave={e => { e.currentTarget.style.color = '#888' }}>{label}</a>
+                  : <p key={label} style={{ fontSize: '13px', color: '#bbb', padding: '3px 0' }}>{label}</p>
+              ))}
             </div>
-            <ScribbleButton to="/contact" className="btn-primary mt-5 text-sm">
+
+            {/* CTA */}
+            <Link
+              to="/contact"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#fff',
+                background: '#1c1c1c',
+                border: '1px solid #1c1c1c',
+                borderRadius: '100px',
+                padding: '9px 18px',
+                textDecoration: 'none',
+                transition: 'background 0.22s, border-color 0.22s',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#333' }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#1c1c1c' }}
+            >
               Request a proposal
-            </ScribbleButton>
+            </Link>
           </motion.div>
+
         </div>
 
+        {/* ── Bottom bar ── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="mt-10 border-t border-border pt-6"
+          variants={itemVariants}
+          style={{
+            marginTop: '48px',
+            paddingTop: '20px',
+            borderTop: '1px solid rgba(0,0,0,0.07)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+          className="sm:flex-row sm:items-center sm:justify-between"
         >
-          <div className="flex flex-col gap-3 text-xs text-ink-muted sm:flex-row sm:items-center sm:justify-between">
-            <p>© 2026 Ghaim UAE. All rights reserved.</p>
-            <div className="flex flex-wrap gap-4">
-              <Link to="/privacy" className="transition hover:text-ink">
-                Privacy policy
-              </Link>
-              <Link to="/terms" className="transition hover:text-ink">
-                Terms of service
-              </Link>
-              <button
-                onClick={() => scrollToSection('get-started')}
-                className="transition hover:text-ink"
+          <p style={{ fontSize: '11px', color: '#bbb', letterSpacing: '0.03em' }}>
+            © 2026 Ghaim UAE. All rights reserved.
+          </p>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+            {[
+              { to: '/privacy', label: 'Privacy policy'  },
+              { to: '/terms',   label: 'Terms of service' },
+            ].map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                style={{
+                  fontSize: '11px',
+                  color: '#bbb',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                  letterSpacing: '0.03em',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = '#1c1c1c' }}
+                onMouseLeave={e => { e.currentTarget.style.color = '#bbb' }}
               >
-                Start a project
-              </button>
-            </div>
+                {label}
+              </Link>
+            ))}
+
+            <button
+              onClick={() => scrollToSection('get-started')}
+              style={{
+                fontSize: '11px',
+                color: '#bbb',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'color 0.2s',
+                letterSpacing: '0.03em',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#1c1c1c' }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#bbb' }}
+            >
+              Start a project
+            </button>
           </div>
         </motion.div>
-      </div>
+
+      </motion.div>
     </footer>
   )
 }
