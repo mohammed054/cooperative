@@ -77,13 +77,12 @@ const Hero = () => {
             Senior-led crews for AV, staging, lighting, and show-day control.
           </p>
 
-          <div className="mt-5 md:mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-5 md:mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-3">
             <ScribbleButton
               onClick={() => scrollToSection('get-started')}
               ariaLabel="Request a proposal"
               analyticsLabel="hero-request-proposal"
-              disableScribble
-              className="w-auto mx-auto inline-flex items-center justify-center gap-2 rounded bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90"
+              className="w-auto mx-auto inline-flex items-center justify-center gap-2 rounded md:rounded-full bg-white px-6 md:px-7 py-3 md:py-3.5 text-sm font-semibold text-black shadow-[0_16px_44px_rgba(0,0,0,0.28)] transition hover:bg-white/90 hover:shadow-[0_18px_54px_rgba(0,0,0,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Request a proposal
               <FaArrowRight
@@ -94,7 +93,7 @@ const Hero = () => {
             <button
               onClick={() => scrollToSection('services')}
               aria-label="Explore services"
-              className="text-left text-sm text-white/70 hover:text-white/90 transition-colors py-2 sm:hidden"
+              className="text-center text-sm text-white/70 hover:text-white/90 transition-colors py-2 sm:hidden"
             >
               Explore services
             </button>
