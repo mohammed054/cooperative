@@ -16,30 +16,27 @@ export const HeaderMobile = ({
   const closeBtnRef = useRef(null)
   const drawerRef = useRef(null)
 
-  // Handle focus management
+  /** ---------------- Focus on close button when drawer opens ---------------- */
   useEffect(() => {
-    if (mobileOpen && closeBtnRef.current) {
-      closeBtnRef.current.focus()
-    }
+    if (mobileOpen && closeBtnRef.current) closeBtnRef.current.focus()
   }, [mobileOpen])
 
-  const handleHamburgerClick = () => {
+  /** ---------------- Handle hamburger toggle ---------------- */
+  const toggleMobileMenu = () => {
     if (isAnimating) return
     setIsAnimating(true)
-    setMobileOpen(!mobileOpen)
-    // Reset accordions when opening/closing
-    if (!mobileOpen) {
-      setOpenAccordions(new Set())
-    }
+    setMobileOpen(prev => !prev)
+
+    if (!mobileOpen) setOpenAccordions(new Set())
   }
 
-  const handleCloseClick = () => {
+  const handleClose = () => {
     setIsAnimating(true)
     setMobileOpen(false)
     setOpenAccordions(new Set())
   }
 
-  // Reset animation state when animation ends
+  /** ---------------- Reset animation state after drawer closes ---------------- */
   useEffect(() => {
     if (!mobileOpen) {
       const timer = setTimeout(() => setIsAnimating(false), 300)
@@ -47,30 +44,23 @@ export const HeaderMobile = ({
     }
   }, [mobileOpen])
 
-  // Handle click outside to close drawer
+  /** ---------------- Click outside drawer to close ---------------- */
   useEffect(() => {
     if (!mobileOpen) return
 
     const handleClickOutside = e => {
-      // Check if click is inside drawer
-      if (drawerRef.current && drawerRef.current.contains(e.target)) {
-        return
-      }
-      // Check if click is on hamburger button
       if (
-        mobileMenuButtonRef.current &&
-        mobileMenuButtonRef.current.contains(e.target)
-      ) {
-        return
-      }
-      // Click is outside, close the menu
-      handleCloseClick()
+        drawerRef.current?.contains(e.target) ||
+        mobileMenuButtonRef.current?.contains(e.target)
+      ) return
+      handleClose()
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [mobileOpen])
 
+  /** ---------------- Keyboard accessibility ---------------- */
   const handleKeyDown = (e, action) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
@@ -78,21 +68,44 @@ export const HeaderMobile = ({
     }
   }
 
+  /** ---------------- Accordion state ---------------- */
   const toggleAccordion = label => {
     const newAccordions = new Set(openAccordions)
-    if (newAccordions.has(label)) {
-      newAccordions.delete(label)
-    } else {
-      newAccordions.add(label)
-    }
+    if (newAccordions.has(label)) newAccordions.delete(label)
+    else newAccordions.add(label)
     setOpenAccordions(newAccordions)
   }
 
   const isAccordionOpen = label => openAccordions.has(label)
 
+  /** ---------------- Reusable navigation button ---------------- */
+  const NavButton = ({ label, href, isSub = false }) => (
+    <button
+      onClick={() => {
+        goTo(href)
+        setMobileOpen(false)
+      }}
+      className={`w-full text-left font-medium rounded-lg transition-colors py-3 px-4 ${
+        isActivePage(href)
+          ? 'text-ink bg-surface'
+          : isSub
+          ? 'text-ink-muted hover:text-ink hover:bg-surface'
+          : 'text-ink hover:bg-surface'
+      }`}
+      aria-current={isActivePage(href) ? 'page' : undefined}
+      style={{
+        minHeight: isSub ? '44px' : '48px',
+        fontSize: isSub ? '16px' : '18px',
+        paddingLeft: isSub ? '32px' : '16px',
+      }}
+    >
+      {label}
+    </button>
+  )
+
   return (
     <>
-      {/* Mobile Header - Fixed at top, 64px height */}
+      {/* ---------- Mobile Header ---------- */}
       <header className="fixed top-0 left-0 right-0 z-[60] lg:hidden">
         <div
           className={`flex items-center justify-end h-16 px-4 transition-colors duration-300 ${
@@ -101,77 +114,63 @@ export const HeaderMobile = ({
               : 'bg-transparent'
           }`}
         >
-          {/* Hamburger Button Right */}
+          {/* Hamburger */}
           <button
             ref={mobileMenuButtonRef}
-            className="flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 hover:bg-surface/50 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            onClick={handleHamburgerClick}
-            onKeyDown={e => handleKeyDown(e, handleHamburgerClick)}
+            onClick={toggleMobileMenu}
+            onKeyDown={e => handleKeyDown(e, toggleMobileMenu)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
             aria-controls="mobile-drawer"
-            style={{
-              minHeight: '44px',
-              minWidth: '44px',
-            }}
+            className="flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 hover:bg-surface/50 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            style={{ minHeight: '44px', minWidth: '44px' }}
           >
             <div className="flex flex-col items-center justify-center gap-1.5">
               <span
                 className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? 'translate-y-2 rotate-45' : ''
                 }`}
-                style={{
-                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c',
-                  transformOrigin: 'center',
-                }}
+                style={{ backgroundColor: '#1c1c1c', transformOrigin: 'center' }}
               />
               <span
                 className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? 'opacity-0' : ''
                 }`}
-                style={{
-                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c',
-                }}
+                style={{ backgroundColor: '#1c1c1c' }}
               />
               <span
                 className={`block h-0.5 w-6 rounded-full transition-all duration-300 ${
                   mobileOpen ? '-translate-y-2 -rotate-45' : ''
                 }`}
-                style={{
-                  backgroundColor: mobileOpen ? '#1c1c1c' : '#1c1c1c',
-                  transformOrigin: 'center',
-                }}
+                style={{ backgroundColor: '#1c1c1c', transformOrigin: 'center' }}
               />
             </div>
           </button>
         </div>
       </header>
 
-      {/* Drawer Overlay - Full screen coverage */}
+      {/* ---------- Overlay ---------- */}
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-[45] transition-opacity duration-200 cursor-pointer"
-          onMouseDown={handleCloseClick}
+          onMouseDown={handleClose}
           aria-hidden="true"
         />
       )}
 
-      {/* Mobile Drawer */}
+      {/* ---------- Mobile Drawer ---------- */}
       <div
         ref={drawerRef}
         id="mobile-drawer"
         className={`fixed top-0 right-0 h-screen w-[85vw] max-w-[420px] bg-white z-[60] transform transition-transform duration-280 ease-out ${
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{
-          boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)',
-        }}
+        style={{ boxShadow: '-4px 0 24px rgba(0,0,0,0.15)' }}
         onAnimationEnd={() => setIsAnimating(false)}
         onClick={e => e.stopPropagation()}
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-border/50">
-          {/* Logo */}
           <button
             onClick={() => goTo('/')}
             className="flex items-center gap-3"
@@ -189,25 +188,15 @@ export const HeaderMobile = ({
             </span>
           </button>
 
-          {/* Close Button */}
           <button
             ref={closeBtnRef}
+            onClick={handleClose}
+            onKeyDown={e => handleKeyDown(e, handleClose)}
             className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            onClick={handleCloseClick}
-            onKeyDown={e => handleKeyDown(e, handleCloseClick)}
             aria-label="Close menu"
-            style={{
-              minHeight: '44px',
-              minWidth: '44px',
-            }}
+            style={{ minHeight: '44px', minWidth: '44px' }}
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="text-ink"
-            >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path
                 d="M6 6l12 12M18 6L6 18"
                 stroke="currentColor"
@@ -219,48 +208,33 @@ export const HeaderMobile = ({
           </button>
         </div>
 
-        {/* Scrollable Content */}
+        {/* Scrollable Navigation */}
         <div className="max-h-[calc(100vh-64px-120px)] overflow-y-auto">
           <nav className="p-6" aria-label="Mobile navigation">
-            {/* Main Navigation Items */}
             <div className="space-y-2">
               {/* Services Accordion */}
               <div>
                 <button
                   onClick={() => toggleAccordion('Services')}
-                  className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-between ${
-                    isActivePage('/services')
-                      ? 'text-ink bg-surface'
-                      : 'text-ink hover:bg-surface'
+                  className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg flex items-center justify-between transition-colors ${
+                    isActivePage('/services') ? 'text-ink bg-surface' : 'text-ink hover:bg-surface'
                   }`}
                   aria-expanded={isAccordionOpen('Services')}
                   aria-controls="services-submenu"
-                  style={{
-                    minHeight: '48px',
-                    fontSize: '18px',
-                  }}
+                  style={{ minHeight: '48px', fontSize: '18px' }}
                 >
                   <span>Services</span>
                   <svg
                     width="16"
                     height="16"
                     viewBox="0 0 24 24"
+                    className={`transition-transform duration-200 ${isAccordionOpen('Services') ? 'rotate-180' : ''}`}
                     fill="none"
-                    className={`transition-transform duration-200 ${
-                      isAccordionOpen('Services') ? 'rotate-180' : ''
-                    }`}
                   >
-                    <path
-                      d="M6 9l6 6 6-6"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
 
-                {/* Services Submenu */}
                 <div
                   id="services-submenu"
                   className="overflow-hidden transition-all duration-200 ease-out"
@@ -271,132 +245,45 @@ export const HeaderMobile = ({
                 >
                   <div className="space-y-2 mt-2 pl-4">
                     {services.map(service => (
-                      <button
+                      <NavButton
                         key={service.slug}
-                        onClick={() => {
-                          goTo(`/services/${service.slug}`)
-                          setMobileOpen(false)
-                        }}
-                        className={`w-full text-left text-base font-medium py-3 px-4 rounded-lg transition-colors ${
-                          location.pathname === `/services/${service.slug}`
-                            ? 'text-ink bg-surface'
-                            : 'text-ink-muted hover:text-ink hover:bg-surface'
-                        }`}
-                        aria-current={
-                          location.pathname === `/services/${service.slug}`
-                            ? 'page'
-                            : undefined
-                        }
-                        style={{
-                          minHeight: '44px',
-                          fontSize: '16px',
-                          paddingLeft: '32px',
-                        }}
-                      >
-                        {service.title}
-                      </button>
+                        label={service.title}
+                        href={`/services/${service.slug}`}
+                        isSub
+                      />
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Work */}
-              <button
-                onClick={() => {
-                  goTo('/work')
-                  setMobileOpen(false)
-                }}
-                className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors ${
-                  isActivePage('/work')
-                    ? 'text-ink bg-surface'
-                    : 'text-ink hover:bg-surface'
-                }`}
-                aria-current={isActivePage('/work') ? 'page' : undefined}
-                style={{
-                  minHeight: '48px',
-                  fontSize: '18px',
-                }}
-              >
-                Work
-              </button>
-
-              {/* Process */}
-              <button
-                onClick={() => {
-                  goTo('/process')
-                  setMobileOpen(false)
-                }}
-                className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors ${
-                  isActivePage('/process')
-                    ? 'text-ink bg-surface'
-                    : 'text-ink hover:bg-surface'
-                }`}
-                aria-current={isActivePage('/process') ? 'page' : undefined}
-                style={{
-                  minHeight: '48px',
-                  fontSize: '18px',
-                }}
-              >
-                Process
-              </button>
-
-              {/* Pricing */}
-              <button
-                onClick={() => {
-                  goTo('/pricing')
-                  setMobileOpen(false)
-                }}
-                className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors ${
-                  isActivePage('/pricing')
-                    ? 'text-ink bg-surface'
-                    : 'text-ink hover:bg-surface'
-                }`}
-                aria-current={isActivePage('/pricing') ? 'page' : undefined}
-                style={{
-                  minHeight: '48px',
-                  fontSize: '18px',
-                }}
-              >
-                Pricing
-              </button>
+              {/* Other Nav Links */}
+              <NavButton label="Work" href="/work" />
+              <NavButton label="Process" href="/process" />
+              <NavButton label="Pricing" href="/pricing" />
 
               {/* Company Accordion */}
               <div>
                 <button
                   onClick={() => toggleAccordion('Company')}
-                  className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-between ${
-                    isActivePage('/about')
-                      ? 'text-ink bg-surface'
-                      : 'text-ink hover:bg-surface'
+                  className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg flex items-center justify-between transition-colors ${
+                    isActivePage('/about') ? 'text-ink bg-surface' : 'text-ink hover:bg-surface'
                   }`}
                   aria-expanded={isAccordionOpen('Company')}
                   aria-controls="company-submenu"
-                  style={{
-                    minHeight: '48px',
-                    fontSize: '18px',
-                  }}
+                  style={{ minHeight: '48px', fontSize: '18px' }}
                 >
                   <span>Company</span>
                   <svg
                     width="16"
                     height="16"
                     viewBox="0 0 24 24"
+                    className={`transition-transform duration-200 ${isAccordionOpen('Company') ? 'rotate-180' : ''}`}
                     fill="none"
-                    className={`transition-transform duration-200 ${
-                      isAccordionOpen('Company') ? 'rotate-180' : ''
-                    }`}
                   >
-                    <path
-                      d="M6 9l6 6 6-6"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
 
-                {/* Company Submenu */}
                 <div
                   id="company-submenu"
                   className="overflow-hidden transition-all duration-200 ease-out"
@@ -406,103 +293,20 @@ export const HeaderMobile = ({
                   }}
                 >
                   <div className="space-y-2 mt-2 pl-4">
-                    <button
-                      onClick={() => {
-                        goTo('/about')
-                        setMobileOpen(false)
-                      }}
-                      className={`w-full text-left text-base font-medium py-3 px-4 rounded-lg transition-colors ${
-                        location.pathname === '/about'
-                          ? 'text-ink bg-surface'
-                          : 'text-ink-muted hover:text-ink hover:bg-surface'
-                      }`}
-                      aria-current={
-                        location.pathname === '/about' ? 'page' : undefined
-                      }
-                      style={{
-                        minHeight: '44px',
-                        fontSize: '16px',
-                        paddingLeft: '32px',
-                      }}
-                    >
-                      About
-                    </button>
-                    <button
-                      onClick={() => {
-                        goTo('/testimonials')
-                        setMobileOpen(false)
-                      }}
-                      className={`w-full text-left text-base font-medium py-3 px-4 rounded-lg transition-colors ${
-                        location.pathname === '/testimonials'
-                          ? 'text-ink bg-surface'
-                          : 'text-ink-muted hover:text-ink hover:bg-surface'
-                      }`}
-                      aria-current={
-                        location.pathname === '/testimonials'
-                          ? 'page'
-                          : undefined
-                      }
-                      style={{
-                        minHeight: '44px',
-                        fontSize: '16px',
-                        paddingLeft: '32px',
-                      }}
-                    >
-                      Testimonials
-                    </button>
-                    <button
-                      onClick={() => {
-                        goTo('/faq')
-                        setMobileOpen(false)
-                      }}
-                      className={`w-full text-left text-base font-medium py-3 px-4 rounded-lg transition-colors ${
-                        location.pathname === '/faq'
-                          ? 'text-ink bg-surface'
-                          : 'text-ink-muted hover:text-ink hover:bg-surface'
-                      }`}
-                      aria-current={
-                        location.pathname === '/faq' ? 'page' : undefined
-                      }
-                      style={{
-                        minHeight: '44px',
-                        fontSize: '16px',
-                        paddingLeft: '32px',
-                      }}
-                    >
-                      FAQ
-                    </button>
+                    <NavButton label="About" href="/about" isSub />
+                    <NavButton label="Testimonials" href="/testimonials" isSub />
+                    <NavButton label="FAQ" href="/faq" isSub />
                   </div>
                 </div>
               </div>
 
-              {/* Contact */}
-              <button
-                onClick={() => {
-                  goTo('/contact')
-                  setMobileOpen(false)
-                }}
-                className={`w-full text-left text-lg font-semibold py-3 px-4 rounded-lg transition-colors ${
-                  isActivePage('/contact')
-                    ? 'text-ink bg-surface'
-                    : 'text-ink hover:bg-surface'
-                }`}
-                aria-current={isActivePage('/contact') ? 'page' : undefined}
-                style={{
-                  minHeight: '48px',
-                  fontSize: '18px',
-                }}
-              >
-                Contact
-              </button>
+              <NavButton label="Contact" href="/contact" />
             </div>
           </nav>
         </div>
 
-        {/* Sticky CTA - Anchors the layout at bottom */}
-        <div
-          className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-border/50"
-          style={{ paddingBottom: '24px', paddingTop: '24px' }}
-        >
+        {/* Sticky CTA */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-border/50" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
           <button
             onClick={() => {
               goTo('/contact')
@@ -510,10 +314,7 @@ export const HeaderMobile = ({
             }}
             className="w-full h-12 bg-ink text-white text-base font-semibold rounded-lg hover:bg-ink-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-current={location.pathname === '/contact' ? 'page' : undefined}
-            style={{
-              minHeight: '48px',
-              fontSize: '16px',
-            }}
+            style={{ minHeight: '48px', fontSize: '16px' }}
           >
             Contact
           </button>
