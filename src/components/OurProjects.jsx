@@ -372,14 +372,13 @@ export default function OurProjects() {
         scrollbarWidth: 'none',
       }}>
         <div
-          className="mx-auto"
+          className="mx-auto sm:px-6 lg:px-8"
           style={{
             maxWidth: '1280px',
             display: 'flex',
             gap: '8px',
             padding: '12px 20px',
           }}
-          className="sm:px-6 lg:px-8"
         >
           {categories.map(cat => (
             <FilterPill
