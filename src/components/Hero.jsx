@@ -77,7 +77,7 @@ const Hero = () => {
             Senior-led crews for AV, staging, lighting, and show-day control.
           </p>
 
-          <div className="mt-5 md:mt-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <div className="mt-5 md:mt-8 flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
             <ScribbleButton
               onClick={() => scrollToSection('get-started')}
               ariaLabel="Request a proposal"
