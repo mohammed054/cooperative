@@ -17,7 +17,10 @@ const Hero = () => {
 
   return (
     <section id="hero" className="relative h-[100svh] overflow-hidden bg-black">
-      <div className="absolute inset-0 h-full w-full" style={{ aspectRatio: '16/9' }}>
+      <div
+        className="absolute inset-0 h-full w-full"
+        style={{ aspectRatio: '16/9' }}
+      >
         <img
           src={assetUrl('images/event1.jpg')}
           alt="Event production in the UAE"
@@ -47,40 +50,40 @@ const Hero = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-black/90" />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-80"
+        className="pointer-events-none absolute inset-0 opacity-80 hidden md:block"
         style={{
           backgroundImage:
             'radial-gradient(900px 520px at 50% 5%, var(--color-video-overlay-accent), transparent 60%), radial-gradient(700px 520px at 0% 70%, rgba(255,255,255,0.08), transparent 58%)',
         }}
       />
 
-      <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pb-10 pt-20 sm:px-6 sm:pb-14 sm:pt-24 lg:px-8">
+      <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 pb-6 pt-8 sm:px-6 sm:pb-14 sm:pt-24 lg:px-8">
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={transition}
           className="w-full max-w-3xl"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.2] bg-white/[0.1] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/90 backdrop-blur">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.2] bg-white/[0.1] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/90 backdrop-blur hidden md:inline-flex">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             UAE event production
           </div>
 
-          <h1 className="mt-6 text-[clamp(2.6rem,5vw,4.5rem)] font-semibold leading-[1.02] tracking-tight text-white font-serif">
+          <h1 className="mt-4 md:mt-6 text-[clamp(28px,6vw,36px)] md:text-[clamp(2.6rem,5vw,4.5rem)] font-semibold leading-[1.1] md:leading-[1.02] tracking-tight text-white font-serif">
             Production that keeps the room composed.
           </h1>
 
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-            Senior-led crews for AV, staging, lighting, seating, and show‑day
-            control. One accountable team, one timeline, no surprises.
+          <p className="mt-4 md:mt-6 max-w-2xl text-sm md:text-base leading-relaxed text-white/70 md:text-white/75 sm:text-lg">
+            Senior-led crews for AV, staging, lighting, and show-day control.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-5 md:mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <ScribbleButton
               onClick={() => scrollToSection('get-started')}
               ariaLabel="Request a proposal"
               analyticsLabel="hero-request-proposal"
-              className="group inline-flex items-center justify-center gap-3 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black shadow-[0_16px_44px_rgba(0,0,0,0.28)] transition hover:bg-white/90 hover:shadow-[0_18px_54px_rgba(0,0,0,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              disableScribble
+              className="group inline-flex items-center justify-center gap-3 rounded md:rounded-full bg-white px-5 md:px-7 py-3 md:py-3.5 text-sm font-semibold text-black shadow-[0_16px_44px_rgba(0,0,0,0.28)] transition hover:bg-white/90 hover:shadow-[0_18px_54px_rgba(0,0,0,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Request a proposal
               <FaArrowRight
@@ -88,28 +91,35 @@ const Hero = () => {
                 size={14}
               />
             </ScribbleButton>
+            <button
+              onClick={() => scrollToSection('services')}
+              aria-label="Explore services"
+              className="text-left text-sm text-white/70 hover:text-white/90 transition-colors py-2 sm:hidden"
+            >
+              Explore services
+            </button>
             <ScribbleButton
               onClick={() => scrollToSection('services')}
               ariaLabel="Explore services"
               analyticsLabel="hero-explore-services"
-              className="inline-flex items-center justify-center rounded-full border border-white/[0.18] bg-white/[0.08] px-7 py-3.5 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/[0.14] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="hidden sm:inline-flex items-center justify-center rounded-full border border-white/[0.18] bg-white/[0.08] px-7 py-3.5 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/[0.14] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Explore services
             </ScribbleButton>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-x-10 gap-y-3 text-sm text-white/70">
+          <div className="mt-5 md:mt-8 hidden md:flex flex-wrap gap-x-10 gap-y-3 text-sm text-white/70">
             <p className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-              UAE‑wide coverage
+              UAE-wide coverage
             </p>
             <p className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-              Show‑day command
+              Show-day command
             </p>
             <p className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-              White‑glove rentals
+              White-glove rentals
             </p>
           </div>
         </motion.div>
@@ -124,7 +134,7 @@ const Hero = () => {
             ? undefined
             : { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }
         }
-        className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/[0.16] bg-white/[0.06] p-3 text-white/90 backdrop-blur transition hover:bg-white/[0.10] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/[0.16] bg-white/[0.06] p-3 text-white/90 backdrop-blur transition hover:bg-white/[0.10] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white hidden md:block"
         onClick={() => scrollToSection('services')}
       >
         <FaArrowDown size={18} />
