@@ -42,7 +42,11 @@ const Footer = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="flex items-center gap-3"
+              onClick={scrollToTop}
+            >
               <img
                 src={assetUrl('images/logo.webp')}
                 alt="Ghaim UAE logo"
@@ -53,7 +57,7 @@ const Footer = () => {
               <span className="text-lg font-semibold tracking-[0.2em]">
                 GHAIM
               </span>
-            </div>
+            </Link>
             <p className="mt-4 text-sm text-ink-muted">
               Event production and curated rentals across the UAE. Senior-led
               crews, disciplined timelines, and calm show control.
