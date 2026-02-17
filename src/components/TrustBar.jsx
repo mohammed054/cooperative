@@ -1,43 +1,66 @@
-import React from 'react'
+import React, { useRef } from 'react'
+import { motion, useInView, useReducedMotion } from 'framer-motion'
+
+const items = [
+  { title: 'UAE coverage',         desc: 'On‑site teams across all major emirates' },
+  { title: 'End‑to‑end delivery',  desc: 'Planning, rentals, setup, and show control' },
+  { title: 'Curated inventory',    desc: 'AV, staging, lighting, seating' },
+  { title: 'Accountable producers',desc: 'Single point of contact throughout' },
+]
 
 const TrustBar = () => {
-  const items = [
-    { title: 'UAE coverage', desc: 'On‑site teams across all major emirates' },
-    {
-      title: 'End‑to‑end delivery',
-      desc: 'Planning, rentals, setup, and show control',
-    },
-    { title: 'Curated inventory', desc: 'AV, staging, lighting, seating' },
-    {
-      title: 'Accountable producers',
-      desc: 'Single point of contact throughout',
-    },
-  ]
+  const shouldReduceMotion = useReducedMotion()
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-8% 0px' })
+
+  const containerVariants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  }
+
+  const itemVariants = shouldReduceMotion ? {} : {
+    hidden: { opacity: 0, y: 12 },
+    show:   { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+  }
 
   return (
-    <section className="border-y border-border bg-surface-3">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-          <div className="max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle mb-3">
-              Trusted production partner
+    <section
+      ref={ref}
+      className="border-y border-border bg-white pt-16 pb-20 sm:pt-20 sm:pb-24 lg:pt-28 lg:pb-32"
+    >
+      <motion.div
+        variants={containerVariants}
+        initial={shouldReduceMotion ? false : 'hidden'}
+        animate={inView ? 'show' : 'hidden'}
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '0',
+        }}
+      >
+        {items.map((item, i) => (
+          <motion.div
+            key={item.title}
+            variants={itemVariants}
+            style={{
+              padding: '36px 0', // much bigger vertical padding
+              borderBottom: i < 2 ? '1px solid rgba(0,0,0,0.07)' : 'none',
+              borderRight: i % 2 === 0 ? '1px solid rgba(0,0,0,0.07)' : 'none',
+              paddingLeft:  i % 2 === 0 ? '0'    : '36px',
+              paddingRight: i % 2 === 0 ? '36px' : '0',
+            }}
+            className="lg:border-b-0 lg:border-r lg:last:border-r-0 lg:py-6 lg:px-10 lg:first:pl-0 lg:last:pr-0"
+          >
+            <p className="text-lg font-semibold text-ink mb-2">
+              {item.title}
             </p>
-            <h3 className="text-2xl sm:text-3xl font-semibold text-ink font-serif">
-              Built for teams who need calm, reliable execution.
-            </h3>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-            {items.map(item => (
-              <div key={item.title} className="min-w-0">
-                <p className="text-sm font-semibold text-ink">{item.title}</p>
-                <p className="text-xs sm:text-sm text-ink-muted mt-1">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {item.desc}
+            </p>
+          </motion.div>
+        ))}
+      </motion.div>
     </section>
   )
 }
