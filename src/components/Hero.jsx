@@ -83,7 +83,7 @@ const Hero = () => {
               ariaLabel="Request a proposal"
               analyticsLabel="hero-request-proposal"
               disableScribble
-              className="group inline-flex items-center justify-center gap-3 rounded md:rounded-full bg-white px-5 md:px-7 py-3 md:py-3.5 text-sm font-semibold text-black shadow-[0_16px_44px_rgba(0,0,0,0.28)] transition hover:bg-white/90 hover:shadow-[0_18px_54px_rgba(0,0,0,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="w-auto mx-auto inline-flex items-center justify-center gap-2 rounded bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90"
             >
               Request a proposal
               <FaArrowRight
