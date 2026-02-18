@@ -79,7 +79,7 @@ const Hero = () => {
       {/* Bottom gradient bridge — subtle transition to light section */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[var(--home-light-100)] to-transparent"
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[var(--home-light-100)] via-[var(--home-light-200)] to-transparent"
       />
 
       {/* ── Content ── */}

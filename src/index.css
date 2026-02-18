@@ -63,6 +63,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden; /* Prevent horizontal scrolling - moved from body */
   }
 
   body {
@@ -74,7 +75,7 @@
     letter-spacing: -0.01em;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    /* overflow-x: hidden moved to html - putting it on body breaks sticky positioning */
   }
 
   :focus-visible {
@@ -100,10 +101,18 @@
 .home-cinematic {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  /* overflow: hidden removed - it breaks sticky positioning in child sections */
   background:
-    radial-gradient(1100px 620px at 78% 30%, rgba(255, 255, 255, 0.14), transparent 62%),
-    radial-gradient(900px 460px at 16% 60%, rgba(255, 255, 255, 0.08), transparent 60%),
+    radial-gradient(
+      1100px 620px at 78% 30%,
+      rgba(255, 255, 255, 0.14),
+      transparent 62%
+    ),
+    radial-gradient(
+      900px 460px at 16% 60%,
+      rgba(255, 255, 255, 0.08),
+      transparent 60%
+    ),
     linear-gradient(
       180deg,
       #080a0f 0%,
@@ -131,6 +140,21 @@
   padding-top: 24px;
 }
 
+.home-scene-discovery,
+.home-scene-proof,
+.home-scene-close {
+  padding-bottom: 0;
+}
+
+.home-scene-discovery {
+  background: linear-gradient(
+    180deg,
+    var(--home-light-100) 0%,
+    var(--home-light-200) 34%,
+    var(--home-light-300) 100%
+  );
+}
+
 @media (min-width: 768px) {
   .home-scene + .home-scene {
     margin-top: -40px;
@@ -141,32 +165,30 @@
 .cinematic-shell {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  /* overflow: hidden removed - it breaks sticky positioning in child sections */
 }
 
 .cinematic-shell-linen {
-  background:
-    linear-gradient(
-      180deg,
-      #f8f4ee 0%,
-      #f4f0e9 18%,
-      #f7f5f0 38%,
-      #f3eee6 62%,
-      #f0ebe3 86%,
-      #ece7de 100%
-    );
+  background: linear-gradient(
+    180deg,
+    #f8f4ee 0%,
+    #f4f0e9 18%,
+    #f7f5f0 38%,
+    #f3eee6 62%,
+    #f0ebe3 86%,
+    #ece7de 100%
+  );
 }
 
 .cinematic-shell-dark {
-  background:
-    linear-gradient(
-      180deg,
-      #101217 0%,
-      #181a20 24%,
-      #1e2026 50%,
-      #16181d 74%,
-      #121317 100%
-    );
+  background: linear-gradient(
+    180deg,
+    #101217 0%,
+    #181a20 24%,
+    #1e2026 50%,
+    #16181d 74%,
+    #121317 100%
+  );
 }
 
 .cinematic-scene {
@@ -221,19 +243,35 @@
 }
 
 .scene-bridge-warm::before {
-  background: linear-gradient(to bottom, rgba(243, 234, 223, 0.86), transparent 84%);
+  background: linear-gradient(
+    to bottom,
+    rgba(243, 234, 223, 0.86),
+    transparent 84%
+  );
 }
 
 .scene-bridge-neutral::before {
-  background: linear-gradient(to bottom, rgba(246, 243, 237, 0.82), transparent 84%);
+  background: linear-gradient(
+    to bottom,
+    rgba(246, 243, 237, 0.82),
+    transparent 84%
+  );
 }
 
 .scene-bridge-soft::before {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.58), transparent 86%);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.58),
+    transparent 86%
+  );
 }
 
 .scene-bridge-deep::before {
-  background: linear-gradient(to bottom, rgba(30, 34, 44, 0.66), transparent 84%);
+  background: linear-gradient(
+    to bottom,
+    rgba(30, 34, 44, 0.66),
+    transparent 84%
+  );
 }
 
 @media (min-width: 640px) {
@@ -950,18 +988,19 @@
    ================================================ */
 
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari, Opera */
+    display: none; /* Chrome, Safari, Opera */
   }
 
   /* Performance optimizations for scrollable sections */
   .scrollable-card-section {
-    will-change: transform;
-    contain: layout style paint;
+    /* will-change: transform removed - creates stacking context that breaks sticky */
+    /* contain: paint removed - creates containing block that breaks sticky */
+    contain: layout style;
   }
 
   .card-image {
@@ -1022,9 +1061,11 @@
     @apply text-ink font-medium;
   }
 
-  /* Flip card styles */
+  /* Flip card styles - Only apply to specific flip card containers */
   .perspective {
     perspective: 1200px;
+    /* Warning: perspective creates a 3D stacking context that can affect sticky positioning */
+    /* Only apply this class to the immediate parent of 3D transformed elements */
   }
 
   .backface-hidden {

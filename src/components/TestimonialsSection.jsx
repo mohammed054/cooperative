@@ -91,11 +91,12 @@ const TestimonialsSection = ({
         />
       )}
 
-      {/* Tonal bridge to FinalCta — subtle gradient at bottom */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-[#111]/80 to-transparent"
-      />
+      {isHome && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-[#101114]/45 via-[#101114]/16 to-transparent"
+        />
+      )}
 
       <div className={['relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8', isHome ? 'py-14 sm:py-20 lg:py-24' : 'py-12 sm:py-18 lg:py-22'].join(' ')}>
 

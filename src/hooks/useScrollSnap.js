@@ -8,6 +8,16 @@ export const useScrollSnap = sectionIds => {
     const handleWheel = e => {
       if (isScrolling.current) return
 
+      // Don't hijack scroll when user is in the horizontal scroll services section
+      const servicesSection = document.getElementById('services')
+      if (servicesSection) {
+        const rect = servicesSection.getBoundingClientRect()
+        // If services section is in viewport (sticky section is active)
+        if (rect.top <= 0 && rect.bottom > window.innerHeight) {
+          return // Let the horizontal scroll section handle it
+        }
+      }
+
       e.preventDefault()
 
       const direction = e.deltaY > 0 ? 1 : -1
@@ -71,6 +81,15 @@ export const useScrollSnap = sectionIds => {
 
     const handleTouchEnd = e => {
       if (isScrolling.current) return
+
+      // Don't hijack touch scroll when user is in the horizontal scroll services section
+      const servicesSection = document.getElementById('services')
+      if (servicesSection) {
+        const rect = servicesSection.getBoundingClientRect()
+        if (rect.top <= 0 && rect.bottom > window.innerHeight) {
+          return // Let the horizontal scroll section handle it
+        }
+      }
 
       touchEndY = e.changedTouches[0].clientY
       const diff = touchStartY - touchEndY

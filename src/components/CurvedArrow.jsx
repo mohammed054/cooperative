@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 
+const ARROW_STROKE = 'rgba(28, 28, 28, 0.36)'
+
 const CurvedArrow = () => {
   const pathRef = useRef(null)
   const [pathLength, setPathLength] = useState(0)
@@ -90,7 +92,7 @@ M745.037354,99.007019
 	C734.505432,132.465530 739.764404,115.977333 745.037354,99.007019 
 z"
         fill="none"
-        stroke="#2d2d2d"
+        stroke={ARROW_STROKE}
         strokeWidth="4"
         style={{
           strokeDasharray: pathLength,
