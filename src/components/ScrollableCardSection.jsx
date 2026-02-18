@@ -58,7 +58,6 @@ const MobileCard = ({ card }) => {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-12% 0px' })
   const shouldReduceMotion = useReducedMotion()
-
   return (
     <motion.a
       ref={ref}
@@ -66,24 +65,29 @@ const MobileCard = ({ card }) => {
       initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      style={{
-        display: 'block',
-        textDecoration: 'none',
-        color: 'inherit',
-        borderBottom: '1px solid rgba(0,0,0,0.05)',
-      }}
+      className="block h-full"
+      style={{ textDecoration: 'none', color: 'inherit' }}
     >
-      <div style={{ display: 'flex', gap: '16px', padding: '20px 0' }}>
-        {/* Image — compact on mobile */}
-        <div style={{
-          position: 'relative',
-          width: '100px',
-          height: '75px',
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          borderRadius: '14px',
+          border: '1px solid rgba(0,0,0,0.06)',
+          background: 'rgba(255,255,255,0.76)',
           overflow: 'hidden',
-          borderRadius: '6px',
-          background: '#f0eeec',
-          flexShrink: 0,
-        }}>
+        }}
+      >
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            aspectRatio: '4 / 3',
+            overflow: 'hidden',
+            background: '#f0eeec',
+          }}
+        >
           <img
             src={card.img}
             alt={card.title}
@@ -98,60 +102,69 @@ const MobileCard = ({ card }) => {
             }}
           />
         </div>
-
-        {/* Text */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{
-            fontSize: '9px',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: '#aaa',
-            fontWeight: 500,
-            marginBottom: '4px',
-          }}>
+        <div style={{ flex: 1, minWidth: 0, padding: '14px 12px 12px' }}>
+          <p
+            style={{
+              fontSize: '9px',
+              letterSpacing: '0.13em',
+              textTransform: 'uppercase',
+              color: '#aaa',
+              fontWeight: 500,
+              marginBottom: '5px',
+            }}
+          >
             {card.subtitle}
           </p>
-          <h3 className="font-serif" style={{
-            fontSize: '17px',
-            fontWeight: 600,
-            color: '#1c1c1c',
-            lineHeight: 1.2,
-            letterSpacing: '-0.01em',
-            marginBottom: '4px',
-          }}>
+          <h3
+            className="font-serif"
+            style={{
+              fontSize: '15px',
+              fontWeight: 600,
+              color: '#1c1c1c',
+              lineHeight: 1.18,
+              letterSpacing: '-0.01em',
+              marginBottom: '6px',
+            }}
+          >
             {card.title}
           </h3>
-          <p style={{
-            fontSize: '13px',
-            color: '#888',
-            lineHeight: 1.5,
-          }}>
+          <p
+            style={{
+              fontSize: '12px',
+              color: '#888',
+              lineHeight: 1.45,
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {card.description}
           </p>
         </div>
-
-        {/* Arrow */}
-        <div style={{
-          flexShrink: 0,
-          width: '28px',
-          height: '28px',
-          borderRadius: '50%',
-          border: '1px solid rgba(0,0,0,0.08)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          alignSelf: 'center',
-        }}>
-          <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
-            <path d="M2 7h10M8 3l4 4-4 4" stroke="#1c1c1c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+        <div style={{ padding: '0 12px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '10px', color: 'rgba(0,0,0,0.28)', letterSpacing: '0.12em' }}>{card.index}</span>
+          <span
+            style={{
+              width: '26px',
+              height: '26px',
+              borderRadius: '50%',
+              border: '1px solid rgba(0,0,0,0.08)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="#1c1c1c" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
         </div>
       </div>
     </motion.a>
   )
 }
-
-// ── Desktop card ──
+// Desktop card
 const DesktopCard = ({ card }) => {
   const [hovered, setHovered] = useState(false)
 
@@ -323,8 +336,8 @@ const ScrollableCardSection = () => {
   // ── MOBILE ──
   if (isMobile) {
     return (
-      <section id="services" className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+      <section id="services" className="bg-transparent">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <motion.div
             ref={headerRef}
             variants={headingVariants}
@@ -355,13 +368,13 @@ const ScrollableCardSection = () => {
               fontSize: '14px',
               color: '#888',
               lineHeight: 1.55,
-              marginBottom: '24px',
+              marginBottom: '20px',
             }}>
               End-to-end production with single-point accountability.
             </p>
           </motion.div>
 
-          <div style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {cards.map((card, i) => (
               <MobileCard key={i} card={card} />
             ))}
@@ -376,7 +389,7 @@ const ScrollableCardSection = () => {
     <section
       id="services"
       ref={sectionRef}
-      style={{ position: 'relative', width: '100%', height: '380vh', background: '#fafaf8' }}
+      style={{ position: 'relative', width: '100%', height: '380vh', background: 'transparent' }}
     >
       <div style={{ position: 'sticky', top: 0, height: '100svh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 

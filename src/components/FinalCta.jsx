@@ -43,13 +43,18 @@ const FinalCta = () => {
     <section
       id="get-started"
       ref={ref}
-      style={{ background: '#111', overflow: 'hidden' }}
+      style={{ background: 'linear-gradient(180deg, #16181d 0%, #111 18%, #0f1012 100%)', overflow: 'hidden', position: 'relative' }}
     >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-white/25 to-transparent"
+      />
+
       <motion.div
         variants={containerVariants}
         initial={shouldReduceMotion ? false : 'hidden'}
         animate={inView ? 'show' : 'hidden'}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-32"
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28"
       >
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20 items-start">
 
@@ -177,7 +182,7 @@ const FinalCta = () => {
             <div style={{
               background: '#fafaf8',
               borderRadius: '6px',
-              padding: '28px',
+              padding: '24px',
             }}>
               <p style={{
                 fontSize: '10px',
@@ -192,7 +197,7 @@ const FinalCta = () => {
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }} className="grid-cols-1 sm:grid-cols-2">
+                <div style={{ display: 'grid', gap: '12px' }} className="grid-cols-1 sm:grid-cols-2">
                   <div>
                     <label htmlFor="name" className={labelClass} style={{ color: '#888' }}>Full name *</label>
                     <input type="text" id="name" name="name" required placeholder="Full name" className={inputClass} />
@@ -203,7 +208,7 @@ const FinalCta = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }} className="grid-cols-1 sm:grid-cols-2">
+                <div style={{ display: 'grid', gap: '12px' }} className="grid-cols-1 sm:grid-cols-2">
                   <div>
                     <label htmlFor="email" className={labelClass} style={{ color: '#888' }}>Email *</label>
                     <input type="email" id="email" name="email" required placeholder="name@company.com" className={inputClass} />

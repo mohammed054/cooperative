@@ -67,6 +67,7 @@ const Footer = () => {
   const location  = useLocation()
   const ref       = useRef(null)
   const inView    = useInView(ref, { once: true, margin: '-5% 0px' })
+  const isHome    = location.pathname === '/'
 
   const scrollToSection = id => {
     if (location.pathname !== '/') { navigate({ pathname: '/', hash: `#${id}` }); return }
@@ -83,7 +84,21 @@ const Footer = () => {
   }
 
   return (
-    <footer id="site-footer" ref={ref} style={{ background: '#fff', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+    <footer
+      id="site-footer"
+      ref={ref}
+      style={{
+        background: isHome ? '#f7f5f1' : '#fff',
+        borderTop: isHome ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.07)',
+        position: 'relative',
+      }}
+    >
+      {isHome && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-[#15161a]/70 via-[#2b2c30]/20 to-transparent"
+        />
+      )}
 
       <style>{`
         .footer-grid {

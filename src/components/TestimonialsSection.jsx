@@ -82,22 +82,32 @@ const TestimonialsSection = ({
   return (
     <section
       id="testimonials"
-      className="relative overflow-hidden bg-[#fafaf8]"
+      className={[
+        'relative overflow-hidden',
+        isHome ? 'bg-transparent' : 'bg-[#fafaf8]',
+      ].join(' ')}
     >
+      {isHome && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-white/65 to-transparent"
+        />
+      )}
+
       {/* Tonal bridge to FinalCta — subtle gradient at bottom */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#111]/80 to-transparent z-10"
+        className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-[#111]/80 to-transparent"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-32">
+      <div className={['relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8', isHome ? 'py-14 sm:py-20 lg:py-24' : 'py-20 sm:py-24 lg:py-32'].join(' ')}>
 
         <motion.header
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={transition}
-          className="max-w-2xl mb-12 lg:mb-16"
+          className="mb-10 max-w-2xl lg:mb-14"
         >
           <p
             style={{
@@ -135,9 +145,9 @@ const TestimonialsSection = ({
           </p>
         </motion.header>
 
-        <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
+        <div className="grid gap-5 lg:grid-cols-12 lg:items-stretch">
 
-          <div className="lg:col-span-7 flex flex-col">
+          <div className="flex flex-col lg:col-span-7">
             <AnimatePresence mode="wait" initial={false}>
               <motion.figure
                 key={active?.id}
@@ -145,10 +155,13 @@ const TestimonialsSection = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -12 }}
                 transition={transition}
-                className="flex-1 overflow-hidden rounded-xl border border-black/[0.06] bg-white"
+                className={[
+                  'flex-1 overflow-hidden rounded-xl border border-black/[0.06]',
+                  isHome ? 'bg-white/[0.8] backdrop-blur-[2px]' : 'bg-white',
+                ].join(' ')}
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12 flex-1">
-                  <div className="p-6 sm:p-8 lg:col-span-7 lg:p-8 flex flex-col justify-between">
+                  <div className="flex flex-col justify-between p-5 sm:p-7 lg:col-span-7 lg:p-8">
                     <div className="flex items-center justify-between gap-4">
                       <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-surface-2 px-3 py-1 text-xs font-medium text-ink-muted">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -219,7 +232,9 @@ const TestimonialsSection = ({
                       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
                       isActive
                         ? 'border-ink bg-ink text-white'
-                        : 'border-black/[0.08] bg-white text-ink-muted hover:border-ink hover:text-ink',
+                        : isHome
+                          ? 'border-black/[0.08] bg-white/[0.72] text-ink-muted hover:border-ink hover:text-ink'
+                          : 'border-black/[0.08] bg-white text-ink-muted hover:border-ink hover:text-ink',
                     ].join(' ')}
                   >
                     {t.company}
@@ -230,7 +245,7 @@ const TestimonialsSection = ({
           </div>
 
           {/* ── Right column ── */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
+          <div className="mt-1 flex flex-col gap-4 lg:col-span-5 lg:mt-0">
 
             {/* Desktop selector */}
             <div className="hidden lg:block">
@@ -280,9 +295,12 @@ const TestimonialsSection = ({
             </div>
 
             {/* Why teams come back */}
-            <div className="flex-1 rounded-xl border border-black/[0.06] bg-white p-5 flex flex-col">
+            <div className={[
+                'flex flex-1 flex-col rounded-xl border border-black/[0.06] p-5',
+                isHome ? 'bg-white/[0.78] backdrop-blur-[2px]' : 'bg-white',
+              ].join(' ')}>
               <p className="text-sm font-semibold text-ink">Why teams come back</p>
-              <ul className="mt-3 space-y-2 text-sm text-ink-muted">
+              <ul className={['mt-3 text-sm text-ink-muted', isHome ? 'grid grid-cols-2 gap-2.5 text-[13px]' : 'space-y-2'].join(' ')}>
                 <li className="flex gap-2.5">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
                   One accountable producer from setup to show‑close
@@ -313,7 +331,7 @@ const TestimonialsSection = ({
         </div>
 
         {/* ── Nav controls ── */}
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2.5">
             <button
               type="button"

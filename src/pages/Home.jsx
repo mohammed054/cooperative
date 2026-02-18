@@ -11,16 +11,27 @@ import FinalCta from '../components/FinalCta'
 
 const Home = () => {
   return (
-    <div className="App">
-      <Hero />
-      <TrustBar />
-      <ScrollableCardSection />
-      <AnimatedArrow />
-      <ProjectDeck />
-      <CurvedArrow />
-      <GhaimAEProcessSection />
-      <TestimonialsSection />
-      <FinalCta />
+    <div className="App home-cinematic">
+      <div className="home-scene home-scene-hero">
+        <Hero />
+      </div>
+
+      <div className="home-scene home-scene-discovery">
+        <TrustBar />
+        <ScrollableCardSection />
+        <AnimatedArrow />
+      </div>
+
+      <div className="home-scene home-scene-proof">
+        <ProjectDeck />
+        <CurvedArrow />
+        <GhaimAEProcessSection />
+        <TestimonialsSection />
+      </div>
+
+      <div className="home-scene home-scene-close">
+        <FinalCta />
+      </div>
     </div>
   )
 }

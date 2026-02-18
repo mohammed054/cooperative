@@ -79,11 +79,11 @@ const Hero = () => {
       {/* Bottom gradient bridge — subtle transition to light section */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/90 to-transparent"
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[var(--home-light-100)] to-transparent"
       />
 
       {/* ── Content ── */}
-      <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-4 pt-8 pb-6 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8">
+      <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-4 pt-10 pb-10 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8">
         <motion.div
           variants={containerVariants}
           initial={shouldReduceMotion ? false : 'hidden'}

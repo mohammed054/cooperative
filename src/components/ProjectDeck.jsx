@@ -51,16 +51,16 @@ const ProjectDeck = () => {
   return (
     <section
       id="rentals"
-      className="relative w-full bg-[#fafaf8] overflow-hidden"
+      className="relative w-full bg-transparent overflow-hidden"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-32">
-        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24">
+        <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-20">
 
           {/* Left Stacked Images */}
           <motion.div
             className={`
               relative flex-shrink-0
-              w-[85vw] h-[60vw]
+              w-[84vw] h-[58vw]
               sm:w-[420px] sm:h-[420px]
               md:w-[500px] md:h-[500px]
               lg:w-[500px] lg:h-[500px]
@@ -101,7 +101,7 @@ const ProjectDeck = () => {
                   dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
                   onDragEnd={() => handleDragEnd(index)}
                   style={{ zIndex, cursor: 'grab' }}
-                  className="absolute top-0 left-0 w-full h-full rounded-2xl border border-black/[0.06]"
+                  className="absolute top-0 left-0 w-full h-full rounded-2xl border border-black/[0.04]"
                   whileTap={{ cursor: 'grabbing' }}
                   variants={cardVariants(rotation, offsetY)}
                 >
@@ -156,7 +156,7 @@ const ProjectDeck = () => {
                 fontSize: 'clamp(14px, 1.5vw, 16px)',
                 color: '#888',
                 lineHeight: 1.65,
-                marginBottom: '28px',
+                marginBottom: '24px',
               }}
             >
               From investor summits to gala nights, we deliver composed production across every emirate. Our team manages the details so your stakeholders only see the final, polished room.
@@ -164,7 +164,7 @@ const ProjectDeck = () => {
             <div className="flex justify-center lg:justify-start">
               <ScribbleButton
                 to="/work"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition hover:bg-ink-muted"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(0,0,0,0.1)] transition hover:bg-ink-muted"
               >
                 View case studies
               </ScribbleButton>

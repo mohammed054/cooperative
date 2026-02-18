@@ -26,33 +26,22 @@ const TrustBar = () => {
   return (
     <section
       ref={ref}
-      className="relative bg-white pt-20 pb-16 sm:pt-24 sm:pb-20 lg:pt-28 lg:pb-24"
+      className="relative bg-transparent pt-10 pb-12 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
     >
       <motion.div
         variants={containerVariants}
         initial={shouldReduceMotion ? false : 'hidden'}
         animate={inView ? 'show' : 'hidden'}
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '0',
-        }}
+        className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 sm:gap-4 sm:px-6 lg:grid-cols-4 lg:gap-5 lg:px-8"
       >
-        {items.map((item, i) => (
+        {items.map(item => (
           <motion.div
             key={item.title}
             variants={itemVariants}
-            style={{
-              padding: '28px 0',
-              borderBottom: i < 2 ? '1px solid rgba(0,0,0,0.05)' : 'none',
-              borderRight: i % 2 === 0 ? '1px solid rgba(0,0,0,0.05)' : 'none',
-              paddingLeft:  i % 2 === 0 ? '0'    : '28px',
-              paddingRight: i % 2 === 0 ? '28px' : '0',
-            }}
-            className="lg:border-b-0 lg:border-r lg:last:border-r-0 lg:py-8 lg:px-12 lg:first:pl-0 lg:last:pr-0"
+            className="rounded-2xl border border-black/[0.06] bg-white/[0.72] p-4 backdrop-blur-[2px] sm:p-5 lg:p-6"
+            style={{ minHeight: '132px' }}
           >
-            <p className="text-base lg:text-lg font-semibold text-ink mb-1.5 lg:mb-2">
+            <p className="mb-1.5 text-[15px] font-semibold text-ink sm:text-base lg:mb-2 lg:text-lg">
               {item.title}
             </p>
             <p className="text-sm text-ink-muted leading-relaxed">

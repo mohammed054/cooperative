@@ -31,8 +31,8 @@ const GhaimAEProcessSection = () => {
   }
 
   return (
-    <section id="process" ref={ref} className="relative bg-white">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28">
+    <section id="process" ref={ref} className="relative bg-transparent">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16 items-center">
 
           {/* ── Left: text ── */}
@@ -87,18 +87,15 @@ const GhaimAEProcessSection = () => {
             </motion.p>
 
             {/* Step list */}
-            <motion.div variants={containerVariants} style={{ marginBottom: '36px' }}>
-              {steps.map((step, i) => (
+            <motion.div
+              variants={containerVariants}
+              className="mb-8 grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-1"
+            >
+              {steps.map(step => (
                 <motion.div
                   key={step.index}
                   variants={itemVariants}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    padding: '14px 0',
-                    borderBottom: i < steps.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none',
-                  }}
+                  className="flex items-center gap-2.5 rounded-xl border border-black/[0.06] bg-white/[0.68] px-3 py-3 sm:gap-3 sm:px-4"
                 >
                   <span style={{
                     fontSize: '10px',
@@ -112,10 +109,11 @@ const GhaimAEProcessSection = () => {
                     {step.index}
                   </span>
                   <span style={{
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 500,
                     color: '#1c1c1c',
                     letterSpacing: '0.01em',
+                    lineHeight: 1.35,
                   }}>
                     {step.label}
                   </span>
@@ -145,7 +143,7 @@ const GhaimAEProcessSection = () => {
               alt="Event planning in action"
               loading="lazy"
               decoding="async"
-              className="w-full max-w-xs lg:max-w-sm rounded-lg"
+              className="w-full max-w-xs rounded-lg border border-black/[0.06] lg:max-w-sm"
             />
           </motion.div>
 
