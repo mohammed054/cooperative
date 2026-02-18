@@ -1,7 +1,10 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import ScribbleButton from '../components/ScribbleButton'
 
 const Process = () => {
+  const shouldReduceMotion = useReducedMotion()
+
   const steps = [
     {
       title: 'Scope & alignment',
@@ -27,8 +30,17 @@ const Process = () => {
     'Single point of escalation for show-day decisions',
   ]
 
+  const variants = shouldReduceMotion ? {} : {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+    },
+  }
+
   return (
-    <div className="bg-surface-3">
+    <div className="bg-[#fafaf8]">
       <PageIntro
         eyebrow="Process"
         title="A disciplined process that keeps the room calm."
@@ -39,45 +51,113 @@ const Process = () => {
         </ScribbleButton>
       </PageIntro>
 
-      <section className="bg-surface py-16 sm:py-20">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-          {steps.map((step, index) => (
-            <div
-              key={step.title}
-              className="rounded-3xl border border-border bg-surface-3 p-6"
-            >
-              <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
-                Step 0{index + 1}
-              </p>
-              <h2 className="mt-3 text-xl font-semibold text-ink">
-                {step.title}
-              </h2>
-              <p className="mt-3 text-sm text-ink-muted">{step.desc}</p>
-            </div>
-          ))}
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-4 md:grid-cols-2">
+            {steps.map((step, i) => (
+              <motion.div
+                key={step.title}
+                variants={variants}
+                initial={shouldReduceMotion ? false : 'hidden'}
+                whileInView="show"
+                viewport={{ once: true, margin: '-8%' }}
+                transition={{ delay: i * 0.08 }}
+                className="rounded-xl border border-black/[0.06] bg-[#fafaf8] p-6"
+              >
+                <p
+                  style={{
+                    fontSize: '9px',
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: '#aaa',
+                    fontWeight: 500,
+                    marginBottom: '12px',
+                  }}
+                >
+                  Step 0{i + 1}
+                </p>
+                <h2
+                  className="font-serif"
+                  style={{
+                    fontSize: 'clamp(1.1rem, 2vw, 1.3rem)',
+                    fontWeight: 600,
+                    color: '#1c1c1c',
+                    lineHeight: 1.2,
+                    marginBottom: '10px',
+                  }}
+                >
+                  {step.title}
+                </h2>
+                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>
+                  {step.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="bg-surface-3 py-16 sm:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
-          <div>
-            <p className="eyebrow">Communication</p>
-            <h2 className="mt-4 text-3xl font-semibold text-ink font-serif">
-              No surprises, no loose ends.
-            </h2>
-            <p className="mt-4 text-base text-ink-muted">
-              We keep your internal team, venue, and vendors aligned with a
-              consistent cadence and clear documentation.
-            </p>
+      <section className="bg-[#fafaf8] py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <motion.div
+              className="lg:col-span-7"
+              variants={variants}
+              initial={shouldReduceMotion ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-8%' }}
+            >
+              <p
+                style={{
+                  fontSize: '10px',
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: '#aaa',
+                  fontWeight: 500,
+                  marginBottom: '12px',
+                }}
+              >
+                Communication
+              </p>
+              <h2
+                className="font-serif"
+                style={{
+                  fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
+                  fontWeight: 600,
+                  color: '#1c1c1c',
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.02em',
+                  marginBottom: '16px',
+                }}
+              >
+                No surprises, no loose ends.
+              </h2>
+              <p style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', color: '#888', lineHeight: 1.65 }}>
+                We keep your internal team, venue, and vendors aligned with a
+                consistent cadence and clear documentation.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="lg:col-span-5"
+              variants={variants}
+              initial={shouldReduceMotion ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-8%' }}
+            >
+              <ul className="rounded-xl border border-black/[0.06] bg-white p-6">
+                {cadence.map((item, i) => (
+                  <li
+                    key={item}
+                    className={`flex gap-3 text-sm ${i > 0 ? 'mt-3 pt-3 border-t border-black/[0.05]' : ''}`}
+                  >
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
+                    <span className="text-ink">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           </div>
-          <ul className="space-y-4 rounded-3xl border border-border bg-surface-2 p-6 text-sm text-ink">
-            {cadence.map(item => (
-              <li key={item} className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
-                {item}
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
     </div>

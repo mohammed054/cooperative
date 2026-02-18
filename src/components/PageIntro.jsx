@@ -1,3 +1,5 @@
+import { motion, useReducedMotion } from 'framer-motion'
+
 const PageIntro = ({
   eyebrow,
   title,
@@ -5,28 +7,79 @@ const PageIntro = ({
   align = 'left',
   children,
 }) => {
-  const alignment =
-    align === 'center' ? 'text-center items-center' : 'text-left items-start'
+  const shouldReduceMotion = useReducedMotion()
+  const alignment = align === 'center' ? 'text-center items-center' : 'text-left items-start'
+
+  const variants = shouldReduceMotion ? {} : {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+    },
+  }
 
   return (
-    <section className="page-intro border-b border-border bg-surface">
+    <section className="relative border-b border-black/[0.05] bg-white">
       <div
-        className={`page-intro-content mx-auto flex max-w-5xl flex-col gap-6 px-4 py-16 sm:px-6 lg:px-8 ${alignment}`}
+        className={`mx-auto flex max-w-7xl flex-col gap-5 px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 ${alignment}`}
       >
         {eyebrow && (
-          <p className="eyebrow">
+          <motion.p
+            variants={variants}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            animate="show"
+            style={{
+              fontSize: '10px',
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: '#aaa',
+              fontWeight: 500,
+            }}
+          >
             {eyebrow}
-          </p>
+          </motion.p>
         )}
-        <h1 className="text-3xl font-semibold text-ink sm:text-4xl lg:text-5xl font-serif">
+        <motion.h1
+          variants={variants}
+          initial={shouldReduceMotion ? false : 'hidden'}
+          animate="show"
+          className="font-serif"
+          style={{
+            fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+            fontWeight: 600,
+            color: '#1c1c1c',
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+          }}
+        >
           {title}
-        </h1>
+        </motion.h1>
         {description && (
-          <p className="max-w-3xl text-base text-ink-muted sm:text-lg">
+          <motion.p
+            variants={variants}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            animate="show"
+            style={{
+              maxWidth: '600px',
+              fontSize: 'clamp(14px, 1.5vw, 17px)',
+              color: '#888',
+              lineHeight: 1.6,
+            }}
+          >
             {description}
-          </p>
+          </motion.p>
         )}
-        {children}
+        {children && (
+          <motion.div
+            variants={variants}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            animate="show"
+            className="mt-2"
+          >
+            {children}
+          </motion.div>
+        )}
       </div>
     </section>
   )

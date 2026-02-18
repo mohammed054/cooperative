@@ -1,6 +1,9 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 
 const About = () => {
+  const shouldReduceMotion = useReducedMotion()
+
   const values = [
     {
       title: 'Accountability',
@@ -16,54 +19,136 @@ const About = () => {
     },
   ]
 
+  const variants = shouldReduceMotion ? {} : {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+    },
+  }
+
   return (
-    <div className="bg-surface-3">
+    <div className="bg-[#fafaf8]">
       <PageIntro
         eyebrow="About"
         title="A production partner built around composure and detail."
         description="Ghaim is a UAE-based event production studio trusted by corporate, government, and hospitality teams. We keep timelines tight, communication clear, and the final experience refined."
       />
 
-      <section className="bg-surface py-16 sm:py-20">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
-          <div>
-            <p className="eyebrow">How we work</p>
-            <h2 className="mt-4 text-3xl font-semibold text-ink font-serif">
-              Small, senior-led teams.
-            </h2>
-            <p className="mt-4 text-base text-ink-muted">
-              We run lean teams with senior oversight at every stage. That means
-              faster decisions, cleaner execution, and fewer surprises for your
-              stakeholders.
-            </p>
-          </div>
-          <div className="rounded-3xl border border-border bg-surface-3 p-6 text-sm text-ink-muted">
-            <p className="text-ink">
-              Our leadership team has managed large-scale conferences,
-              government summits, and VIP hospitality programs across the UAE.
-            </p>
-            <p className="mt-4">
-              We value precise planning, consistent crew communication, and an
-              onsite presence that keeps the room calm.
-            </p>
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <motion.div
+              className="lg:col-span-7"
+              variants={variants}
+              initial={shouldReduceMotion ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-8%' }}
+            >
+              <p
+                style={{
+                  fontSize: '10px',
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: '#aaa',
+                  fontWeight: 500,
+                  marginBottom: '12px',
+                }}
+              >
+                How we work
+              </p>
+              <h2
+                className="font-serif"
+                style={{
+                  fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
+                  fontWeight: 600,
+                  color: '#1c1c1c',
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.02em',
+                  marginBottom: '16px',
+                }}
+              >
+                Small, senior-led teams.
+              </h2>
+              <p
+                style={{
+                  fontSize: 'clamp(14px, 1.5vw, 16px)',
+                  color: '#888',
+                  lineHeight: 1.65,
+                }}
+              >
+                We run lean teams with senior oversight at every stage. That means
+                faster decisions, cleaner execution, and fewer surprises for your
+                stakeholders.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="lg:col-span-5"
+              variants={variants}
+              initial={shouldReduceMotion ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-8%' }}
+            >
+              <div className="rounded-xl border border-black/[0.06] bg-[#fafaf8] p-6">
+                <p style={{ fontSize: '15px', color: '#1c1c1c', lineHeight: 1.6 }}>
+                  Our leadership team has managed large-scale conferences,
+                  government summits, and VIP hospitality programs across the UAE.
+                </p>
+                <p style={{ fontSize: '15px', color: '#888', lineHeight: 1.6, marginTop: '16px' }}>
+                  We value precise planning, consistent crew communication, and an
+                  onsite presence that keeps the room calm.
+                </p>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="bg-surface-3 py-16 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <p className="eyebrow">Principles</p>
-          <div className="mt-6 grid gap-6 md:grid-cols-3">
-            {values.map(value => (
-              <div
+      <section className="bg-[#fafaf8] py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.p
+            variants={variants}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            whileInView="show"
+            viewport={{ once: true, margin: '-8%' }}
+            style={{
+              fontSize: '10px',
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: '#aaa',
+              fontWeight: 500,
+              marginBottom: '16px',
+            }}
+          >
+            Principles
+          </motion.p>
+          <div className="grid gap-4 md:grid-cols-3">
+            {values.map((value, i) => (
+              <motion.div
                 key={value.title}
-                className="rounded-3xl border border-border bg-surface-2 p-6"
+                variants={variants}
+                initial={shouldReduceMotion ? false : 'hidden'}
+                whileInView="show"
+                viewport={{ once: true, margin: '-8%' }}
+                transition={{ delay: i * 0.08 }}
+                className="rounded-xl border border-black/[0.06] bg-white p-6"
               >
-                <h3 className="text-lg font-semibold text-ink">
+                <h3
+                  style={{
+                    fontSize: '17px',
+                    fontWeight: 600,
+                    color: '#1c1c1c',
+                    marginBottom: '10px',
+                  }}
+                >
                   {value.title}
                 </h3>
-                <p className="mt-3 text-sm text-ink-muted">{value.desc}</p>
-              </div>
+                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>
+                  {value.desc}
+                </p>
+              </motion.div>
             ))}
           </div>
         </div>

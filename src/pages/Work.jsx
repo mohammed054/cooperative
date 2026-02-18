@@ -1,68 +1,140 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
 import { caseStudies } from '../data/siteData'
 import ScribbleButton from '../components/ScribbleButton'
 
 const Work = () => {
+  const shouldReduceMotion = useReducedMotion()
+
+  const variants = shouldReduceMotion ? {} : {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+    },
+  }
+
   return (
-    <div className="bg-surface-3">
+    <div className="bg-[#fafaf8]">
       <PageIntro
         eyebrow="Work"
         title="Selected projects across the UAE."
         description="A snapshot of recent productions delivered with tight timelines, composed crews, and high-touch execution."
       />
 
-      <section className="bg-surface py-16 sm:py-20">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
-          {caseStudies.map(study => (
-            <Link
-              key={study.slug}
-              to={`/work/${study.slug}`}
-              className="group overflow-hidden rounded-3xl border border-border bg-surface-3 transition hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(17,17,17,0.12)]"
-            >
-              <div className="h-56 w-full overflow-hidden">
-                <img
-                  src={study.image}
-                  alt={study.title}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div className="p-6">
-                <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
-                  {study.location}
-                </p>
-                <h2 className="mt-3 text-xl font-semibold text-ink">
-                  {study.title}
-                </h2>
-                <p className="mt-3 text-sm text-ink-muted">{study.summary}</p>
-                <span className="mt-6 inline-flex text-sm font-semibold text-ink">
-                  View case study
-                </span>
-              </div>
-            </Link>
-          ))}
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-5 lg:grid-cols-3">
+            {caseStudies.map((study, i) => (
+              <motion.div
+                key={study.slug}
+                variants={variants}
+                initial={shouldReduceMotion ? false : 'hidden'}
+                whileInView="show"
+                viewport={{ once: true, margin: '-8%' }}
+                transition={{ delay: i * 0.08 }}
+              >
+                <Link
+                  to={`/work/${study.slug}`}
+                  className="group block overflow-hidden rounded-xl border border-black/[0.06] bg-[#fafaf8]"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden bg-[#f0eeec]">
+                    <img
+                      src={study.image}
+                      alt={study.title}
+                      className="h-full w-full object-cover transition duration-700 group-hover:brightness-90"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <p
+                      style={{
+                        fontSize: '9px',
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                        color: '#aaa',
+                        fontWeight: 500,
+                        marginBottom: '8px',
+                      }}
+                    >
+                      {study.location}
+                    </p>
+                    <h2
+                      className="font-serif"
+                      style={{
+                        fontSize: 'clamp(1.1rem, 2vw, 1.25rem)',
+                        fontWeight: 600,
+                        color: '#1c1c1c',
+                        lineHeight: 1.2,
+                        marginBottom: '8px',
+                      }}
+                    >
+                      {study.title}
+                    </h2>
+                    <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.55 }}>
+                      {study.summary}
+                    </p>
+                    <span className="mt-4 inline-flex text-sm font-medium text-ink-muted transition-colors group-hover:text-ink">
+                      View case study
+                    </span>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="bg-surface-3 py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-semibold text-ink font-serif">
+      <section className="bg-[#fafaf8] py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <motion.h2
+            variants={variants}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            whileInView="show"
+            viewport={{ once: true, margin: '-8%' }}
+            className="font-serif"
+            style={{
+              fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)',
+              fontWeight: 600,
+              color: '#1c1c1c',
+              lineHeight: 1.15,
+              marginBottom: '12px',
+            }}
+          >
             Planning an event with tight timing?
-          </h2>
-          <p className="mt-4 text-base text-ink-muted">
+          </motion.h2>
+          <motion.p
+            variants={variants}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            whileInView="show"
+            viewport={{ once: true, margin: '-8%' }}
+            style={{
+              fontSize: 'clamp(14px, 1.5vw, 16px)',
+              color: '#888',
+              lineHeight: 1.6,
+              marginBottom: '24px',
+            }}
+          >
             Share your scope and we will respond with a clear plan, timeline,
             and assigned producer.
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          </motion.p>
+          <motion.div
+            variants={variants}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            whileInView="show"
+            viewport={{ once: true, margin: '-8%' }}
+            className="flex flex-wrap justify-center gap-3"
+          >
             <ScribbleButton to="/contact" className="btn-primary text-sm">
               Start a project
             </ScribbleButton>
             <ScribbleButton to="/projects" className="btn-secondary text-sm">
               View the gallery
             </ScribbleButton>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import { useParams } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
 import { caseStudies, services } from '../data/siteData'
@@ -5,6 +6,7 @@ import NotFound from './NotFound'
 import ScribbleButton from '../components/ScribbleButton'
 
 const ServiceDetail = () => {
+  const shouldReduceMotion = useReducedMotion()
   const { slug } = useParams()
   const service = services.find(item => item.slug === slug)
 
@@ -16,8 +18,17 @@ const ServiceDetail = () => {
     study => study.slug === service.relatedCase
   )
 
+  const variants = shouldReduceMotion ? {} : {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+    },
+  }
+
   return (
-    <div className="bg-surface-3">
+    <div className="bg-[#fafaf8]">
       <PageIntro
         eyebrow="Service"
         title={service.title}
@@ -33,71 +44,158 @@ const ServiceDetail = () => {
         </div>
       </PageIntro>
 
-      <section className="bg-surface py-16 sm:py-20">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
-          <div className="rounded-3xl border border-border bg-surface-3 p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
-              What's included
-            </p>
-            <ul className="mt-4 space-y-3 text-sm text-ink">
-              {service.includes.map(item => (
-                <li key={item} className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-4 lg:grid-cols-3">
+            <motion.div
+              variants={variants}
+              initial={shouldReduceMotion ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-8%' }}
+              className="rounded-xl border border-black/[0.06] bg-[#fafaf8] p-6"
+            >
+              <p
+                style={{
+                  fontSize: '9px',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: '#aaa',
+                  fontWeight: 500,
+                  marginBottom: '16px',
+                }}
+              >
+                What's included
+              </p>
+              <ul className="space-y-3">
+                {service.includes.map(item => (
+                  <li key={item} className="flex gap-3 text-sm text-ink">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
 
-          <div className="rounded-3xl border border-border bg-surface-3 p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
-              Ideal for
-            </p>
-            <ul className="mt-4 space-y-3 text-sm text-ink">
-              {service.idealFor.map(item => (
-                <li key={item} className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+            <motion.div
+              variants={variants}
+              initial={shouldReduceMotion ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-8%' }}
+              transition={{ delay: 0.06 }}
+              className="rounded-xl border border-black/[0.06] bg-[#fafaf8] p-6"
+            >
+              <p
+                style={{
+                  fontSize: '9px',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: '#aaa',
+                  fontWeight: 500,
+                  marginBottom: '16px',
+                }}
+              >
+                Ideal for
+              </p>
+              <ul className="space-y-3">
+                {service.idealFor.map(item => (
+                  <li key={item} className="flex gap-3 text-sm text-ink">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
 
-          <div className="rounded-3xl border border-border bg-surface-3 p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-ink-subtle">
-              Delivery standards
-            </p>
-            <ul className="mt-4 space-y-3 text-sm text-ink">
-              {service.standards.map(item => (
-                <li key={item} className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-ink" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <motion.div
+              variants={variants}
+              initial={shouldReduceMotion ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-8%' }}
+              transition={{ delay: 0.12 }}
+              className="rounded-xl border border-black/[0.06] bg-[#fafaf8] p-6"
+            >
+              <p
+                style={{
+                  fontSize: '9px',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: '#aaa',
+                  fontWeight: 500,
+                  marginBottom: '16px',
+                }}
+              >
+                Delivery standards
+              </p>
+              <ul className="space-y-3">
+                {service.standards.map(item => (
+                  <li key={item} className="flex gap-3 text-sm text-ink">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {relatedCase && (
-        <section className="border-t border-border bg-surface-3 py-16 sm:py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <p className="eyebrow">Related case study</p>
-            <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="overflow-hidden rounded-3xl border border-border">
-                <img
-                  src={relatedCase.image}
-                  alt={relatedCase.title}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div>
-                <h2 className="text-2xl font-semibold text-ink">
+        <section className="border-t border-black/[0.05] bg-[#fafaf8] py-20 sm:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <motion.p
+              variants={variants}
+              initial={shouldReduceMotion ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-8%' }}
+              style={{
+                fontSize: '10px',
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: '#aaa',
+                fontWeight: 500,
+                marginBottom: '16px',
+              }}
+            >
+              Related case study
+            </motion.p>
+            <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
+              <motion.div
+                variants={variants}
+                initial={shouldReduceMotion ? false : 'hidden'}
+                whileInView="show"
+                viewport={{ once: true, margin: '-8%' }}
+                className="lg:col-span-7"
+              >
+                <div className="overflow-hidden rounded-xl border border-black/[0.06]">
+                  <img
+                    src={relatedCase.image}
+                    alt={relatedCase.title}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              </motion.div>
+              <motion.div
+                variants={variants}
+                initial={shouldReduceMotion ? false : 'hidden'}
+                whileInView="show"
+                viewport={{ once: true, margin: '-8%' }}
+                className="lg:col-span-5"
+              >
+                <h2
+                  className="font-serif"
+                  style={{
+                    fontSize: 'clamp(1.4rem, 3vw, 1.8rem)',
+                    fontWeight: 600,
+                    color: '#1c1c1c',
+                    lineHeight: 1.2,
+                    marginBottom: '12px',
+                  }}
+                >
                   {relatedCase.title}
                 </h2>
-                <p className="mt-4 text-sm text-ink-muted">
+                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>
                   {relatedCase.summary}
                 </p>
                 <ScribbleButton
@@ -106,28 +204,55 @@ const ServiceDetail = () => {
                 >
                   Read the case study
                 </ScribbleButton>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
       )}
 
       {/* Related Services */}
-      <section className="border-t border-border bg-surface-3 py-16 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-semibold text-ink">Other services</h2>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="border-t border-black/[0.05] bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.h2
+            variants={variants}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            whileInView="show"
+            viewport={{ once: true, margin: '-8%' }}
+            className="font-serif"
+            style={{
+              fontSize: 'clamp(1.4rem, 3vw, 1.8rem)',
+              fontWeight: 600,
+              color: '#1c1c1c',
+              lineHeight: 1.2,
+              marginBottom: '24px',
+            }}
+          >
+            Other services
+          </motion.h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {services
               .filter(s => s.slug !== service.slug)
-              .map(relatedService => (
-                <div
+              .map((relatedService, i) => (
+                <motion.div
                   key={relatedService.slug}
-                  className="rounded-3xl border border-border bg-surface-2 p-6"
+                  variants={variants}
+                  initial={shouldReduceMotion ? false : 'hidden'}
+                  whileInView="show"
+                  viewport={{ once: true, margin: '-8%' }}
+                  transition={{ delay: i * 0.06 }}
+                  className="rounded-xl border border-black/[0.06] bg-[#fafaf8] p-6"
                 >
-                  <h3 className="text-lg font-semibold text-ink">
+                  <h3
+                    style={{
+                      fontSize: '17px',
+                      fontWeight: 600,
+                      color: '#1c1c1c',
+                      marginBottom: '8px',
+                    }}
+                  >
                     {relatedService.title}
                   </h3>
-                  <p className="mt-2 text-sm text-ink-muted">
+                  <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.55 }}>
                     {relatedService.summary}
                   </p>
                   <ScribbleButton
@@ -136,7 +261,7 @@ const ServiceDetail = () => {
                   >
                     Learn more
                   </ScribbleButton>
-                </div>
+                </motion.div>
               ))}
           </div>
         </div>
