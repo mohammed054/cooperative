@@ -389,7 +389,14 @@ const ScrollableCardSection = () => {
     <section
       id="services"
       ref={sectionRef}
-      style={{ position: 'relative', width: '100%', height: '380vh', background: 'transparent' }}
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '260vh',
+        background: 'transparent',
+        overflow: 'clip',
+        overscrollBehavior: 'contain',
+      }}
     >
       <div style={{ position: 'sticky', top: 0, height: '100svh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
@@ -460,7 +467,7 @@ const ScrollableCardSection = () => {
             transition: 'width 0.08s linear',
           }} />
         </div>
-        <div style={{ height: '20px', flexShrink: 0 }} />
+        <div style={{ height: '8px', flexShrink: 0 }} />
       </div>
     </section>
   )

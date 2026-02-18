@@ -3,6 +3,7 @@ import { motion, useInView, useReducedMotion } from 'framer-motion'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { caseStudies, services } from '../data/siteData'
 import { assetUrl } from '../lib/assetUrl'
+import ScribbleButton from './ScribbleButton'
 
 const IconFacebook = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -138,21 +139,14 @@ const Footer = () => {
       ref={ref}
       style={{
         background: isHome
-          ? 'linear-gradient(180deg, #16181d 0%, #f2eee7 17%, #f5f2eb 62%, #f3eee5 100%)'
+          ? 'linear-gradient(180deg, #0f1012 0%, #f2eee7 22%, #f5f2eb 64%, #f3eee5 100%)'
           : 'linear-gradient(180deg, rgba(248,244,236,0.95) 0%, #f6f2eb 62%, #f3ede4 100%)',
         borderTop: isHome
-          ? '1px solid rgba(255,255,255,0.1)'
+          ? 'none'
           : '1px solid rgba(0,0,0,0.05)',
         position: 'relative',
       }}
     >
-      {isHome && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-[#15161a]/68 via-[#2b2c30]/18 to-transparent"
-        />
-      )}
-
       <style>{`
         .footer-grid {
           display: grid;
@@ -355,8 +349,9 @@ const Footer = () => {
               )}
             </div>
 
-            <Link
+            <ScribbleButton
               to="/contact"
+              showArrow={false}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -382,7 +377,7 @@ const Footer = () => {
               }}
             >
               Request a proposal
-            </Link>
+            </ScribbleButton>
           </motion.div>
         </div>
 

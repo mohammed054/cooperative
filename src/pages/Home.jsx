@@ -12,7 +12,7 @@ import FinalCta from '../components/FinalCta'
 const Home = () => {
   return (
     <div className="App home-cinematic">
-      <div className="home-scene home-scene-hero scene-rhythm-hero">
+      <div className="home-scene home-scene-hero">
         <Hero />
       </div>
 

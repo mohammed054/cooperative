@@ -53,14 +53,4 @@
   display: none;
 }
 
-/* Mobile: Disable scribble animation for performance */
-@media (max-width: 768px) {
-  .scribble-svg {
-    display: none;
-  }
-
-  .scribble-button:hover .scribble-svg path {
-    stroke-dashoffset: 12500;
-    animation: none;
-  }
-}
+/* Keep scribble enabled on mobile for visual continuity. */

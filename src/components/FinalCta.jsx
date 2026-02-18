@@ -45,11 +45,6 @@ const FinalCta = () => {
       ref={ref}
       style={{ background: 'linear-gradient(180deg, #16181d 0%, #111 18%, #0f1012 100%)', overflow: 'hidden', position: 'relative' }}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-white/25 to-transparent"
-      />
-
       <motion.div
         variants={containerVariants}
         initial={shouldReduceMotion ? false : 'hidden'}

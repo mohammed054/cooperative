@@ -28,7 +28,7 @@ const Hero = () => {
       }
 
   return (
-    <section id="hero" className="relative h-[100svh] overflow-hidden bg-black">
+    <section id="hero" className="relative min-h-[100svh] overflow-hidden bg-black">
 
       {/* ── Background media ── */}
       <div className="absolute inset-0 h-full w-full">

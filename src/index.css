@@ -120,47 +120,21 @@
   z-index: 1;
 }
 
+.home-scene-hero {
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .home-scene + .home-scene {
-  margin-top: -36px;
-  padding-top: 36px;
-}
-
-.home-scene-discovery::before,
-.home-scene-proof::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(248, 244, 238, 0.85), transparent 85%);
-}
-
-.home-scene-close::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 140px;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(18, 19, 23, 0.72), transparent 82%);
+  margin-top: -24px;
+  padding-top: 24px;
 }
 
 @media (min-width: 768px) {
   .home-scene + .home-scene {
-    margin-top: -56px;
-    padding-top: 56px;
-  }
-
-  .home-scene-discovery::before,
-  .home-scene-proof::before {
-    height: 168px;
-  }
-
-  .home-scene-close::before {
-    height: 180px;
+    margin-top: -40px;
+    padding-top: 40px;
   }
 }
 
@@ -168,34 +142,6 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-}
-
-.cinematic-shell::before,
-.cinematic-shell::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.cinematic-shell::before {
-  background:
-    radial-gradient(820px 520px at 92% 8%, rgba(255, 255, 255, 0.7), transparent 68%),
-    radial-gradient(620px 420px at 6% 32%, rgba(255, 255, 255, 0.36), transparent 72%);
-}
-
-.cinematic-shell::after {
-  background:
-    radial-gradient(740px 440px at 14% 88%, rgba(24, 30, 42, 0.08), transparent 74%),
-    linear-gradient(
-      180deg,
-      rgba(243, 239, 232, 0.42) 0%,
-      rgba(248, 245, 239, 0.14) 18%,
-      rgba(246, 243, 237, 0.06) 35%,
-      rgba(247, 244, 239, 0.14) 58%,
-      rgba(241, 236, 229, 0.35) 100%
-    );
 }
 
 .cinematic-shell-linen {
@@ -229,8 +175,8 @@
 }
 
 .cinematic-scene + .cinematic-scene {
-  margin-top: -22px;
-  padding-top: 22px;
+  margin-top: -14px;
+  padding-top: 14px;
 }
 
 .scene-rhythm-hero {
@@ -292,8 +238,8 @@
 
 @media (min-width: 640px) {
   .cinematic-scene + .cinematic-scene {
-    margin-top: -30px;
-    padding-top: 30px;
+    margin-top: -22px;
+    padding-top: 22px;
   }
 
   .scene-rhythm-hero {
@@ -333,8 +279,8 @@
 
 @media (min-width: 1024px) {
   .cinematic-scene + .cinematic-scene {
-    margin-top: -42px;
-    padding-top: 42px;
+    margin-top: -34px;
+    padding-top: 34px;
   }
 
   .scene-rhythm-hero {
