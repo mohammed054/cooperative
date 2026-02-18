@@ -31,7 +31,6 @@ const AnimatedArrow = () => {
       width="160"
       height="180"
       viewBox="0 0 238 272"
-      // {/* hidden on mobile; desktop: centred with fixed vertical offset (was broken "translate-y-" with no value) */}
       className="hidden sm:block absolute left-1/2 -translate-x-1/2 -translate-y-20 z-50"
     >
       <g>

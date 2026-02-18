@@ -66,7 +66,7 @@ const Hero = () => {
       {/* Primary gradient — deeper at bottom for content legibility */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/88 pointer-events-none" />
 
-      {/* Subtle radial bloom — desktop only, unchanged from original */}
+      {/* Subtle radial bloom — desktop only */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-80 hidden md:block"
@@ -74,6 +74,12 @@ const Hero = () => {
           backgroundImage:
             'radial-gradient(900px 520px at 50% 5%, var(--color-video-overlay-accent), transparent 60%), radial-gradient(700px 520px at 0% 70%, rgba(255,255,255,0.08), transparent 58%)',
         }}
+      />
+
+      {/* Bottom gradient bridge — subtle transition to light section */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/90 to-transparent"
       />
 
       {/* ── Content ── */}

@@ -19,24 +19,24 @@ const FinalCta = () => {
 
   const containerVariants = {
     hidden: {},
-    show: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+    show: { transition: { staggerChildren: 0.12, delayChildren: 0.08 } },
   }
 
   const itemVariants = shouldReduceMotion ? {} : {
-    hidden: { opacity: 0, y: 14 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+    hidden: { opacity: 0, y: 18 },
+    show:   { opacity: 1, y: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } },
   }
 
   // Shared input class
   const inputClass = `
     w-full px-4 py-3 rounded-lg text-sm text-ink bg-white
-    border border-border
-    focus:outline-none focus:ring-2 focus:ring-ink focus:border-transparent
-    transition-all duration-200 placeholder:text-ink-muted/60
+    border border-black/[0.08]
+    focus:outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink/30
+    transition-all duration-200 placeholder:text-ink-muted/50
   `
 
   const labelClass = `
-    block text-xs font-medium uppercase tracking-[0.1em] text-white/50 mb-2
+    block text-xs font-medium uppercase tracking-[0.1em] text-white/40 mb-2
   `
 
   return (
@@ -45,88 +45,69 @@ const FinalCta = () => {
       ref={ref}
       style={{ background: '#111', overflow: 'hidden' }}
     >
-      <style>{`
-        .cta-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 48px;
-          align-items: start;
-        }
-        @media (min-width: 1024px) {
-          .cta-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-          }
-        }
-      `}</style>
-
       <motion.div
         variants={containerVariants}
         initial={shouldReduceMotion ? false : 'hidden'}
         animate={inView ? 'show' : 'hidden'}
-        style={{ maxWidth: '1280px', margin: '0 auto', padding: '80px 20px' }}
-        className="sm:px-6 lg:px-8"
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-32"
       >
-        <div className="cta-grid">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20 items-start">
 
           {/* ── Left: headline + trust ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
             <motion.div variants={itemVariants}>
               <p style={{
                 fontSize: '10px',
                 letterSpacing: '0.22em',
                 textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.35)',
+                color: 'rgba(255,255,255,0.3)',
                 fontWeight: 500,
-                marginBottom: '16px',
+                marginBottom: '14px',
               }}>
                 Get started
               </p>
               <h2
                 className="font-serif"
                 style={{
-                  fontSize: 'clamp(2rem, 5vw, 3.6rem)',
+                  fontSize: 'clamp(1.8rem, 4.5vw, 3rem)',
                   fontWeight: 600,
                   color: '#fff',
-                  lineHeight: 1.05,
+                  lineHeight: 1.08,
                   letterSpacing: '-0.02em',
-                  marginBottom: '20px',
+                  marginBottom: '16px',
                 }}
               >
                 Let's build your next event.
               </h2>
 
-              {/* Thin rule */}
-              <div style={{ width: '40px', height: '1px', background: 'rgba(255,255,255,0.2)', marginBottom: '20px' }} />
-
               <p style={{
-                fontSize: 'clamp(14px, 1.6vw, 16px)',
-                color: 'rgba(255,255,255,0.55)',
-                lineHeight: 1.65,
-                maxWidth: '400px',
+                fontSize: 'clamp(14px, 1.5vw, 16px)',
+                color: 'rgba(255,255,255,0.5)',
+                lineHeight: 1.6,
+                maxWidth: '380px',
               }}>
-                Share your timeline, venue, and priorities. We'll respond with a clear plan and the right team within 24 hours.
+                Share your timeline, venue, and priorities. We'll respond with a clear plan within 24 hours.
               </p>
             </motion.div>
 
             {/* Trust signals */}
-            <motion.div variants={itemVariants} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <motion.div variants={itemVariants} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
                 'Response within 24 hours',
                 'Senior-led crews, not juniors',
                 'UAE-wide coverage',
               ].map(item => (
-                <p key={item} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>
-                  <span style={{ display: 'block', width: '12px', height: '1px', background: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+                <p key={item} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+                  <span style={{ display: 'block', width: '12px', height: '1px', background: 'rgba(255,255,255,0.2)', flexShrink: 0 }} />
                   {item}
                 </p>
               ))}
             </motion.div>
 
             {/* Contact links */}
-            <motion.div variants={itemVariants} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <p style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>
+            <motion.div variants={itemVariants} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <p style={{ fontSize: '10px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', fontWeight: 500 }}>
                 Or reach out directly
               </p>
 
@@ -158,13 +139,13 @@ const FinalCta = () => {
                     alignItems: 'center',
                     gap: '10px',
                     fontSize: '14px',
-                    color: 'rgba(255,255,255,0.55)',
+                    color: 'rgba(255,255,255,0.5)',
                     textDecoration: 'none',
                     transition: 'color 0.22s ease',
                     width: 'fit-content',
                   }}
                   onMouseEnter={e => { e.currentTarget.style.color = '#fff' }}
-                  onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.55)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.5)' }}
                 >
                   {icon}
                   {label}
@@ -183,7 +164,7 @@ const FinalCta = () => {
                   }} />
                   <span style={{ position: 'relative', width: '8px', height: '8px', borderRadius: '50%', background: '#34d399' }} />
                 </span>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em' }}>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.03em' }}>
                   Available for urgent requirements
                 </span>
               </div>
@@ -196,13 +177,11 @@ const FinalCta = () => {
             <div style={{
               background: '#fafaf8',
               borderRadius: '6px',
-              border: '1px solid rgba(255,255,255,0.06)',
-              padding: '32px',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+              padding: '28px',
             }}>
               <p style={{
                 fontSize: '10px',
-                letterSpacing: '0.18em',
+                letterSpacing: '0.16em',
                 textTransform: 'uppercase',
                 color: '#aaa',
                 fontWeight: 500,
@@ -211,32 +190,32 @@ const FinalCta = () => {
                 Request a proposal
               </p>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }} className="grid-cols-1 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="name" className={labelClass} style={{ color: '#999' }}>Full name *</label>
+                    <label htmlFor="name" className={labelClass} style={{ color: '#888' }}>Full name *</label>
                     <input type="text" id="name" name="name" required placeholder="Full name" className={inputClass} />
                   </div>
                   <div>
-                    <label htmlFor="company" className={labelClass} style={{ color: '#999' }}>Company *</label>
+                    <label htmlFor="company" className={labelClass} style={{ color: '#888' }}>Company *</label>
                     <input type="text" id="company" name="company" required placeholder="Company name" className={inputClass} />
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }} className="grid-cols-1 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="email" className={labelClass} style={{ color: '#999' }}>Email *</label>
+                    <label htmlFor="email" className={labelClass} style={{ color: '#888' }}>Email *</label>
                     <input type="email" id="email" name="email" required placeholder="name@company.com" className={inputClass} />
                   </div>
                   <div>
-                    <label htmlFor="phone" className={labelClass} style={{ color: '#999' }}>Phone</label>
+                    <label htmlFor="phone" className={labelClass} style={{ color: '#888' }}>Phone</label>
                     <input type="tel" id="phone" name="phone" placeholder="+971 XX XXX XXXX" className={inputClass} />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="service" className={labelClass} style={{ color: '#999' }}>Service *</label>
+                  <label htmlFor="service" className={labelClass} style={{ color: '#888' }}>Service *</label>
                   <select id="service" name="service" required className={inputClass}>
                     <option value="">Select a service</option>
                     <option value="event-production">Event production</option>
@@ -248,7 +227,7 @@ const FinalCta = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className={labelClass} style={{ color: '#999' }}>How can we help? *</label>
+                  <label htmlFor="message" className={labelClass} style={{ color: '#888' }}>How can we help? *</label>
                   <textarea
                     id="message"
                     name="message"
@@ -268,17 +247,17 @@ const FinalCta = () => {
                   disabled={isSubmitting}
                   style={{
                     width: '100%',
-                    height: '52px',
+                    height: '48px',
                     background: isSubmitting ? '#555' : '#1c1c1c',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '6px',
                     fontSize: '12px',
                     fontWeight: 600,
-                    letterSpacing: '0.12em',
+                    letterSpacing: '0.1em',
                     textTransform: 'uppercase',
                     cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                    transition: 'background 0.25s ease, box-shadow 0.25s ease',
+                    transition: 'background 0.25s ease',
                     marginTop: '4px',
                   }}
                   onMouseEnter={e => { if (!isSubmitting) e.currentTarget.style.background = '#2d2d2d' }}
@@ -301,8 +280,8 @@ const FinalCta = () => {
                   </p>
                 )}
 
-                <p style={{ fontSize: '11px', color: '#bbb', textAlign: 'center', letterSpacing: '0.02em' }}>
-                  We respond within 24 hours. Your information is secure and confidential.
+                <p style={{ fontSize: '11px', color: '#aaa', textAlign: 'center', letterSpacing: '0.02em' }}>
+                  We respond within 24 hours. Your information is secure.
                 </p>
 
               </form>
@@ -314,7 +293,7 @@ const FinalCta = () => {
         {/* Back to top */}
         <motion.div
           variants={itemVariants}
-          style={{ marginTop: '64px', display: 'flex', justifyContent: 'center' }}
+          style={{ marginTop: '48px', display: 'flex', justifyContent: 'center' }}
         >
           <button
             onClick={scrollToTop}
@@ -323,16 +302,16 @@ const FinalCta = () => {
               alignItems: 'center',
               gap: '8px',
               fontSize: '11px',
-              letterSpacing: '0.14em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.25)',
+              color: 'rgba(255,255,255,0.2)',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
               transition: 'color 0.22s ease',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)' }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.25)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.5)' }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.2)' }}
           >
             <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
               <path d="M7 12V2M3 6l4-4 4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />

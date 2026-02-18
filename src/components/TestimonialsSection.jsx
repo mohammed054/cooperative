@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from 'react-icons/fa'
 import { assetUrl } from '../lib/assetUrl'
-import ScribbleButton from './ScribbleButton'
 
 const getInitials = name => {
   const parts = String(name).trim().split(/\s+/).filter(Boolean)
@@ -53,15 +52,12 @@ const TESTIMONIALS = [
 
 const TestimonialsSection = ({
   title = 'Trusted by teams who can\'t miss.',
-  intro = 'Premium rentals and on‑site production, delivered with calm precision — so you can focus on the room.',
-  showLink = true,
+  intro = 'Premium rentals and on‑site production, delivered with calm precision.',
 }) => {
   const shouldReduceMotion = useReducedMotion()
   const location = useLocation()
   const isHome = location.pathname === '/'
   const proposalHref = '#get-started'
-  const processHref = isHome ? '#process' : '/process'
-  const isProcessAnchor = String(processHref).startsWith('#')
   const [activeId, setActiveId] = useState(TESTIMONIALS[0]?.id)
 
   const activeIndex = useMemo(
@@ -72,7 +68,7 @@ const TestimonialsSection = ({
 
   const transition = shouldReduceMotion
     ? { duration: 0 }
-    : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }
+    : { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
 
   const goPrev = () => {
     const nextIndex = (activeIndex - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
@@ -86,75 +82,97 @@ const TestimonialsSection = ({
   return (
     <section
       id="testimonials"
-      className="relative overflow-hidden bg-surface-2 py-12 sm:py-16"  // was py-24 sm:py-32
+      className="relative overflow-hidden bg-[#fafaf8]"
     >
+      {/* Tonal bridge to FinalCta — subtle gradient at bottom */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-70"
-        style={{
-          backgroundImage:
-            'radial-gradient(900px 500px at 50% -10%, rgba(155, 107, 61, 0.16), transparent 60%), radial-gradient(700px 500px at 0% 65%, rgba(0, 0, 0, 0.08), transparent 55%)',
-        }}
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#111]/80 to-transparent z-10"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-32">
 
         <motion.header
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={transition}
-          className="max-w-3xl"
+          className="max-w-2xl mb-12 lg:mb-16"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-ink-subtle">
+          <p
+            style={{
+              fontSize: '10px',
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: '#aaa',
+              fontWeight: 500,
+              marginBottom: '12px',
+            }}
+          >
             Testimonials
           </p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink sm:text-4xl lg:text-5xl font-serif"> {/* was mt-4, text-4xl sm:text-5xl lg:text-6xl */}
+          <h2
+            className="font-serif"
+            style={{
+              fontSize: 'clamp(1.6rem, 4vw, 2.6rem)',
+              fontWeight: 600,
+              color: '#1c1c1c',
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              marginBottom: '14px',
+            }}
+          >
             {title}
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base"> {/* was mt-5, text-base sm:text-lg */}
+          <p
+            style={{
+              fontSize: 'clamp(14px, 1.5vw, 16px)',
+              color: '#888',
+              lineHeight: 1.6,
+            }}
+          >
             {intro}
           </p>
         </motion.header>
 
-        <div className="mt-8 grid gap-4 lg:mt-10 lg:grid-cols-12 lg:items-stretch">
+        <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
 
           <div className="lg:col-span-7 flex flex-col">
             <AnimatePresence mode="wait" initial={false}>
               <motion.figure
                 key={active?.id}
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
+                exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -12 }}
                 transition={transition}
-                className="flex-1 overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-[0_8px_40px_rgba(22,22,22,0.08)] flex flex-col lg:flex-row"
+                className="flex-1 overflow-hidden rounded-xl border border-black/[0.06] bg-white"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12 flex-1">
-                  <div className="p-6 sm:p-8 lg:col-span-7 lg:p-8 flex flex-col justify-between"> {/* was p-8 sm:p-10 lg:p-12 */}
+                  <div className="p-6 sm:p-8 lg:col-span-7 lg:p-8 flex flex-col justify-between">
                     <div className="flex items-center justify-between gap-4">
-                      <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs font-semibold text-ink-muted">
+                      <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-surface-2 px-3 py-1 text-xs font-medium text-ink-muted">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                         Client feedback
                       </div>
-                      <p className="text-xs font-medium text-ink-subtle">
+                      <p className="text-xs text-ink-subtle">
                         {active?.event} • {active?.location}
                       </p>
                     </div>
 
                     <div>
-                      <FaQuoteLeft className="mt-6 text-3xl text-ink-subtle opacity-40" aria-hidden="true" />
-                      <blockquote className="mt-4 text-base font-medium leading-snug tracking-tight text-ink sm:text-lg">
+                      <FaQuoteLeft className="mt-5 text-2xl text-ink-subtle opacity-30" aria-hidden="true" />
+                      <blockquote className="mt-3 text-base font-medium leading-snug text-ink">
                         {active?.quote}
                       </blockquote>
                     </div>
 
-                    <figcaption className="mt-6 flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-ink text-xs font-semibold text-white"> {/* was h-11 w-11 */}
+                    <figcaption className="mt-5 flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-ink text-xs font-semibold text-white">
                         {getInitials(active?.name)}
                       </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-ink">{active?.name}</p>
-                        <p className="truncate text-xs text-ink-muted">{active?.role} • {active?.company}</p> {/* was text-sm */}
+                        <p className="truncate text-xs text-ink-muted">{active?.role} • {active?.company}</p>
                       </div>
                     </figcaption>
                   </div>
@@ -165,17 +183,17 @@ const TestimonialsSection = ({
                       alt={`${active?.event} in ${active?.location}`}
                       loading="lazy"
                       decoding="async"
-                      initial={shouldReduceMotion ? false : { scale: 1.03 }}
+                      initial={shouldReduceMotion ? false : { scale: 1.02 }}
                       animate={{ scale: 1 }}
                       transition={transition}
-                      className="h-48 w-full object-cover lg:h-full" // was h-64
+                      className="h-48 w-full object-cover lg:h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/50 via-black/10 to-transparent" />
-                    <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5"> {/* was bottom-5 left-5 right-5 gap-2 */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-black/10 to-transparent" />
+                    <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5">
                       {(active?.tags ?? []).map(tag => (
                         <span
                           key={tag}
-                          className="inline-flex items-center rounded-full bg-white/[0.85] px-2.5 py-0.5 text-xs font-semibold text-ink-muted backdrop-blur"
+                          className="inline-flex items-center rounded-full bg-white/[0.88] px-2.5 py-0.5 text-xs font-medium text-ink-muted backdrop-blur"
                         >
                           {tag}
                         </span>
@@ -197,11 +215,11 @@ const TestimonialsSection = ({
                     onClick={() => setActiveId(t.id)}
                     aria-pressed={isActive}
                     className={[
-                      'shrink-0 rounded-full border px-4 py-1.5 text-xs font-semibold transition',
+                      'shrink-0 rounded-full border px-4 py-1.5 text-xs font-medium transition',
                       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
                       isActive
                         ? 'border-ink bg-ink text-white'
-                        : 'border-border bg-surface-2 text-ink-muted hover:border-ink hover:text-ink',
+                        : 'border-black/[0.08] bg-white text-ink-muted hover:border-ink hover:text-ink',
                     ].join(' ')}
                   >
                     {t.company}
@@ -212,10 +230,11 @@ const TestimonialsSection = ({
           </div>
 
           {/* ── Right column ── */}
-          <div className="lg:col-span-5 flex flex-col">
+          <div className="lg:col-span-5 flex flex-col gap-4">
 
+            {/* Desktop selector */}
             <div className="hidden lg:block">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-subtle mb-3">More feedback</p>
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-subtle mb-3">More feedback</p>
               <div className="flex flex-col gap-2" role="tablist" aria-label="Testimonials">
                 {TESTIMONIALS.map(t => {
                   const isActive = t.id === active?.id
@@ -226,7 +245,7 @@ const TestimonialsSection = ({
                       onClick={() => setActiveId(t.id)}
                       role="tab"
                       aria-selected={isActive}
-                      className="group relative w-full overflow-hidden rounded-xl border border-border bg-surface-2 p-4 text-left transition hover:border-ink hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" // was rounded-2xl p-5
+                      className="group relative w-full overflow-hidden rounded-xl border border-black/[0.06] bg-white p-4 text-left transition hover:border-ink/[0.3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
                     >
                       {isActive && (
                         <motion.div
@@ -235,9 +254,9 @@ const TestimonialsSection = ({
                           className="absolute inset-0 bg-ink"
                         />
                       )}
-                      <div className="relative flex items-start gap-3"> {/* was gap-4 */}
+                      <div className="relative flex items-start gap-3">
                         <div className={[
-                          'flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold shrink-0', // was h-10 w-10
+                          'flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold shrink-0',
                           isActive ? 'bg-white/[0.12] text-white' : 'bg-ink text-white',
                         ].join(' ')}>
                           {getInitials(t.name)}
@@ -246,10 +265,10 @@ const TestimonialsSection = ({
                           <p className={['truncate text-sm font-semibold', isActive ? 'text-white' : 'text-ink'].join(' ')}>
                             {t.name}
                           </p>
-                          <p className={['truncate text-xs', isActive ? 'text-white/70' : 'text-ink-muted'].join(' ')}> {/* was text-sm */}
+                          <p className={['truncate text-xs', isActive ? 'text-white/70' : 'text-ink-muted'].join(' ')}>
                             {t.role} • {t.company}
                           </p>
-                          <p className={['mt-2 text-xs leading-relaxed', isActive ? 'text-white/[0.85]' : 'text-ink-muted'].join(' ')}> {/* was mt-3 text-sm */}
+                          <p className={['mt-2 text-xs leading-relaxed', isActive ? 'text-white/[0.85]' : 'text-ink-muted'].join(' ')}>
                             {t.headline}
                           </p>
                         </div>
@@ -261,9 +280,9 @@ const TestimonialsSection = ({
             </div>
 
             {/* Why teams come back */}
-            <div className="mt-4 flex-1 rounded-2xl border border-border bg-surface-2 p-5 lg:mt-3 flex flex-col">
+            <div className="flex-1 rounded-xl border border-black/[0.06] bg-white p-5 flex flex-col">
               <p className="text-sm font-semibold text-ink">Why teams come back</p>
-              <ul className="mt-3 space-y-2 text-sm text-ink-muted"> {/* was mt-4 space-y-3 */}
+              <ul className="mt-3 space-y-2 text-sm text-ink-muted">
                 <li className="flex gap-2.5">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
                   One accountable producer from setup to show‑close
@@ -278,42 +297,29 @@ const TestimonialsSection = ({
                 </li>
               </ul>
 
-              <div className="mt-auto pt-4 flex flex-col gap-2 sm:flex-row">
-                <ScribbleButton
+              <div className="mt-auto pt-5">
+                <a
                   href={proposalHref}
-                  showArrow={false}
-                  className="inline-flex items-center justify-center gap-3 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(22,22,22,0.15)] transition hover:shadow-[0_12px_36px_rgba(22,22,22,0.2)]"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-ink underline underline-offset-4 hover:text-ink-muted transition"
                 >
                   Request a proposal
-                </ScribbleButton>
-                {isProcessAnchor ? (
-                  <ScribbleButton
-                    href={processHref}
-                    className="inline-flex items-center justify-center rounded-full border border-border bg-surface-2 px-5 py-2.5 text-sm font-semibold text-ink-muted transition hover:border-ink hover:text-ink"
-                  >
-                    See how it works
-                  </ScribbleButton>
-                ) : (
-                  <ScribbleButton
-                    to={processHref}
-                    className="inline-flex items-center justify-center rounded-full border border-border bg-surface-2 px-5 py-2.5 text-sm font-semibold text-ink-muted transition hover:border-ink hover:text-ink"
-                  >
-                    See how it works
-                  </ScribbleButton>
-                )}
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                    <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </a>
               </div>
             </div>
           </div>
         </div>
 
         {/* ── Nav controls ── */}
-        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"> {/* was mt-10 */}
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={goPrev}
               aria-label="Previous testimonial"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-2 text-ink-muted transition hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" // was h-11 w-11
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white text-ink-muted transition hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
             >
               <FaChevronLeft size={12} />
             </button>
@@ -321,23 +327,14 @@ const TestimonialsSection = ({
               type="button"
               onClick={goNext}
               aria-label="Next testimonial"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-2 text-ink-muted transition hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white text-ink-muted transition hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
             >
               <FaChevronRight size={12} />
             </button>
-            <p className="text-xs font-semibold tabular-nums text-ink-muted"> {/* was text-sm */}
+            <p className="text-xs font-medium tabular-nums text-ink-muted">
               {String(activeIndex + 1).padStart(2, '0')} / {String(TESTIMONIALS.length).padStart(2, '0')}
             </p>
           </div>
-
-          {showLink && (
-            <p className="text-sm text-ink-muted">
-              Need a plan by end of week?{' '}
-              <a href={proposalHref} className="font-semibold text-ink underline underline-offset-4">
-                We can move fast.
-              </a>
-            </p>
-          )}
         </div>
 
       </div>

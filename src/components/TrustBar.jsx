@@ -15,18 +15,18 @@ const TrustBar = () => {
 
   const containerVariants = {
     hidden: {},
-    show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+    show: { transition: { staggerChildren: 0.1, delayChildren: 0.12 } },
   }
 
   const itemVariants = shouldReduceMotion ? {} : {
-    hidden: { opacity: 0, y: 12 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+    hidden: { opacity: 0, y: 16 },
+    show:   { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
   }
 
   return (
     <section
       ref={ref}
-      className="border-y border-border bg-white pt-16 pb-20 sm:pt-20 sm:pb-24 lg:pt-28 lg:pb-32"
+      className="relative bg-white pt-20 pb-16 sm:pt-24 sm:pb-20 lg:pt-28 lg:pb-24"
     >
       <motion.div
         variants={containerVariants}
@@ -44,18 +44,18 @@ const TrustBar = () => {
             key={item.title}
             variants={itemVariants}
             style={{
-              padding: '36px 0', // much bigger vertical padding
-              borderBottom: i < 2 ? '1px solid rgba(0,0,0,0.07)' : 'none',
-              borderRight: i % 2 === 0 ? '1px solid rgba(0,0,0,0.07)' : 'none',
-              paddingLeft:  i % 2 === 0 ? '0'    : '36px',
-              paddingRight: i % 2 === 0 ? '36px' : '0',
+              padding: '28px 0',
+              borderBottom: i < 2 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+              borderRight: i % 2 === 0 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+              paddingLeft:  i % 2 === 0 ? '0'    : '28px',
+              paddingRight: i % 2 === 0 ? '28px' : '0',
             }}
-            className="lg:border-b-0 lg:border-r lg:last:border-r-0 lg:py-6 lg:px-10 lg:first:pl-0 lg:last:pr-0"
+            className="lg:border-b-0 lg:border-r lg:last:border-r-0 lg:py-8 lg:px-12 lg:first:pl-0 lg:last:pr-0"
           >
-            <p className="text-lg font-semibold text-ink mb-2">
+            <p className="text-base lg:text-lg font-semibold text-ink mb-1.5 lg:mb-2">
               {item.title}
             </p>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-ink-muted leading-relaxed">
               {item.desc}
             </p>
           </motion.div>
