@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import { faqItems } from '../data/siteData'
 import { Link } from 'react-router-dom'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const FAQ = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -16,14 +17,15 @@ const FAQ = () => {
   }
 
   return (
-    <div className="bg-[#fafaf8]">
+    <CinematicPage>
       <PageIntro
         eyebrow="FAQ"
         title="Answers to the questions we hear most."
         description="If you are planning a production and need a clear next step, start here."
+        bridge="warm"
       />
 
-      <section className="bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-3">
             {faqItems.map((item, i) => (
@@ -53,9 +55,9 @@ const FAQ = () => {
             ))}
           </div>
         </div>
-      </section>
+      </CinematicScene>
 
-      <section className="bg-[#fafaf8] py-16">
+      <CinematicScene rhythm="quiet" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <motion.p
             variants={variants}
@@ -71,8 +73,8 @@ const FAQ = () => {
             .
           </motion.p>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import ScribbleButton from '../components/ScribbleButton'
 import { useLeadSubmission } from '../hooks/useLeadSubmission'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Contact = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -32,14 +33,15 @@ const Contact = () => {
   const labelClass = "block text-sm text-ink"
 
   return (
-    <div className="bg-[#fafaf8]">
+    <CinematicPage>
       <PageIntro
         eyebrow="Contact"
         title="Tell us about the event."
         description="Share your timeline, venue, and priorities. We will respond with a clear plan and the right team within 24 hours."
+        bridge="warm"
       />
 
-      <section className="bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="anchor" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <motion.div
@@ -172,8 +174,8 @@ const Contact = () => {
             </motion.div>
           </div>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

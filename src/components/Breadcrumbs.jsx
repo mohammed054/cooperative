@@ -128,12 +128,12 @@ const Breadcrumbs = () => {
 
   return (
     <nav
-      className="breadcrumb-nav bg-surface-1 border-b border-border"
+      className="breadcrumb-nav border-b border-black/[0.06] bg-[#f8f4ee]/82 backdrop-blur-md"
       aria-label="Breadcrumb"
       role="navigation"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <ol className="breadcrumb-list flex items-center gap-2 py-3 text-sm">
+        <ol className="breadcrumb-list flex items-center gap-2 py-2.5 text-sm">
           <li className="breadcrumb-item flex items-center gap-2">
             <Link
               to="/"

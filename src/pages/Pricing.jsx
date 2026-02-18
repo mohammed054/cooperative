@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import { engagementModels } from '../data/siteData'
 import ScribbleButton from '../components/ScribbleButton'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Pricing = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -16,18 +17,19 @@ const Pricing = () => {
   }
 
   return (
-    <div className="bg-[#fafaf8]">
+    <CinematicPage>
       <PageIntro
         eyebrow="Engagement models"
         title="Clear scopes, flexible engagement."
         description="We tailor every proposal to the event, but our engagement models keep expectations clear and approvals fast."
+        bridge="warm"
       >
         <ScribbleButton to="/contact" className="btn-primary text-sm">
           Request a proposal
         </ScribbleButton>
       </PageIntro>
 
-      <section className="bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-4 lg:grid-cols-3">
             {engagementModels.map((model, i) => (
@@ -82,8 +84,8 @@ const Pricing = () => {
             </p>
           </motion.div>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import ScribbleButton from '../components/ScribbleButton'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Process = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -40,18 +41,19 @@ const Process = () => {
   }
 
   return (
-    <div className="bg-[#fafaf8]">
+    <CinematicPage>
       <PageIntro
         eyebrow="Process"
         title="A disciplined process that keeps the room calm."
         description="We run every project with tight approvals, clear handoffs, and a focused crew. The goal is simple: keep the timeline clean and the experience premium."
+        bridge="warm"
       >
         <ScribbleButton to="/contact" className="btn-primary text-sm">
           Start a project
         </ScribbleButton>
       </PageIntro>
 
-      <section className="bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-4 md:grid-cols-2">
             {steps.map((step, i) => (
@@ -95,9 +97,9 @@ const Process = () => {
             ))}
           </div>
         </div>
-      </section>
+      </CinematicScene>
 
-      <section className="bg-[#fafaf8] py-20 sm:py-24">
+      <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <motion.div
@@ -159,8 +161,8 @@ const Process = () => {
             </motion.div>
           </div>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

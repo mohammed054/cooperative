@@ -4,27 +4,49 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { caseStudies, services } from '../data/siteData'
 import { assetUrl } from '../lib/assetUrl'
 
-// ── Inline SVG social icons — no icon library ─────────────
 const IconFacebook = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
+
 const IconInstagram = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <rect
+      x="2"
+      y="2"
+      width="20"
+      height="20"
+      rx="5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" />
     <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
   </svg>
 )
+
 const IconLinkedIn = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <circle cx="4" cy="4" r="2" stroke="currentColor" strokeWidth="1.5" />
   </svg>
 )
 
-// ── Footer link ───────────────────────────────────────────
 const FooterLink = ({ to, href, onClick, children }) => {
   const base = {
     fontSize: '13px',
@@ -37,40 +59,61 @@ const FooterLink = ({ to, href, onClick, children }) => {
   }
 
   const handlers = {
-    onMouseEnter: e => { e.currentTarget.style.color = '#1c1c1c' },
-    onMouseLeave: e => { e.currentTarget.style.color = '#888' },
+    onMouseEnter: e => {
+      e.currentTarget.style.color = '#1c1c1c'
+    },
+    onMouseLeave: e => {
+      e.currentTarget.style.color = '#888'
+    },
   }
 
   if (to) return <Link to={to} style={base} {...handlers}>{children}</Link>
   if (href) return <a href={href} style={base} {...handlers}>{children}</a>
-  return <button onClick={onClick} style={{ ...base, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }} {...handlers}>{children}</button>
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        ...base,
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        textAlign: 'left',
+      }}
+      {...handlers}
+    >
+      {children}
+    </button>
+  )
 }
 
-// ── Column heading ────────────────────────────────────────
 const ColHeading = ({ children }) => (
-  <p style={{
-    fontSize: '10px',
-    fontWeight: 600,
-    letterSpacing: '0.18em',
-    textTransform: 'uppercase',
-    color: '#1c1c1c',
-    marginBottom: '14px',
-  }}>
+  <p
+    style={{
+      fontSize: '10px',
+      fontWeight: 600,
+      letterSpacing: '0.18em',
+      textTransform: 'uppercase',
+      color: '#1c1c1c',
+      marginBottom: '14px',
+    }}
+  >
     {children}
   </p>
 )
 
-// ── Main component ────────────────────────────────────────
 const Footer = () => {
   const shouldReduceMotion = useReducedMotion()
-  const navigate  = useNavigate()
-  const location  = useLocation()
-  const ref       = useRef(null)
-  const inView    = useInView(ref, { once: true, margin: '-5% 0px' })
-  const isHome    = location.pathname === '/'
+  const navigate = useNavigate()
+  const location = useLocation()
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-5% 0px' })
+  const isHome = location.pathname === '/'
 
   const scrollToSection = id => {
-    if (location.pathname !== '/') { navigate({ pathname: '/', hash: `#${id}` }); return }
+    if (location.pathname !== '/') {
+      navigate({ pathname: '/', hash: `#${id}` })
+      return
+    }
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
   }
 
@@ -78,25 +121,35 @@ const Footer = () => {
     hidden: {},
     show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
   }
-  const itemVariants = shouldReduceMotion ? {} : {
-    hidden: { opacity: 0, y: 10 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
-  }
+  const itemVariants = shouldReduceMotion
+    ? {}
+    : {
+        hidden: { opacity: 0, y: 10 },
+        show: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+        },
+      }
 
   return (
     <footer
       id="site-footer"
       ref={ref}
       style={{
-        background: isHome ? '#f7f5f1' : '#fff',
-        borderTop: isHome ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.07)',
+        background: isHome
+          ? 'linear-gradient(180deg, #16181d 0%, #f2eee7 17%, #f5f2eb 62%, #f3eee5 100%)'
+          : 'linear-gradient(180deg, rgba(248,244,236,0.95) 0%, #f6f2eb 62%, #f3ede4 100%)',
+        borderTop: isHome
+          ? '1px solid rgba(255,255,255,0.1)'
+          : '1px solid rgba(0,0,0,0.05)',
         position: 'relative',
       }}
     >
       {isHome && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-[#15161a]/70 via-[#2b2c30]/20 to-transparent"
+          className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-[#15161a]/68 via-[#2b2c30]/18 to-transparent"
         />
       )}
 
@@ -118,20 +171,24 @@ const Footer = () => {
         variants={containerVariants}
         initial={shouldReduceMotion ? false : 'hidden'}
         animate={inView ? 'show' : 'hidden'}
-        style={{ maxWidth: '1280px', margin: '0 auto', padding: '56px 20px 40px' }}
+        style={{ maxWidth: '1280px', margin: '0 auto', padding: '52px 20px 36px' }}
         className="sm:px-6 lg:px-8"
       >
-
-        {/* ── Main grid ── */}
         <div className="footer-grid">
-
-          {/* Brand — full width on mobile */}
           <motion.div
             variants={itemVariants}
             style={{ gridColumn: '1 / -1' }}
             className="md:col-auto"
           >
-            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <Link
+              to="/"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                textDecoration: 'none',
+              }}
+            >
               <img
                 src={assetUrl('images/logo.webp')}
                 alt="Ghaim UAE"
@@ -139,21 +196,37 @@ const Footer = () => {
                 loading="lazy"
                 decoding="async"
               />
-              <span style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#1c1c1c' }}>
+              <span
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: '#1c1c1c',
+                }}
+              >
                 GHAIM
               </span>
             </Link>
 
-            <p style={{ marginTop: '14px', fontSize: '13px', color: '#888', lineHeight: 1.6, maxWidth: '260px' }}>
-              Event production and curated rentals across the UAE. Senior-led crews, disciplined timelines, calm show control.
+            <p
+              style={{
+                marginTop: '14px',
+                fontSize: '13px',
+                color: '#888',
+                lineHeight: 1.6,
+                maxWidth: '260px',
+              }}
+            >
+              Event production and curated rentals across the UAE. Senior-led crews,
+              disciplined timelines, calm show control.
             </p>
 
-            {/* Social icons */}
             <div style={{ display: 'flex', gap: '16px', marginTop: '20px' }}>
               {[
-                { href: 'https://facebook.com',  label: 'Facebook',  Icon: IconFacebook  },
+                { href: 'https://facebook.com', label: 'Facebook', Icon: IconFacebook },
                 { href: 'https://instagram.com', label: 'Instagram', Icon: IconInstagram },
-                { href: 'https://linkedin.com',  label: 'LinkedIn',  Icon: IconLinkedIn  },
+                { href: 'https://linkedin.com', label: 'LinkedIn', Icon: IconLinkedIn },
               ].map(({ href, label, Icon }) => (
                 <a
                   key={label}
@@ -173,8 +246,14 @@ const Footer = () => {
                     textDecoration: 'none',
                     transition: 'border-color 0.22s, color 0.22s',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#1c1c1c'; e.currentTarget.style.color = '#1c1c1c' }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.color = '#888' }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = '#1c1c1c'
+                    e.currentTarget.style.color = '#1c1c1c'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'
+                    e.currentTarget.style.color = '#888'
+                  }}
                 >
                   <Icon />
                 </a>
@@ -182,30 +261,30 @@ const Footer = () => {
             </div>
           </motion.div>
 
-          {/* Services */}
           <motion.div variants={itemVariants}>
             <ColHeading>Services</ColHeading>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-              {services.map(s => (
-                <li key={s.slug}>
-                  <FooterLink to={`/services/${s.slug}`}>{s.title}</FooterLink>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {services.map(service => (
+                <li key={service.slug}>
+                  <FooterLink to={`/services/${service.slug}`}>{service.title}</FooterLink>
                 </li>
               ))}
               <li style={{ marginTop: '10px' }}>
                 <FooterLink to="/services">
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#1c1c1c' }}>All services →</span>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#1c1c1c' }}>
+                    All services -&gt;
+                  </span>
                 </FooterLink>
               </li>
             </ul>
           </motion.div>
 
-          {/* Work */}
           <motion.div variants={itemVariants}>
             <ColHeading>Work</ColHeading>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-              {caseStudies.map(s => (
-                <li key={s.slug}>
-                  <FooterLink to={`/work/${s.slug}`}>{s.title}</FooterLink>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {caseStudies.map(study => (
+                <li key={study.slug}>
+                  <FooterLink to={`/work/${study.slug}`}>{study.title}</FooterLink>
                 </li>
               ))}
               <li>
@@ -213,46 +292,69 @@ const Footer = () => {
               </li>
               <li style={{ marginTop: '10px' }}>
                 <FooterLink to="/work">
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#1c1c1c' }}>Case studies →</span>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#1c1c1c' }}>
+                    Case studies -&gt;
+                  </span>
                 </FooterLink>
               </li>
             </ul>
           </motion.div>
 
-          {/* Company */}
           <motion.div variants={itemVariants}>
             <ColHeading>Company</ColHeading>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
-                { to: '/about',        label: 'About'        },
-                { to: '/process',      label: 'Process'      },
+                { to: '/about', label: 'About' },
+                { to: '/process', label: 'Process' },
                 { to: '/testimonials', label: 'Testimonials' },
-                { to: '/faq',          label: 'FAQ'          },
-                { to: '/pricing',      label: 'Pricing'      },
+                { to: '/faq', label: 'FAQ' },
+                { to: '/pricing', label: 'Pricing' },
               ].map(({ to, label }) => (
-                <li key={to}><FooterLink to={to}>{label}</FooterLink></li>
+                <li key={to}>
+                  <FooterLink to={to}>{label}</FooterLink>
+                </li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Contact */}
           <motion.div variants={itemVariants}>
             <ColHeading>Contact</ColHeading>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
               {[
-                { href: 'tel:+97142345678',          label: '+971 4 234 5678'        },
-                { href: 'mailto:hello@ghaimuae.com', label: 'hello@ghaimuae.com'     },
-                { href: null,                         label: 'Dubai Design District'  },
-              ].map(({ href, label }) => (
-                href
-                  ? <a key={label} href={href} style={{ fontSize: '13px', color: '#888', textDecoration: 'none', transition: 'color 0.2s', minHeight: '28px', display: 'block', padding: '3px 0' }}
-                      onMouseEnter={e => { e.currentTarget.style.color = '#1c1c1c' }}
-                      onMouseLeave={e => { e.currentTarget.style.color = '#888' }}>{label}</a>
-                  : <p key={label} style={{ fontSize: '13px', color: '#bbb', padding: '3px 0' }}>{label}</p>
-              ))}
+                { href: 'tel:+97142345678', label: '+971 4 234 5678' },
+                { href: 'mailto:hello@ghaimuae.com', label: 'hello@ghaimuae.com' },
+                { href: null, label: 'Dubai Design District' },
+              ].map(({ href, label }) =>
+                href ? (
+                  <a
+                    key={label}
+                    href={href}
+                    style={{
+                      fontSize: '13px',
+                      color: '#888',
+                      textDecoration: 'none',
+                      transition: 'color 0.2s',
+                      minHeight: '28px',
+                      display: 'block',
+                      padding: '3px 0',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.color = '#1c1c1c'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.color = '#888'
+                    }}
+                  >
+                    {label}
+                  </a>
+                ) : (
+                  <p key={label} style={{ fontSize: '13px', color: '#bbb', padding: '3px 0' }}>
+                    {label}
+                  </p>
+                )
+              )}
             </div>
 
-            {/* CTA */}
             <Link
               to="/contact"
               style={{
@@ -272,22 +374,24 @@ const Footer = () => {
                 transition: 'background 0.22s, border-color 0.22s',
                 whiteSpace: 'nowrap',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#333' }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#1c1c1c' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#333'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#1c1c1c'
+              }}
             >
               Request a proposal
             </Link>
           </motion.div>
-
         </div>
 
-        {/* ── Bottom bar ── */}
         <motion.div
           variants={itemVariants}
           style={{
             marginTop: '48px',
             paddingTop: '20px',
-            borderTop: '1px solid rgba(0,0,0,0.07)',
+            borderTop: '1px solid rgba(0,0,0,0.05)',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
@@ -295,13 +399,13 @@ const Footer = () => {
           className="sm:flex-row sm:items-center sm:justify-between"
         >
           <p style={{ fontSize: '11px', color: '#bbb', letterSpacing: '0.03em' }}>
-            © 2026 Ghaim UAE. All rights reserved.
+            (c) 2026 Ghaim UAE. All rights reserved.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
             {[
-              { to: '/privacy', label: 'Privacy policy'  },
-              { to: '/terms',   label: 'Terms of service' },
+              { to: '/privacy', label: 'Privacy policy' },
+              { to: '/terms', label: 'Terms of service' },
             ].map(({ to, label }) => (
               <Link
                 key={to}
@@ -313,8 +417,12 @@ const Footer = () => {
                   transition: 'color 0.2s',
                   letterSpacing: '0.03em',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.color = '#1c1c1c' }}
-                onMouseLeave={e => { e.currentTarget.style.color = '#bbb' }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = '#1c1c1c'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = '#bbb'
+                }}
               >
                 {label}
               </Link>
@@ -332,14 +440,17 @@ const Footer = () => {
                 transition: 'color 0.2s',
                 letterSpacing: '0.03em',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#1c1c1c' }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#bbb' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = '#1c1c1c'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = '#bbb'
+              }}
             >
               Start a project
             </button>
           </div>
         </motion.div>
-
       </motion.div>
     </footer>
   )

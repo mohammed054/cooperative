@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion'
 import { assetUrl } from '../lib/assetUrl'
 import ScribbleButton from './ScribbleButton'
+import { CinematicPage } from './CinematicPage'
 
 // ── Data ─────────────────────────────────────────────────
 const categories = ['All', 'Weddings', 'Corporate', 'Birthday', 'Product Launch']
@@ -300,7 +301,12 @@ export default function OurProjects() {
   }
 
   return (
-    <section id="our-projects" style={{ background: '#fff' }}>
+    <CinematicPage>
+      <section
+        id="our-projects"
+        className="cinematic-scene scene-rhythm-hero scene-bridge-warm"
+        style={{ background: 'transparent' }}
+      >
 
       {/* ── Header ─────────────────────────────────────── */}
       <motion.div
@@ -435,8 +441,8 @@ export default function OurProjects() {
       <div
         className="md:hidden"
         style={{
-          padding: '32px 20px 48px',
-          borderTop: '1px solid rgba(0,0,0,0.07)',
+          padding: '28px 20px 42px',
+          borderTop: '1px solid rgba(0,0,0,0.05)',
           display: 'flex',
           flexDirection: 'column',
           gap: '12px',
@@ -456,6 +462,7 @@ export default function OurProjects() {
         </ScribbleButton>
       </div>
 
-    </section>
+      </section>
+    </CinematicPage>
   )
 }

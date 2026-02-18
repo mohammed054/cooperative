@@ -164,6 +164,210 @@
   }
 }
 
+.cinematic-shell {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.cinematic-shell::before,
+.cinematic-shell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cinematic-shell::before {
+  background:
+    radial-gradient(820px 520px at 92% 8%, rgba(255, 255, 255, 0.7), transparent 68%),
+    radial-gradient(620px 420px at 6% 32%, rgba(255, 255, 255, 0.36), transparent 72%);
+}
+
+.cinematic-shell::after {
+  background:
+    radial-gradient(740px 440px at 14% 88%, rgba(24, 30, 42, 0.08), transparent 74%),
+    linear-gradient(
+      180deg,
+      rgba(243, 239, 232, 0.42) 0%,
+      rgba(248, 245, 239, 0.14) 18%,
+      rgba(246, 243, 237, 0.06) 35%,
+      rgba(247, 244, 239, 0.14) 58%,
+      rgba(241, 236, 229, 0.35) 100%
+    );
+}
+
+.cinematic-shell-linen {
+  background:
+    linear-gradient(
+      180deg,
+      #f8f4ee 0%,
+      #f4f0e9 18%,
+      #f7f5f0 38%,
+      #f3eee6 62%,
+      #f0ebe3 86%,
+      #ece7de 100%
+    );
+}
+
+.cinematic-shell-dark {
+  background:
+    linear-gradient(
+      180deg,
+      #101217 0%,
+      #181a20 24%,
+      #1e2026 50%,
+      #16181d 74%,
+      #121317 100%
+    );
+}
+
+.cinematic-scene {
+  position: relative;
+  z-index: 1;
+}
+
+.cinematic-scene + .cinematic-scene {
+  margin-top: -22px;
+  padding-top: 22px;
+}
+
+.scene-rhythm-hero {
+  padding-top: 1.1rem;
+  padding-bottom: 2.4rem;
+}
+
+.scene-rhythm-dense {
+  padding-top: 1.9rem;
+  padding-bottom: 2.6rem;
+}
+
+.scene-rhythm-medium {
+  padding-top: 2.8rem;
+  padding-bottom: 3.2rem;
+}
+
+.scene-rhythm-airy {
+  padding-top: 3.6rem;
+  padding-bottom: 4rem;
+}
+
+.scene-rhythm-anchor {
+  padding-top: 4.1rem;
+  padding-bottom: 4.8rem;
+}
+
+.scene-rhythm-quiet {
+  padding-top: 2.4rem;
+  padding-bottom: 3.7rem;
+}
+
+.scene-bridge::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 120px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.scene-bridge-warm::before {
+  background: linear-gradient(to bottom, rgba(243, 234, 223, 0.86), transparent 84%);
+}
+
+.scene-bridge-neutral::before {
+  background: linear-gradient(to bottom, rgba(246, 243, 237, 0.82), transparent 84%);
+}
+
+.scene-bridge-soft::before {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.58), transparent 86%);
+}
+
+.scene-bridge-deep::before {
+  background: linear-gradient(to bottom, rgba(30, 34, 44, 0.66), transparent 84%);
+}
+
+@media (min-width: 640px) {
+  .cinematic-scene + .cinematic-scene {
+    margin-top: -30px;
+    padding-top: 30px;
+  }
+
+  .scene-rhythm-hero {
+    padding-top: 1.4rem;
+    padding-bottom: 2.9rem;
+  }
+
+  .scene-rhythm-dense {
+    padding-top: 2.8rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .scene-rhythm-medium {
+    padding-top: 3.5rem;
+    padding-bottom: 4.2rem;
+  }
+
+  .scene-rhythm-airy {
+    padding-top: 4.8rem;
+    padding-bottom: 5.2rem;
+  }
+
+  .scene-rhythm-anchor {
+    padding-top: 5.8rem;
+    padding-bottom: 6.2rem;
+  }
+
+  .scene-rhythm-quiet {
+    padding-top: 3.2rem;
+    padding-bottom: 4.5rem;
+  }
+
+  .scene-bridge::before {
+    height: 162px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cinematic-scene + .cinematic-scene {
+    margin-top: -42px;
+    padding-top: 42px;
+  }
+
+  .scene-rhythm-hero {
+    padding-top: 1.8rem;
+    padding-bottom: 3.4rem;
+  }
+
+  .scene-rhythm-dense {
+    padding-top: 3.5rem;
+    padding-bottom: 4.2rem;
+  }
+
+  .scene-rhythm-medium {
+    padding-top: 4.6rem;
+    padding-bottom: 5.3rem;
+  }
+
+  .scene-rhythm-airy {
+    padding-top: 6rem;
+    padding-bottom: 6.7rem;
+  }
+
+  .scene-rhythm-anchor {
+    padding-top: 7rem;
+    padding-bottom: 7.8rem;
+  }
+
+  .scene-rhythm-quiet {
+    padding-top: 4rem;
+    padding-bottom: 5.4rem;
+  }
+}
+
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-surface-2 shadow-[0_12px_30px_rgba(22,22,22,0.18)] transition hover:bg-ink-muted hover:shadow-[0_16px_42px_rgba(22,22,22,0.22)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink;

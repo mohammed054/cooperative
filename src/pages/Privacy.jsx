@@ -1,16 +1,18 @@
 import { Link } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Privacy = () => {
   return (
-    <div className="bg-surface-3">
+    <CinematicPage>
       <PageIntro
         eyebrow="Privacy"
         title="Privacy policy"
         description="We collect only the information needed to respond to your inquiry and deliver event services."
+        bridge="warm"
       />
 
-      <section className="bg-surface py-16 sm:py-20">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-4xl space-y-6 px-4 text-sm text-ink-muted sm:px-6 lg:px-8">
           <div className="rounded-3xl border border-border bg-surface-3 p-6">
             <h2 className="text-sm font-semibold text-ink">
@@ -35,9 +37,9 @@ const Privacy = () => {
             </p>
           </div>
         </div>
-      </section>
+      </CinematicScene>
 
-      <section className="bg-surface-3 py-12">
+      <CinematicScene rhythm="quiet" bridge="soft">
         <div className="mx-auto max-w-4xl px-4 text-sm text-ink-muted sm:px-6 lg:px-8">
           Need anything clarified?{' '}
           <Link to="/contact" className="font-semibold text-ink">
@@ -45,8 +47,8 @@ const Privacy = () => {
           </Link>
           .
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

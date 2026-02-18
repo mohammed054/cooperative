@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
 import { services } from '../data/siteData'
 import ScribbleButton from '../components/ScribbleButton'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Services = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -23,11 +24,12 @@ const Services = () => {
   }
 
   return (
-    <div className="bg-[#fafaf8]">
+    <CinematicPage>
       <PageIntro
         eyebrow="Services"
         title="Production partners for events that cannot miss."
         description="From full event production to highly technical shows, we build the right team for the scope and stay accountable through show-close."
+        bridge="warm"
       >
         <div className="flex flex-wrap gap-3">
           <ScribbleButton to="/contact" className="btn-primary text-sm">
@@ -39,7 +41,7 @@ const Services = () => {
         </div>
       </PageIntro>
 
-      <section className="bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-4 md:grid-cols-2">
             {services.map((service, i) => (
@@ -92,9 +94,9 @@ const Services = () => {
             ))}
           </div>
         </div>
-      </section>
+      </CinematicScene>
 
-      <section className="bg-[#fafaf8] py-20 sm:py-24">
+      <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <motion.div
@@ -157,8 +159,8 @@ const Services = () => {
             </motion.div>
           </div>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

@@ -1,14 +1,16 @@
 import PageIntro from '../components/PageIntro'
 import TestimonialsSection from '../components/TestimonialsSection'
 import FinalCta from '../components/FinalCta'
+import { CinematicPage } from '../components/CinematicPage'
 
 const Testimonials = () => {
   return (
-    <div className="bg-surface-3">
+    <CinematicPage>
       <PageIntro
         eyebrow="Testimonials"
         title="Feedback from teams who value precision."
         description="Short notes from clients who needed calm execution and a crew that stays ahead of the timeline."
+        bridge="warm"
       />
       <TestimonialsSection
         title="Calm execution, clean timelines."
@@ -16,7 +18,7 @@ const Testimonials = () => {
         showLink={false}
       />
       <FinalCta />
-    </div>
+    </CinematicPage>
   )
 }
 

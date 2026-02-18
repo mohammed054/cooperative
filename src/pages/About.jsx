@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const About = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -29,14 +30,15 @@ const About = () => {
   }
 
   return (
-    <div className="bg-[#fafaf8]">
+    <CinematicPage>
       <PageIntro
         eyebrow="About"
         title="A production partner built around composure and detail."
         description="Ghaim is a UAE-based event production studio trusted by corporate, government, and hospitality teams. We keep timelines tight, communication clear, and the final experience refined."
+        bridge="warm"
       />
 
-      <section className="bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <motion.div
@@ -104,9 +106,9 @@ const About = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </CinematicScene>
 
-      <section className="bg-[#fafaf8] py-20 sm:py-24">
+      <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.p
             variants={variants}
@@ -152,8 +154,8 @@ const About = () => {
             ))}
           </div>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

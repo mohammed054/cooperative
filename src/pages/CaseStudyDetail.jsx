@@ -4,6 +4,7 @@ import PageIntro from '../components/PageIntro'
 import { caseStudies, services } from '../data/siteData'
 import NotFound from './NotFound'
 import ScribbleButton from '../components/ScribbleButton'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const CaseStudyDetail = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -24,11 +25,12 @@ const CaseStudyDetail = () => {
   }
 
   return (
-    <div className="bg-[#fafaf8]">
+    <CinematicPage>
       <PageIntro
         eyebrow="Case study"
         title={study.title}
         description={study.summary}
+        bridge="warm"
       >
         <div className="flex flex-wrap gap-3">
           <ScribbleButton to="/contact" className="btn-primary text-sm">
@@ -40,7 +42,7 @@ const CaseStudyDetail = () => {
         </div>
       </PageIntro>
 
-      <section className="bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
             <motion.div
@@ -147,9 +149,9 @@ const CaseStudyDetail = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </CinematicScene>
 
-      <section className="bg-[#fafaf8] py-20 sm:py-24">
+      <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-4 lg:grid-cols-3">
             <motion.div
@@ -228,10 +230,10 @@ const CaseStudyDetail = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </CinematicScene>
 
       {/* Related Case Studies */}
-      <section className="border-t border-black/[0.05] bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.h2
             variants={variants}
@@ -300,8 +302,8 @@ const CaseStudyDetail = () => {
             </ScribbleButton>
           </motion.div>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

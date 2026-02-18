@@ -5,6 +5,10 @@ const PageIntro = ({
   title,
   description,
   align = 'left',
+  rhythm = 'hero',
+  bridge = 'soft',
+  className = '',
+  contentClassName = '',
   children,
 }) => {
   const shouldReduceMotion = useReducedMotion()
@@ -20,9 +24,22 @@ const PageIntro = ({
   }
 
   return (
-    <section className="relative border-b border-black/[0.05] bg-white">
+    <section
+      className={[
+        'relative cinematic-scene',
+        `scene-rhythm-${rhythm}`,
+        bridge !== 'none' ? 'scene-bridge' : '',
+        bridge !== 'none' ? `scene-bridge-${bridge}` : '',
+        className,
+      ].join(' ')}
+    >
       <div
-        className={`mx-auto flex max-w-7xl flex-col gap-5 px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 ${alignment}`}
+        className={[
+          'mx-auto flex max-w-7xl flex-col gap-5 px-4 sm:px-6 lg:px-8',
+          'pt-10 pb-3 sm:pt-12 sm:pb-5 lg:pt-16 lg:pb-8',
+          alignment,
+          contentClassName,
+        ].join(' ')}
       >
         {eyebrow && (
           <motion.p

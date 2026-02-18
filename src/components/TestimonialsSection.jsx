@@ -57,7 +57,7 @@ const TestimonialsSection = ({
   const shouldReduceMotion = useReducedMotion()
   const location = useLocation()
   const isHome = location.pathname === '/'
-  const proposalHref = '#get-started'
+  const proposalHref = isHome ? '#get-started' : '/contact'
   const [activeId, setActiveId] = useState(TESTIMONIALS[0]?.id)
 
   const activeIndex = useMemo(
@@ -82,10 +82,7 @@ const TestimonialsSection = ({
   return (
     <section
       id="testimonials"
-      className={[
-        'relative overflow-hidden',
-        isHome ? 'bg-transparent' : 'bg-[#fafaf8]',
-      ].join(' ')}
+      className="relative overflow-hidden bg-transparent"
     >
       {isHome && (
         <div
@@ -100,7 +97,7 @@ const TestimonialsSection = ({
         className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-[#111]/80 to-transparent"
       />
 
-      <div className={['relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8', isHome ? 'py-14 sm:py-20 lg:py-24' : 'py-20 sm:py-24 lg:py-32'].join(' ')}>
+      <div className={['relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8', isHome ? 'py-14 sm:py-20 lg:py-24' : 'py-12 sm:py-18 lg:py-22'].join(' ')}>
 
         <motion.header
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}

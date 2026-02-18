@@ -1,9 +1,14 @@
 import ScribbleButton from '../components/ScribbleButton'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const NotFound = () => {
   return (
-    <div className="bg-surface-3">
-      <section className="mx-auto flex max-w-5xl flex-col items-start gap-6 px-4 py-24 sm:px-6 lg:px-8">
+    <CinematicPage>
+      <CinematicScene
+        rhythm="anchor"
+        bridge="warm"
+        className="mx-auto flex max-w-5xl flex-col items-start gap-6 px-4 sm:px-6 lg:px-8"
+      >
         <p className="eyebrow">404</p>
         <h1 className="text-3xl font-semibold text-ink sm:text-4xl">
           This page does not exist.
@@ -20,8 +25,8 @@ const NotFound = () => {
             Contact us
           </ScribbleButton>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
 import { caseStudies } from '../data/siteData'
 import ScribbleButton from '../components/ScribbleButton'
+import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Work = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -17,14 +18,15 @@ const Work = () => {
   }
 
   return (
-    <div className="bg-[#fafaf8]">
+    <CinematicPage>
       <PageIntro
         eyebrow="Work"
         title="Selected projects across the UAE."
         description="A snapshot of recent productions delivered with tight timelines, composed crews, and high-touch execution."
+        bridge="warm"
       />
 
-      <section className="bg-white py-20 sm:py-24">
+      <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-5 lg:grid-cols-3">
             {caseStudies.map((study, i) => (
@@ -86,9 +88,9 @@ const Work = () => {
             ))}
           </div>
         </div>
-      </section>
+      </CinematicScene>
 
-      <section className="bg-[#fafaf8] py-20 sm:py-24">
+      <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2
             variants={variants}
@@ -136,8 +138,8 @@ const Work = () => {
             </ScribbleButton>
           </motion.div>
         </div>
-      </section>
-    </div>
+      </CinematicScene>
+    </CinematicPage>
   )
 }
 

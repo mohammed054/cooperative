@@ -12,24 +12,24 @@ import FinalCta from '../components/FinalCta'
 const Home = () => {
   return (
     <div className="App home-cinematic">
-      <div className="home-scene home-scene-hero">
+      <div className="home-scene home-scene-hero scene-rhythm-hero">
         <Hero />
       </div>
 
-      <div className="home-scene home-scene-discovery">
+      <div className="home-scene home-scene-discovery scene-rhythm-medium scene-bridge-soft">
         <TrustBar />
         <ScrollableCardSection />
         <AnimatedArrow />
       </div>
 
-      <div className="home-scene home-scene-proof">
+      <div className="home-scene home-scene-proof scene-rhythm-airy scene-bridge-neutral">
         <ProjectDeck />
         <CurvedArrow />
         <GhaimAEProcessSection />
         <TestimonialsSection />
       </div>
 
-      <div className="home-scene home-scene-close">
+      <div className="home-scene home-scene-close scene-rhythm-anchor scene-bridge-deep">
         <FinalCta />
       </div>
     </div>
