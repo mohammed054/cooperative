@@ -4,6 +4,8 @@ import PageIntro from '../components/PageIntro'
 import { caseStudies, services } from '../data/siteData'
 import NotFound from './NotFound'
 import ScribbleButton from '../components/ScribbleButton'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const CaseStudyDetail = () => {
@@ -14,6 +16,24 @@ const CaseStudyDetail = () => {
   if (!study) {
     return <NotFound />
   }
+
+  const projectSignals = [
+    {
+      label: 'Challenge',
+      title: 'Risk surfaced early',
+      description: study.challenge,
+    },
+    {
+      label: 'Approach',
+      title: 'Execution path designed',
+      description: study.approach,
+    },
+    {
+      label: 'Outcome',
+      title: 'Delivery remained controlled',
+      description: study.results[0],
+    },
+  ]
 
   const variants = shouldReduceMotion ? {} : {
     hidden: { opacity: 0, y: 16 },
@@ -41,6 +61,12 @@ const CaseStudyDetail = () => {
           </ScribbleButton>
         </div>
       </PageIntro>
+
+      <SceneSignalBand
+        eyebrow="Case signal"
+        title="Project success came from timeline control, not last-minute heroics."
+        description="This breakdown shows how scope clarity and disciplined execution translated into room confidence."
+      />
 
       <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -150,6 +176,13 @@ const CaseStudyDetail = () => {
           </div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="Project summary"
+        title="Challenge, approach, result."
+        description="A compact mobile narrative before the full detailed breakdown."
+        cards={projectSignals}
+      />
 
       <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

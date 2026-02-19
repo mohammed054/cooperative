@@ -1,5 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const About = () => {
@@ -20,6 +22,27 @@ const About = () => {
     },
   ]
 
+  const mobilePrinciples = [
+    {
+      label: 'Leadership',
+      title: 'Senior oversight in every phase',
+      description:
+        'Decision quality improves when the same experienced lead stays close to scope and delivery.',
+    },
+    {
+      label: 'Systems',
+      title: 'Operational discipline by default',
+      description:
+        'Runbooks, approval logs, and rehearsal gates are built into every project.',
+    },
+    {
+      label: 'Behavior',
+      title: 'Calm under show pressure',
+      description:
+        'Our crews communicate quietly and clearly so the room feels in control.',
+    },
+  ]
+
   const variants = shouldReduceMotion ? {} : {
     hidden: { opacity: 0, y: 16 },
     show: {
@@ -36,6 +59,12 @@ const About = () => {
         title="A production partner built around composure and detail."
         description="Ghaim is a UAE-based event production studio trusted by corporate, government, and hospitality teams. We keep timelines tight, communication clear, and the final experience refined."
         bridge="warm"
+      />
+
+      <SceneSignalBand
+        eyebrow="Company signal"
+        title="We are structured for trust, not volume."
+        description="Lean, senior teams keep communication clear and preserve executive confidence."
       />
 
       <CinematicScene rhythm="medium" bridge="neutral">
@@ -107,6 +136,13 @@ const About = () => {
           </div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="Core principles"
+        title="The operating model behind every room."
+        description="A mobile-first summary of the standards clients experience day to day."
+        cards={mobilePrinciples}
+      />
 
       <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

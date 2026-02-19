@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
+import SceneSignalBand from '../components/SceneSignalBand'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Terms = () => {
@@ -10,6 +11,12 @@ const Terms = () => {
         title="Terms of service"
         description="These terms outline the basic engagement expectations for production services and rentals."
         bridge="warm"
+      />
+
+      <SceneSignalBand
+        eyebrow="Terms signal"
+        title="Clear expectations protect delivery quality."
+        description="These terms are designed to keep planning predictable and execution reliable."
       />
 
       <CinematicScene rhythm="medium" bridge="neutral">

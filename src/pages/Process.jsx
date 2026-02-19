@@ -1,6 +1,8 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import ScribbleButton from '../components/ScribbleButton'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Process = () => {
@@ -31,6 +33,27 @@ const Process = () => {
     'Single point of escalation for show-day decisions',
   ]
 
+  const mobileCadenceCards = [
+    {
+      label: 'Cadence',
+      title: 'Weekly stakeholder rhythm',
+      description:
+        'Critical decisions stay visible and unresolved points are closed before they affect delivery.',
+    },
+    {
+      label: 'Control',
+      title: 'Runbook-driven operations',
+      description:
+        'Venue, vendors, and crew execute against one documented production sequence.',
+    },
+    {
+      label: 'Assurance',
+      title: 'Escalation path is explicit',
+      description:
+        'On show day, decision authority is clear so adjustments stay fast and calm.',
+    },
+  ]
+
   const variants = shouldReduceMotion ? {} : {
     hidden: { opacity: 0, y: 16 },
     show: {
@@ -52,6 +75,12 @@ const Process = () => {
           Start a project
         </ScribbleButton>
       </PageIntro>
+
+      <SceneSignalBand
+        eyebrow="Process signal"
+        title="Composure on event day is built weeks before the room opens."
+        description="We front-load alignment so technical and production teams can execute without friction."
+      />
 
       <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -98,6 +127,13 @@ const Process = () => {
           </div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="Operating cadence"
+        title="How your team experiences our process."
+        description="Structured for mobile-first scanning while stakeholders are moving between meetings."
+        cards={mobileCadenceCards}
+      />
 
       <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

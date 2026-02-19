@@ -4,6 +4,8 @@ import PageIntro from '../components/PageIntro'
 import { caseStudies, services } from '../data/siteData'
 import NotFound from './NotFound'
 import ScribbleButton from '../components/ScribbleButton'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const ServiceDetail = () => {
@@ -18,6 +20,27 @@ const ServiceDetail = () => {
   const relatedCase = caseStudies.find(
     study => study.slug === service.relatedCase
   )
+
+  const deliveryCards = [
+    {
+      label: 'Included',
+      title: 'Scope is explicit',
+      description:
+        'Every deliverable is defined before procurement and crew booking begin.',
+    },
+    {
+      label: 'Ideal fit',
+      title: 'Use-case matched planning',
+      description:
+        'Teams and systems are sized for your specific room dynamics and guest expectations.',
+    },
+    {
+      label: 'Standards',
+      title: 'Execution quality protected',
+      description:
+        'Documentation, checks, and show controls are built to prevent avoidable volatility.',
+    },
+  ]
 
   const variants = shouldReduceMotion ? {} : {
     hidden: { opacity: 0, y: 16 },
@@ -45,6 +68,12 @@ const ServiceDetail = () => {
           </ScribbleButton>
         </div>
       </PageIntro>
+
+      <SceneSignalBand
+        eyebrow="Service signal"
+        title={`${service.title} is delivered with the same operating discipline as full production.`}
+        description="The detail below clarifies scope, best-fit scenarios, and execution standards for fast internal alignment."
+      />
 
       <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -140,6 +169,13 @@ const ServiceDetail = () => {
           </div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="Delivery lens"
+        title="How this service is structured in practice."
+        description="A concise mobile layer for stakeholders reviewing scope on the move."
+        cards={deliveryCards}
+      />
 
       {relatedCase && (
         <CinematicScene rhythm="airy" bridge="warm">

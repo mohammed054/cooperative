@@ -2,10 +2,33 @@ import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import { engagementModels } from '../data/siteData'
 import ScribbleButton from '../components/ScribbleButton'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Pricing = () => {
   const shouldReduceMotion = useReducedMotion()
+
+  const proposalCards = [
+    {
+      label: 'Step 01',
+      title: 'Brief intake',
+      description:
+        'We review venue, timeline, and complexity so scope assumptions are explicit.',
+    },
+    {
+      label: 'Step 02',
+      title: 'Commercial framing',
+      description:
+        'Engagement model, responsibilities, and operational boundaries are defined clearly.',
+    },
+    {
+      label: 'Step 03',
+      title: 'Delivery baseline',
+      description:
+        'Your proposal maps resources and sequence against the event timeline.',
+    },
+  ]
 
   const variants = shouldReduceMotion ? {} : {
     hidden: { opacity: 0, y: 16 },
@@ -28,6 +51,12 @@ const Pricing = () => {
           Request a proposal
         </ScribbleButton>
       </PageIntro>
+
+      <SceneSignalBand
+        eyebrow="Commercial signal"
+        title="Pricing clarity starts with scope discipline."
+        description="We avoid vague estimates by mapping responsibilities, milestones, and operating assumptions early."
+      />
 
       <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -85,6 +114,13 @@ const Pricing = () => {
           </motion.div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="Proposal flow"
+        title="How estimates become execution-ready plans."
+        description="Optimized for mobile review by decision-makers and procurement teams."
+        cards={proposalCards}
+      />
     </CinematicPage>
   )
 }

@@ -2,10 +2,33 @@ import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import { faqItems } from '../data/siteData'
 import { Link } from 'react-router-dom'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const FAQ = () => {
   const shouldReduceMotion = useReducedMotion()
+
+  const preBriefCards = [
+    {
+      label: 'Inputs',
+      title: 'Define non-negotiables',
+      description:
+        'Guest profile, room goals, and timing constraints help us frame the right production path quickly.',
+    },
+    {
+      label: 'Scope',
+      title: 'Clarify ownership',
+      description:
+        'Knowing who approves technical and creative decisions removes friction during planning.',
+    },
+    {
+      label: 'Timeline',
+      title: 'Lock key milestones',
+      description:
+        'Venue access, rehearsal windows, and event day sequence shape reliable delivery.',
+    },
+  ]
 
   const variants = shouldReduceMotion ? {} : {
     hidden: { opacity: 0, y: 16 },
@@ -23,6 +46,12 @@ const FAQ = () => {
         title="Answers to the questions we hear most."
         description="If you are planning a production and need a clear next step, start here."
         bridge="warm"
+      />
+
+      <SceneSignalBand
+        eyebrow="Planning signal"
+        title="Most production risk is removed by early clarity."
+        description="These answers cover the questions that influence timeline stability and room quality."
       />
 
       <CinematicScene rhythm="medium" bridge="neutral">
@@ -56,6 +85,13 @@ const FAQ = () => {
           </div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="Before you brief us"
+        title="Three details that speed up planning."
+        description="Quick to scan on mobile, useful for internal alignment before kickoff."
+        cards={preBriefCards}
+      />
 
       <CinematicScene rhythm="quiet" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">

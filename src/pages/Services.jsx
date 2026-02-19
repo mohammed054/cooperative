@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
 import { services } from '../data/siteData'
 import ScribbleButton from '../components/ScribbleButton'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Services = () => {
@@ -12,6 +14,27 @@ const Services = () => {
     'Single accountable producer for every project',
     'Lean crews scaled to your show requirements',
     'Clear scopes, transparent timelines, and calm execution',
+  ]
+
+  const mobileServiceFlow = [
+    {
+      label: '01',
+      title: 'Scope clarity first',
+      description:
+        'We confirm room objectives, decision owners, and timeline constraints before execution starts.',
+    },
+    {
+      label: '02',
+      title: 'One accountable lead',
+      description:
+        'A senior producer owns approvals and vendor alignment so information stays consistent.',
+    },
+    {
+      label: '03',
+      title: 'Controlled delivery',
+      description:
+        'Crew, systems, and setup run to one production plan with calm show-day control.',
+    },
   ]
 
   const variants = shouldReduceMotion ? {} : {
@@ -40,6 +63,13 @@ const Services = () => {
           </ScribbleButton>
         </div>
       </PageIntro>
+
+      <SceneSignalBand
+        eyebrow="Service architecture"
+        title="Every service is engineered to protect decision confidence."
+        description="From scope lock through show close, we stage your production so leadership always sees control."
+        tone="light"
+      />
 
       <CinematicScene rhythm="medium" bridge="neutral">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -95,6 +125,13 @@ const Services = () => {
           </div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="Mobile overview"
+        title="How a Ghaim engagement unfolds."
+        description="Designed for quick scanning on mobile, then deeper detail as teams align."
+        cards={mobileServiceFlow}
+      />
 
       <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

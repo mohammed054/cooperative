@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
+import SceneSignalBand from '../components/SceneSignalBand'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Privacy = () => {
@@ -10,6 +11,12 @@ const Privacy = () => {
         title="Privacy policy"
         description="We collect only the information needed to respond to your inquiry and deliver event services."
         bridge="warm"
+      />
+
+      <SceneSignalBand
+        eyebrow="Policy signal"
+        title="Minimal collection. Clear use. Responsible handling."
+        description="Our privacy approach is deliberately simple and operationally strict."
       />
 
       <CinematicScene rhythm="medium" bridge="neutral">

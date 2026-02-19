@@ -3,10 +3,33 @@ import { Link } from 'react-router-dom'
 import PageIntro from '../components/PageIntro'
 import { caseStudies } from '../data/siteData'
 import ScribbleButton from '../components/ScribbleButton'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Work = () => {
   const shouldReduceMotion = useReducedMotion()
+
+  const sceneCards = [
+    {
+      label: 'Brief',
+      title: 'Timeline risk mapped early',
+      description:
+        'Stakeholders and technical owners align quickly so approvals do not stall delivery.',
+    },
+    {
+      label: 'Build',
+      title: 'Crews run on one runbook',
+      description:
+        'Vendors, technical systems, and scenic teams move in sequence with minimal noise.',
+    },
+    {
+      label: 'Show',
+      title: 'Execution stays composed',
+      description:
+        'Room transitions and cue timing stay controlled, even under schedule pressure.',
+    },
+  ]
 
   const variants = shouldReduceMotion ? {} : {
     hidden: { opacity: 0, y: 16 },
@@ -24,6 +47,13 @@ const Work = () => {
         title="Selected projects across the UAE."
         description="A snapshot of recent productions delivered with tight timelines, composed crews, and high-touch execution."
         bridge="warm"
+      />
+
+      <SceneSignalBand
+        eyebrow="Project signal"
+        title="The work reads premium because operations stay disciplined."
+        description="Each case below reflects the same principle: reduce uncertainty before guests arrive."
+        tone="light"
       />
 
       <CinematicScene rhythm="medium" bridge="neutral">
@@ -89,6 +119,13 @@ const Work = () => {
           </div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="Execution arc"
+        title="What unites these projects."
+        description="A consistent operating pattern across conferences, launches, and VIP rooms."
+        cards={sceneCards}
+      />
 
       <CinematicScene rhythm="airy" bridge="warm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">

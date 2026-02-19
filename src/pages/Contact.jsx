@@ -2,10 +2,33 @@ import { motion, useReducedMotion } from 'framer-motion'
 import PageIntro from '../components/PageIntro'
 import ScribbleButton from '../components/ScribbleButton'
 import { useLeadSubmission } from '../hooks/useLeadSubmission'
+import SceneSignalBand from '../components/SceneSignalBand'
+import SceneMobileStack from '../components/SceneMobileStack'
 import { CinematicPage, CinematicScene } from '../components/CinematicPage'
 
 const Contact = () => {
   const shouldReduceMotion = useReducedMotion()
+
+  const nextStepCards = [
+    {
+      label: 'Within 24 hours',
+      title: 'Initial producer response',
+      description:
+        'You receive acknowledgement, baseline assumptions, and any missing input requests.',
+    },
+    {
+      label: 'Planning window',
+      title: 'Scope and timeline alignment',
+      description:
+        'We map technical and operational requirements against your delivery deadline.',
+    },
+    {
+      label: 'Proposal issue',
+      title: 'Execution-ready recommendation',
+      description:
+        'Commercial framing, staffing outline, and delivery sequence are shared clearly.',
+    },
+  ]
 
   const { submit, isSubmitting, isSuccess, isError, feedbackMessage } =
     useLeadSubmission({ formName: 'contact-page-form' })
@@ -39,6 +62,12 @@ const Contact = () => {
         title="Tell us about the event."
         description="Share your timeline, venue, and priorities. We will respond with a clear plan and the right team within 24 hours."
         bridge="warm"
+      />
+
+      <SceneSignalBand
+        eyebrow="Response signal"
+        title="Fast responses are useful only when they are structured."
+        description="Our first reply is designed to move your project toward execution, not just start a conversation."
       />
 
       <CinematicScene rhythm="anchor" bridge="neutral">
@@ -175,6 +204,13 @@ const Contact = () => {
           </div>
         </div>
       </CinematicScene>
+
+      <SceneMobileStack
+        eyebrow="After submission"
+        title="What happens next."
+        description="A clear post-submit sequence so your team knows exactly what to expect."
+        cards={nextStepCards}
+      />
     </CinematicPage>
   )
 }
