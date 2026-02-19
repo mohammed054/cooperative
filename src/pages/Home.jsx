@@ -67,7 +67,7 @@ const Home = () => {
         as="section"
         rhythm="medium"
         bridge="none"
-        className="home-scene home-scene-proof !pt-0 !pb-0"
+        className="home-scene home-scene-testimonials !pt-0 !pb-0"
       >
         <TestimonialsSection />
       </CinematicScene>

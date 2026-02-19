@@ -132,21 +132,38 @@ const Footer = () => {
           transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
         },
       }
+  const footerBackground = isHome
+    ? 'linear-gradient(180deg, #f2eee7 0%, #f5f2eb 64%, #f3eee5 100%)'
+    : 'linear-gradient(180deg, rgba(248,244,236,0.95) 0%, #f6f2eb 62%, #f3ede4 100%)'
 
   return (
     <footer
       id="site-footer"
       ref={ref}
       style={{
-        background: isHome
-          ? 'linear-gradient(180deg, #0f1012 0%, #f2eee7 22%, #f5f2eb 64%, #f3eee5 100%)'
-          : 'linear-gradient(180deg, rgba(248,244,236,0.95) 0%, #f6f2eb 62%, #f3ede4 100%)',
+        background: footerBackground,
         borderTop: isHome
           ? 'none'
           : '1px solid rgba(0,0,0,0.05)',
         position: 'relative',
       }}
     >
+      {isHome && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            height: '180px',
+            pointerEvents: 'none',
+            background:
+              'linear-gradient(180deg, #101114 0%, rgba(16,17,20,0.82) 18%, rgba(16,17,20,0.52) 36%, rgba(16,17,20,0.24) 58%, rgba(16,17,20,0.08) 78%, rgba(16,17,20,0) 100%)',
+          }}
+        />
+      )}
+
       <style>{`
         .footer-grid {
           display: grid;
@@ -165,7 +182,11 @@ const Footer = () => {
         variants={containerVariants}
         initial={shouldReduceMotion ? false : 'hidden'}
         animate={inView ? 'show' : 'hidden'}
-        style={{ maxWidth: '1280px', margin: '0 auto', padding: '48px 20px 24px' }}
+        style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: isHome ? '76px 20px 24px' : '48px 20px 24px',
+        }}
         className="sm:px-6 lg:px-8"
       >
         <div className="footer-grid">

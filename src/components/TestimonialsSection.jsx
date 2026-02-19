@@ -114,18 +114,21 @@ const TestimonialsSection = ({
   }
 
   return (
-    <section
+      <section
       id="testimonials"
       ref={sectionRef}
       className={[
-        'relative overflow-hidden bg-transparent',
+        'relative overflow-hidden',
+        isHome
+          ? 'bg-[linear-gradient(180deg,#f4efe7_0%,#f2ede5_26%,#ece7de_100%)]'
+          : 'bg-transparent',
         isHome ? 'min-h-screen' : '',
       ].join(' ')}
     >
       {isHome && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-white/65 to-transparent"
+          className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-[#f4efe7] via-[#f4efe7]/70 to-transparent"
         />
       )}
 

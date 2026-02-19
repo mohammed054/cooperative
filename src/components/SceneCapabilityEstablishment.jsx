@@ -49,7 +49,7 @@ const getRange = (index, total) => {
   const step = 1 / total
   const start = step * index
   const leadIn = index === 0 ? step * 0.38 : step * 0.28
-  const mid = start + step * (index === total - 1 ? 0.74 : 0.58)
+  const mid = start + step * (index === total - 1 ? 0.5 : 0.58)
   const end = start + step
   const tail = index === total - 1 ? step * 0.44 : step * 0.22
 
@@ -62,28 +62,40 @@ const CapabilityCard = ({
   range,
   shouldReduceMotion,
   isFirst,
+  isLast,
 }) => {
   const holdEnd = range[1] + (range[2] - range[1]) * 0.64
-  const opacity = useTransform(
+  const opacityStandard = useTransform(
     progress,
     [range[0], range[1], holdEnd, range[2]],
     isFirst ? [0.86, 1, 1, 0.44] : [0.26, 1, 1, 0.4]
   )
-  const y = useTransform(
+  const opacityLast = useTransform(progress, [range[0], range[1], range[2]], [0.26, 1, 1])
+  const opacity = isLast ? opacityLast : opacityStandard
+
+  const yStandard = useTransform(
     progress,
     [range[0], range[1], holdEnd, range[2]],
     isFirst ? [8, 0, 0, -20] : [26, 0, 0, -20]
   )
-  const scale = useTransform(
+  const yLast = useTransform(progress, [range[0], range[1], range[2]], [26, 0, 0])
+  const y = isLast ? yLast : yStandard
+
+  const scaleStandard = useTransform(
     progress,
     [range[0], range[1], holdEnd, range[2]],
     isFirst ? [0.998, 1, 1, 0.993] : [0.985, 1, 1, 0.993]
   )
-  const borderAlpha = useTransform(
+  const scaleLast = useTransform(progress, [range[0], range[1], range[2]], [0.985, 1, 1])
+  const scale = isLast ? scaleLast : scaleStandard
+
+  const borderAlphaStandard = useTransform(
     progress,
     [range[0], range[1], holdEnd, range[2]],
     [0.08, 0.22, 0.2, 0.1]
   )
+  const borderAlphaLast = useTransform(progress, [range[0], range[1], range[2]], [0.08, 0.22, 0.22])
+  const borderAlpha = isLast ? borderAlphaLast : borderAlphaStandard
   const borderColor = useTransform(
     borderAlpha,
     value => `rgba(17,17,17,${value})`
@@ -144,9 +156,9 @@ const SceneCapabilityEstablishment = () => {
     offset: ['start start', 'end start'],
   })
 
-  const sequenceProgress = useTransform(scrollYProgress, [0.04, 0.995], [0, 1])
+  const sequenceProgress = useTransform(scrollYProgress, [0.03, 0.9], [0, 1])
   const railScale = useTransform(sequenceProgress, [0, 1], [0, 1])
-  const cardTrackY = useTransform(sequenceProgress, [0, 0.16, 1], [0, 0, trackEndY])
+  const cardTrackY = useTransform(sequenceProgress, [0, 0.14, 1], [0, 0, trackEndY])
 
   useEffect(() => {
     if (shouldReduceMotion) return
@@ -157,11 +169,14 @@ const SceneCapabilityEstablishment = () => {
       if (!viewportEl || !trackEl) return
 
       const viewportHeight = viewportEl.clientHeight
-      const trackHeight = trackEl.scrollHeight
+      const cards = Array.from(trackEl.children)
+      const lastCard = cards[cards.length - 1]
+      if (!lastCard) return
 
-      // Keep scrolling upward until only a small tail of the stack remains visible.
-      const visibleTail = Math.max(56, Math.min(140, viewportHeight * 0.14))
-      const overflowEndY = Math.min(0, visibleTail - trackHeight)
+      // End with the final card anchored near the top edge, not offscreen.
+      const targetTop = Math.max(96, Math.min(160, viewportHeight * 0.2))
+      const alignLastCardY = targetTop - lastCard.offsetTop
+      const overflowEndY = Math.min(0, alignLastCardY)
 
       setTrackEndY(previous =>
         Math.abs(previous - overflowEndY) < 1 ? previous : overflowEndY
@@ -192,7 +207,7 @@ const SceneCapabilityEstablishment = () => {
     <section
       id="scene-capability-establishment"
       ref={sectionRef}
-      className="relative h-[460vh] bg-transparent"
+      className="relative h-[540vh] bg-transparent"
     >
       <div className="sticky top-0 h-screen">
         <div className="mx-auto grid h-full max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:gap-14 lg:px-8">
@@ -251,7 +266,7 @@ const SceneCapabilityEstablishment = () => {
               <motion.div
                 style={shouldReduceMotion ? undefined : { y: cardTrackY }}
                 ref={trackRef}
-                className="space-y-4 pb-5 pr-1 will-change-transform lg:space-y-5"
+                className="space-y-4 pb-5 pt-6 pr-1 will-change-transform lg:space-y-5 lg:pt-8"
               >
                 {CAPABILITIES.map((item, index) => (
                   <CapabilityCard
@@ -261,6 +276,7 @@ const SceneCapabilityEstablishment = () => {
                     range={getRange(index, CAPABILITIES.length)}
                     shouldReduceMotion={shouldReduceMotion}
                     isFirst={index === 0}
+                    isLast={index === CAPABILITIES.length - 1}
                   />
                 ))}
               </motion.div>
