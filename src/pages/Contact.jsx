@@ -92,6 +92,7 @@ const Contact = () => {
                       name="name"
                       className={inputClass}
                       placeholder="Your name"
+                      autoComplete="name"
                       required
                     />
                   </label>
@@ -102,6 +103,7 @@ const Contact = () => {
                       name="company"
                       className={inputClass}
                       placeholder="Company name"
+                      autoComplete="organization"
                     />
                   </label>
                 </div>
@@ -114,6 +116,8 @@ const Contact = () => {
                       name="email"
                       className={inputClass}
                       placeholder="you@company.com"
+                      autoComplete="email"
+                      inputMode="email"
                       required
                     />
                   </label>
@@ -124,6 +128,8 @@ const Contact = () => {
                       name="phone"
                       className={inputClass}
                       placeholder="+971"
+                      autoComplete="tel"
+                      inputMode="tel"
                     />
                   </label>
                 </div>
@@ -135,6 +141,7 @@ const Contact = () => {
                     name="date"
                     className={inputClass}
                     placeholder="Dates, venue, and city"
+                    autoComplete="off"
                     required
                   />
                 </label>
@@ -146,6 +153,7 @@ const Contact = () => {
                     rows="4"
                     className={`${inputClass} resize-none`}
                     placeholder="Tell us about your event goals and production needs."
+                    autoComplete="off"
                     required
                   />
                 </label>

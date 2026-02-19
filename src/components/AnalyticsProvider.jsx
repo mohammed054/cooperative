@@ -12,7 +12,13 @@ export const AnalyticsProvider = ({ children }) => {
     if (!analytics) return
 
     const pathWithQuery = `${location.pathname}${location.search || ''}`
-    analytics.trackPageView(pathWithQuery, document.title)
+    const frameId = window.requestAnimationFrame(() => {
+      analytics.trackPageView(pathWithQuery, document.title)
+    })
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+    }
   }, [location.pathname, location.search, analytics])
 
   return (

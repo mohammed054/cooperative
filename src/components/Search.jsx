@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { FaSearch, FaTimes, FaArrowRight } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSearch } from '../hooks/useSearch'
+import { useFocusTrap } from '../hooks/useFocusTrap'
+
+const escapeForRegex = value =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 const Search = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('')
@@ -10,6 +14,7 @@ const Search = ({ isOpen, onClose }) => {
   const navigate = useNavigate()
   const inputRef = useRef(null)
   const resultsRef = useRef(null)
+  const { containerRef } = useFocusTrap(isOpen, { onEscape: onClose })
   const { results, popularSearches, totalResults, hasResults } =
     useSearch(query)
 
@@ -17,16 +22,6 @@ const Search = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus()
-    }
-  }, [isOpen])
-
-  // Reset state when search closes
-  useEffect(() => {
-    return () => {
-      if (!isOpen) {
-        setQuery('')
-        setSelectedIndex(0)
-      }
     }
   }, [isOpen])
 
@@ -48,7 +43,15 @@ const Search = ({ isOpen, onClose }) => {
       if (!isOpen) return
 
       const flatResults = results.flatMap(category => category.items)
-      const totalFlatResults = flatResults.length + popularSearches.length
+      const popularCount = query ? 0 : popularSearches.length
+      const totalFlatResults = flatResults.length + popularCount
+
+      if (totalFlatResults === 0) {
+        if (e.key === 'Escape') {
+          onClose()
+        }
+        return
+      }
 
       switch (e.key) {
         case 'ArrowDown':
@@ -62,12 +65,12 @@ const Search = ({ isOpen, onClose }) => {
           e.preventDefault()
           setSelectedIndex(prev => {
             const next = prev - 1
-            return next >= 0 ? totalFlatResults - 1 : next
+            return next >= 0 ? next : totalFlatResults - 1
           })
           break
         case 'Enter':
           e.preventDefault()
-          if (selectedIndex < popularSearches.length && !query) {
+          if (!query && selectedIndex < popularSearches.length) {
             handlePopularSearch(popularSearches[selectedIndex])
           } else {
             const resultIndex = query
@@ -99,11 +102,13 @@ const Search = ({ isOpen, onClose }) => {
   const highlightMatch = (text, query) => {
     if (!query) return text
 
-    const regex = new RegExp(`(${query})`, 'gi')
+    const escapedQuery = escapeForRegex(query)
+    const regex = new RegExp(`(${escapedQuery})`, 'gi')
+    const exactSegmentRegex = new RegExp(`^${escapedQuery}$`, 'i')
     const parts = text.split(regex)
 
     return parts.map((part, index) =>
-      regex.test(part) ? (
+      exactSegmentRegex.test(part) ? (
         <mark key={index} className="bg-primary/20 text-primary font-semibold">
           {part}
         </mark>
@@ -147,11 +152,16 @@ const Search = ({ isOpen, onClose }) => {
 
           {/* Search Modal */}
           <motion.div
+            ref={containerRef}
             initial={{ y: -25, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -25, opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-4xl mx-auto mt-20 px-4 sm:px-6 lg:px-8"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search site content"
+            onKeyDown={handleKeyDown}
           >
             <div className="bg-white rounded-2xl shadow-2xl border border-border">
               {/* Search Input */}
@@ -168,6 +178,7 @@ const Search = ({ isOpen, onClose }) => {
                   placeholder="Search services, projects, FAQ, or pages..."
                   className="w-full pl-12 pr-20 py-4 text-lg border-0 focus:outline-none focus:ring-0 placeholder:text-ink-muted"
                   aria-label="Search input"
+                  autoComplete="off"
                 />
                 <button
                   onClick={onClose}
@@ -274,7 +285,9 @@ const Search = ({ isOpen, onClose }) => {
                       </div>
                     ) : (
                       <div className="p-12 text-center">
-                        <div className="text-4xl mb-4">🔍</div>
+                        <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] bg-surface-2 text-ink-muted">
+                          <FaSearch aria-hidden="true" />
+                        </div>
                         <h3 className="text-lg font-semibold text-ink mb-2">
                           No results found
                         </h3>

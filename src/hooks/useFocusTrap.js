@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-export const useFocusTrap = isActive => {
+export const useFocusTrap = (isActive, options = {}) => {
+  const { onEscape } = options
   const containerRef = useRef(null)
   const previousFocusRef = useRef(null)
 
@@ -44,8 +45,9 @@ export const useFocusTrap = isActive => {
     const handleEscapeKey = e => {
       if (e.key === 'Escape') {
         e.preventDefault()
-        // Return focus to the trigger element
-        if (previousFocusRef.current) {
+        if (typeof onEscape === 'function') {
+          onEscape()
+        } else if (previousFocusRef.current) {
           previousFocusRef.current.focus()
         }
       }
@@ -66,7 +68,7 @@ export const useFocusTrap = isActive => {
         previousFocusRef.current.focus()
       }
     }
-  }, [isActive])
+  }, [isActive, onEscape])
 
   return { containerRef, previousFocusRef }
 }

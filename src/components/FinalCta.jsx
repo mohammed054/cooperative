@@ -161,6 +161,7 @@ const FinalCta = () => {
                       name="name"
                       required
                       placeholder="Full name"
+                      autoComplete="name"
                       className={inputClass}
                     />
                   </div>
@@ -174,6 +175,7 @@ const FinalCta = () => {
                       name="company"
                       required
                       placeholder="Company name"
+                      autoComplete="organization"
                       className={inputClass}
                     />
                   </div>
@@ -190,6 +192,8 @@ const FinalCta = () => {
                       name="email"
                       required
                       placeholder="name@company.com"
+                      autoComplete="email"
+                      inputMode="email"
                       className={inputClass}
                     />
                   </div>
@@ -202,6 +206,8 @@ const FinalCta = () => {
                       id="phone"
                       name="phone"
                       placeholder="+971 XX XXX XXXX"
+                      autoComplete="tel"
+                      inputMode="tel"
                       className={inputClass}
                     />
                   </div>
@@ -231,6 +237,7 @@ const FinalCta = () => {
                     rows={4}
                     required
                     placeholder="Tell us about your event scope, venue, and goals."
+                    autoComplete="off"
                     className={inputClass}
                   />
                 </div>
