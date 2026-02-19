@@ -66,18 +66,28 @@ const GhaimAEHeader = () => {
   // Scroll behavior
   // ----------------------------
   useEffect(() => {
-    const TOP_THRESHOLD = 4
-    const DELTA_THRESHOLD = 6
+    const TOP_THRESHOLD = 8
+    const HIDE_START_Y = 120
+    const HIDE_DELTA = 14
+    const REVEAL_DELTA = -8
 
     const applyScrollState = () => {
       const currentY = Math.max(window.scrollY, 0)
       const delta = currentY - lastScrollYRef.current
-      const absDelta = Math.abs(delta)
       const nextScrolled = currentY > TOP_THRESHOLD
       let nextHidden = hiddenRef.current
 
-      if (mobileOpenRef.current || currentY <= TOP_THRESHOLD) nextHidden = false
-      else if (absDelta >= DELTA_THRESHOLD) nextHidden = delta > 0
+      if (mobileOpenRef.current || currentY <= TOP_THRESHOLD) {
+        nextHidden = false
+      } else {
+        // Calmer behavior: hide only on intentional downward velocity and
+        // reveal quickly when the user reverses direction.
+        if (currentY > HIDE_START_Y && delta > HIDE_DELTA) {
+          nextHidden = true
+        } else if (delta < REVEAL_DELTA) {
+          nextHidden = false
+        }
+      }
 
       if (nextHidden !== hiddenRef.current) {
         hiddenRef.current = nextHidden

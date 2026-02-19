@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { assetUrl } from '../lib/assetUrl'
 import { services } from '../data/siteData'
 
@@ -103,11 +103,11 @@ export const HeaderMobile = ({
     if (!mobileOpen) setOpenAccordions(new Set())
   }
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsAnimating(true)
     setMobileOpen(false)
     setOpenAccordions(new Set())
-  }
+  }, [setMobileOpen])
 
   useEffect(() => {
     if (!mobileOpen) {
@@ -124,7 +124,7 @@ export const HeaderMobile = ({
     }
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
-  }, [mobileOpen])
+  }, [handleClose, mobileMenuButtonRef, mobileOpen])
 
   const toggleAccordion = label => {
     const next = new Set(openAccordions)

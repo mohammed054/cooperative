@@ -45,7 +45,6 @@
 
 .scribble-button:hover .scribble-svg path {
   stroke-dashoffset: 0;
-  animation: scribble-shake 0.3s infinite linear;
 }
 
 /* Disable scribble when no-scribble class is applied */
