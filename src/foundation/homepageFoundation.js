@@ -36,7 +36,6 @@ export const TONE_STATE_MACHINE = Object.freeze({
     'steel',
     'warm',
     'linen',
-    'dark',
     'deep',
     'deep',
   ]),
@@ -82,9 +81,8 @@ export const SCENE_DEFINITION_TEMPLATE = Object.freeze({
  * 5. OperationsSpine (pinned)
  * 6. NarrativeBridge
  * 7. ProofTheater
- * 8. GlobalCommandNetwork
- * 9. ConversionChamber
- * 10. GlobalFooter
+ * 8. ConversionChamber
+ * 9. GlobalFooter
  */
 export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   // Free hero lock with micro-pause after initial authority reveal; deep tone.
@@ -204,29 +202,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
         'testimonial-media-01',
         'testimonial-media-02',
         'testimonial-media-03',
-        'testimonial-media-04',
-        'testimonial-media-05',
-        'testimonial-media-06',
-        'testimonial-media-07',
-        'testimonial-media-08',
-        'testimonial-media-09',
       ],
-    },
-  },
-  // Free global network reveal; dark tone regains technical authority.
-  // Pin status: free
-  {
-    id: 'global-command-network',
-    tone: 'dark',
-    length: 110,
-    mode: 'free',
-    entryCue: 'network-node-boot',
-    exitCue: 'network-counter-settle',
-    ctaSlot: 'qualification-nudge',
-    mediaPlaceholder: {
-      type: 'map-nodes',
-      key: 'global-map-nodes',
-      ref: ['dubai', 'abu-dhabi', 'sharjah', 'ajman', 'ras-al-khaimah'],
     },
   },
   // Free conversion chamber; deep tone consolidates final action state.
@@ -279,11 +255,11 @@ export const HOMEPAGE_GRADIENT_BRIDGES = Object.freeze([
     toTone: 'warm',
   },
   {
-    id: 'bridge-linen-to-dark',
+    id: 'bridge-linen-to-deep',
     fromSceneId: 'proof-theater',
-    toSceneId: 'global-command-network',
+    toSceneId: 'conversion-chamber',
     fromTone: 'linen',
-    toTone: 'dark',
+    toTone: 'deep',
   },
 ])
 
@@ -298,7 +274,7 @@ export const HOMEPAGE_FOUNDATION = Object.freeze({
 
 const VALID_MODES = new Set(['free', 'pinned'])
 const REQUIRED_PINNED_IDS = new Set(['signature-reel', 'operations-spine'])
-const EXPECTED_SCENE_COUNT = 10
+const EXPECTED_SCENE_COUNT = 9
 const MAX_BRIDGE_COUNT = 3
 
 export const validateHomepageFoundation = foundation => {

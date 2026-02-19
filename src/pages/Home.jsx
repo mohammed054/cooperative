@@ -11,7 +11,6 @@ import {
   CapabilityMatrixScene,
   CommandArrivalScene,
   ConversionChamberScene,
-  GlobalCommandNetworkScene,
   GlobalFooterScene,
   NarrativeBridgeScene,
   OperationsSpineScene,
@@ -27,7 +26,6 @@ const SCENE_COMPONENT_REGISTRY = Object.freeze({
   'operations-spine': OperationsSpineScene,
   'narrative-bridge': NarrativeBridgeScene,
   'proof-theater': ProofTheaterScene,
-  'global-command-network': GlobalCommandNetworkScene,
   'conversion-chamber': ConversionChamberScene,
   'global-footer': GlobalFooterScene,
 })

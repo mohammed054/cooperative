@@ -1,15 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
-  useInView,
   useReducedMotion,
-  useScroll,
-  useTransform,
 } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import ScribbleButton from '../ScribbleButton'
 import { SceneShell, SceneWrapper, ScrollLockedSection } from '../flagship'
 import { MOTION_TOKEN_CONTRACT, parseBezier } from '../../motion/motionTokenContract.js'
+import { caseStudies, services, testimonials as testimonialData } from '../../data/siteData'
+import { assetUrl } from '../../lib/assetUrl'
 
 const EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.authority)
 const MASS = parseBezier(MOTION_TOKEN_CONTRACT.easing.mass)
@@ -21,48 +21,111 @@ const AUTHORITY_MODULES = [
     title: 'Creative Direction',
     detail:
       'Studio-level narrative control built for high-stakes brand moments.',
+    image: assetUrl('images/event-planning-in-action.png'),
   },
   {
     title: 'Technical Command',
     detail:
       'Show systems architecture with disciplined execution and redundancy.',
+    image: assetUrl('images/av-setup.png'),
   },
   {
     title: 'Executive Delivery',
     detail:
       'Enterprise-ready operations cadence for leadership and stakeholder events.',
+    image: assetUrl('images/always-on-time.png'),
   },
 ]
 
-const PROJECTS = Array.from({ length: 3 }, (_, index) => ({
+const PROJECTS = caseStudies.slice(0, 3).map((project, index) => ({
   id: `project-${String(index + 1).padStart(2, '0')}`,
-  title: `Project Panel ${index + 1}`,
-  subtitle: `Signature reel placeholder ${index + 1}`,
+  title: project.title,
+  subtitle: project.summary,
+  image: project.image,
+  location: project.location,
 }))
 
 const CAPABILITIES = [
-  'Stagecraft & Scenic',
-  'AV Systems',
-  'Lighting Narrative',
+  {
+    title: 'Stagecraft & Scenic',
+    copy: 'Scenic systems and stage architecture tailored for executive sightlines and camera readiness.',
+    image: assetUrl('images/full-production.png'),
+  },
+  {
+    title: 'AV Systems',
+    copy: 'Integrated signal flow and operator control for critical live content delivery.',
+    image: assetUrl('images/av-setup.png'),
+  },
+  {
+    title: 'Lighting Narrative',
+    copy: 'Lighting composition that supports pacing, focus, and presentation hierarchy.',
+    image: assetUrl('images/lighting-effects.png'),
+  },
 ]
 
 const STEPS = [
-  'Strategic intake',
-  'System alignment',
-  'Rehearsal discipline',
-  'Live execution',
+  {
+    id: '01',
+    title: 'Strategic intake',
+    detail:
+      'Objectives, constraints, and leadership requirements are aligned into an executable scope.',
+    image: assetUrl('images/process-bg.jpg'),
+  },
+  {
+    id: '02',
+    title: 'System alignment',
+    detail:
+      'Creative, technical, and logistics teams move under one command cadence.',
+    image: assetUrl('images/event-planning.png'),
+  },
+  {
+    id: '03',
+    title: 'Rehearsal discipline',
+    detail:
+      'Show flow and cueing are validated before live audience exposure.',
+    image: assetUrl('images/event-planning-in-action.png'),
+  },
+  {
+    id: '04',
+    title: 'Live execution',
+    detail:
+      'Senior-led floor command protects timing, transitions, and delivery quality.',
+    image: assetUrl('images/full-production.png'),
+  },
 ]
 
-const TESTIMONIALS = Array.from({ length: 9 }, (_, index) => ({
-  id: `testimonial-${String(index + 1).padStart(2, '0')}`,
-  name: `Client Placeholder ${index + 1}`,
-  role: ['Head of Corporate Affairs', 'Brand Experience Director', 'Operations Lead'][index % 3],
-  organization: `Organization Placeholder ${Math.floor(index / 3) + 1}`,
-  quote:
-    'Controlled execution, strong narrative pacing, and technical reliability across the full event cycle.',
-  eventContext: `Event context placeholder ${index + 1}`,
-  outcome: 'Delivery quality remained stable under complex production conditions.',
-}))
+const TESTIMONIAL_TARGET_COUNT = 9
+
+const TESTIMONIALS = Array.from({ length: TESTIMONIAL_TARGET_COUNT }, (_, index) => {
+  const source = testimonialData[index]
+  const fallbackStudy = caseStudies[index % caseStudies.length]
+
+  if (source) {
+    return {
+      id: source.id || `testimonial-${String(index + 1).padStart(2, '0')}`,
+      name: source.name,
+      role: source.role,
+      organization: source.company,
+      quote: source.quote,
+      eventContext: source.project,
+      outcome: `Delivered in ${source.location}`,
+      image: caseStudies[index]?.image || assetUrl(`images/event${index + 1}.jpg`),
+      verification: 'verified',
+    }
+  }
+
+  return {
+    id: `testimonial-pending-${String(index + 1).padStart(2, '0')}`,
+    name: 'Client profile pending release',
+    role: 'Executive Stakeholder',
+    organization: fallbackStudy.title,
+    quote: 'Verified testimonial copy pending client publication approval.',
+    eventContext: fallbackStudy.summary,
+    outcome: 'Reserved slot for an approved client statement.',
+    image: fallbackStudy.image,
+    verification: 'pending',
+  }
+})
 
 const LOGOS = [
   'MERIDIAN',
@@ -75,19 +138,12 @@ const LOGOS = [
   'ASTRA',
 ]
 
-const COUNTERS = [
-  { label: 'Events delivered', target: 980, suffix: '+' },
-  { label: 'Production hours', target: 48000, suffix: '' },
-  { label: 'On-time delivery', target: 99, suffix: '%' },
+const FOOTER_COMPANY_LINKS = [
+  { to: '/about', label: 'About' },
+  { to: '/process', label: 'Process' },
+  { to: '/pricing', label: 'Pricing' },
+  { to: '/faq', label: 'FAQ' },
 ]
-
-const MAP_POSITIONS = {
-  dubai: { left: '31%', top: '44%' },
-  'abu-dhabi': { left: '23%', top: '61%' },
-  sharjah: { left: '42%', top: '37%' },
-  ajman: { left: '49%', top: '31%' },
-  'ras-al-khaimah': { left: '62%', top: '22%' },
-}
 
 const buildHeight = vh => `${vh}vh`
 const clampIndex = (value, max) => Math.max(0, Math.min(max, value))
@@ -180,50 +236,6 @@ const PinnedSceneFrame = ({ scene, layout, className = '', children }) => (
   </>
 )
 
-const Counter = ({ label, target, suffix }) => {
-  const reduced = useReducedMotion()
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, amount: 0.45 })
-  const [value, setValue] = useState(0)
-
-  useEffect(() => {
-    if (!inView) return
-    if (reduced) return
-    let start = 0
-    let frame = 0
-    const duration = MOTION_TOKEN_CONTRACT.durations.cinematic * 1000
-    const tick = ts => {
-      if (!start) start = ts
-      const p = Math.min((ts - start) / duration, 1)
-      setValue(Math.round(target * p))
-      if (p < 1) frame = window.requestAnimationFrame(tick)
-    }
-    frame = window.requestAnimationFrame(tick)
-    return () => window.cancelAnimationFrame(frame)
-  }, [inView, reduced, target])
-
-  const displayValue = reduced ? (inView ? target : 0) : value
-  const shown =
-    displayValue >= 1000 && suffix !== '%'
-      ? `${(displayValue / 1000).toFixed(displayValue > 10000 ? 0 : 1)}K${suffix}`
-      : `${displayValue}${suffix}`
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={reduced ? false : { opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS }}
-    >
-      <SceneCard>
-        <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{label}</p>
-        <p className="mt-3 font-serif text-[clamp(1.3rem,2.4vw,2rem)] text-[var(--color-ink)]">{shown}</p>
-      </SceneCard>
-    </motion.div>
-  )
-}
-
 const ProjectPanelCard = ({
   project,
   mediaRef,
@@ -249,16 +261,22 @@ const ProjectPanelCard = ({
     } ${interactive ? 'cursor-pointer' : ''}`}
   >
     <div className="relative h-36 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+      <img
+        src={project.image}
+        alt={project.title}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
       <div className="absolute left-2 top-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-2 py-1 text-[9px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
         {mediaRef}
-      </div>
-      <div className="absolute inset-0 grid place-items-center text-xs text-[var(--color-ink-muted)]">
-        Project image placeholder
       </div>
     </div>
     <p className="mt-3 text-[10px] uppercase tracking-[0.13em] text-[var(--color-ink-subtle)]">{project.id}</p>
     <h3 className="mt-1 font-serif text-lg text-[var(--color-ink)]">{project.title}</h3>
     <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{project.subtitle}</p>
+    <p className="mt-1 text-xs text-[var(--color-ink-subtle)]">{project.location}</p>
     <div className="mt-3">
       <ScribbleButton
         variant="micro"
@@ -429,7 +447,23 @@ export const CommandArrivalScene = ({ scene }) => (
                 }}
               />
               <motion.p variants={fadeUp(0)} className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-subtle)]">Command Arrival</motion.p>
-              <motion.h1 variants={fadeUp(0.04, MOTION_TOKEN_CONTRACT.distances.panel)} className="mt-4 max-w-[16ch] font-serif text-[clamp(2rem,5vw,4rem)] leading-[1.02] text-[var(--color-ink)]">We Engineer Moments</motion.h1>
+              <motion.h1
+                variants={stagger(0.02, MOTION_TOKEN_CONTRACT.stagger.line)}
+                initial={reduced ? false : 'hidden'}
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                className="mt-4 max-w-[16ch] font-serif text-[clamp(2rem,5vw,4rem)] leading-[1.02] text-[var(--color-ink)]"
+              >
+                {['We Engineer', 'Moments'].map((line, index) => (
+                  <motion.span
+                    key={line}
+                    variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.line, MOTION_TOKEN_CONTRACT.distances.panel * 0.4)}
+                    className="block"
+                  >
+                    {line}
+                  </motion.span>
+                ))}
+              </motion.h1>
               <motion.p variants={fadeUp(0.1)} className="mt-4 max-w-[50ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">Immediate authority and immersive production for high-stakes events</motion.p>
               <motion.div variants={fadeUp(0.14)} className="mt-7">
                 <ScribbleButton variant="primary" tone="dark" size="md" analyticsLabel="phase9-hero-see-signature-builds">See Signature Builds</ScribbleButton>
@@ -439,8 +473,17 @@ export const CommandArrivalScene = ({ scene }) => (
           <motion.div initial={reduced ? false : { opacity: 0, y: 24, filter: 'blur(8px)' }} whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}>
             <SceneCard className="h-full">
               <div className="relative min-h-[300px] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-3)]">
-                <div className="absolute left-4 top-4 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Hero video placeholder</div>
-                <div className="absolute inset-0 flex items-center justify-center text-sm text-[var(--color-ink-muted)]">Ref: {scene.mediaPlaceholder.ref}</div>
+                <video
+                  className="absolute inset-0 h-full w-full object-cover"
+                  src={Array.isArray(scene.mediaPlaceholder.ref) ? scene.mediaPlaceholder.ref[0] : scene.mediaPlaceholder.ref}
+                  preload="metadata"
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent" />
+                <div className="absolute left-4 top-4 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-white/90">Hero video</div>
               </div>
             </SceneCard>
           </motion.div>
@@ -476,7 +519,14 @@ export const AuthorityLedgerScene = ({ scene }) => (
           {AUTHORITY_MODULES.map((module, index) => (
             <motion.div key={module.title} variants={fadeUp(index * 0.12)}>
               <SceneCard>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">{module.title}</p>
+                <img
+                  src={module.image}
+                  alt={module.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover"
+                />
+                <p className="mt-3 text-[10px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">{module.title}</p>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-muted)]">{module.detail}</p>
               </SceneCard>
             </motion.div>
@@ -517,11 +567,11 @@ export const CapabilityMatrixScene = ({ scene }) => (
           </SceneCard>
         </motion.div>
         <div className="grid gap-3 md:grid-cols-[1.15fr_0.85fr]">
-          <motion.div variants={fadeUp(0)}><SceneCard className="h-full"><p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module 01</p><h3 className="mt-2 font-serif text-[1.18rem] text-[var(--color-ink)]">{CAPABILITIES[0]}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">Primary scenic system placeholder for stagecraft planning.</p></SceneCard></motion.div>
+          <motion.div variants={fadeUp(0)}><SceneCard className="h-full"><img src={CAPABILITIES[0].image} alt={CAPABILITIES[0].title} loading="lazy" decoding="async" className="h-28 w-full rounded-xl border border-[var(--color-border)] object-cover" /><p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module 01</p><h3 className="mt-2 font-serif text-[1.18rem] text-[var(--color-ink)]">{CAPABILITIES[0].title}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">{CAPABILITIES[0].copy}</p></SceneCard></motion.div>
           <div className="grid gap-3">
-            {CAPABILITIES.slice(1).map((title, index) => (
-              <motion.div key={title} variants={fadeUp((index + 1) * MOTION_TOKEN_CONTRACT.stagger.card)}>
-                <SceneCard><p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module {String(index + 2).padStart(2, '0')}</p><h3 className="mt-2 font-serif text-[1.08rem] text-[var(--color-ink)]">{title}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">Capability card placeholder.</p></SceneCard>
+            {CAPABILITIES.slice(1).map((capability, index) => (
+              <motion.div key={capability.title} variants={fadeUp((index + 1) * MOTION_TOKEN_CONTRACT.stagger.card)}>
+                <SceneCard><img src={capability.image} alt={capability.title} loading="lazy" decoding="async" className="h-20 w-full rounded-xl border border-[var(--color-border)] object-cover" /><p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module {String(index + 2).padStart(2, '0')}</p><h3 className="mt-2 font-serif text-[1.08rem] text-[var(--color-ink)]">{capability.title}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">{capability.copy}</p></SceneCard>
               </motion.div>
             ))}
           </div>
@@ -564,9 +614,12 @@ export const OperationsSpineScene = ({ scene }) => (
           <div className="grid gap-2">
             {STEPS.map((step, index) => (
               <motion.article key={step} animate={{ opacity: reduced ? 1 : index === active ? 1 : 0.44, x: reduced ? 0 : index === active ? 0 : 26 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: EASE }} className={`rounded-2xl border p-4 ${index === active ? 'border-[rgba(28,28,28,0.28)] bg-[var(--color-surface-2)]' : 'border-[var(--color-border)] bg-[var(--color-surface)]'}`}>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Step {String(index + 1).padStart(2, '0')}</p>
-                <h3 className="mt-2 font-serif text-[1.05rem] text-[var(--color-ink)]">{step}</h3>
-                <p className="mt-2 text-sm text-[var(--color-ink-muted)]">ProcessStepRailCard placeholder copy.</p>
+                <img src={step.image} alt={step.title} loading="lazy" decoding="async" className="h-14 w-20 rounded-lg border border-[var(--color-border)] object-cover" />
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Step {step.id}</p>
+                  <h3 className="mt-2 font-serif text-[1.05rem] text-[var(--color-ink)]">{step.title}</h3>
+                  <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{step.detail}</p>
+                </div>
               </motion.article>
             ))}
           </div>
@@ -592,7 +645,7 @@ export const NarrativeBridgeScene = ({ scene }) => (
   </FreeSceneFrame>
 )
 
-// Scroll behavior: free proof theater with 9 testimonial placeholders.
+// Scroll behavior: free proof theater with available testimonial assets.
 // Tone layer: linen.
 // Pin status: free.
 export const ProofTheaterScene = ({ scene }) => (
@@ -625,43 +678,7 @@ const ProofTheaterSplit = ({ reduced, mediaRefs }) => {
 
   return (
     <div className="grid gap-3">
-      <div className="grid gap-3 lg:grid-cols-[0.44fr_0.56fr]">
-        <motion.aside
-          variants={stagger(0.02, MOTION_TOKEN_CONTRACT.stagger.card)}
-          initial={reduced ? false : 'hidden'}
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
-          className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
-        >
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Testimonial Selection</p>
-          <div className="mt-3 grid gap-2">
-            {TESTIMONIALS.map((item, index) => (
-              <motion.div
-                role="button"
-                tabIndex={0}
-                key={item.id}
-                variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.card, 12)}
-                onClick={() => setActiveIndex(index)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    setActiveIndex(index)
-                  }
-                }}
-                className={`rounded-xl border px-3 py-3 text-left transition ${
-                  index === activeIndex
-                    ? 'border-[rgba(28,28,28,0.28)] bg-[var(--color-surface-3)]'
-                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-3)]'
-                }`}
-              >
-                <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{item.id}</p>
-                <p className="mt-1 text-sm font-semibold text-[var(--color-ink)]">{item.name}</p>
-                <p className="text-xs text-[var(--color-ink-muted)]">{item.role}</p>
-                <p className="text-xs text-[var(--color-ink-muted)]">{item.organization}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.aside>
+      <div className="grid gap-3 lg:grid-cols-[0.56fr_0.44fr]">
         <SceneCard className="bg-[var(--color-surface-3)]">
           <AnimatePresence mode="wait">
             <motion.div
@@ -687,9 +704,15 @@ const ProofTheaterSplit = ({ reduced, mediaRefs }) => {
                   transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS }}
                   className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
                 >
-                  <div className="mx-auto h-24 w-24 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]" />
+                  <img
+                    src={activeTestimonial.image}
+                    alt={activeTestimonial.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="mx-auto h-24 w-24 rounded-full border border-[var(--color-border)] object-cover"
+                  />
                   <p className="mt-3 text-center text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
-                    {refs[activeIndex] || `testimonial-media-${String(activeIndex + 1).padStart(2, '0')}`}
+                    {refs[activeIndex] || activeTestimonial.id}
                   </p>
                 </motion.div>
               </div>
@@ -731,6 +754,42 @@ const ProofTheaterSplit = ({ reduced, mediaRefs }) => {
             </ScribbleButton>
           </motion.div>
         </SceneCard>
+        <motion.aside
+          variants={stagger(0.02, MOTION_TOKEN_CONTRACT.stagger.card)}
+          initial={reduced ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
+        >
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Testimonial Selection</p>
+          <div className="mt-3 grid gap-2">
+            {TESTIMONIALS.map((item, index) => (
+              <motion.div
+                role="button"
+                tabIndex={0}
+                key={item.id}
+                variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.card, 12)}
+                onClick={() => setActiveIndex(index)}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    setActiveIndex(index)
+                  }
+                }}
+                className={`rounded-xl border px-3 py-3 text-left transition ${
+                  index === activeIndex
+                    ? 'border-[rgba(28,28,28,0.28)] bg-[var(--color-surface-3)]'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-3)]'
+                }`}
+              >
+                <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{item.id}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--color-ink)]">{item.name}</p>
+                <p className="text-xs text-[var(--color-ink-muted)]">{item.role}</p>
+                <p className="text-xs text-[var(--color-ink-muted)]">{item.organization}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.aside>
       </div>
       <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] py-2">
         <motion.div
@@ -757,89 +816,6 @@ const ProofTheaterSplit = ({ reduced, mediaRefs }) => {
           ))}
         </motion.div>
       </div>
-    </div>
-  )
-}
-
-const GlobalCommandNetworkContent = ({ scene, reduced }) => {
-  const containerRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  })
-  const layerBackX = useTransform(scrollYProgress, [0, 1], [-24, 24])
-  const layerFrontX = useTransform(scrollYProgress, [0, 1], [18, -18])
-
-  return (
-    <div ref={containerRef} className="relative grid gap-4 overflow-hidden rounded-2xl p-1 lg:grid-cols-[1.05fr_0.95fr]">
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 w-[40%] rounded-r-[36%] bg-[radial-gradient(circle_at_20%_30%,rgba(28,28,28,0.08)_0%,rgba(28,28,28,0)_70%)]"
-        style={reduced ? undefined : { x: layerBackX }}
-      />
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 w-[34%] rounded-l-[32%] bg-[radial-gradient(circle_at_80%_44%,rgba(16,185,129,0.14)_0%,rgba(16,185,129,0)_74%)]"
-        style={reduced ? undefined : { x: layerFrontX }}
-      />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[rgba(255,255,255,0.72)] to-transparent" />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[rgba(255,255,255,0.62)] to-transparent" />
-      <SceneCard className="relative z-10 min-h-[340px] bg-[var(--color-surface-3)]">
-        <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Global Command Network</p>
-        <p className="mt-2 text-sm text-[var(--color-ink-muted)]">Animated UAE coverage map with staged pulse activation and metric confirmation.</p>
-        <div className="absolute inset-x-4 bottom-4 top-20 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-          {Array.isArray(scene.mediaPlaceholder.ref)
-            ? scene.mediaPlaceholder.ref.map((node, index) => (
-                <motion.span
-                  key={node}
-                  initial={reduced ? false : { opacity: 0, scale: 0.45 }}
-                  whileInView={
-                    reduced
-                      ? { opacity: 1, scale: 1 }
-                      : { opacity: 1, scale: [0.84, 1.18, 1] }
-                  }
-                  viewport={{ once: true, amount: 0.35 }}
-                  transition={{
-                    duration: MOTION_TOKEN_CONTRACT.durations.scene,
-                    delay: index * MOTION_TOKEN_CONTRACT.stagger.card,
-                    ease: parseBezier(MOTION_TOKEN_CONTRACT.easing.release),
-                  }}
-                  className="absolute h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.18)]"
-                  style={MAP_POSITIONS[node] || { left: '50%', top: '50%' }}
-                />
-              ))
-            : null}
-        </div>
-      </SceneCard>
-      <motion.div
-        variants={stagger(0.02)}
-        initial={reduced ? false : 'hidden'}
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.22 }}
-        className="relative z-10 grid gap-3"
-      >
-        {COUNTERS.map((counter, index) => (
-          <motion.div key={counter.label} variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.card, 18)}>
-            <Counter label={counter.label} target={counter.target} suffix={counter.suffix} />
-          </motion.div>
-        ))}
-        <motion.div
-          variants={fadeUp(0.16, 18)}
-          initial={reduced ? false : 'hidden'}
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          <ScribbleButton
-            variant="micro"
-            tone="dark"
-            size="sm"
-            showArrow={false}
-            analyticsLabel="phase8-network-confirm-coverage"
-          >
-            Confirm Coverage
-          </ScribbleButton>
-        </motion.div>
-      </motion.div>
     </div>
   )
 }
@@ -944,22 +920,6 @@ const ConversionChamberContent = ({ scene, reduced }) => {
   )
 }
 
-// Scroll behavior: free map nodes + count-up placeholders.
-// Tone layer: dark (mapped to light surface system).
-// Pin status: free.
-export const GlobalCommandNetworkScene = ({ scene }) => (
-  <FreeSceneFrame
-    scene={scene}
-    layout="map-network"
-    pinBehavior="none"
-    className="scene-skeleton scene-skeleton-global-command-network !bg-none bg-[var(--color-surface-2)]"
-  >
-    {({ reduced }) => (
-      <GlobalCommandNetworkContent scene={scene} reduced={reduced} />
-    )}
-  </FreeSceneFrame>
-)
-
 // Scroll behavior: free conversion split with form placeholders.
 // Tone layer: deep (mapped to light surface system).
 // Pin status: free.
@@ -983,16 +943,64 @@ export const GlobalFooterScene = ({ scene }) => (
   <FreeSceneFrame scene={scene} layout="footer-columns" pinBehavior="none" className="scene-skeleton scene-skeleton-global-footer">
     {({ reduced }) => (
       <motion.div variants={stagger(0.03, MOTION_TOKEN_CONTRACT.stagger.card)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-3 md:grid-cols-4">
-        {['Company', 'Services', 'Work', 'Contact'].map((column, index) => (
-          <motion.div key={column} variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.card)}>
-            <SceneCard>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{column}</p>
-              <div className="mt-3 h-20 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]" />
-            </SceneCard>
-          </motion.div>
-        ))}
+        <motion.div variants={fadeUp(0)}>
+          <SceneCard>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Company</p>
+            <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+              {FOOTER_COMPANY_LINKS.map(item => (
+                <li key={item.to}>
+                  <Link className="transition-colors hover:text-[var(--color-ink)]" to={item.to}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </SceneCard>
+        </motion.div>
+        <motion.div variants={fadeUp(MOTION_TOKEN_CONTRACT.stagger.card)}>
+          <SceneCard>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Services</p>
+            <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+              {services.slice(0, 4).map(service => (
+                <li key={service.slug}>
+                  <Link className="transition-colors hover:text-[var(--color-ink)]" to={`/services/${service.slug}`}>
+                    {service.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </SceneCard>
+        </motion.div>
+        <motion.div variants={fadeUp(MOTION_TOKEN_CONTRACT.stagger.card * 2)}>
+          <SceneCard>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Work</p>
+            <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+              {caseStudies.map(study => (
+                <li key={study.slug}>
+                  <Link className="transition-colors hover:text-[var(--color-ink)]" to={`/work/${study.slug}`}>
+                    {study.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </SceneCard>
+        </motion.div>
+        <motion.div variants={fadeUp(MOTION_TOKEN_CONTRACT.stagger.card * 3)}>
+          <SceneCard>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Contact</p>
+            <div className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+              <a className="block transition-colors hover:text-[var(--color-ink)]" href="tel:+97142345678">
+                +971 4 234 5678
+              </a>
+              <a className="block transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">
+                hello@ghaimuae.com
+              </a>
+              <p>Dubai Design District</p>
+            </div>
+          </SceneCard>
+        </motion.div>
         <motion.div variants={fadeUp(0.14)} className="md:col-span-4">
-          <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase9-footer-utility">
+          <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase9-footer-utility" to="/contact">
             Utility Access
           </ScribbleButton>
         </motion.div>
