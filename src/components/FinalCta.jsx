@@ -123,7 +123,7 @@ const FinalCta = () => {
                   <a
                     key={channel.href}
                     href={channel.href}
-                  className="inline-flex w-fit items-center gap-2.5 text-sm text-white/70 transition-colors duration-300 hover:text-white/94"
+                    className="inline-flex w-fit items-center gap-2.5 text-sm text-white/70 transition-colors duration-300 hover:text-white/94"
                   >
                     {channel.icon}
                     {channel.label}
