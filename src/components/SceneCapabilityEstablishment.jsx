@@ -50,13 +50,27 @@ const getRange = (index, total) => {
   const start = step * index
   const mid = start + step * 0.52
   const end = start + step
-  return [Math.max(0, start - step * 0.34), mid, Math.min(1, end + step * 0.22)]
+  return [Math.max(0, start - step * 0.4), mid, Math.min(1, end + step * 0.18)]
 }
 
-const CapabilityCard = ({ item, progress, range, shouldReduceMotion }) => {
-  const opacity = useTransform(progress, range, [0.26, 1, 0.4])
-  const y = useTransform(progress, range, [26, 0, -20])
-  const scale = useTransform(progress, range, [0.985, 1, 0.993])
+const CapabilityCard = ({
+  item,
+  progress,
+  range,
+  shouldReduceMotion,
+  isFirst,
+}) => {
+  const opacity = useTransform(
+    progress,
+    range,
+    isFirst ? [0.86, 1, 0.44] : [0.26, 1, 0.4]
+  )
+  const y = useTransform(progress, range, isFirst ? [8, 0, -20] : [26, 0, -20])
+  const scale = useTransform(
+    progress,
+    range,
+    isFirst ? [0.998, 1, 0.993] : [0.985, 1, 0.993]
+  )
   const borderAlpha = useTransform(progress, range, [0.08, 0.2, 0.1])
   const borderColor = useTransform(
     borderAlpha,
@@ -113,14 +127,19 @@ const SceneCapabilityEstablishment = () => {
     offset: ['start start', 'end start'],
   })
 
-  const railScale = useTransform(scrollYProgress, [0, 1], [0, 1])
-  const cardTrackY = useTransform(scrollYProgress, [0, 1], ['0%', '-56%'])
+  const sequenceProgress = useTransform(scrollYProgress, [0.02, 0.84], [0, 1])
+  const railScale = useTransform(sequenceProgress, [0, 1], [0, 1])
+  const cardTrackY = useTransform(
+    sequenceProgress,
+    [0, 0.12, 1],
+    ['0%', '0%', '-54%']
+  )
 
   return (
     <section
       id="scene-capability-establishment"
       ref={sectionRef}
-      className="relative h-[340vh] bg-transparent"
+      className="relative h-[360vh] bg-transparent"
     >
       <div className="sticky top-0 h-screen">
         <div className="mx-auto grid h-full max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:gap-14 lg:px-8">
@@ -181,9 +200,10 @@ const SceneCapabilityEstablishment = () => {
                   <CapabilityCard
                     key={item.index}
                     item={item}
-                    progress={scrollYProgress}
+                    progress={sequenceProgress}
                     range={getRange(index, CAPABILITIES.length)}
                     shouldReduceMotion={shouldReduceMotion}
+                    isFirst={index === 0}
                   />
                 ))}
               </motion.div>

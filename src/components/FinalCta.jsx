@@ -46,12 +46,13 @@ const FinalCta = () => {
     offset: ['start end', 'end start'],
   })
 
-  const introOpacity = useTransform(scrollYProgress, [0.05, 0.28], [0, 1])
-  const introY = useTransform(scrollYProgress, [0.05, 0.28], [26, 0])
-  const formOpacity = useTransform(scrollYProgress, [0.18, 0.46], [0, 1])
-  const formY = useTransform(scrollYProgress, [0.18, 0.46], [32, 0])
-  const formScale = useTransform(scrollYProgress, [0.18, 0.46], [0.985, 1])
-  const backToTopY = useTransform(formY, value => value * 0.5)
+  const revealProgress = useTransform(scrollYProgress, [0.04, 0.5], [0, 1])
+  const introOpacity = useTransform(revealProgress, [0, 1], [0.72, 1])
+  const introY = useTransform(revealProgress, [0, 1], [12, 0])
+  const formOpacity = useTransform(revealProgress, [0, 1], [0.68, 1])
+  const formY = useTransform(revealProgress, [0, 1], [18, 0])
+  const formScale = useTransform(revealProgress, [0, 1], [0.992, 1])
+  const backToTopY = useTransform(formY, value => value * 0.45)
 
   const handleSubmit = async event => {
     event.preventDefault()
@@ -71,7 +72,7 @@ const FinalCta = () => {
     <section
       id="get-started"
       ref={sectionRef}
-      className="relative overflow-hidden bg-[linear-gradient(180deg,#17191d_0%,#111318_28%,#0f1012_100%)]"
+      className="relative overflow-hidden bg-[linear-gradient(180deg,#1a1e26_0%,#141821_46%,#11141b_100%)]"
     >
       <div className="cinematic-grain-overlay pointer-events-none absolute inset-0 opacity-[0.06]" />
 
@@ -92,13 +93,13 @@ const FinalCta = () => {
               <h2 className="mt-4 max-w-[14ch] font-serif text-[clamp(1.9rem,4.6vw,3.2rem)] leading-[1.06] tracking-[-0.02em] text-white">
                 Let us engineer your next room.
               </h2>
-              <p className="mt-4 max-w-[38ch] text-[15px] leading-relaxed text-white/56">
+              <p className="mt-4 max-w-[38ch] text-[15px] leading-relaxed text-white/68">
                 Share your timeline and scope. You receive a clear production
                 path within 24 hours.
               </p>
             </div>
 
-            <ul className="space-y-2.5 text-sm text-white/52">
+            <ul className="space-y-2.5 text-sm text-white/62">
               <li className="flex gap-2.5">
                 <span className="mt-2 block h-[1px] w-3 shrink-0 bg-white/36" />
                 Response within 24 hours
@@ -122,7 +123,7 @@ const FinalCta = () => {
                   <a
                     key={channel.href}
                     href={channel.href}
-                    className="inline-flex w-fit items-center gap-2.5 text-sm text-white/58 transition-colors duration-300 hover:text-white/90"
+                  className="inline-flex w-fit items-center gap-2.5 text-sm text-white/70 transition-colors duration-300 hover:text-white/94"
                   >
                     {channel.icon}
                     {channel.label}
@@ -131,7 +132,7 @@ const FinalCta = () => {
               </div>
             </div>
 
-            <div className="inline-flex items-center gap-2 text-xs tracking-[0.03em] text-white/38">
+            <div className="inline-flex items-center gap-2 text-xs tracking-[0.03em] text-white/52">
               <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400/90" />
               Available for urgent requirements
             </div>

@@ -117,7 +117,10 @@ const TestimonialsSection = ({
     <section
       id="testimonials"
       ref={sectionRef}
-      className="relative overflow-hidden bg-transparent"
+      className={[
+        'relative overflow-hidden bg-transparent',
+        isHome ? 'min-h-screen' : '',
+      ].join(' ')}
     >
       {isHome && (
         <div
@@ -136,7 +139,9 @@ const TestimonialsSection = ({
       <div
         className={[
           'relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8',
-          isHome ? 'py-14 sm:py-20 lg:py-24' : 'py-12 sm:py-18 lg:py-22',
+          isHome
+            ? 'min-h-screen py-10 sm:py-12 lg:py-16'
+            : 'py-12 sm:py-18 lg:py-22',
         ].join(' ')}
       >
         <motion.header
@@ -145,7 +150,12 @@ const TestimonialsSection = ({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={transition}
-          className="mb-10 max-w-2xl lg:mb-14"
+          className={[
+            'mb-10 max-w-2xl lg:mb-14',
+            isHome
+              ? 'md:sticky md:top-20 md:z-20 md:bg-gradient-to-b md:from-[#f6f2eb]/95 md:to-transparent md:pb-4'
+              : '',
+          ].join(' ')}
         >
           <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.22em] text-[#a7a7a7]">
             Testimonials

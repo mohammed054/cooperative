@@ -35,18 +35,32 @@ const getRange = (index, total) => {
   const mid = start + step * 0.52
   const end = start + step
 
-  return [Math.max(0, start - step * 0.34), mid, Math.min(1, end + step * 0.22)]
+  return [Math.max(0, start - step * 0.38), mid, Math.min(1, end + step * 0.12)]
 }
 
-const ProcessStepCard = ({ step, progress, range, shouldReduceMotion }) => {
+const ProcessStepCard = ({
+  step,
+  progress,
+  range,
+  shouldReduceMotion,
+  isFirst,
+}) => {
   const mid = (range[0] + range[1]) / 2
   const opacity = useTransform(
     progress,
     [range[0], mid, range[1]],
-    [0.28, 1, 0.38]
+    isFirst ? [0.86, 1, 0.42] : [0.28, 1, 0.38]
   )
-  const y = useTransform(progress, [range[0], mid, range[1]], [22, 0, -16])
-  const scale = useTransform(progress, [range[0], mid, range[1]], [0.985, 1, 0.992])
+  const y = useTransform(
+    progress,
+    [range[0], mid, range[1]],
+    isFirst ? [8, 0, -16] : [22, 0, -16]
+  )
+  const scale = useTransform(
+    progress,
+    [range[0], mid, range[1]],
+    isFirst ? [0.998, 1, 0.992] : [0.985, 1, 0.992]
+  )
   const borderOpacity = useTransform(progress, [range[0], mid, range[1]], [0.08, 0.2, 0.1])
   const borderColor = useTransform(
     borderOpacity,
@@ -89,16 +103,21 @@ const SceneProcessDepth = () => {
     offset: ['start start', 'end start'],
   })
 
-  const spineScale = useTransform(scrollYProgress, [0, 1], [0, 1])
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1.04, 1])
-  const imageY = useTransform(scrollYProgress, [0, 1], [14, -14])
-  const stepTrackY = useTransform(scrollYProgress, [0, 1], ['0%', '-48%'])
+  const sequenceProgress = useTransform(scrollYProgress, [0.02, 0.78], [0, 1])
+  const spineScale = useTransform(sequenceProgress, [0, 1], [0, 1])
+  const imageScale = useTransform(sequenceProgress, [0, 1], [1.04, 1])
+  const imageY = useTransform(sequenceProgress, [0, 1], [14, -14])
+  const stepTrackY = useTransform(
+    sequenceProgress,
+    [0, 0.15, 1],
+    ['0%', '0%', '-44%']
+  )
 
   return (
     <section
       id="scene-process-depth"
       ref={sectionRef}
-      className="relative h-[340vh] bg-transparent"
+      className="relative h-[360vh] bg-transparent"
     >
       <div className="sticky top-0 h-screen">
         <div className="mx-auto grid h-full max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-12 lg:gap-14 lg:px-8">
@@ -154,9 +173,10 @@ const SceneProcessDepth = () => {
                   <ProcessStepCard
                     key={step.index}
                     step={step}
-                    progress={scrollYProgress}
+                    progress={sequenceProgress}
                     range={getRange(index, PROCESS_STEPS.length)}
                     shouldReduceMotion={shouldReduceMotion}
+                    isFirst={index === 0}
                   />
                 ))}
               </motion.div>

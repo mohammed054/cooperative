@@ -15,7 +15,7 @@ const Hero = () => {
 
   const mediaScale = useTransform(scrollYProgress, [0, 0.35], [1.05, 1])
   const contentY = useTransform(scrollYProgress, [0, 0.5], [0, -24])
-  const veilOpacity = useTransform(scrollYProgress, [0.2, 0.7], [0.84, 0.97])
+  const veilOpacity = useTransform(scrollYProgress, [0.2, 0.7], [0.72, 0.86])
   const bloomOpacity = useTransform(scrollYProgress, [0, 0.45], [0.82, 0.56])
 
   const scrollToSection = sectionId => {
@@ -94,7 +94,7 @@ const Hero = () => {
 
       <motion.div
         style={shouldReduceMotion ? undefined : { opacity: veilOpacity }}
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/88"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/34 to-black/76"
       />
 
       <motion.div

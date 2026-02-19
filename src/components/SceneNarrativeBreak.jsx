@@ -10,6 +10,8 @@ import { MOTION_EASE } from '../motion'
 
 const NARRATIVE_LINE =
   'When the room is high-stakes, every second of the show must feel inevitable.'
+const REVEAL_START = 0.16
+const REVEAL_END = 0.58
 
 const SceneNarrativeBreak = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -32,8 +34,8 @@ const SceneNarrativeBreak = () => {
   const panelY = useTransform(scrollYProgress, [0.82, 1], ['0vh', '-10vh'])
   const panelOpacity = useTransform(
     scrollYProgress,
-    [0.03, 0.14, 0.72, 1],
-    [0.22, 1, 1, 0.9]
+    [0.08, 0.22, 0.72, 1],
+    [0.18, 1, 1, 0.9]
   )
 
   useMotionValueEvent(scrollYProgress, 'change', latest => {
@@ -41,11 +43,16 @@ const SceneNarrativeBreak = () => {
       return
     }
 
-    const revealProgress = Math.max(0, (latest - 0.1) / 0.44)
-    const nextWordCount = Math.min(
-      words.length,
-      Math.max(0, Math.floor(revealProgress * words.length) + 1)
-    )
+    let nextWordCount = 0
+    if (latest >= REVEAL_END) {
+      nextWordCount = words.length
+    } else if (latest > REVEAL_START) {
+      const revealProgress = (latest - REVEAL_START) / (REVEAL_END - REVEAL_START)
+      nextWordCount = Math.min(
+        words.length,
+        Math.max(0, Math.floor(revealProgress * (words.length + 1)))
+      )
+    }
 
     setRevealedWords(current =>
       current === nextWordCount ? current : nextWordCount
