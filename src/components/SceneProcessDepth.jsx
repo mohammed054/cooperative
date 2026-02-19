@@ -32,10 +32,12 @@ const PROCESS_STEPS = [
 const getRange = (index, total) => {
   const step = 1 / total
   const start = step * index
-  const mid = start + step * 0.52
+  const mid = start + step * (index === total - 1 ? 0.74 : 0.6)
   const end = start + step
+  const leadIn = index === 0 ? step * 0.34 : step * 0.22
+  const tail = index === total - 1 ? step * 0.56 : step * 0.34
 
-  return [Math.max(0, start - step * 0.38), mid, Math.min(1, end + step * 0.12)]
+  return [Math.max(0, start - leadIn), Math.min(1, mid), Math.min(1, end + tail)]
 }
 
 const ProcessStepCard = ({
@@ -49,17 +51,17 @@ const ProcessStepCard = ({
   const opacity = useTransform(
     progress,
     [range[0], mid, range[1]],
-    isFirst ? [0.86, 1, 0.42] : [0.28, 1, 0.38]
+    isFirst ? [0.86, 1, 0.68] : [0.44, 1, 0.62]
   )
   const y = useTransform(
     progress,
     [range[0], mid, range[1]],
-    isFirst ? [8, 0, -16] : [22, 0, -16]
+    isFirst ? [6, 0, -10] : [18, 0, -10]
   )
   const scale = useTransform(
     progress,
     [range[0], mid, range[1]],
-    isFirst ? [0.998, 1, 0.992] : [0.985, 1, 0.992]
+    isFirst ? [0.998, 1, 0.997] : [0.99, 1, 0.996]
   )
   const borderOpacity = useTransform(progress, [range[0], mid, range[1]], [0.08, 0.2, 0.1])
   const borderColor = useTransform(
@@ -103,24 +105,24 @@ const SceneProcessDepth = () => {
     offset: ['start start', 'end start'],
   })
 
-  const sequenceProgress = useTransform(scrollYProgress, [0.02, 0.78], [0, 1])
+  const sequenceProgress = useTransform(scrollYProgress, [0.03, 0.95], [0, 1])
   const spineScale = useTransform(sequenceProgress, [0, 1], [0, 1])
   const imageScale = useTransform(sequenceProgress, [0, 1], [1.04, 1])
   const imageY = useTransform(sequenceProgress, [0, 1], [14, -14])
   const stepTrackY = useTransform(
     sequenceProgress,
-    [0, 0.15, 1],
-    ['0%', '0%', '-44%']
+    [0, 0.18, 1],
+    ['0%', '0%', '-58%']
   )
 
   return (
     <section
       id="scene-process-depth"
       ref={sectionRef}
-      className="relative h-[360vh] bg-transparent"
+      className="relative h-[430vh] bg-transparent"
     >
       <div className="sticky top-0 h-screen">
-        <div className="mx-auto grid h-full max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-12 lg:gap-14 lg:px-8">
+        <div className="mx-auto grid h-full max-w-7xl grid-cols-1 items-start gap-10 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-12 lg:gap-14 lg:px-8">
           <div className="lg:col-span-5">
             <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#8f8f8f]">
               Process depth
@@ -151,12 +153,12 @@ const SceneProcessDepth = () => {
 
             <motion.div
               style={shouldReduceMotion ? undefined : { scale: imageScale, y: imageY }}
-              className="mt-8 hidden overflow-hidden rounded-2xl border border-black/[0.08] bg-white/[0.82] lg:block"
+              className="mt-6 hidden overflow-hidden rounded-2xl border border-black/[0.08] bg-white/[0.82] lg:mt-7 lg:block"
             >
               <img
                 src={assetUrl('images/event-planning-in-action.png')}
                 alt="Production planning in progress"
-                className="h-[220px] w-full object-cover"
+                className="h-[clamp(160px,25vh,220px)] w-full object-cover"
                 loading="lazy"
                 decoding="async"
               />
@@ -164,7 +166,7 @@ const SceneProcessDepth = () => {
           </div>
 
           <div className="lg:col-span-7">
-            <div className="relative h-[46vh] min-h-[280px] overflow-hidden sm:h-[52vh] lg:h-[64vh] lg:min-h-[380px]">
+            <div className="relative h-[46vh] min-h-[280px] overflow-hidden sm:h-[52vh] lg:h-[64vh] lg:min-h-[340px]">
               <motion.div
                 style={shouldReduceMotion ? undefined : { y: stepTrackY }}
                 className="space-y-4 pb-5 pr-1 will-change-transform lg:space-y-5"

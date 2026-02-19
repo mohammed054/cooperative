@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { assetUrl } from '../lib/assetUrl'
 
@@ -48,9 +48,12 @@ const CAPABILITIES = [
 const getRange = (index, total) => {
   const step = 1 / total
   const start = step * index
-  const mid = start + step * 0.52
+  const leadIn = index === 0 ? step * 0.38 : step * 0.28
+  const mid = start + step * (index === total - 1 ? 0.74 : 0.58)
   const end = start + step
-  return [Math.max(0, start - step * 0.4), mid, Math.min(1, end + step * 0.18)]
+  const tail = index === total - 1 ? step * 0.44 : step * 0.22
+
+  return [Math.max(0, start - leadIn), Math.min(1, mid), Math.min(1, end + tail)]
 }
 
 const CapabilityCard = ({
@@ -60,18 +63,27 @@ const CapabilityCard = ({
   shouldReduceMotion,
   isFirst,
 }) => {
+  const holdEnd = range[1] + (range[2] - range[1]) * 0.64
   const opacity = useTransform(
     progress,
-    range,
-    isFirst ? [0.86, 1, 0.44] : [0.26, 1, 0.4]
+    [range[0], range[1], holdEnd, range[2]],
+    isFirst ? [0.86, 1, 1, 0.44] : [0.26, 1, 1, 0.4]
   )
-  const y = useTransform(progress, range, isFirst ? [8, 0, -20] : [26, 0, -20])
+  const y = useTransform(
+    progress,
+    [range[0], range[1], holdEnd, range[2]],
+    isFirst ? [8, 0, 0, -20] : [26, 0, 0, -20]
+  )
   const scale = useTransform(
     progress,
-    range,
-    isFirst ? [0.998, 1, 0.993] : [0.985, 1, 0.993]
+    [range[0], range[1], holdEnd, range[2]],
+    isFirst ? [0.998, 1, 1, 0.993] : [0.985, 1, 1, 0.993]
   )
-  const borderAlpha = useTransform(progress, range, [0.08, 0.2, 0.1])
+  const borderAlpha = useTransform(
+    progress,
+    [range[0], range[1], holdEnd, range[2]],
+    [0.08, 0.22, 0.2, 0.1]
+  )
   const borderColor = useTransform(
     borderAlpha,
     value => `rgba(17,17,17,${value})`
@@ -92,13 +104,15 @@ const CapabilityCard = ({
       className="overflow-hidden rounded-2xl border bg-white/[0.74] shadow-[0_10px_28px_rgba(17,17,17,0.05)] backdrop-blur-[1.5px]"
     >
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_1.1fr]">
-        <img
-          src={item.image}
-          alt={item.title}
-          loading="lazy"
-          decoding="async"
-          className="h-40 w-full object-cover sm:h-full"
-        />
+        <div className="relative h-44 overflow-hidden sm:h-full sm:min-h-[160px] lg:min-h-[180px]">
+          <img
+            src={item.image}
+            alt={item.title}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover object-[center_20%]"
+          />
+        </div>
         <div className="p-5 sm:p-6">
           <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
             {item.subtitle}
@@ -121,25 +135,64 @@ const CapabilityCard = ({
 const SceneCapabilityEstablishment = () => {
   const shouldReduceMotion = useReducedMotion()
   const sectionRef = useRef(null)
+  const trackViewportRef = useRef(null)
+  const trackRef = useRef(null)
+  const [trackEndY, setTrackEndY] = useState(-520)
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   })
 
-  const sequenceProgress = useTransform(scrollYProgress, [0.02, 0.84], [0, 1])
+  const sequenceProgress = useTransform(scrollYProgress, [0.04, 0.995], [0, 1])
   const railScale = useTransform(sequenceProgress, [0, 1], [0, 1])
-  const cardTrackY = useTransform(
-    sequenceProgress,
-    [0, 0.12, 1],
-    ['0%', '0%', '-54%']
-  )
+  const cardTrackY = useTransform(sequenceProgress, [0, 0.16, 1], [0, 0, trackEndY])
+
+  useEffect(() => {
+    if (shouldReduceMotion) return
+
+    const updateTrackEnd = () => {
+      const viewportEl = trackViewportRef.current
+      const trackEl = trackRef.current
+      if (!viewportEl || !trackEl) return
+
+      const viewportHeight = viewportEl.clientHeight
+      const trackHeight = trackEl.scrollHeight
+
+      // Keep scrolling upward until only a small tail of the stack remains visible.
+      const visibleTail = Math.max(56, Math.min(140, viewportHeight * 0.14))
+      const overflowEndY = Math.min(0, visibleTail - trackHeight)
+
+      setTrackEndY(previous =>
+        Math.abs(previous - overflowEndY) < 1 ? previous : overflowEndY
+      )
+    }
+
+    updateTrackEnd()
+
+    const resizeObserver = new ResizeObserver(updateTrackEnd)
+    const viewportEl = trackViewportRef.current
+    const trackEl = trackRef.current
+
+    if (viewportEl) resizeObserver.observe(viewportEl)
+    if (trackEl) {
+      resizeObserver.observe(trackEl)
+      Array.from(trackEl.children).forEach(card => resizeObserver.observe(card))
+    }
+
+    window.addEventListener('resize', updateTrackEnd)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', updateTrackEnd)
+    }
+  }, [shouldReduceMotion])
 
   return (
     <section
       id="scene-capability-establishment"
       ref={sectionRef}
-      className="relative h-[360vh] bg-transparent"
+      className="relative h-[460vh] bg-transparent"
     >
       <div className="sticky top-0 h-screen">
         <div className="mx-auto grid h-full max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:gap-14 lg:px-8">
@@ -191,9 +244,13 @@ const SceneCapabilityEstablishment = () => {
           </div>
 
           <div className="lg:col-span-7">
-            <div className="relative h-[50vh] min-h-[300px] overflow-hidden pb-2 sm:h-[55vh] lg:h-[68vh] lg:min-h-[420px]">
+            <div
+              ref={trackViewportRef}
+              className="relative h-[50vh] min-h-[300px] overflow-hidden pb-2 sm:h-[55vh] lg:h-[68vh] lg:min-h-[420px]"
+            >
               <motion.div
                 style={shouldReduceMotion ? undefined : { y: cardTrackY }}
+                ref={trackRef}
                 className="space-y-4 pb-5 pr-1 will-change-transform lg:space-y-5"
               >
                 {CAPABILITIES.map((item, index) => (

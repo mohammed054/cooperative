@@ -165,7 +165,7 @@ const Footer = () => {
         variants={containerVariants}
         initial={shouldReduceMotion ? false : 'hidden'}
         animate={inView ? 'show' : 'hidden'}
-        style={{ maxWidth: '1280px', margin: '0 auto', padding: '52px 20px 36px' }}
+        style={{ maxWidth: '1280px', margin: '0 auto', padding: '48px 20px 24px' }}
         className="sm:px-6 lg:px-8"
       >
         <div className="footer-grid">
@@ -384,7 +384,7 @@ const Footer = () => {
         <motion.div
           variants={itemVariants}
           style={{
-            marginTop: '48px',
+            marginTop: '36px',
             paddingTop: '20px',
             borderTop: '1px solid rgba(0,0,0,0.05)',
             display: 'flex',

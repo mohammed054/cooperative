@@ -249,7 +249,11 @@ const ServiceDetail = () => {
       )}
 
       {/* Related Services */}
-      <CinematicScene rhythm="medium" bridge="neutral">
+      <CinematicScene
+        rhythm="dense"
+        bridge="neutral"
+        className="!pb-8 lg:!pb-10"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.h2
             variants={variants}

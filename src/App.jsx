@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from 'react'
+import React, { Suspense, lazy, useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { AnalyticsProvider } from './context'
@@ -11,13 +11,14 @@ import SiteMetaManager from './components/SiteMetaManager'
 import MobileCtaDock from './components/MobileCtaDock'
 import AppErrorBoundary from './components/AppErrorBoundary'
 import PageTransitionFallback from './components/PageTransitionFallback'
+import InitialLoadingScreen from './components/InitialLoadingScreen'
+import Home from './pages/Home'
 import { trackError } from './utils/errorMonitoring'
 import {
   loadAbout,
   loadCaseStudyDetail,
   loadContact,
   loadFaq,
-  loadHome,
   loadNotFound,
   loadPricing,
   loadPrivacy,
@@ -31,7 +32,6 @@ import {
   preloadHighIntentRoutes,
 } from './utils/routePreload'
 
-const Home = lazy(loadHome)
 const Services = lazy(loadServices)
 const ServiceDetail = lazy(loadServiceDetail)
 const Work = lazy(loadWork)
@@ -115,7 +115,61 @@ const AnimatedRoutes = () => {
 }
 
 function App() {
+  const shouldReduceMotion = useReducedMotion()
+  const [showInitialLoader, setShowInitialLoader] = useState(true)
   const basename = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      setShowInitialLoader(false)
+      return
+    }
+
+    const minimumDurationMs = shouldReduceMotion ? 0 : 700
+    const fallbackTimeoutMs = 3200
+    const start = Date.now()
+    let isSettled = false
+    let minimumTimerId = null
+    let fallbackTimerId = null
+
+    const completeLoading = () => {
+      if (isSettled) return
+      isSettled = true
+
+      const elapsed = Date.now() - start
+      const remainingDelay = Math.max(0, minimumDurationMs - elapsed)
+
+      minimumTimerId = window.setTimeout(() => {
+        setShowInitialLoader(false)
+      }, remainingDelay)
+    }
+
+    const handleWindowLoad = () => {
+      completeLoading()
+    }
+
+    if (document.readyState === 'complete') {
+      completeLoading()
+    } else {
+      window.addEventListener('load', handleWindowLoad, { once: true })
+    }
+
+    fallbackTimerId = window.setTimeout(completeLoading, fallbackTimeoutMs)
+
+    return () => {
+      window.removeEventListener('load', handleWindowLoad)
+      if (minimumTimerId) window.clearTimeout(minimumTimerId)
+      if (fallbackTimerId) window.clearTimeout(fallbackTimerId)
+    }
+  }, [shouldReduceMotion])
+
+  if (showInitialLoader) {
+    return (
+      <AnimatePresence mode="wait">
+        <InitialLoadingScreen shouldReduceMotion={shouldReduceMotion} />
+      </AnimatePresence>
+    )
+  }
 
   return (
     <BrowserRouter basename={basename}>

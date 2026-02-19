@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { motion, useReducedMotion, useTransform } from 'framer-motion'
 import ScribbleButton from './ScribbleButton'
 import { assetUrl } from '../lib/assetUrl'
@@ -6,8 +6,8 @@ import { useSceneProgress } from '../motion/hooks/useSceneProgress'
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion()
-  const [videoReady, setVideoReady] = useState(false)
   const sectionRef = useRef(null)
+  const videoRef = useRef(null)
 
   const { scrollYProgress } = useSceneProgress(sectionRef, {
     offset: ['start start', 'end start'],
@@ -15,8 +15,8 @@ const Hero = () => {
 
   const mediaScale = useTransform(scrollYProgress, [0, 0.35], [1.05, 1])
   const contentY = useTransform(scrollYProgress, [0, 0.5], [0, -24])
-  const veilOpacity = useTransform(scrollYProgress, [0.2, 0.7], [0.72, 0.86])
-  const bloomOpacity = useTransform(scrollYProgress, [0, 0.45], [0.82, 0.56])
+  const veilOpacity = useTransform(scrollYProgress, [0.14, 0.72], [0.28, 0.42])
+  const bloomOpacity = useTransform(scrollYProgress, [0, 0.45], [0.58, 0.4])
 
   const scrollToSection = sectionId => {
     const element = document.getElementById(sectionId)
@@ -52,6 +52,21 @@ const Hero = () => {
     [bloomOpacity, shouldReduceMotion]
   )
 
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const tryPlay = async () => {
+      try {
+        await video.play()
+      } catch {
+        // Keep poster image if autoplay is blocked.
+      }
+    }
+
+    tryPlay()
+  }, [])
+
   return (
     <section
       id="hero"
@@ -65,25 +80,22 @@ const Hero = () => {
         <img
           src={assetUrl('images/event1.jpg')}
           alt="Luxury event production"
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-            videoReady ? 'opacity-0' : 'opacity-100'
-          }`}
+          className="absolute inset-0 h-full w-full object-cover"
           loading="eager"
           decoding="async"
           width={1920}
           height={1080}
         />
         <video
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-            videoReady ? 'opacity-100' : 'opacity-0'
-          }`}
-          autoPlay={!shouldReduceMotion}
+          ref={videoRef}
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
           muted
-          loop={!shouldReduceMotion}
+          loop
           playsInline
-          preload="none"
+          preload="metadata"
           poster={assetUrl('images/event1.jpg')}
-          onLoadedData={() => setVideoReady(true)}
+          onCanPlay={() => videoRef.current?.play().catch(() => {})}
           aria-hidden="true"
           width={1920}
           height={1080}
@@ -94,7 +106,7 @@ const Hero = () => {
 
       <motion.div
         style={shouldReduceMotion ? undefined : { opacity: veilOpacity }}
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/34 to-black/76"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-black/12 to-black/34"
       />
 
       <motion.div
@@ -187,7 +199,7 @@ const Hero = () => {
             ].map(label => (
               <p
                 key={label}
-                className="flex items-center gap-2 text-white/55"
+                className="flex items-center gap-2 text-white/72"
                 style={{ fontSize: '13px', letterSpacing: '0.03em' }}
               >
                 <span
@@ -196,7 +208,7 @@ const Hero = () => {
                     display: 'block',
                     width: '12px',
                     height: '1px',
-                    background: 'rgba(255,255,255,0.35)',
+                    background: 'rgba(255,255,255,0.52)',
                     flexShrink: 0,
                   }}
                 />

@@ -129,18 +129,11 @@ const TestimonialsSection = ({
         />
       )}
 
-      {isHome && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-[#101114]/45 via-[#101114]/16 to-transparent"
-        />
-      )}
-
       <div
         className={[
           'relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8',
           isHome
-            ? 'min-h-screen py-10 sm:py-12 lg:py-16'
+            ? 'min-h-screen py-10 sm:py-12 lg:flex lg:h-screen lg:min-h-0 lg:flex-col lg:py-8'
             : 'py-12 sm:py-18 lg:py-22',
         ].join(' ')}
       >
@@ -153,7 +146,7 @@ const TestimonialsSection = ({
           className={[
             'mb-10 max-w-2xl lg:mb-14',
             isHome
-              ? 'md:sticky md:top-20 md:z-20 md:bg-gradient-to-b md:from-[#f6f2eb]/95 md:to-transparent md:pb-4'
+              ? 'mb-8 lg:mb-4'
               : '',
           ].join(' ')}
         >
@@ -168,8 +161,13 @@ const TestimonialsSection = ({
           </p>
         </motion.header>
 
-        <div className="grid gap-5 lg:grid-cols-12 lg:items-stretch">
-          <div className="flex flex-col lg:col-span-7">
+        <div
+          className={[
+            'grid gap-5 lg:grid-cols-12 lg:items-stretch',
+            isHome ? 'lg:min-h-0 lg:flex-1' : '',
+          ].join(' ')}
+        >
+          <div className="flex flex-col lg:col-span-7 lg:min-h-0">
             <AnimatePresence mode="wait" initial={false}>
               <motion.figure
                 key={active?.id}
@@ -203,11 +201,17 @@ const TestimonialsSection = ({
                 transition={transition}
                 className={[
                   'flex-1 overflow-hidden rounded-xl border border-black/[0.06] shadow-[0_16px_44px_rgba(17,17,17,0.06)]',
+                  isHome ? 'lg:min-h-0' : '',
                   isHome ? 'bg-white/[0.8] backdrop-blur-[2px]' : 'bg-white',
                 ].join(' ')}
               >
-                <div className="grid flex-1 grid-cols-1 lg:grid-cols-12">
-                  <div className="flex flex-col justify-between p-5 sm:p-7 lg:col-span-7 lg:p-8">
+                <div className="grid flex-1 grid-cols-1 lg:h-full lg:grid-cols-12">
+                  <div
+                    className={[
+                      'flex flex-col justify-between p-5 sm:p-7 lg:col-span-7 lg:p-8',
+                      isHome ? 'lg:p-5' : '',
+                    ].join(' ')}
+                  >
                     <div className="flex items-center justify-between gap-4">
                       <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-surface-2 px-3 py-1 text-xs font-medium text-ink-muted">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -267,7 +271,7 @@ const TestimonialsSection = ({
 
                   <motion.div
                     style={shouldReduceMotion ? undefined : { y: imageDriftY }}
-                    className="relative lg:col-span-5"
+                    className="relative overflow-hidden lg:col-span-5"
                   >
                     <motion.img
                       src={active?.image}
@@ -323,7 +327,7 @@ const TestimonialsSection = ({
 
           <motion.div
             style={shouldReduceMotion ? undefined : { y: sideRailY }}
-            className="mt-1 flex flex-col gap-4 lg:col-span-5 lg:mt-0"
+            className="mt-1 flex flex-col gap-4 lg:col-span-5 lg:mt-0 lg:min-h-0"
           >
             <div className="hidden lg:block">
               <p className="mb-3 text-xs font-medium uppercase tracking-[0.14em] text-ink-subtle">
@@ -394,6 +398,7 @@ const TestimonialsSection = ({
             <div
               className={[
                 'flex flex-1 flex-col rounded-xl border border-black/[0.06] p-5',
+                isHome ? 'lg:min-h-0 lg:p-4' : '',
                 isHome ? 'bg-white/[0.78] backdrop-blur-[2px]' : 'bg-white',
               ].join(' ')}
             >
@@ -441,7 +446,12 @@ const TestimonialsSection = ({
           </motion.div>
         </div>
 
-        <div className="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className={[
+            'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
+            isHome ? 'mt-5 lg:mt-4' : 'mt-7',
+          ].join(' ')}
+        >
           <div className="flex items-center gap-2.5">
             <button
               type="button"

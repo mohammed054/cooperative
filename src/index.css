@@ -380,6 +380,12 @@
   }
 }
 
+/* Home scenes are full-bleed and should not inherit global scene overlap offsets. */
+.home-cinematic .home-scene + .home-scene {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-surface-2 shadow-[0_12px_30px_rgba(22,22,22,0.18)] transition hover:bg-ink-muted hover:shadow-[0_16px_42px_rgba(22,22,22,0.22)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink;
