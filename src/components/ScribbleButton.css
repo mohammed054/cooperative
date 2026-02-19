@@ -1,30 +1,82 @@
 .scribble-button {
+  --sb-bg: #161a22;
+  --sb-fg: #f7f3ed;
+  --sb-border: rgba(20, 24, 32, 0.3);
+  --sb-hover-bg: #0f131b;
+  --sb-hover-fg: #ffffff;
+  --sb-hover-border: rgba(20, 24, 32, 0.66);
+  --sb-shadow: 0 16px 36px rgba(9, 12, 17, 0.24);
+  --sb-padding-x: 1.4rem;
+  --sb-padding-y: 0.72rem;
+  --sb-font-size: 0.79rem;
+  --sb-letter: 0.1em;
+
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.72rem;
+  border-radius: 999px;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-bg);
+  color: var(--sb-fg);
+  padding: var(--sb-padding-y) var(--sb-padding-x);
+  font-family: var(--font-body);
+  font-size: var(--sb-font-size);
+  font-weight: 600;
+  letter-spacing: var(--sb-letter);
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: var(--sb-shadow);
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transform: translateZ(0);
+  transition:
+    background-color var(--cine-transition-medium),
+    border-color var(--cine-transition-medium),
+    color var(--cine-transition-medium),
+    box-shadow var(--cine-transition-medium),
+    transform var(--cine-transition-fast);
+}
+
+.scribble-button:hover {
+  background: var(--sb-hover-bg);
+  color: var(--sb-hover-fg);
+  border-color: var(--sb-hover-border);
+  transform: translateY(-1px);
+  box-shadow: 0 18px 42px rgba(8, 11, 16, 0.28);
 }
 
 .scribble-button:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
-.scribble-text {
+.scribble-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.scribble-text,
+.scribble-icon {
   position: relative;
   z-index: 2;
 }
 
 .scribble-icon {
-  position: relative;
-  z-index: 2;
   flex-shrink: 0;
+  transition: transform var(--cine-transition-fast);
+}
+
+.scribble-button:hover .scribble-icon {
+  transform: translateX(1.5px);
 }
 
 .scribble-svg {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 150%;
+  width: 140%;
   height: 180%;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -33,23 +85,137 @@
 
 .scribble-svg path {
   stroke: currentColor;
-  stroke-width: 280;
+  stroke-width: 20;
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
-  opacity: 0.3;
-  stroke-dasharray: 12500;
-  stroke-dashoffset: 12500;
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.28;
+  stroke-dasharray: 2800;
+  stroke-dashoffset: 2800;
+  transition: stroke-dashoffset 0.7s cubic-bezier(0.2, 0.85, 0.25, 1);
 }
 
 .scribble-button:hover .scribble-svg path {
   stroke-dashoffset: 0;
 }
 
-/* Disable scribble when no-scribble class is applied */
 .no-scribble .scribble-svg {
   display: none;
 }
 
-/* Keep scribble enabled on mobile for visual continuity. */
+.sb-size-sm {
+  --sb-padding-x: 1.1rem;
+  --sb-padding-y: 0.56rem;
+  --sb-font-size: 0.7rem;
+  --sb-letter: 0.08em;
+  min-height: 2.4rem;
+}
+
+.sb-size-md {
+  --sb-padding-x: 1.4rem;
+  --sb-padding-y: 0.72rem;
+  --sb-font-size: 0.79rem;
+}
+
+.sb-size-lg {
+  --sb-padding-x: 1.72rem;
+  --sb-padding-y: 0.85rem;
+  --sb-font-size: 0.82rem;
+  min-height: 2.95rem;
+}
+
+.sb-tone-dark.sb-variant-primary {
+  --sb-bg: #151a22;
+  --sb-fg: #f8f3eb;
+  --sb-border: rgba(20, 24, 32, 0.38);
+  --sb-hover-bg: #0f131b;
+  --sb-hover-fg: #ffffff;
+  --sb-hover-border: rgba(20, 24, 32, 0.72);
+}
+
+.sb-tone-light.sb-variant-primary {
+  --sb-bg: rgba(255, 255, 255, 0.95);
+  --sb-fg: #15181f;
+  --sb-border: rgba(255, 255, 255, 0.64);
+  --sb-hover-bg: rgba(255, 255, 255, 1);
+  --sb-hover-fg: #0f1117;
+  --sb-hover-border: rgba(255, 255, 255, 0.88);
+  --sb-shadow: 0 18px 44px rgba(0, 0, 0, 0.3);
+}
+
+.sb-variant-secondary {
+  --sb-bg: rgba(255, 255, 255, 0.62);
+  --sb-fg: #20242c;
+  --sb-border: rgba(36, 41, 52, 0.25);
+  --sb-hover-bg: rgba(255, 255, 255, 0.85);
+  --sb-hover-fg: #11151d;
+  --sb-hover-border: rgba(36, 41, 52, 0.44);
+  --sb-shadow: 0 12px 28px rgba(16, 20, 29, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.sb-tone-light.sb-variant-secondary {
+  --sb-bg: rgba(19, 23, 31, 0.5);
+  --sb-fg: rgba(249, 245, 236, 0.92);
+  --sb-border: rgba(255, 255, 255, 0.24);
+  --sb-hover-bg: rgba(19, 23, 31, 0.66);
+  --sb-hover-fg: rgba(255, 255, 255, 1);
+  --sb-hover-border: rgba(255, 255, 255, 0.44);
+  --sb-shadow: 0 14px 34px rgba(2, 4, 8, 0.35);
+}
+
+.sb-variant-outline {
+  --sb-bg: transparent;
+  --sb-fg: #1d2129;
+  --sb-border: rgba(24, 28, 36, 0.42);
+  --sb-hover-bg: rgba(25, 29, 37, 0.08);
+  --sb-hover-fg: #13161d;
+  --sb-hover-border: rgba(24, 28, 36, 0.72);
+  --sb-shadow: none;
+}
+
+.sb-tone-light.sb-variant-outline {
+  --sb-bg: transparent;
+  --sb-fg: rgba(246, 240, 230, 0.92);
+  --sb-border: rgba(255, 255, 255, 0.44);
+  --sb-hover-bg: rgba(255, 255, 255, 0.12);
+  --sb-hover-fg: #ffffff;
+  --sb-hover-border: rgba(255, 255, 255, 0.66);
+  --sb-shadow: none;
+}
+
+.sb-variant-micro {
+  --sb-padding-x: 0.9rem;
+  --sb-padding-y: 0.42rem;
+  --sb-font-size: 0.64rem;
+  --sb-letter: 0.13em;
+  min-height: 2.02rem;
+  --sb-bg: transparent;
+  --sb-fg: #2a2f37;
+  --sb-border: rgba(33, 38, 47, 0.24);
+  --sb-hover-bg: rgba(31, 36, 46, 0.08);
+  --sb-hover-fg: #151922;
+  --sb-hover-border: rgba(33, 38, 47, 0.44);
+  --sb-shadow: none;
+}
+
+.sb-tone-light.sb-variant-micro {
+  --sb-fg: rgba(244, 238, 228, 0.9);
+  --sb-border: rgba(255, 255, 255, 0.28);
+  --sb-hover-bg: rgba(255, 255, 255, 0.1);
+  --sb-hover-fg: #ffffff;
+  --sb-hover-border: rgba(255, 255, 255, 0.56);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sb-variant-secondary {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    --sb-bg: rgba(255, 255, 255, 0.9);
+  }
+
+  .sb-tone-light.sb-variant-secondary {
+    --sb-bg: rgba(19, 23, 31, 0.88);
+  }
+}

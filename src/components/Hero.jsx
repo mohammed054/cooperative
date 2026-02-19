@@ -3,6 +3,13 @@ import { motion, useReducedMotion, useTransform } from 'framer-motion'
 import ScribbleButton from './ScribbleButton'
 import { assetUrl } from '../lib/assetUrl'
 import { useSceneProgress } from '../motion/hooks/useSceneProgress'
+import { SCENE_RANGES } from '../motion/ranges'
+
+const HERO_TRUST_ITEMS = [
+  'UAE-wide command coverage',
+  'Senior show-day leadership',
+  'White-glove technical delivery',
+]
 
 const Hero = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -13,10 +20,18 @@ const Hero = () => {
     offset: ['start start', 'end start'],
   })
 
-  const mediaScale = useTransform(scrollYProgress, [0, 0.35], [1.05, 1])
-  const contentY = useTransform(scrollYProgress, [0, 0.5], [0, -24])
-  const veilOpacity = useTransform(scrollYProgress, [0.14, 0.72], [0.28, 0.42])
-  const bloomOpacity = useTransform(scrollYProgress, [0, 0.45], [0.58, 0.4])
+  // Settles the media stack as users enter the journey for a premium directed opening.
+  const mediaScale = useTransform(scrollYProgress, SCENE_RANGES.hero.mediaSettle, [1.08, 1])
+  // Adds subtle vertical drift so the hero feels like a living stage, not a flat banner.
+  const mediaY = useTransform(scrollYProgress, [0, 1], [0, -30])
+  // Lifts content while preserving readability during scroll.
+  const copyY = useTransform(scrollYProgress, SCENE_RANGES.hero.contentLift, [0, -32])
+  // Softens alpha transitions for copy to avoid abrupt visual jumps.
+  const copyOpacity = useTransform(scrollYProgress, [0.02, 0.14, 0.9], [0.78, 1, 0.9])
+  // Deepens the veil to bridge into lighter follow-up scenes.
+  const veilOpacity = useTransform(scrollYProgress, SCENE_RANGES.hero.veilDeepen, [0.24, 0.54])
+  // Reveals trust micro-list after authority headline lands.
+  const trustOpacity = useTransform(scrollYProgress, SCENE_RANGES.hero.trustReveal, [0.18, 1])
 
   const scrollToSection = sectionId => {
     const element = document.getElementById(sectionId)
@@ -25,31 +40,12 @@ const Hero = () => {
     }
   }
 
-  const containerVariants = {
-    hidden: {},
-    show: {
-      transition: { staggerChildren: 0.13, delayChildren: 0.15 },
-    },
-  }
-
-  const itemVariants = shouldReduceMotion
-    ? {}
-    : {
-        hidden: { opacity: 0, y: 18 },
-        show: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] },
-        },
-      }
-
   const bloomStyle = useMemo(
     () => ({
       backgroundImage:
-        'radial-gradient(900px 520px at 50% 5%, var(--color-video-overlay-accent), transparent 60%), radial-gradient(700px 520px at 0% 70%, rgba(255,255,255,0.08), transparent 58%)',
-      ...(shouldReduceMotion ? {} : { opacity: bloomOpacity }),
+        'radial-gradient(76% 54% at 52% 12%, rgba(255,255,255,0.16), rgba(255,255,255,0) 66%), radial-gradient(62% 46% at 12% 70%, rgba(206,180,128,0.24), rgba(206,180,128,0) 70%)',
     }),
-    [bloomOpacity, shouldReduceMotion]
+    []
   )
 
   useEffect(() => {
@@ -60,7 +56,7 @@ const Hero = () => {
       try {
         await video.play()
       } catch {
-        // Keep poster image if autoplay is blocked.
+        // Autoplay can be blocked by browser policy; poster image remains as fallback.
       }
     }
 
@@ -74,12 +70,12 @@ const Hero = () => {
       className="relative min-h-[100svh] overflow-hidden bg-black"
     >
       <motion.div
-        style={shouldReduceMotion ? undefined : { scale: mediaScale }}
-        className="absolute inset-0 h-full w-full"
+        style={shouldReduceMotion ? undefined : { scale: mediaScale, y: mediaY }}
+        className="absolute inset-0"
       >
         <img
           src={assetUrl('images/event1.jpg')}
-          alt="Luxury event production"
+          alt="Luxury event production in progress"
           className="absolute inset-0 h-full w-full object-cover"
           loading="eager"
           decoding="async"
@@ -106,10 +102,12 @@ const Hero = () => {
 
       <motion.div
         style={shouldReduceMotion ? undefined : { opacity: veilOpacity }}
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-black/12 to-black/34"
-      />
+        className="pointer-events-none absolute inset-0"
+      >
+        <div className="absolute inset-0" style={{ background: 'var(--cine-gradient-hero)' }} />
+      </motion.div>
 
-      <motion.div
+      <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 hidden md:block"
         style={bloomStyle}
@@ -117,128 +115,71 @@ const Hero = () => {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[var(--home-light-100)] via-[var(--home-light-200)] to-transparent"
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[var(--home-light-100)] via-[var(--home-light-200)] to-transparent"
       />
 
-      <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-4 pb-10 pt-10 sm:px-6 sm:pb-14 sm:pt-24 lg:px-8">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <motion.div
-          style={shouldReduceMotion ? undefined : { y: contentY }}
-          variants={containerVariants}
-          initial={shouldReduceMotion ? false : 'hidden'}
-          animate="show"
-          className="w-full max-w-3xl"
+          style={shouldReduceMotion ? undefined : { y: copyY, opacity: copyOpacity }}
+          className="max-w-3xl"
         >
-          <motion.div variants={itemVariants} className="hidden md:block">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-white/[0.18] bg-white/[0.08] px-4 py-1.5 backdrop-blur-sm">
-              <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span
-                className="font-medium text-white/85"
-                style={{
-                  fontSize: '10px',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Ultra-premium event production
-              </span>
-            </div>
-          </motion.div>
+          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-sm">
+            <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <span className="cinematic-eyebrow text-white/84">
+              Hero authority scene
+            </span>
+          </div>
 
-          <motion.h1
-            variants={itemVariants}
-            className="mt-5 font-serif leading-[1.05] tracking-tight text-white md:mt-6"
-            style={{ fontSize: 'clamp(2rem, 5.5vw, 4.5rem)' }}
-          >
-            Production that
-            <br className="hidden sm:block" /> defines perfection.
-          </motion.h1>
+          <h1 className="mt-6 font-serif text-[clamp(2.1rem,5.6vw,4.8rem)] leading-[1.03] tracking-[-0.032em] text-white">
+            Production direction
+            <br className="hidden sm:block" /> for rooms that cannot slip.
+          </h1>
 
-          <motion.div variants={itemVariants}>
-            <div
-              className="mt-5 md:mt-6"
-              style={{
-                width: '40px',
-                height: '1px',
-                background: 'rgba(255,255,255,0.35)',
-              }}
-            />
-          </motion.div>
+          <p className="mt-5 max-w-[46ch] text-[clamp(0.95rem,1.55vw,1.18rem)] leading-[1.72] text-white/72">
+            Senior-led AV, staging, lighting, and show control calibrated for
+            executive-level precision and composure.
+          </p>
 
-          <motion.p
-            variants={itemVariants}
-            className="mt-4 max-w-xl leading-relaxed text-white/70"
-            style={{ fontSize: 'clamp(14px, 1.8vw, 18px)' }}
-          >
-            Senior-led crews for AV, staging, lighting, and show-day control -
-            designed for the most discerning clients.
-          </motion.p>
-
-          <motion.div
-            variants={itemVariants}
-            className="mt-7 flex flex-col items-start gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4"
-          >
+          <div className="mt-8 flex flex-wrap gap-3">
             <ScribbleButton
               onClick={() => scrollToSection('get-started')}
               ariaLabel="Request a proposal"
               analyticsLabel="hero-request-proposal"
-              showArrow={true}
-              className="inline-flex w-auto items-center justify-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-[0_16px_44px_rgba(0,0,0,0.28)] transition hover:bg-white/90 hover:shadow-[0_18px_54px_rgba(0,0,0,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:px-7 md:py-3.5"
+              tone="light"
+              variant="primary"
+              size="lg"
             >
               Request a proposal
             </ScribbleButton>
-          </motion.div>
+            <ScribbleButton
+              onClick={() => scrollToSection('scene-capability-establishment')}
+              ariaLabel="Explore capabilities"
+              analyticsLabel="hero-explore-capabilities"
+              tone="light"
+              variant="outline"
+              size="lg"
+              showArrow={false}
+            >
+              Explore capabilities
+            </ScribbleButton>
+          </div>
 
-          <motion.div
-            variants={itemVariants}
-            className="mt-8 hidden flex-wrap gap-x-8 gap-y-3 md:flex"
+          <motion.ul
+            style={shouldReduceMotion ? undefined : { opacity: trustOpacity }}
+            className="mt-8 flex flex-wrap gap-x-8 gap-y-3"
           >
-            {[
-              'UAE-wide coverage',
-              'Show-day command',
-              'White-glove rentals',
-            ].map(label => (
-              <p
-                key={label}
-                className="flex items-center gap-2 text-white/72"
-                style={{ fontSize: '13px', letterSpacing: '0.03em' }}
+            {HERO_TRUST_ITEMS.map(item => (
+              <li
+                key={item}
+                className="flex items-center gap-2 text-[12px] tracking-[0.04em] text-white/72"
               >
-                <span
-                  aria-hidden
-                  style={{
-                    display: 'block',
-                    width: '12px',
-                    height: '1px',
-                    background: 'rgba(255,255,255,0.52)',
-                    flexShrink: 0,
-                  }}
-                />
-                {label}
-              </p>
+                <span className="h-[1px] w-3 bg-white/44" />
+                {item}
+              </li>
             ))}
-          </motion.div>
+          </motion.ul>
         </motion.div>
       </div>
-
-      {!shouldReduceMotion && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-          className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
-          aria-hidden="true"
-        >
-          <motion.div
-            animate={{ opacity: [0.35, 0.75, 0.35] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-              width: '1px',
-              height: '48px',
-              background:
-                'linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)',
-            }}
-          />
-        </motion.div>
-      )}
     </section>
   )
 }

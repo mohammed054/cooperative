@@ -5,42 +5,42 @@ import { assetUrl } from '../lib/assetUrl'
 const CAPABILITIES = [
   {
     index: '01',
-    title: 'Event production leadership',
+    title: 'Command-led production',
     subtitle: 'Single accountable producer',
     description:
-      'Senior ownership from first brief to room close keeps timelines and decisions disciplined.',
+      'One senior owner orchestrates approvals, crew alignment, and show priorities end-to-end.',
     image: assetUrl('images/event-planning.png'),
   },
   {
     index: '02',
-    title: 'Technical systems',
-    subtitle: 'AV, lighting, show control',
+    title: 'Technical certainty',
+    subtitle: 'AV, lighting, and show control',
     description:
-      'Audio, video, and cue infrastructure engineered for clarity, redundancy, and calm operation.',
+      'Signal flow, redundancy, and cue logic are designed for clarity before doors open.',
     image: assetUrl('images/av-setup.png'),
   },
   {
     index: '03',
-    title: 'Staging and scenic',
-    subtitle: 'Built to approved render',
+    title: 'Spatial precision',
+    subtitle: 'Staging and scenic architecture',
     description:
-      'Stage architecture and scenic execution delivered with exacting build standards.',
+      'Builds are translated from concept into safe, camera-ready room geometry.',
     image: assetUrl('images/seating.png'),
   },
   {
     index: '04',
-    title: 'Furniture and rentals',
-    subtitle: 'Curated premium inventory',
+    title: 'Curated finish quality',
+    subtitle: 'Furniture and premium rentals',
     description:
-      'White-glove logistics for seating, tables, and finish pieces that read as intentional.',
+      'Inventory arrives staged, labeled, and set with white-glove handling.',
     image: assetUrl('images/lighting-effects.png'),
   },
   {
     index: '05',
-    title: 'Show-day command',
-    subtitle: 'Calm operational control',
+    title: 'Show-day composure',
+    subtitle: 'Operational leadership',
     description:
-      'On-site producer and crew maintain cadence so stakeholders stay focused on outcomes.',
+      'A calm command lane maintains cadence while stakeholders stay focused on outcomes.',
     image: assetUrl('images/full-production.png'),
   },
 ]
@@ -48,12 +48,9 @@ const CAPABILITIES = [
 const getRange = (index, total) => {
   const step = 1 / total
   const start = step * index
-  const leadIn = index === 0 ? step * 0.38 : step * 0.28
-  const mid = start + step * (index === total - 1 ? 0.5 : 0.58)
-  const end = start + step
-  const tail = index === total - 1 ? step * 0.44 : step * 0.22
-
-  return [Math.max(0, start - leadIn), Math.min(1, mid), Math.min(1, end + tail)]
+  const mid = start + step * 0.54
+  const end = start + step * 1.18
+  return [Math.max(0, start - step * 0.24), Math.min(1, mid), Math.min(1, end)]
 }
 
 const CapabilityCard = ({
@@ -64,42 +61,27 @@ const CapabilityCard = ({
   isFirst,
   isLast,
 }) => {
-  const holdEnd = range[1] + (range[2] - range[1]) * 0.64
-  const opacityStandard = useTransform(
+  // Fades cards in and out in sequence to create directed scene choreography.
+  const opacity = useTransform(
     progress,
-    [range[0], range[1], holdEnd, range[2]],
-    isFirst ? [0.86, 1, 1, 0.44] : [0.26, 1, 1, 0.4]
+    [range[0], range[1], range[2]],
+    isLast ? [0.3, 1, 1] : isFirst ? [0.86, 1, 0.44] : [0.3, 1, 0.42]
   )
-  const opacityLast = useTransform(progress, [range[0], range[1], range[2]], [0.26, 1, 1])
-  const opacity = isLast ? opacityLast : opacityStandard
-
-  const yStandard = useTransform(
+  // Adds vertical motion to reinforce progression through the capability stack.
+  const y = useTransform(
     progress,
-    [range[0], range[1], holdEnd, range[2]],
-    isFirst ? [8, 0, 0, -20] : [26, 0, 0, -20]
+    [range[0], range[1], range[2]],
+    isLast ? [24, 0, 0] : isFirst ? [8, 0, -18] : [26, 0, -18]
   )
-  const yLast = useTransform(progress, [range[0], range[1], range[2]], [26, 0, 0])
-  const y = isLast ? yLast : yStandard
-
-  const scaleStandard = useTransform(
+  // Slight scaling keeps active cards visually dominant without aggressive zoom.
+  const scale = useTransform(
     progress,
-    [range[0], range[1], holdEnd, range[2]],
-    isFirst ? [0.998, 1, 1, 0.993] : [0.985, 1, 1, 0.993]
+    [range[0], range[1], range[2]],
+    isLast ? [0.986, 1, 1] : [0.985, 1, 0.992]
   )
-  const scaleLast = useTransform(progress, [range[0], range[1], range[2]], [0.985, 1, 1])
-  const scale = isLast ? scaleLast : scaleStandard
-
-  const borderAlphaStandard = useTransform(
-    progress,
-    [range[0], range[1], holdEnd, range[2]],
-    [0.08, 0.22, 0.2, 0.1]
-  )
-  const borderAlphaLast = useTransform(progress, [range[0], range[1], range[2]], [0.08, 0.22, 0.22])
-  const borderAlpha = isLast ? borderAlphaLast : borderAlphaStandard
-  const borderColor = useTransform(
-    borderAlpha,
-    value => `rgba(17,17,17,${value})`
-  )
+  // Dynamic border contrast helps users identify the active card at a glance.
+  const borderAlpha = useTransform(progress, [range[0], range[1], range[2]], [0.08, 0.26, 0.1])
+  const borderColor = useTransform(borderAlpha, value => `rgba(20,24,32,${value})`)
 
   return (
     <motion.article
@@ -113,28 +95,24 @@ const CapabilityCard = ({
               borderColor,
             }
       }
-      className="overflow-hidden rounded-2xl border bg-white/[0.74] shadow-[0_10px_28px_rgba(17,17,17,0.05)] backdrop-blur-[1.5px]"
+      className="overflow-hidden rounded-2xl border bg-white/72 shadow-[0_12px_30px_rgba(16,18,24,0.1)] backdrop-blur-md"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_1.1fr]">
-        <div className="relative h-44 overflow-hidden sm:h-full sm:min-h-[160px] lg:min-h-[180px]">
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_1.08fr]">
+        <div className="relative h-44 overflow-hidden sm:h-full sm:min-h-[170px] lg:min-h-[190px]">
           <img
             src={item.image}
             alt={item.title}
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-[center_20%]"
+            className="absolute inset-0 h-full w-full object-cover object-center"
           />
         </div>
         <div className="p-5 sm:p-6">
-          <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
-            {item.subtitle}
-          </p>
-          <h3 className="mt-3 font-serif text-[clamp(1.1rem,1.8vw,1.45rem)] leading-[1.1] tracking-[-0.015em] text-ink">
+          <p className="cinematic-eyebrow text-ink-subtle">{item.subtitle}</p>
+          <h3 className="mt-3 font-serif text-[clamp(1.14rem,1.84vw,1.52rem)] leading-[1.1] tracking-[-0.016em] text-ink">
             {item.title}
           </h3>
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-            {item.description}
-          </p>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">{item.description}</p>
           <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">
             Capability {item.index}
           </p>
@@ -149,16 +127,21 @@ const SceneCapabilityEstablishment = () => {
   const sectionRef = useRef(null)
   const trackViewportRef = useRef(null)
   const trackRef = useRef(null)
-  const [trackEndY, setTrackEndY] = useState(-520)
+  const [trackEndY, setTrackEndY] = useState(-500)
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   })
 
-  const sequenceProgress = useTransform(scrollYProgress, [0.03, 0.9], [0, 1])
+  // Controls sequence timing for all capability cards in the sticky track.
+  const sequenceProgress = useTransform(scrollYProgress, [0.04, 0.92], [0, 1])
+  // Draws the vertical progress rail as users move through the scene.
   const railScale = useTransform(sequenceProgress, [0, 1], [0, 1])
-  const cardTrackY = useTransform(sequenceProgress, [0, 0.14, 1], [0, 0, trackEndY])
+  // Scroll-translates the card stack so the next capability is always staged.
+  const cardTrackY = useTransform(sequenceProgress, [0, 0.16, 1], [0, 0, trackEndY])
+  // Adds ambient glow depth to keep the scene visually rich on large screens.
+  const glowOpacity = useTransform(sequenceProgress, [0.1, 0.6, 1], [0.08, 0.18, 0.1])
 
   useEffect(() => {
     if (shouldReduceMotion) return
@@ -168,35 +151,28 @@ const SceneCapabilityEstablishment = () => {
       const trackEl = trackRef.current
       if (!viewportEl || !trackEl) return
 
-      const viewportHeight = viewportEl.clientHeight
       const cards = Array.from(trackEl.children)
       const lastCard = cards[cards.length - 1]
       if (!lastCard) return
 
-      // End with the final card anchored near the top edge, not offscreen.
-      const targetTop = Math.max(96, Math.min(160, viewportHeight * 0.2))
+      const viewportHeight = viewportEl.clientHeight
+      const targetTop = Math.max(88, Math.min(152, viewportHeight * 0.2))
       const alignLastCardY = targetTop - lastCard.offsetTop
-      const overflowEndY = Math.min(0, alignLastCardY)
+      const nextEnd = Math.min(0, alignLastCardY)
 
-      setTrackEndY(previous =>
-        Math.abs(previous - overflowEndY) < 1 ? previous : overflowEndY
-      )
+      setTrackEndY(previous => (Math.abs(previous - nextEnd) < 1 ? previous : nextEnd))
     }
 
     updateTrackEnd()
 
     const resizeObserver = new ResizeObserver(updateTrackEnd)
-    const viewportEl = trackViewportRef.current
-    const trackEl = trackRef.current
-
-    if (viewportEl) resizeObserver.observe(viewportEl)
-    if (trackEl) {
-      resizeObserver.observe(trackEl)
-      Array.from(trackEl.children).forEach(card => resizeObserver.observe(card))
+    if (trackViewportRef.current) resizeObserver.observe(trackViewportRef.current)
+    if (trackRef.current) {
+      resizeObserver.observe(trackRef.current)
+      Array.from(trackRef.current.children).forEach(card => resizeObserver.observe(card))
     }
 
     window.addEventListener('resize', updateTrackEnd)
-
     return () => {
       resizeObserver.disconnect()
       window.removeEventListener('resize', updateTrackEnd)
@@ -207,24 +183,27 @@ const SceneCapabilityEstablishment = () => {
     <section
       id="scene-capability-establishment"
       ref={sectionRef}
-      className="relative h-[540vh] bg-transparent"
+      className="relative h-[520vh] overflow-hidden bg-transparent"
     >
+      <motion.div
+        style={shouldReduceMotion ? undefined : { opacity: glowOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(56%_46%_at_16%_30%,rgba(255,255,255,0.58),rgba(255,255,255,0)_76%),radial-gradient(46%_36%_at_82%_62%,rgba(216,188,142,0.28),rgba(216,188,142,0)_78%)]"
+      />
+
       <div className="sticky top-0 h-screen">
         <div className="mx-auto grid h-full max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:gap-14 lg:px-8">
           <div className="flex flex-col justify-center lg:col-span-5">
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#8f8f8f]">
-              Capability establishment
-            </p>
-            <h2 className="mt-4 max-w-[13ch] font-serif text-[clamp(1.9rem,4vw,3.2rem)] leading-[1.04] tracking-[-0.02em] text-ink">
-              Built for high-stakes rooms.
+            <p className="cinematic-eyebrow text-[#8f8f8f]">Capability establishment</p>
+            <h2 className="mt-4 max-w-[13ch] font-serif text-[clamp(1.95rem,4.08vw,3.26rem)] leading-[1.04] tracking-[-0.022em] text-ink">
+              Engineered for high-stakes rooms.
             </h2>
             <p className="mt-5 max-w-[40ch] text-[15px] leading-relaxed text-ink-muted">
-              Every capability is structured to reduce volatility and preserve
-              executive confidence through delivery.
+              Delivery discipline is layered from first brief to final cue, so
+              confidence grows as complexity increases.
             </p>
 
             <div className="mt-8 flex items-center gap-4">
-              <div className="relative h-20 w-[2px] overflow-hidden rounded-full bg-black/[0.08]">
+              <div className="relative h-20 w-[2px] overflow-hidden rounded-full bg-black/10">
                 <motion.div
                   style={
                     shouldReduceMotion
@@ -245,15 +224,15 @@ const SceneCapabilityEstablishment = () => {
             <ul className="mt-8 space-y-2.5 text-sm text-ink-muted">
               <li className="flex gap-2.5">
                 <span className="mt-2 block h-[1px] w-3 shrink-0 bg-black/30" />
-                UAE-wide technical and production coverage
+                Scope clarity before procurement starts
               </li>
               <li className="flex gap-2.5">
                 <span className="mt-2 block h-[1px] w-3 shrink-0 bg-black/30" />
-                Senior crew leadership through show close
+                Sequenced crew deployment with tight approvals
               </li>
               <li className="flex gap-2.5">
                 <span className="mt-2 block h-[1px] w-3 shrink-0 bg-black/30" />
-                White-glove logistics and room finishing
+                Show-day command continuity across the full room
               </li>
             </ul>
           </div>

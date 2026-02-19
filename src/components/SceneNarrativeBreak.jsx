@@ -9,9 +9,9 @@ import {
 import { MOTION_EASE } from '../motion'
 
 const NARRATIVE_LINE =
-  'When the room is high-stakes, every second of the show must feel inevitable.'
-const REVEAL_START = 0.16
-const REVEAL_END = 0.58
+  'When consequence enters the room, precision is no longer optional.'
+const REVEAL_START = 0.17
+const REVEAL_END = 0.61
 
 const SceneNarrativeBreak = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -26,37 +26,28 @@ const SceneNarrativeBreak = () => {
     offset: ['start start', 'end end'],
   })
 
-  const backgroundTone = useTransform(
-    scrollYProgress,
-    [0, 1],
-    ['#17191d', '#0f1013']
-  )
-  const panelY = useTransform(scrollYProgress, [0.82, 1], ['0vh', '-10vh'])
-  const panelOpacity = useTransform(
-    scrollYProgress,
-    [0.08, 0.22, 0.72, 1],
-    [0.18, 1, 1, 0.9]
-  )
+  // Gradually cools the backdrop to move emotional tone deeper into the narrative arc.
+  const backgroundTone = useTransform(scrollYProgress, [0, 1], ['#161a22', '#0e1118'])
+  // Raises the copy panel slightly to stage the reveal as a directed moment.
+  const panelY = useTransform(scrollYProgress, [0.78, 1], ['0vh', '-11vh'])
+  // Soft fade envelope keeps the copy readable through the reveal cycle.
+  const panelOpacity = useTransform(scrollYProgress, [0.08, 0.24, 0.72, 1], [0.2, 1, 1, 0.88])
+  // De-blur effect gives words a sharpened premium release as they become active.
+  const blurValue = useTransform(scrollYProgress, [0.04, 0.24], [8, 0])
+  const blurFilter = useTransform(blurValue, value => `blur(${value}px)`)
 
   useMotionValueEvent(scrollYProgress, 'change', latest => {
-    if (shouldReduceMotion) {
-      return
-    }
+    if (shouldReduceMotion) return
 
     let nextWordCount = 0
     if (latest >= REVEAL_END) {
       nextWordCount = words.length
     } else if (latest > REVEAL_START) {
       const revealProgress = (latest - REVEAL_START) / (REVEAL_END - REVEAL_START)
-      nextWordCount = Math.min(
-        words.length,
-        Math.max(0, Math.floor(revealProgress * (words.length + 1)))
-      )
+      nextWordCount = Math.min(words.length, Math.floor(revealProgress * (words.length + 1)))
     }
 
-    setRevealedWords(current =>
-      current === nextWordCount ? current : nextWordCount
-    )
+    setRevealedWords(current => (current === nextWordCount ? current : nextWordCount))
   })
 
   return (
@@ -65,32 +56,27 @@ const SceneNarrativeBreak = () => {
       aria-label="Narrative break"
       className="relative h-[300vh] overflow-clip"
     >
-      <motion.div
-        style={{ backgroundColor: backgroundTone }}
-        className="sticky top-0 h-screen"
-      >
-        <div className="cinematic-grain-overlay pointer-events-none absolute inset-0 opacity-[0.07]" />
+      <motion.div style={{ backgroundColor: backgroundTone }} className="sticky top-0 h-screen">
+        <div className="cinematic-grain-overlay pointer-events-none absolute inset-0 opacity-[0.08]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(66%_44%_at_50%_22%,rgba(255,255,255,0.1),rgba(255,255,255,0)_74%),radial-gradient(50%_38%_at_18%_70%,rgba(214,183,135,0.2),rgba(214,183,135,0)_76%)]" />
 
         <motion.div
           style={
-            shouldReduceMotion ? undefined : { y: panelY, opacity: panelOpacity }
+            shouldReduceMotion
+              ? undefined
+              : { y: panelY, opacity: panelOpacity, filter: blurFilter }
           }
           transition={{ duration: 0.8, ease: MOTION_EASE.mass }}
           className="relative mx-auto flex h-full max-w-5xl items-center px-6 sm:px-10 lg:px-12"
         >
           <div>
-            <p className="mb-6 text-[10px] font-medium uppercase tracking-[0.22em] text-white/40">
-              Narrative break
-            </p>
+            <p className="cinematic-eyebrow mb-6 text-white/44">Narrative break</p>
             <p className="font-serif text-[clamp(2rem,4.8vw,4rem)] leading-[1.03] tracking-[-0.03em] text-white/95">
               {words.map((word, index) => (
                 <span
                   key={`${word}-${index}`}
                   className="transition-opacity duration-500"
-                  style={{
-                    opacity:
-                      shouldReduceMotion || index < revealedWords ? 1 : 0.18,
-                  }}
+                  style={{ opacity: shouldReduceMotion || index < revealedWords ? 1 : 0.18 }}
                 >
                   {word}{' '}
                 </span>

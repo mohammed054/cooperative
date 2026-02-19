@@ -187,7 +187,10 @@ export const HeaderDesktop = ({
         <ScribbleButton
           to="/contact"
           ariaLabel="Contact"
-          className="w-auto rounded-full inline-flex items-center justify-center gap-2 bg-white px-6 py-2 text-sm font-semibold text-black shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition hover:bg-white/90 hover:shadow-[0_12px_36px_rgba(0,0,0,0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          variant={isLight ? 'primary' : 'outline'}
+          tone={isLight ? 'light' : 'dark'}
+          size="sm"
+          className="w-auto"
           aria-current={location.pathname === '/contact' ? 'page' : undefined}
         >
           Contact

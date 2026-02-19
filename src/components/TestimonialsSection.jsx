@@ -9,6 +9,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from 'react-icons/fa'
 import { assetUrl } from '../lib/assetUrl'
+import ScribbleButton from './ScribbleButton'
 
 const getInitials = name => {
   const parts = String(name).trim().split(/\s+/).filter(Boolean)
@@ -23,45 +24,45 @@ const TESTIMONIALS = [
     name: 'Sarah Al-Mansouri',
     role: 'CEO',
     company: 'Skyline Ventures',
-    headline: 'Calm, precise execution even on a tight timeline.',
+    headline: 'Calm, precise execution even on compressed timelines.',
     quote:
-      'We gave them a complex room layout and a tight timeline. They delivered with zero drama. Every cue landed, everything looked premium, and the room opened on time.',
+      'We brought a complex room configuration and a tight timeline. Their team executed without noise, and every cue landed exactly as rehearsed.',
     event: 'Investor summit',
     location: 'Dubai',
     image: assetUrl('images/event1.jpg'),
-    tags: ['Full production', 'AV + lighting', 'On-site crew'],
+    tags: ['Full production', 'AV + lighting', 'On-site command'],
   },
   {
     id: 'prestige',
     name: 'James Mitchell',
     role: 'Marketing Director',
     company: 'Prestige Group',
-    headline: 'Everything arrived tested, labeled, and ready to go.',
+    headline: 'Room-ready systems delivered with complete control.',
     quote:
-      'The logistics were flawless. Equipment arrived tested and organized, the crew communicated clearly, and the setup looked exactly like the render with no last-minute surprises.',
+      'Equipment arrived tested, organized, and presentation-ready. The setup matched the render and the team was steady throughout live execution.',
     event: 'Brand launch',
     location: 'Abu Dhabi',
     image: assetUrl('images/event2.jpg'),
-    tags: ['Staging + seating', 'Show-day support', 'White-glove delivery'],
+    tags: ['Staging + seating', 'Run-of-show support', 'White-glove delivery'],
   },
   {
     id: 'elite',
     name: 'Layla Hassan',
     role: 'Events Manager',
     company: 'Elite Hospitality',
-    headline: 'Proactive, detail-obsessed, and reliable under pressure.',
+    headline: 'Detail-focused leadership under pressure.',
     quote:
-      'They anticipate problems before they happen. The team is proactive, detail-obsessed, and calm under pressure, exactly the partner you want on event day.',
+      'They anticipate pressure points before they surface. The crew is proactive, detail-focused, and consistently composed when stakes rise.',
     event: 'VIP gala',
     location: 'Sharjah',
     image: assetUrl('images/event3.jpg'),
-    tags: ['Lighting design', 'Backstage ops', 'Client-ready finish'],
+    tags: ['Lighting design', 'Backstage operations', 'Premium finish'],
   },
 ]
 
 const TestimonialsSection = ({
-  title = "Trusted by teams who can't miss.",
-  intro = 'Premium rentals and on-site production, delivered with calm precision.',
+  title = "Trusted by teams who cannot miss.",
+  intro = 'Premium rentals and production systems delivered with composed precision.',
   showLink = true,
 }) => {
   const shouldReduceMotion = useReducedMotion()
@@ -76,9 +77,15 @@ const TestimonialsSection = ({
     offset: ['start end', 'end start'],
   })
 
-  const headerY = useTransform(scrollYProgress, [0, 1], [10, -8])
-  const imageDriftY = useTransform(scrollYProgress, [0, 1], [12, -14])
-  const sideRailY = useTransform(scrollYProgress, [0, 1], [8, -6])
+  // Gives the section header gentle counter-scroll for an editorial reveal feel.
+  const headerY = useTransform(scrollYProgress, [0, 1], [12, -10])
+  // Adds image drift so testimonial media feels layered, not static.
+  const imageDriftY = useTransform(scrollYProgress, [0, 1], [14, -16])
+  // Moves side rail slightly to maintain depth continuity across cards.
+  const sideRailY = useTransform(scrollYProgress, [0, 1], [8, -8])
+  // Floating gradient motion keeps transition continuity with adjacent scenes.
+  const auraY = useTransform(scrollYProgress, [0, 1], [22, -18])
+  const auraOpacity = useTransform(scrollYProgress, [0.1, 0.62, 1], [0.08, 0.2, 0.08])
 
   const activeIndex = useMemo(
     () => Math.max(0, TESTIMONIALS.findIndex(item => item.id === activeId)),
@@ -89,19 +96,14 @@ const TestimonialsSection = ({
     () => String(active?.quote ?? '').split(/\s+/).filter(Boolean),
     [active?.quote]
   )
-  const quoteMeasureClass = isHome ? 'max-w-[34ch]' : 'max-w-[37ch]'
 
   const transition = shouldReduceMotion
     ? { duration: 0 }
     : { duration: 0.82, ease: [0.23, 1, 0.32, 1] }
 
-  const imageTransition = shouldReduceMotion
-    ? { duration: 0 }
-    : { duration: 1.1, ease: [0.18, 0.9, 0.25, 1] }
-
   const selectorTransition = shouldReduceMotion
     ? { duration: 0 }
-    : { duration: 0.7, ease: [0.23, 1, 0.32, 1] }
+    : { duration: 0.66, ease: [0.23, 1, 0.32, 1] }
 
   const goPrev = () => {
     const nextIndex = (activeIndex - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
@@ -114,63 +116,39 @@ const TestimonialsSection = ({
   }
 
   return (
-      <section
+    <section
       id="testimonials"
       ref={sectionRef}
       className={[
         'relative overflow-hidden',
-        isHome
-          ? 'bg-[linear-gradient(180deg,#f4efe7_0%,#f2ede5_26%,#ece7de_100%)]'
-          : 'bg-transparent',
-        isHome ? 'min-h-screen' : '',
+        isHome ? 'cinematic-gradient-light min-h-screen' : 'bg-transparent',
       ].join(' ')}
     >
-      {isHome && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-[#f4efe7] via-[#f4efe7]/70 to-transparent"
-        />
-      )}
+      <motion.div
+        style={shouldReduceMotion ? undefined : { y: auraY, opacity: auraOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(48%_40%_at_76%_24%,rgba(255,255,255,0.58),rgba(255,255,255,0)_74%),radial-gradient(52%_36%_at_14%_74%,rgba(209,178,131,0.24),rgba(209,178,131,0)_80%)]"
+      />
 
-      <div
-        className={[
-          'relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8',
-          isHome
-            ? 'min-h-screen py-10 sm:py-12 lg:flex lg:h-screen lg:min-h-0 lg:flex-col lg:py-8'
-            : 'py-12 sm:py-18 lg:py-22',
-        ].join(' ')}
-      >
+      <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-8">
         <motion.header
           style={shouldReduceMotion ? undefined : { y: headerY }}
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={transition}
-          className={[
-            'mb-10 max-w-2xl lg:mb-14',
-            isHome
-              ? 'mb-8 lg:mb-4'
-              : '',
-          ].join(' ')}
+          className={[isHome ? 'mb-8 lg:mb-4' : 'mb-10 lg:mb-14', 'max-w-2xl'].join(' ')}
         >
-          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.22em] text-[#a7a7a7]">
-            Testimonials
-          </p>
-          <h2 className="mb-4 max-w-[16ch] font-serif text-[clamp(1.6rem,4vw,2.6rem)] font-semibold leading-[1.07] tracking-[-0.02em] text-ink">
+          <p className="cinematic-eyebrow mb-3 text-[#a7a7a7]">Social proof elevation</p>
+          <h2 className="mb-4 max-w-[16ch] font-serif text-[clamp(1.64rem,4vw,2.7rem)] font-semibold leading-[1.07] tracking-[-0.022em] text-ink">
             {title}
           </h2>
-          <p className="max-w-[52ch] text-[clamp(14px,1.5vw,16px)] leading-[1.68] text-ink-muted">
+          <p className="max-w-[52ch] text-[clamp(14px,1.5vw,16px)] leading-[1.7] text-ink-muted">
             {intro}
           </p>
         </motion.header>
 
-        <div
-          className={[
-            'grid gap-5 lg:grid-cols-12 lg:items-stretch',
-            isHome ? 'lg:min-h-0 lg:flex-1' : '',
-          ].join(' ')}
-        >
-          <div className="flex flex-col lg:col-span-7 lg:min-h-0">
+        <div className="grid gap-5 lg:grid-cols-12 lg:items-stretch">
+          <div className="flex flex-col lg:col-span-7">
             <AnimatePresence mode="wait" initial={false}>
               <motion.figure
                 key={active?.id}
@@ -180,7 +158,7 @@ const TestimonialsSection = ({
                     : {
                         opacity: 0,
                         y: 10,
-                        clipPath: 'inset(0 0 12% 0 round 12px)',
+                        clipPath: 'inset(0 0 10% 0 round 14px)',
                       }
                 }
                 animate={
@@ -189,7 +167,7 @@ const TestimonialsSection = ({
                     : {
                         opacity: 1,
                         y: 0,
-                        clipPath: 'inset(0% 0% 0% 0 round 12px)',
+                        clipPath: 'inset(0% 0% 0% 0 round 14px)',
                       }
                 }
                 exit={
@@ -198,25 +176,16 @@ const TestimonialsSection = ({
                     : {
                         opacity: 0,
                         y: -8,
-                        clipPath: 'inset(8% 0% 0% 0 round 12px)',
+                        clipPath: 'inset(8% 0 0 0 round 14px)',
                       }
                 }
                 transition={transition}
-                className={[
-                  'flex-1 overflow-hidden rounded-xl border border-black/[0.06] shadow-[0_16px_44px_rgba(17,17,17,0.06)]',
-                  isHome ? 'lg:min-h-0' : '',
-                  isHome ? 'bg-white/[0.8] backdrop-blur-[2px]' : 'bg-white',
-                ].join(' ')}
+                className="flex-1 overflow-hidden rounded-[14px] border border-black/[0.06] bg-white/80 shadow-[0_18px_48px_rgba(17,17,17,0.08)] backdrop-blur-[2px]"
               >
                 <div className="grid flex-1 grid-cols-1 lg:h-full lg:grid-cols-12">
-                  <div
-                    className={[
-                      'flex flex-col justify-between p-5 sm:p-7 lg:col-span-7 lg:p-8',
-                      isHome ? 'lg:p-5' : '',
-                    ].join(' ')}
-                  >
+                  <div className="flex flex-col justify-between p-5 sm:p-7 lg:col-span-7 lg:p-6">
                     <div className="flex items-center justify-between gap-4">
-                      <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-surface-2 px-3 py-1 text-xs font-medium text-ink-muted">
+                      <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white px-3 py-1 text-xs font-medium text-ink-muted">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                         Client feedback
                       </div>
@@ -226,15 +195,9 @@ const TestimonialsSection = ({
                     </div>
 
                     <div className="mt-1">
-                      <FaQuoteLeft
-                        className="mt-4 text-2xl text-ink-subtle opacity-26"
-                        aria-hidden="true"
-                      />
+                      <FaQuoteLeft className="mt-4 text-2xl text-ink-subtle opacity-30" aria-hidden="true" />
                       <blockquote
-                        className={[
-                          'mt-4 text-[clamp(1rem,1.25vw,1.16rem)] font-medium leading-[1.68] tracking-[-0.003em] text-ink',
-                          quoteMeasureClass,
-                        ].join(' ')}
+                        className="mt-4 max-w-[34ch] text-[clamp(1rem,1.25vw,1.16rem)] font-medium leading-[1.68] tracking-[-0.003em] text-ink"
                         style={{ textWrap: 'balance' }}
                       >
                         {shouldReduceMotion
@@ -245,9 +208,9 @@ const TestimonialsSection = ({
                                 initial={{ opacity: 0.08, y: 3 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{
-                                  duration: 0.34,
+                                  duration: 0.32,
                                   ease: [0.23, 1, 0.32, 1],
-                                  delay: Math.min(0.38, index * 0.012),
+                                  delay: Math.min(0.34, index * 0.011),
                                 }}
                                 className="mr-[0.28em] inline-block"
                               >
@@ -262,9 +225,7 @@ const TestimonialsSection = ({
                         {getInitials(active?.name)}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-ink">
-                          {active?.name}
-                        </p>
+                        <p className="truncate text-sm font-semibold text-ink">{active?.name}</p>
                         <p className="truncate text-xs text-ink-muted">
                           {active?.role} - {active?.company}
                         </p>
@@ -276,22 +237,19 @@ const TestimonialsSection = ({
                     style={shouldReduceMotion ? undefined : { y: imageDriftY }}
                     className="relative overflow-hidden lg:col-span-5"
                   >
-                    <motion.img
+                    <img
                       src={active?.image}
                       alt={`${active?.event} in ${active?.location}`}
                       loading="lazy"
                       decoding="async"
-                      initial={shouldReduceMotion ? false : { scale: 1.05 }}
-                      animate={{ scale: 1 }}
-                      transition={imageTransition}
                       className="h-48 w-full object-cover lg:h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-black/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-tr from-black/44 via-black/12 to-transparent" />
                     <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5">
                       {(active?.tags ?? []).map(tag => (
                         <span
                           key={tag}
-                          className="inline-flex items-center rounded-full bg-white/[0.88] px-2.5 py-0.5 text-xs font-medium text-ink-muted backdrop-blur"
+                          className="inline-flex items-center rounded-full bg-white/[0.9] px-2.5 py-0.5 text-xs font-medium text-ink-muted backdrop-blur"
                         >
                           {tag}
                         </span>
@@ -316,9 +274,7 @@ const TestimonialsSection = ({
                       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
                       isActive
                         ? 'border-ink bg-ink text-white'
-                        : isHome
-                          ? 'border-black/[0.08] bg-white/[0.72] text-ink-muted hover:border-ink hover:text-ink'
-                          : 'border-black/[0.08] bg-white text-ink-muted hover:border-ink hover:text-ink',
+                        : 'border-black/[0.08] bg-white/[0.74] text-ink-muted hover:border-ink hover:text-ink',
                     ].join(' ')}
                   >
                     {item.company}
@@ -330,7 +286,7 @@ const TestimonialsSection = ({
 
           <motion.div
             style={shouldReduceMotion ? undefined : { y: sideRailY }}
-            className="mt-1 flex flex-col gap-4 lg:col-span-5 lg:mt-0 lg:min-h-0"
+            className="mt-1 flex flex-col gap-4 lg:col-span-5 lg:mt-0"
           >
             <div className="hidden lg:block">
               <p className="mb-3 text-xs font-medium uppercase tracking-[0.14em] text-ink-subtle">
@@ -366,28 +322,13 @@ const TestimonialsSection = ({
                           {getInitials(item.name)}
                         </div>
                         <div className="min-w-0">
-                          <p
-                            className={[
-                              'truncate text-sm font-semibold',
-                              isActive ? 'text-white' : 'text-ink',
-                            ].join(' ')}
-                          >
+                          <p className={['truncate text-sm font-semibold', isActive ? 'text-white' : 'text-ink'].join(' ')}>
                             {item.name}
                           </p>
-                          <p
-                            className={[
-                              'truncate text-xs',
-                              isActive ? 'text-white/70' : 'text-ink-muted',
-                            ].join(' ')}
-                          >
+                          <p className={['truncate text-xs', isActive ? 'text-white/70' : 'text-ink-muted'].join(' ')}>
                             {item.role} - {item.company}
                           </p>
-                          <p
-                            className={[
-                              'mt-2 text-xs leading-relaxed',
-                              isActive ? 'text-white/[0.85]' : 'text-ink-muted',
-                            ].join(' ')}
-                          >
+                          <p className={['mt-2 text-xs leading-relaxed', isActive ? 'text-white/[0.85]' : 'text-ink-muted'].join(' ')}>
                             {item.headline}
                           </p>
                         </div>
@@ -398,85 +339,59 @@ const TestimonialsSection = ({
               </div>
             </div>
 
-            <div
-              className={[
-                'flex flex-1 flex-col rounded-xl border border-black/[0.06] p-5',
-                isHome ? 'lg:min-h-0 lg:p-4' : '',
-                isHome ? 'bg-white/[0.78] backdrop-blur-[2px]' : 'bg-white',
-              ].join(' ')}
-            >
-              <p className="text-sm font-semibold text-ink">Why teams come back</p>
-              <ul
-                className={[
-                  'mt-3 text-sm text-ink-muted',
-                  isHome ? 'grid grid-cols-2 gap-2.5 text-[13px]' : 'space-y-2',
-                ].join(' ')}
-              >
+            <div className="flex flex-1 flex-col rounded-xl border border-black/[0.06] bg-white/78 p-5 backdrop-blur-[2px] lg:p-4">
+              <p className="text-sm font-semibold text-ink">Why leadership teams return</p>
+              <ul className="mt-3 grid grid-cols-2 gap-2.5 text-[13px] text-ink-muted">
                 <li className="flex gap-2.5">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
-                  One accountable producer from setup to close
+                  One accountable producer through show close
                 </li>
                 <li className="flex gap-2.5">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
-                  Equipment arrives tested, organized, and room-ready
+                  Systems arrive tested, labeled, and room-ready
                 </li>
                 <li className="flex gap-2.5">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
-                  Calm crews, clean finishes, no surprise execution
+                  Calm crews and controlled transitions under pressure
                 </li>
               </ul>
 
               {showLink && (
                 <div className="mt-auto pt-5">
-                  <a
+                  <ScribbleButton
                     href={proposalHref}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-ink underline underline-offset-4 transition hover:text-ink-muted"
+                    variant="outline"
+                    size="sm"
+                    analyticsLabel="testimonials-request-proposal"
                   >
                     Request a proposal
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-                      <path
-                        d="M2 7h10M8 3l4 4-4 4"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </a>
+                  </ScribbleButton>
                 </div>
               )}
             </div>
           </motion.div>
         </div>
 
-        <div
-          className={[
-            'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
-            isHome ? 'mt-5 lg:mt-4' : 'mt-7',
-          ].join(' ')}
-        >
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={goPrev}
-              aria-label="Previous testimonial"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white text-ink-muted transition duration-300 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-            >
-              <FaChevronLeft size={12} />
-            </button>
-            <button
-              type="button"
-              onClick={goNext}
-              aria-label="Next testimonial"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white text-ink-muted transition duration-300 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-            >
-              <FaChevronRight size={12} />
-            </button>
-            <p className="text-xs font-medium tabular-nums text-ink-muted">
-              {String(activeIndex + 1).padStart(2, '0')} /{' '}
-              {String(TESTIMONIALS.length).padStart(2, '0')}
-            </p>
-          </div>
+        <div className={[isHome ? 'mt-5 lg:mt-4' : 'mt-7', 'flex items-center gap-2.5'].join(' ')}>
+          <button
+            type="button"
+            onClick={goPrev}
+            aria-label="Previous testimonial"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white text-ink-muted transition duration-300 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          >
+            <FaChevronLeft size={12} />
+          </button>
+          <button
+            type="button"
+            onClick={goNext}
+            aria-label="Next testimonial"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white text-ink-muted transition duration-300 hover:border-ink hover:bg-ink hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          >
+            <FaChevronRight size={12} />
+          </button>
+          <p className="text-xs font-medium tabular-nums text-ink-muted">
+            {String(activeIndex + 1).padStart(2, '0')} / {String(TESTIMONIALS.length).padStart(2, '0')}
+          </p>
         </div>
       </div>
     </section>

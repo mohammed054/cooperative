@@ -1,37 +1,16 @@
 import React, { useRef } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { useLeadSubmission } from '../hooks/useLeadSubmission'
+import ScribbleButton from './ScribbleButton'
 
 const CONTACT_CHANNELS = [
   {
     href: 'tel:+97142345678',
     label: '+971 4 234 5678',
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
   },
   {
     href: 'mailto:hello@ghaimuae.com',
     label: 'hello@ghaimuae.com',
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
   },
 ]
 
@@ -46,13 +25,19 @@ const FinalCta = () => {
     offset: ['start end', 'end start'],
   })
 
+  // Controls intro reveal so conversion copy enters with calm authority.
   const revealProgress = useTransform(scrollYProgress, [0.04, 0.5], [0, 1])
+  // Fades and lifts intro narrative to keep hierarchy clear.
   const introOpacity = useTransform(revealProgress, [0, 1], [0.72, 1])
-  const introY = useTransform(revealProgress, [0, 1], [12, 0])
-  const formOpacity = useTransform(revealProgress, [0, 1], [0.68, 1])
-  const formY = useTransform(revealProgress, [0, 1], [18, 0])
-  const formScale = useTransform(revealProgress, [0, 1], [0.992, 1])
-  const backToTopY = useTransform(formY, value => value * 0.45)
+  const introY = useTransform(revealProgress, [0, 1], [14, 0])
+  // Stages form card entrance as a premium conversion moment.
+  const formOpacity = useTransform(revealProgress, [0, 1], [0.66, 1])
+  const formY = useTransform(revealProgress, [0, 1], [20, 0])
+  const formScale = useTransform(revealProgress, [0, 1], [0.988, 1])
+  // Bridges toward finale by gently lifting the closing action.
+  const backToTopY = useTransform(formY, value => value * 0.4)
+  // Ambient glow keeps dark/light split cohesive and cinematic.
+  const glowOpacity = useTransform(revealProgress, [0.1, 0.62, 1], [0.08, 0.18, 0.1])
 
   const handleSubmit = async event => {
     event.preventDefault()
@@ -72,30 +57,28 @@ const FinalCta = () => {
     <section
       id="get-started"
       ref={sectionRef}
-      className="relative overflow-hidden bg-[linear-gradient(180deg,#1a1e26_0%,#141821_46%,#11141b_100%)]"
+      className="relative overflow-hidden bg-[linear-gradient(180deg,#161b24_0%,#10141c_48%,#0d1016_100%)]"
     >
-      <div className="cinematic-grain-overlay pointer-events-none absolute inset-0 opacity-[0.06]" />
+      <motion.div
+        style={shouldReduceMotion ? undefined : { opacity: glowOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(56%_46%_at_16%_24%,rgba(255,255,255,0.14),rgba(255,255,255,0)_76%),radial-gradient(50%_38%_at_84%_68%,rgba(201,170,124,0.18),rgba(201,170,124,0)_78%)]"
+      />
+      <div className="cinematic-grain-overlay pointer-events-none absolute inset-0 opacity-[0.07]" />
 
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-20">
           <motion.div
-            style={
-              shouldReduceMotion
-                ? undefined
-                : { opacity: introOpacity, y: introY }
-            }
+            style={shouldReduceMotion ? undefined : { opacity: introOpacity, y: introY }}
             className="flex flex-col gap-8"
           >
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/35">
-                Conversion gravity
-              </p>
-              <h2 className="mt-4 max-w-[14ch] font-serif text-[clamp(1.9rem,4.6vw,3.2rem)] leading-[1.06] tracking-[-0.02em] text-white">
-                Let us engineer your next room.
+              <p className="cinematic-eyebrow text-white/35">Conversion gravity</p>
+              <h2 className="mt-4 max-w-[14ch] font-serif text-[clamp(1.95rem,4.6vw,3.2rem)] leading-[1.06] tracking-[-0.02em] text-white">
+                Engineer your next room with certainty.
               </h2>
               <p className="mt-4 max-w-[38ch] text-[15px] leading-relaxed text-white/68">
-                Share your timeline and scope. You receive a clear production
-                path within 24 hours.
+                Share timeline, venue, and scope. You receive a clear production
+                path and response within 24 hours.
               </p>
             </div>
 
@@ -106,26 +89,23 @@ const FinalCta = () => {
               </li>
               <li className="flex gap-2.5">
                 <span className="mt-2 block h-[1px] w-3 shrink-0 bg-white/36" />
-                Senior-led crews from setup to show close
+                Senior-led crews from setup through show close
               </li>
               <li className="flex gap-2.5">
                 <span className="mt-2 block h-[1px] w-3 shrink-0 bg-white/36" />
-                UAE-wide logistical and technical coverage
+                UAE-wide logistical and technical reach
               </li>
             </ul>
 
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-white/28">
-                Direct channels
-              </p>
+              <p className="cinematic-eyebrow text-white/30">Direct channels</p>
               <div className="mt-3 flex flex-col gap-2.5">
                 {CONTACT_CHANNELS.map(channel => (
                   <a
                     key={channel.href}
                     href={channel.href}
-                    className="inline-flex w-fit items-center gap-2.5 text-sm text-white/70 transition-colors duration-300 hover:text-white/94"
+                    className="inline-flex w-fit items-center gap-2.5 text-sm text-white/72 transition-colors duration-300 hover:text-white/94"
                   >
-                    {channel.icon}
                     {channel.label}
                   </a>
                 ))}
@@ -139,13 +119,9 @@ const FinalCta = () => {
           </motion.div>
 
           <motion.div
-            style={
-              shouldReduceMotion
-                ? undefined
-                : { opacity: formOpacity, y: formY, scale: formScale }
-            }
+            style={shouldReduceMotion ? undefined : { opacity: formOpacity, y: formY, scale: formScale }}
           >
-            <div className="rounded-xl border border-black/10 bg-[#f8f6f2] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.16)] sm:p-8">
+            <div className="rounded-xl border border-black/12 bg-[#f8f5ef] p-6 shadow-[0_24px_64px_rgba(0,0,0,0.2)] sm:p-8">
               <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.16em] text-ink-subtle">
                 Request a proposal
               </p>
@@ -222,8 +198,8 @@ const FinalCta = () => {
                     <option value="">Select a service</option>
                     <option value="event-production">Event production</option>
                     <option value="technical-production">Technical production</option>
-                    <option value="staging-scenic">Staging & scenic</option>
-                    <option value="furniture-rentals">Furniture & rentals</option>
+                    <option value="staging-scenic">Staging and scenic</option>
+                    <option value="furniture-rentals">Furniture and rentals</option>
                     <option value="unsure">Not sure yet</option>
                   </select>
                 </div>
@@ -251,13 +227,18 @@ const FinalCta = () => {
                   className="hidden"
                 />
 
-                <button
+                <ScribbleButton
                   type="submit"
                   disabled={isSubmitting}
-                  className="mt-1 h-12 rounded-lg bg-ink text-[12px] font-semibold uppercase tracking-[0.1em] text-white transition-colors duration-300 hover:bg-black disabled:cursor-not-allowed disabled:bg-ink-muted"
+                  variant="primary"
+                  tone="dark"
+                  size="lg"
+                  className="mt-1 w-full disabled:cursor-not-allowed disabled:opacity-70"
+                  showArrow={false}
+                  analyticsLabel="final-cta-submit-request"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit request'}
-                </button>
+                </ScribbleButton>
 
                 {feedbackMessage && (
                   <p
@@ -280,28 +261,18 @@ const FinalCta = () => {
         </div>
 
         <motion.div
-          style={
-            shouldReduceMotion
-              ? undefined
-              : { opacity: formOpacity, y: backToTopY }
-          }
+          style={shouldReduceMotion ? undefined : { opacity: formOpacity, y: backToTopY }}
           className="mt-12 flex justify-center"
         >
-          <button
+          <ScribbleButton
             onClick={scrollToTop}
-            className="inline-flex items-center gap-2 bg-transparent text-[11px] uppercase tracking-[0.12em] text-white/25 transition-colors duration-300 hover:text-white/52"
+            variant="micro"
+            tone="light"
+            showArrow={false}
+            analyticsLabel="final-cta-back-to-top"
           >
-            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path
-                d="M7 12V2M3 6l4-4 4 4"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
             Back to top
-          </button>
+          </ScribbleButton>
         </motion.div>
       </div>
     </section>

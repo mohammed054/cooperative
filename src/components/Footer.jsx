@@ -5,109 +5,18 @@ import { caseStudies, services } from '../data/siteData'
 import { assetUrl } from '../lib/assetUrl'
 import ScribbleButton from './ScribbleButton'
 
-const IconFacebook = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-const IconInstagram = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <rect
-      x="2"
-      y="2"
-      width="20"
-      height="20"
-      rx="5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" />
-    <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
-  </svg>
-)
-
-const IconLinkedIn = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx="4" cy="4" r="2" stroke="currentColor" strokeWidth="1.5" />
-  </svg>
-)
-
-const FooterLink = ({ to, href, onClick, children }) => {
-  const base = {
-    fontSize: '13px',
-    color: '#888',
-    textDecoration: 'none',
-    transition: 'color 0.2s ease',
-    display: 'block',
-    padding: '3px 0',
-    minHeight: '28px',
-  }
-
-  const handlers = {
-    onMouseEnter: e => {
-      e.currentTarget.style.color = '#1c1c1c'
-    },
-    onMouseLeave: e => {
-      e.currentTarget.style.color = '#888'
-    },
-  }
-
-  if (to) return <Link to={to} style={base} {...handlers}>{children}</Link>
-  if (href) return <a href={href} style={base} {...handlers}>{children}</a>
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...base,
-        background: 'none',
-        border: 'none',
-        cursor: 'pointer',
-        textAlign: 'left',
-      }}
-      {...handlers}
-    >
-      {children}
-    </button>
-  )
-}
-
-const ColHeading = ({ children }) => (
-  <p
-    style={{
-      fontSize: '10px',
-      fontWeight: 600,
-      letterSpacing: '0.18em',
-      textTransform: 'uppercase',
-      color: '#1c1c1c',
-      marginBottom: '14px',
-    }}
-  >
-    {children}
-  </p>
-)
+const SOCIAL_LINKS = [
+  { label: 'Facebook', href: 'https://facebook.com' },
+  { label: 'Instagram', href: 'https://instagram.com' },
+  { label: 'LinkedIn', href: 'https://linkedin.com' },
+]
 
 const Footer = () => {
   const shouldReduceMotion = useReducedMotion()
   const navigate = useNavigate()
   const location = useLocation()
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-5% 0px' })
+  const footerRef = useRef(null)
+  const inView = useInView(footerRef, { once: true, margin: '-5% 0px' })
   const isHome = location.pathname === '/'
 
   const scrollToSection = id => {
@@ -120,7 +29,7 @@ const Footer = () => {
 
   const containerVariants = {
     hidden: {},
-    show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+    show: { transition: { staggerChildren: 0.07, delayChildren: 0.06 } },
   }
   const itemVariants = shouldReduceMotion
     ? {}
@@ -132,336 +41,163 @@ const Footer = () => {
           transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
         },
       }
-  const footerBackground = isHome
-    ? 'linear-gradient(180deg, #f2eee7 0%, #f5f2eb 64%, #f3eee5 100%)'
-    : 'linear-gradient(180deg, rgba(248,244,236,0.95) 0%, #f6f2eb 62%, #f3ede4 100%)'
 
   return (
     <footer
       id="site-footer"
-      ref={ref}
-      style={{
-        background: footerBackground,
-        borderTop: isHome
-          ? 'none'
-          : '1px solid rgba(0,0,0,0.05)',
-        position: 'relative',
-      }}
+      ref={footerRef}
+      className="relative overflow-hidden border-t border-black/[0.05] bg-[linear-gradient(180deg,#f4efe7_0%,#f5f2eb_66%,#f3ede4_100%)]"
     >
       {isHome && (
         <div
           aria-hidden="true"
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            height: '180px',
-            pointerEvents: 'none',
-            background:
-              'linear-gradient(180deg, #101114 0%, rgba(16,17,20,0.82) 18%, rgba(16,17,20,0.52) 36%, rgba(16,17,20,0.24) 58%, rgba(16,17,20,0.08) 78%, rgba(16,17,20,0) 100%)',
-          }}
+          className="pointer-events-none absolute left-0 right-0 top-0 h-44 bg-[linear-gradient(180deg,#0f1116_0%,rgba(15,17,22,0.82)_20%,rgba(15,17,22,0.52)_44%,rgba(15,17,22,0.18)_68%,rgba(15,17,22,0)_100%)]"
         />
       )}
-
-      <style>{`
-        .footer-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 36px 24px;
-        }
-        @media (min-width: 768px) {
-          .footer-grid {
-            grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
-            gap: 0 40px;
-          }
-        }
-      `}</style>
 
       <motion.div
         variants={containerVariants}
         initial={shouldReduceMotion ? false : 'hidden'}
         animate={inView ? 'show' : 'hidden'}
-        style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          padding: isHome ? '76px 20px 24px' : '48px 20px 24px',
-        }}
-        className="sm:px-6 lg:px-8"
+        className="relative mx-auto max-w-7xl px-4 pb-6 pt-16 sm:px-6 lg:px-8 lg:pb-8 lg:pt-20"
       >
-        <div className="footer-grid">
-          <motion.div
-            variants={itemVariants}
-            style={{ gridColumn: '1 / -1' }}
-            className="md:col-auto"
-          >
-            <Link
-              to="/"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                textDecoration: 'none',
-              }}
-            >
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] md:gap-x-9">
+          <motion.div variants={itemVariants} className="col-span-2 md:col-span-1">
+            <Link to="/" className="inline-flex items-center gap-3">
               <img
                 src={assetUrl('images/logo.webp')}
                 alt="Ghaim UAE"
-                style={{ height: '28px', width: 'auto', filter: 'brightness(0)' }}
+                className="h-7 w-auto brightness-0"
                 loading="lazy"
                 decoding="async"
               />
-              <span
-                style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  color: '#1c1c1c',
-                }}
-              >
-                GHAIM
-              </span>
+              <span className="text-sm font-semibold tracking-[0.16em] text-ink">GHAIM</span>
             </Link>
 
-            <p
-              style={{
-                marginTop: '14px',
-                fontSize: '13px',
-                color: '#888',
-                lineHeight: 1.6,
-                maxWidth: '260px',
-              }}
-            >
-              Event production and curated rentals across the UAE. Senior-led crews,
-              disciplined timelines, calm show control.
+            <p className="mt-4 max-w-[28ch] text-sm leading-relaxed text-ink-muted">
+              Event production and curated rentals across the UAE with senior-led
+              crews and disciplined show control.
             </p>
 
-            <div style={{ display: 'flex', gap: '16px', marginTop: '20px' }}>
-              {[
-                { href: 'https://facebook.com', label: 'Facebook', Icon: IconFacebook },
-                { href: 'https://instagram.com', label: 'Instagram', Icon: IconInstagram },
-                { href: 'https://linkedin.com', label: 'LinkedIn', Icon: IconLinkedIn },
-              ].map(({ href, label, Icon }) => (
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              {SOCIAL_LINKS.map(item => (
                 <a
-                  key={label}
-                  href={href}
+                  key={item.label}
+                  href={item.href}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label={label}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    border: '1px solid rgba(0,0,0,0.1)',
-                    color: '#888',
-                    textDecoration: 'none',
-                    transition: 'border-color 0.22s, color 0.22s',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = '#1c1c1c'
-                    e.currentTarget.style.color = '#1c1c1c'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'
-                    e.currentTarget.style.color = '#888'
-                  }}
+                  className="inline-flex rounded-full border border-black/10 px-3 py-1 text-xs text-ink-muted transition-colors hover:border-black/20 hover:text-ink"
+                  aria-label={item.label}
                 >
-                  <Icon />
+                  {item.label}
                 </a>
               ))}
             </div>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <ColHeading>Services</ColHeading>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <p className="cinematic-eyebrow text-ink-subtle">Services</p>
+            <ul className="mt-4 space-y-2">
               {services.map(service => (
                 <li key={service.slug}>
-                  <FooterLink to={`/services/${service.slug}`}>{service.title}</FooterLink>
+                  <Link
+                    to={`/services/${service.slug}`}
+                    className="text-sm text-ink-muted transition-colors hover:text-ink"
+                  >
+                    {service.title}
+                  </Link>
                 </li>
               ))}
-              <li style={{ marginTop: '10px' }}>
-                <FooterLink to="/services">
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#1c1c1c' }}>
-                    All services -&gt;
-                  </span>
-                </FooterLink>
-              </li>
             </ul>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <ColHeading>Work</ColHeading>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <p className="cinematic-eyebrow text-ink-subtle">Work</p>
+            <ul className="mt-4 space-y-2">
               {caseStudies.map(study => (
                 <li key={study.slug}>
-                  <FooterLink to={`/work/${study.slug}`}>{study.title}</FooterLink>
+                  <Link
+                    to={`/work/${study.slug}`}
+                    className="text-sm text-ink-muted transition-colors hover:text-ink"
+                  >
+                    {study.title}
+                  </Link>
                 </li>
               ))}
               <li>
-                <FooterLink to="/projects">Project gallery</FooterLink>
-              </li>
-              <li style={{ marginTop: '10px' }}>
-                <FooterLink to="/work">
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#1c1c1c' }}>
-                    Case studies -&gt;
-                  </span>
-                </FooterLink>
+                <Link to="/projects" className="text-sm text-ink-muted transition-colors hover:text-ink">
+                  Project gallery
+                </Link>
               </li>
             </ul>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <ColHeading>Company</ColHeading>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <p className="cinematic-eyebrow text-ink-subtle">Company</p>
+            <ul className="mt-4 space-y-2">
               {[
                 { to: '/about', label: 'About' },
                 { to: '/process', label: 'Process' },
                 { to: '/testimonials', label: 'Testimonials' },
                 { to: '/faq', label: 'FAQ' },
                 { to: '/pricing', label: 'Pricing' },
-              ].map(({ to, label }) => (
-                <li key={to}>
-                  <FooterLink to={to}>{label}</FooterLink>
+              ].map(item => (
+                <li key={item.to}>
+                  <Link
+                    to={item.to}
+                    className="text-sm text-ink-muted transition-colors hover:text-ink"
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <ColHeading>Contact</ColHeading>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-              {[
-                { href: 'tel:+97142345678', label: '+971 4 234 5678' },
-                { href: 'mailto:hello@ghaimuae.com', label: 'hello@ghaimuae.com' },
-                { href: null, label: 'Dubai Design District' },
-              ].map(({ href, label }) =>
-                href ? (
-                  <a
-                    key={label}
-                    href={href}
-                    style={{
-                      fontSize: '13px',
-                      color: '#888',
-                      textDecoration: 'none',
-                      transition: 'color 0.2s',
-                      minHeight: '28px',
-                      display: 'block',
-                      padding: '3px 0',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.color = '#1c1c1c'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.color = '#888'
-                    }}
-                  >
-                    {label}
-                  </a>
-                ) : (
-                  <p key={label} style={{ fontSize: '13px', color: '#bbb', padding: '3px 0' }}>
-                    {label}
-                  </p>
-                )
-              )}
+            <p className="cinematic-eyebrow text-ink-subtle">Contact</p>
+            <div className="mt-4 space-y-2 text-sm text-ink-muted">
+              <a href="tel:+97142345678" className="block transition-colors hover:text-ink">
+                +971 4 234 5678
+              </a>
+              <a href="mailto:hello@ghaimuae.com" className="block transition-colors hover:text-ink">
+                hello@ghaimuae.com
+              </a>
+              <p className="text-ink-subtle">Dubai Design District</p>
             </div>
 
-            <ScribbleButton
-              to="/contact"
-              showArrow={false}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '11px',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: '#fff',
-                background: '#1c1c1c',
-                border: '1px solid #1c1c1c',
-                borderRadius: '100px',
-                padding: '9px 18px',
-                textDecoration: 'none',
-                transition: 'background 0.22s, border-color 0.22s',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = '#333'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = '#1c1c1c'
-              }}
-            >
-              Request a proposal
-            </ScribbleButton>
+            <div className="mt-5">
+              <ScribbleButton
+                to="/contact"
+                variant="primary"
+                tone="dark"
+                size="sm"
+                analyticsLabel="footer-request-proposal"
+              >
+                Request a proposal
+              </ScribbleButton>
+            </div>
           </motion.div>
         </div>
 
         <motion.div
           variants={itemVariants}
-          style={{
-            marginTop: '36px',
-            paddingTop: '20px',
-            borderTop: '1px solid rgba(0,0,0,0.05)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-          }}
-          className="sm:flex-row sm:items-center sm:justify-between"
+          className="mt-10 flex flex-col gap-4 border-t border-black/[0.06] pt-5 sm:flex-row sm:items-center sm:justify-between"
         >
-          <p style={{ fontSize: '11px', color: '#bbb', letterSpacing: '0.03em' }}>
+          <p className="text-[11px] tracking-[0.03em] text-ink-subtle">
             (c) 2026 Ghaim UAE. All rights reserved.
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-            {[
-              { to: '/privacy', label: 'Privacy policy' },
-              { to: '/terms', label: 'Terms of service' },
-            ].map(({ to, label }) => (
-              <Link
-                key={to}
-                to={to}
-                style={{
-                  fontSize: '11px',
-                  color: '#bbb',
-                  textDecoration: 'none',
-                  transition: 'color 0.2s',
-                  letterSpacing: '0.03em',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.color = '#1c1c1c'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.color = '#bbb'
-                }}
-              >
-                {label}
-              </Link>
-            ))}
-
+          <div className="flex flex-wrap items-center gap-4 text-[11px] tracking-[0.03em] text-ink-subtle">
+            <Link to="/privacy" className="transition-colors hover:text-ink">
+              Privacy policy
+            </Link>
+            <Link to="/terms" className="transition-colors hover:text-ink">
+              Terms of service
+            </Link>
             <button
               onClick={() => scrollToSection('get-started')}
-              style={{
-                fontSize: '11px',
-                color: '#bbb',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                transition: 'color 0.2s',
-                letterSpacing: '0.03em',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = '#1c1c1c'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = '#bbb'
-              }}
+              className="transition-colors hover:text-ink"
             >
               Start a project
             </button>

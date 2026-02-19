@@ -1,12 +1,9 @@
 import React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import ScribbleButton from './ScribbleButton'
 
-const HIDDEN_PATHS = new Set([
-  '/contact',
-  '/privacy',
-  '/terms',
-])
+const HIDDEN_PATHS = new Set(['/contact', '/privacy', '/terms'])
 
 const MobileCtaDock = () => {
   const shouldReduceMotion = useReducedMotion()
@@ -26,18 +23,27 @@ const MobileCtaDock = () => {
           className="pointer-events-auto rounded-2xl border border-black/[0.08] bg-[#f8f4ee]/95 p-2 shadow-[0_18px_44px_rgba(12,12,12,0.22)] backdrop-blur-md"
         >
           <div className="grid grid-cols-2 gap-2">
-            <a
+            <ScribbleButton
               href="tel:+97142345678"
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-black/[0.1] bg-white/[0.74] text-[11px] font-semibold uppercase tracking-[0.11em] text-ink transition-colors duration-300 hover:border-black/[0.18] hover:bg-white"
+              variant="outline"
+              tone="dark"
+              size="sm"
+              className="w-full justify-center"
+              showArrow={false}
+              analyticsLabel="mobile-dock-call-now"
             >
               Call now
-            </a>
-            <Link
+            </ScribbleButton>
+            <ScribbleButton
               to="/contact"
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-ink text-[11px] font-semibold uppercase tracking-[0.11em] text-white transition-colors duration-300 hover:bg-black"
+              variant="primary"
+              tone="dark"
+              size="sm"
+              className="w-full justify-center"
+              analyticsLabel="mobile-dock-request-proposal"
             >
               Request proposal
-            </Link>
+            </ScribbleButton>
           </div>
         </motion.div>
       </div>

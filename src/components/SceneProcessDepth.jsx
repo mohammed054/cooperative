@@ -5,39 +5,36 @@ import { assetUrl } from '../lib/assetUrl'
 const PROCESS_STEPS = [
   {
     index: '01',
-    title: 'Brief & scope lock',
+    title: 'Strategic intake',
     description:
-      'We define decision owners, timeline constraints, and non-negotiable room objectives.',
+      'Decision owners, event constraints, and technical non-negotiables are locked in one briefing lane.',
   },
   {
     index: '02',
-    title: 'Vendor alignment',
+    title: 'System architecture',
     description:
-      'Technical, scenic, and logistics teams align against one production runbook.',
+      'AV, power, staging, and scenic teams are aligned to a single production logic before build.',
   },
   {
     index: '03',
-    title: 'Run-of-show assurance',
+    title: 'Rehearsal discipline',
     description:
-      'Cue sheets, rehearsals, and approval gates are finalized before show day.',
+      'Cue stacks, transitions, and contingency pathways are rehearsed before show-day pressure starts.',
   },
   {
     index: '04',
-    title: 'Show-day command',
+    title: 'Live execution command',
     description:
-      'A senior producer runs execution in real time so your leadership remains composed.',
+      'A senior producer controls pace in real time so stakeholders experience calm continuity.',
   },
 ]
 
 const getRange = (index, total) => {
   const step = 1 / total
   const start = step * index
-  const mid = start + step * (index === total - 1 ? 0.74 : 0.6)
-  const end = start + step
-  const leadIn = index === 0 ? step * 0.34 : step * 0.22
-  const tail = index === total - 1 ? step * 0.56 : step * 0.34
-
-  return [Math.max(0, start - leadIn), Math.min(1, mid), Math.min(1, end + tail)]
+  const mid = start + step * 0.6
+  const end = start + step * 1.22
+  return [Math.max(0, start - step * 0.24), Math.min(1, mid), Math.min(1, end)]
 }
 
 const ProcessStepCard = ({
@@ -46,28 +43,29 @@ const ProcessStepCard = ({
   range,
   shouldReduceMotion,
   isFirst,
+  isLast,
 }) => {
-  const mid = (range[0] + range[1]) / 2
+  // Fades each step in sequence to create a guided process reveal.
   const opacity = useTransform(
     progress,
-    [range[0], mid, range[1]],
-    isFirst ? [0.86, 1, 0.68] : [0.44, 1, 0.62]
+    [range[0], range[1], range[2]],
+    isLast ? [0.44, 1, 1] : isFirst ? [0.85, 1, 0.56] : [0.4, 1, 0.58]
   )
+  // Vertical offset gives each step an intentional entrance and exit cadence.
   const y = useTransform(
     progress,
-    [range[0], mid, range[1]],
-    isFirst ? [6, 0, -10] : [18, 0, -10]
+    [range[0], range[1], range[2]],
+    isLast ? [16, 0, 0] : isFirst ? [8, 0, -8] : [18, 0, -10]
   )
+  // Gentle scale shift keeps the active step visually forward.
   const scale = useTransform(
     progress,
-    [range[0], mid, range[1]],
-    isFirst ? [0.998, 1, 0.997] : [0.99, 1, 0.996]
+    [range[0], range[1], range[2]],
+    isLast ? [0.992, 1, 1] : [0.99, 1, 0.996]
   )
-  const borderOpacity = useTransform(progress, [range[0], mid, range[1]], [0.08, 0.2, 0.1])
-  const borderColor = useTransform(
-    borderOpacity,
-    value => `rgba(17,17,17,${value})`
-  )
+  // Border contrast indicates active step while preserving a soft premium finish.
+  const borderOpacity = useTransform(progress, [range[0], range[1], range[2]], [0.08, 0.24, 0.1])
+  const borderColor = useTransform(borderOpacity, value => `rgba(17,17,17,${value})`)
 
   return (
     <motion.article
@@ -81,12 +79,10 @@ const ProcessStepCard = ({
               borderColor,
             }
       }
-      className="rounded-2xl border bg-white/[0.74] p-6 backdrop-blur-[1.5px] sm:p-7"
+      className="rounded-2xl border bg-white/74 p-6 shadow-[0_12px_34px_rgba(13,16,22,0.09)] backdrop-blur-md sm:p-7"
     >
-      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
-        Step {step.index}
-      </p>
-      <h3 className="mt-3 font-serif text-[clamp(1.15rem,2vw,1.55rem)] leading-[1.1] tracking-[-0.015em] text-ink">
+      <p className="cinematic-eyebrow text-ink-subtle">Step {step.index}</p>
+      <h3 className="mt-3 font-serif text-[clamp(1.16rem,2vw,1.58rem)] leading-[1.1] tracking-[-0.015em] text-ink">
         {step.title}
       </h3>
       <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-ink-muted sm:text-[15px]">
@@ -105,35 +101,39 @@ const SceneProcessDepth = () => {
     offset: ['start start', 'end start'],
   })
 
+  // Normalizes scroll timing for process choreography.
   const sequenceProgress = useTransform(scrollYProgress, [0.03, 0.95], [0, 1])
+  // Draws the process spine for directional context.
   const spineScale = useTransform(sequenceProgress, [0, 1], [0, 1])
-  const imageScale = useTransform(sequenceProgress, [0, 1], [1.04, 1])
-  const imageY = useTransform(sequenceProgress, [0, 1], [14, -14])
-  const stepTrackY = useTransform(
-    sequenceProgress,
-    [0, 0.18, 1],
-    ['0%', '0%', '-58%']
-  )
+  // Scales and drifts the media block to add depth while users scan steps.
+  const imageScale = useTransform(sequenceProgress, [0, 1], [1.05, 1])
+  const imageY = useTransform(sequenceProgress, [0, 1], [16, -16])
+  // Scroll-translates step stack to keep progress narrative continuous.
+  const stepTrackY = useTransform(sequenceProgress, [0, 0.18, 1], ['0%', '0%', '-55%'])
+  // Modulates ambient glow to avoid static flat backgrounds.
+  const glowOpacity = useTransform(sequenceProgress, [0.1, 0.62, 1], [0.06, 0.18, 0.08])
 
   return (
     <section
       id="scene-process-depth"
       ref={sectionRef}
-      className="relative h-[430vh] bg-transparent"
+      className="relative h-[440vh] overflow-hidden bg-transparent"
     >
+      <motion.div
+        style={shouldReduceMotion ? undefined : { opacity: glowOpacity }}
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(58%_52%_at_84%_26%,rgba(255,255,255,0.64),rgba(255,255,255,0)_74%),radial-gradient(50%_38%_at_12%_66%,rgba(199,169,125,0.26),rgba(199,169,125,0)_78%)]"
+      />
+
       <div className="sticky top-0 h-screen">
         <div className="mx-auto grid h-full max-w-7xl grid-cols-1 items-start gap-10 px-4 py-10 sm:px-6 md:py-12 lg:grid-cols-12 lg:gap-14 lg:px-8">
           <div className="lg:col-span-5">
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#8f8f8f]">
-              Process depth
-            </p>
-            <h2 className="mt-4 max-w-[14ch] font-serif text-[clamp(1.8rem,4vw,3.1rem)] leading-[1.05] tracking-[-0.02em] text-ink">
-              A room of this level is not improvised.
+            <p className="cinematic-eyebrow text-[#8f8f8f]">Process depth</p>
+            <h2 className="mt-4 max-w-[14ch] font-serif text-[clamp(1.86rem,4.02vw,3.12rem)] leading-[1.05] tracking-[-0.02em] text-ink">
+              High-value rooms are directed, never improvised.
             </h2>
             <p className="mt-5 max-w-[40ch] text-[15px] leading-relaxed text-ink-muted">
-              Each phase is engineered to remove uncertainty before audiences
-              arrive. Scroll reveals the same sequence your team experiences in
-              delivery.
+              Scroll through the exact progression stakeholders experience, from
+              intake clarity to show-day command.
             </p>
 
             <div className="mt-8 flex items-center gap-4">
@@ -153,12 +153,12 @@ const SceneProcessDepth = () => {
 
             <motion.div
               style={shouldReduceMotion ? undefined : { scale: imageScale, y: imageY }}
-              className="mt-6 hidden overflow-hidden rounded-2xl border border-black/[0.08] bg-white/[0.82] lg:mt-7 lg:block"
+              className="mt-6 hidden overflow-hidden rounded-2xl border border-black/[0.08] bg-white/82 shadow-[0_12px_34px_rgba(14,16,22,0.12)] lg:mt-7 lg:block"
             >
               <img
                 src={assetUrl('images/event-planning-in-action.png')}
                 alt="Production planning in progress"
-                className="h-[clamp(160px,25vh,220px)] w-full object-cover"
+                className="h-[clamp(166px,25vh,224px)] w-full object-cover"
                 loading="lazy"
                 decoding="async"
               />
@@ -179,6 +179,7 @@ const SceneProcessDepth = () => {
                     range={getRange(index, PROCESS_STEPS.length)}
                     shouldReduceMotion={shouldReduceMotion}
                     isFirst={index === 0}
+                    isLast={index === PROCESS_STEPS.length - 1}
                   />
                 ))}
               </motion.div>
