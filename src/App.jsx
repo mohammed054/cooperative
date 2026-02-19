@@ -116,12 +116,19 @@ const AnimatedRoutes = () => {
 
 function App() {
   const shouldReduceMotion = useReducedMotion()
-  const [showInitialLoader, setShowInitialLoader] = useState(true)
+  const [showInitialLoader, setShowInitialLoader] = useState(() => {
+    // On server-side, don't show the loader
+    if (typeof window === 'undefined') {
+      return false
+    }
+    // On client-side, show the loader initially
+    return true
+  })
   const basename = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      setShowInitialLoader(false)
+    // Skip if already not showing (e.g., server-side render)
+    if (!showInitialLoader) {
       return
     }
 
@@ -161,7 +168,7 @@ function App() {
       if (minimumTimerId) window.clearTimeout(minimumTimerId)
       if (fallbackTimerId) window.clearTimeout(fallbackTimerId)
     }
-  }, [shouldReduceMotion])
+  }, [shouldReduceMotion, showInitialLoader])
 
   if (showInitialLoader) {
     return (
