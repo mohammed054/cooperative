@@ -195,12 +195,18 @@ const Footer = () => {
             <Link to="/terms" className="transition-colors hover:text-ink">
               Terms of service
             </Link>
-            <button
+            <ScribbleButton
               onClick={() => scrollToSection('get-started')}
-              className="transition-colors hover:text-ink"
+              variant="micro"
+              tone="dark"
+              size="sm"
+              showArrow={false}
+              disableScribble
+              analyticsLabel="footer-start-a-project"
+              className="min-h-0 border-0 bg-transparent px-0 py-0 text-[11px] font-medium tracking-[0.03em] text-ink-subtle shadow-none hover:bg-transparent hover:text-ink"
             >
               Start a project
-            </button>
+            </ScribbleButton>
           </div>
         </motion.div>
       </motion.div>

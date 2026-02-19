@@ -1,30 +1,84 @@
 import React, { useEffect } from 'react'
-import Hero from '../components/Hero'
-import TestimonialsSection from '../components/TestimonialsSection'
-import FinalCta from '../components/FinalCta'
-import SceneNarrativeBreak from '../components/SceneNarrativeBreak'
-import SceneNarrativeRelease from '../components/SceneNarrativeRelease'
-import SceneExitBridge from '../components/SceneExitBridge'
-import SceneCapabilityEstablishment from '../components/SceneCapabilityEstablishment'
-import SceneProcessDepth from '../components/SceneProcessDepth'
-import SceneBridgeDusk from '../components/SceneBridgeDusk'
-import { CinematicPage, CinematicScene } from '../components/CinematicPage'
+import {
+  HOMEPAGE_SCENE_REGISTRY,
+  validateHomepageFoundation,
+  HOMEPAGE_FOUNDATION,
+} from '../foundation/homepageFoundation'
 import { useAnalyticsContext } from '../hooks/useAnalyticsContext'
+import useLenisScroll from '../hooks/useLenisScroll'
+import {
+  AuthorityLedgerScene,
+  CapabilityMatrixScene,
+  CommandArrivalScene,
+  ConversionChamberScene,
+  GlobalCommandNetworkScene,
+  GlobalFooterScene,
+  NarrativeBridgeScene,
+  OperationsSpineScene,
+  ProofTheaterScene,
+  SignatureReelScene,
+} from '../components/homepage/HomeSceneSkeletons'
 
-const TRACKED_SCENES = [
-  'scene-01-hero-authority',
-  'scene-02-capability-establishment',
-  'scene-03-depth-and-process',
-  'scene-04-transition-dusk',
-  'scene-05-narrative-break',
-  'scene-06-narrative-release',
-  'scene-07-social-proof-elevation',
-  'scene-08-conversion-gravity',
-  'scene-09-cinematic-exit',
-]
+const SCENE_COMPONENT_REGISTRY = Object.freeze({
+  'command-arrival': CommandArrivalScene,
+  'authority-ledger': AuthorityLedgerScene,
+  'signature-reel': SignatureReelScene,
+  'capability-matrix': CapabilityMatrixScene,
+  'operations-spine': OperationsSpineScene,
+  'narrative-bridge': NarrativeBridgeScene,
+  'proof-theater': ProofTheaterScene,
+  'global-command-network': GlobalCommandNetworkScene,
+  'conversion-chamber': ConversionChamberScene,
+  'global-footer': GlobalFooterScene,
+})
+
+const SCENE_IDS = HOMEPAGE_SCENE_REGISTRY.map(scene => scene.id)
+
+const PHASE_TWO_RHYTHM_ASSERTION = Object.freeze(() => {
+  const issues = []
+  const pinnedIndexes = HOMEPAGE_SCENE_REGISTRY.map((scene, index) =>
+    scene.mode === 'pinned' ? index : -1
+  ).filter(index => index >= 0)
+
+  pinnedIndexes.forEach((index, offset) => {
+    const nextPinnedIndex = pinnedIndexes[offset + 1]
+    if (typeof nextPinnedIndex !== 'number') return
+    if (nextPinnedIndex - index <= 1) {
+      issues.push(
+        `Pinned rhythm violation: '${HOMEPAGE_SCENE_REGISTRY[index].id}' is back-to-back with '${HOMEPAGE_SCENE_REGISTRY[nextPinnedIndex].id}'.`
+      )
+    }
+  })
+
+  if (!HOMEPAGE_SCENE_REGISTRY.some(scene => scene.mode === 'pinned')) {
+    issues.push('Pinned friction points missing from registry.')
+  }
+
+  return Object.freeze({
+    isValid: issues.length === 0,
+    issues: Object.freeze(issues),
+  })
+})
+
+const foundationValidation = validateHomepageFoundation(HOMEPAGE_FOUNDATION)
+const rhythmValidation = PHASE_TWO_RHYTHM_ASSERTION()
+
+if (!foundationValidation.isValid) {
+  throw new Error(
+    `Homepage foundation invalid before Phase 2 skeleton render: ${foundationValidation.issues.join(' | ')}`
+  )
+}
+
+if (!rhythmValidation.isValid) {
+  throw new Error(
+    `Phase 2 rhythm validation failed: ${rhythmValidation.issues.join(' | ')}`
+  )
+}
 
 const Home = () => {
   const analytics = useAnalyticsContext()
+
+  useLenisScroll()
 
   useEffect(() => {
     if (typeof window === 'undefined' || !analytics?.trackEvent) return
@@ -38,112 +92,33 @@ const Home = () => {
           if (!id || seen.has(id)) return
 
           seen.add(id)
-          analytics.trackEvent('scene_view', 'Homepage Scene', id, TRACKED_SCENES.indexOf(id) + 1)
+          analytics.trackEvent(
+            'scene_view',
+            'Homepage Skeleton Scene',
+            id,
+            SCENE_IDS.indexOf(id) + 1
+          )
         })
       },
       { threshold: 0.45 }
     )
 
-    TRACKED_SCENES.forEach(id => {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
+    SCENE_IDS.forEach(id => {
+      const element = document.getElementById(id)
+      if (element) observer.observe(element)
     })
 
     return () => observer.disconnect()
   }, [analytics])
 
   return (
-    <CinematicPage tone="linen" className="App home-cinematic">
-      <CinematicScene
-        id="scene-01-hero-authority"
-        as="section"
-        rhythm="hero"
-        bridge="none"
-        className="home-scene home-scene-hero !pt-0 !pb-0"
-      >
-        <Hero />
-      </CinematicScene>
-
-      <CinematicScene
-        id="scene-02-capability-establishment"
-        as="section"
-        rhythm="anchor"
-        bridge="none"
-        className="home-scene home-scene-discovery !pt-0 !pb-0"
-      >
-        <SceneCapabilityEstablishment />
-      </CinematicScene>
-
-      <CinematicScene
-        id="scene-03-depth-and-process"
-        as="section"
-        rhythm="airy"
-        bridge="none"
-        className="home-scene home-scene-proof !pt-0 !pb-0"
-      >
-        <SceneProcessDepth />
-      </CinematicScene>
-
-      <CinematicScene
-        id="scene-04-transition-dusk"
-        as="section"
-        rhythm="dense"
-        bridge="dusk"
-        className="home-scene home-scene-transition-dusk !pt-0 !pb-0"
-      >
-        <SceneBridgeDusk />
-      </CinematicScene>
-
-      <CinematicScene
-        id="scene-05-narrative-break"
-        as="section"
-        rhythm="anchor"
-        bridge="deep"
-        className="home-scene home-scene-narrative !pt-0 !pb-0"
-      >
-        <SceneNarrativeBreak />
-      </CinematicScene>
-
-      <CinematicScene
-        id="scene-06-narrative-release"
-        as="section"
-        rhythm="dense"
-        bridge="release"
-        className="home-scene home-scene-release !pt-0 !pb-0"
-      >
-        <SceneNarrativeRelease />
-      </CinematicScene>
-
-      <CinematicScene
-        id="scene-07-social-proof-elevation"
-        as="section"
-        rhythm="medium"
-        bridge="soft"
-        className="home-scene home-scene-testimonials !pt-0 !pb-0"
-      >
-        <TestimonialsSection />
-      </CinematicScene>
-
-      <CinematicScene
-        id="scene-08-conversion-gravity"
-        as="section"
-        rhythm="anchor"
-        bridge="deep"
-        className="home-scene home-scene-close !pt-0 !pb-0"
-      >
-        <FinalCta />
-      </CinematicScene>
-
-      <CinematicScene
-        id="scene-09-cinematic-exit"
-        as="section"
-        rhythm="quiet"
-        bridge="deep"
-        className="home-scene home-scene-close !pt-0 !pb-0"
-      >
-        <SceneExitBridge />
-      </CinematicScene>
-    </CinematicPage>
+    <div className="flagship-home flagship-home-skeleton" data-home-skeleton="phase-2">
+      {HOMEPAGE_SCENE_REGISTRY.map(scene => {
+        const SceneComponent = SCENE_COMPONENT_REGISTRY[scene.id]
+        if (!SceneComponent) return null
+        return <SceneComponent key={scene.id} scene={scene} />
+      })}
+    </div>
   )
 }
 

@@ -114,6 +114,16 @@ const AnimatedRoutes = () => {
   )
 }
 
+const FooterGate = () => {
+  const location = useLocation()
+
+  if (location.pathname === '/') {
+    return null
+  }
+
+  return <Footer />
+}
+
 function App() {
   const shouldReduceMotion = useReducedMotion()
   const [showInitialLoader, setShowInitialLoader] = useState(() => {
@@ -200,7 +210,7 @@ function App() {
             <AnimatedRoutes />
           </main>
         </AppErrorBoundary>
-        <Footer />
+        <FooterGate />
         <MobileCtaDock />
       </AnalyticsProvider>
     </BrowserRouter>

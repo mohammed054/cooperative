@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import ScribbleButton from './ScribbleButton'
 
-const HIDDEN_PATHS = new Set(['/contact', '/privacy', '/terms'])
+const HIDDEN_PATHS = new Set(['/', '/contact', '/privacy', '/terms'])
 
 const MobileCtaDock = () => {
   const shouldReduceMotion = useReducedMotion()
