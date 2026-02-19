@@ -17,8 +17,8 @@ const SceneExitBridge = () => {
         variants={stagger(0.06, 0.08)}
         initial={shouldReduceMotion ? false : 'hidden'}
         whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        className="relative mx-auto max-w-7xl px-6 py-20 sm:px-8 sm:py-24 lg:px-10 lg:py-28"
+        viewport={{ once: true, amount: 0.2 }}
+        className="relative mx-auto flex min-h-[62vh] max-w-7xl flex-col justify-center px-6 py-20 sm:px-8 sm:py-24 lg:px-10 lg:py-28"
       >
         <motion.p
           variants={fadeUp}

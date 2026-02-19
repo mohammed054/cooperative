@@ -1,6 +1,5 @@
 import React, { useRef } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { SCENE_RANGES } from '../motion/ranges'
 import { assetUrl } from '../lib/assetUrl'
 
 const PROCESS_STEPS = [
@@ -30,7 +29,16 @@ const PROCESS_STEPS = [
   },
 ]
 
-const ProcessStepCard = ({ step, progress, range }) => {
+const getRange = (index, total) => {
+  const step = 1 / total
+  const start = step * index
+  const mid = start + step * 0.52
+  const end = start + step
+
+  return [Math.max(0, start - step * 0.34), mid, Math.min(1, end + step * 0.22)]
+}
+
+const ProcessStepCard = ({ step, progress, range, shouldReduceMotion }) => {
   const mid = (range[0] + range[1]) / 2
   const opacity = useTransform(
     progress,
@@ -47,12 +55,16 @@ const ProcessStepCard = ({ step, progress, range }) => {
 
   return (
     <motion.article
-      style={{
-        opacity,
-        y,
-        scale,
-        borderColor,
-      }}
+      style={
+        shouldReduceMotion
+          ? undefined
+          : {
+              opacity,
+              y,
+              scale,
+              borderColor,
+            }
+      }
       className="rounded-2xl border bg-white/[0.74] p-6 backdrop-blur-[1.5px] sm:p-7"
     >
       <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
@@ -74,12 +86,13 @@ const SceneProcessDepth = () => {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start start', 'end end'],
+    offset: ['start start', 'end start'],
   })
 
   const spineScale = useTransform(scrollYProgress, [0, 1], [0, 1])
   const imageScale = useTransform(scrollYProgress, [0, 1], [1.04, 1])
   const imageY = useTransform(scrollYProgress, [0, 1], [14, -14])
+  const stepTrackY = useTransform(scrollYProgress, [0, 1], ['0%', '-48%'])
 
   return (
     <section
@@ -131,27 +144,23 @@ const SceneProcessDepth = () => {
             </motion.div>
           </div>
 
-          <div className="space-y-4 lg:col-span-7 lg:space-y-5">
-            <ProcessStepCard
-              step={PROCESS_STEPS[0]}
-              progress={scrollYProgress}
-              range={SCENE_RANGES.process.step1}
-            />
-            <ProcessStepCard
-              step={PROCESS_STEPS[1]}
-              progress={scrollYProgress}
-              range={SCENE_RANGES.process.step2}
-            />
-            <ProcessStepCard
-              step={PROCESS_STEPS[2]}
-              progress={scrollYProgress}
-              range={SCENE_RANGES.process.step3}
-            />
-            <ProcessStepCard
-              step={PROCESS_STEPS[3]}
-              progress={scrollYProgress}
-              range={SCENE_RANGES.process.step4}
-            />
+          <div className="lg:col-span-7">
+            <div className="relative h-[46vh] min-h-[280px] overflow-hidden sm:h-[52vh] lg:h-[64vh] lg:min-h-[380px]">
+              <motion.div
+                style={shouldReduceMotion ? undefined : { y: stepTrackY }}
+                className="space-y-4 pb-5 pr-1 will-change-transform lg:space-y-5"
+              >
+                {PROCESS_STEPS.map((step, index) => (
+                  <ProcessStepCard
+                    key={step.index}
+                    step={step}
+                    progress={scrollYProgress}
+                    range={getRange(index, PROCESS_STEPS.length)}
+                    shouldReduceMotion={shouldReduceMotion}
+                  />
+                ))}
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>

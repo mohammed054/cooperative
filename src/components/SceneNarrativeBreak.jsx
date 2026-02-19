@@ -29,11 +29,11 @@ const SceneNarrativeBreak = () => {
     [0, 1],
     ['#17191d', '#0f1013']
   )
-  const panelY = useTransform(scrollYProgress, [0.88, 1], ['0vh', '-8vh'])
+  const panelY = useTransform(scrollYProgress, [0.82, 1], ['0vh', '-10vh'])
   const panelOpacity = useTransform(
     scrollYProgress,
-    [0.05, 0.2, 0.85],
-    [0.35, 1, 1]
+    [0.03, 0.14, 0.72, 1],
+    [0.22, 1, 1, 0.9]
   )
 
   useMotionValueEvent(scrollYProgress, 'change', latest => {
@@ -41,7 +41,7 @@ const SceneNarrativeBreak = () => {
       return
     }
 
-    const revealProgress = Math.max(0, (latest - 0.12) / 0.62)
+    const revealProgress = Math.max(0, (latest - 0.1) / 0.44)
     const nextWordCount = Math.min(
       words.length,
       Math.max(0, Math.floor(revealProgress * words.length) + 1)
@@ -56,7 +56,7 @@ const SceneNarrativeBreak = () => {
     <section
       ref={sectionRef}
       aria-label="Narrative break"
-      className="relative h-[420vh] overflow-clip"
+      className="relative h-[300vh] overflow-clip"
     >
       <motion.div
         style={{ backgroundColor: backgroundTone }}

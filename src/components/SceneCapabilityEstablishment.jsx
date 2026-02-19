@@ -48,9 +48,9 @@ const CAPABILITIES = [
 const getRange = (index, total) => {
   const step = 1 / total
   const start = step * index
-  const mid = start + step * 0.5
+  const mid = start + step * 0.52
   const end = start + step
-  return [Math.max(0, start - 0.06), mid, Math.min(1, end + 0.06)]
+  return [Math.max(0, start - step * 0.34), mid, Math.min(1, end + step * 0.22)]
 }
 
 const CapabilityCard = ({ item, progress, range, shouldReduceMotion }) => {
@@ -110,10 +110,11 @@ const SceneCapabilityEstablishment = () => {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start start', 'end end'],
+    offset: ['start start', 'end start'],
   })
 
   const railScale = useTransform(scrollYProgress, [0, 1], [0, 1])
+  const cardTrackY = useTransform(scrollYProgress, [0, 1], ['0%', '-56%'])
 
   return (
     <section
@@ -170,16 +171,23 @@ const SceneCapabilityEstablishment = () => {
             </ul>
           </div>
 
-          <div className="space-y-4 overflow-hidden pb-2 lg:col-span-7 lg:space-y-5">
-            {CAPABILITIES.map((item, index) => (
-              <CapabilityCard
-                key={item.index}
-                item={item}
-                progress={scrollYProgress}
-                range={getRange(index, CAPABILITIES.length)}
-                shouldReduceMotion={shouldReduceMotion}
-              />
-            ))}
+          <div className="lg:col-span-7">
+            <div className="relative h-[50vh] min-h-[300px] overflow-hidden pb-2 sm:h-[55vh] lg:h-[68vh] lg:min-h-[420px]">
+              <motion.div
+                style={shouldReduceMotion ? undefined : { y: cardTrackY }}
+                className="space-y-4 pb-5 pr-1 will-change-transform lg:space-y-5"
+              >
+                {CAPABILITIES.map((item, index) => (
+                  <CapabilityCard
+                    key={item.index}
+                    item={item}
+                    progress={scrollYProgress}
+                    range={getRange(index, CAPABILITIES.length)}
+                    shouldReduceMotion={shouldReduceMotion}
+                  />
+                ))}
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>

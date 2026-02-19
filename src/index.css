@@ -101,43 +101,23 @@
 .home-cinematic {
   position: relative;
   isolation: isolate;
-  /* overflow: hidden removed - it breaks sticky positioning in child sections */
-  background:
-    radial-gradient(
-      1100px 620px at 78% 30%,
-      rgba(255, 255, 255, 0.14),
-      transparent 62%
-    ),
-    radial-gradient(
-      900px 460px at 16% 60%,
-      rgba(255, 255, 255, 0.08),
-      transparent 60%
-    ),
-    linear-gradient(
-      180deg,
-      #080a0f 0%,
-      #0f1218 13%,
-      var(--home-light-100) 32%,
-      var(--home-light-200) 56%,
-      var(--home-light-300) 76%,
-      var(--home-dark-900) 100%
-    );
+  background: #f4efe7;
 }
 
 .home-scene {
   position: relative;
   z-index: 1;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .home-scene-hero {
-  margin-top: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+  background: #080a0f;
 }
 
 .home-scene + .home-scene {
-  margin-top: -24px;
-  padding-top: 24px;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .home-scene-discovery,
@@ -146,20 +126,31 @@
   padding-bottom: 0;
 }
 
-.home-scene-discovery {
+.home-scene-discovery,
+.home-scene-proof {
   background: linear-gradient(
     180deg,
-    var(--home-light-100) 0%,
-    var(--home-light-200) 34%,
-    var(--home-light-300) 100%
+    #f7f3ec 0%,
+    #f2eee6 42%,
+    #ece7de 100%
   );
 }
 
-@media (min-width: 768px) {
-  .home-scene + .home-scene {
-    margin-top: -40px;
-    padding-top: 40px;
-  }
+.home-scene-narrative {
+  background: #0f1013;
+}
+
+.home-scene-release {
+  background: linear-gradient(180deg, #0f1013 0%, #ece7df 100%);
+}
+
+.home-scene-close {
+  background: #101114;
+}
+
+.home-cinematic .home-scene-hero {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .cinematic-shell {
