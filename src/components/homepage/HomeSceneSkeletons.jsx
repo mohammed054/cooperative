@@ -16,23 +16,34 @@ const MASS = parseBezier(MOTION_TOKEN_CONTRACT.easing.mass)
 const FREE = 'free'
 const PINNED = 'pinned'
 
-const METRICS = [
-  { label: 'Live productions directed', value: '420+' },
-  { label: 'Client response window', value: '24h' },
-  { label: 'Cities activated', value: '11' },
+const AUTHORITY_MODULES = [
+  {
+    title: 'Creative Direction',
+    detail:
+      'Studio-level narrative control built for high-stakes brand moments.',
+  },
+  {
+    title: 'Technical Command',
+    detail:
+      'Show systems architecture with disciplined execution and redundancy.',
+  },
+  {
+    title: 'Executive Delivery',
+    detail:
+      'Enterprise-ready operations cadence for leadership and stakeholder events.',
+  },
 ]
 
-const PROJECTS = Array.from({ length: 6 }, (_, index) => ({
+const PROJECTS = Array.from({ length: 3 }, (_, index) => ({
   id: `project-${String(index + 1).padStart(2, '0')}`,
   title: `Project Panel ${index + 1}`,
   subtitle: `Signature reel placeholder ${index + 1}`,
 }))
 
 const CAPABILITIES = [
-  'Command-led production',
-  'AV systems integration',
-  'Lighting narrative control',
-  'Show-day direction',
+  'Stagecraft & Scenic',
+  'AV Systems',
+  'Lighting Narrative',
 ]
 
 const STEPS = [
@@ -42,37 +53,26 @@ const STEPS = [
   'Live execution',
 ]
 
-const TESTIMONIALS = [
-  {
-    id: 'testimonial-01',
-    name: 'Client Name Placeholder',
-    role: 'Head of Corporate Affairs',
-    organization: 'Organization Placeholder',
-    quote:
-      'The team translated strategy into a disciplined live experience without losing emotional impact.',
-    eventContext: 'Regional leadership summit',
-    outcome: 'Flawless live execution across multi-segment agenda.',
-  },
-  {
-    id: 'testimonial-02',
-    name: 'Client Name Placeholder',
-    role: 'Brand Experience Director',
-    organization: 'Organization Placeholder',
-    quote:
-      'Execution quality and timing control gave our leadership narrative a premium, confident rhythm.',
-    eventContext: 'Executive launch forum',
-    outcome: 'Audience retention and timing discipline exceeded targets.',
-  },
-  {
-    id: 'testimonial-03',
-    name: 'Client Name Placeholder',
-    role: 'Operations Lead',
-    organization: 'Organization Placeholder',
-    quote:
-      'Complex staging constraints were handled with calm precision and full technical ownership.',
-    eventContext: 'Government stakeholder event',
-    outcome: 'Complex technical transitions delivered without disruption.',
-  },
+const TESTIMONIALS = Array.from({ length: 9 }, (_, index) => ({
+  id: `testimonial-${String(index + 1).padStart(2, '0')}`,
+  name: `Client Placeholder ${index + 1}`,
+  role: ['Head of Corporate Affairs', 'Brand Experience Director', 'Operations Lead'][index % 3],
+  organization: `Organization Placeholder ${Math.floor(index / 3) + 1}`,
+  quote:
+    'Controlled execution, strong narrative pacing, and technical reliability across the full event cycle.',
+  eventContext: `Event context placeholder ${index + 1}`,
+  outcome: 'Delivery quality remained stable under complex production conditions.',
+}))
+
+const LOGOS = [
+  'MERIDIAN',
+  'NOVA',
+  'ALTIUS',
+  'LUMERA',
+  'SILQ',
+  'ORBITAL',
+  'KINETIC',
+  'ASTRA',
 ]
 
 const COUNTERS = [
@@ -259,6 +259,18 @@ const ProjectPanelCard = ({
     <p className="mt-3 text-[10px] uppercase tracking-[0.13em] text-[var(--color-ink-subtle)]">{project.id}</p>
     <h3 className="mt-1 font-serif text-lg text-[var(--color-ink)]">{project.title}</h3>
     <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{project.subtitle}</p>
+    <div className="mt-3">
+      <ScribbleButton
+        variant="micro"
+        tone="dark"
+        size="sm"
+        showArrow={false}
+        analyticsLabel={`phase9-reel-brief-${project.id}`}
+        onClick={event => event.stopPropagation()}
+      >
+        Start a Similar Brief
+      </ScribbleButton>
+    </div>
   </motion.article>
 )
 
@@ -293,7 +305,7 @@ const SignatureReelContent = ({ scene, progress, reduced }) => {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Signature Reel</p>
-            <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Pinned horizontal capability reel placeholders</h2>
+            <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Pinned horizontal signature conveyor</h2>
           </div>
           <div className="flex items-center gap-2">
             <ScribbleButton
@@ -376,8 +388,7 @@ const SignatureReelContent = ({ scene, progress, reduced }) => {
           ))}
         </motion.div>
       </div>
-      <motion.div initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }} animate={reduced || progress > 0.45 ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 14, filter: 'blur(8px)' }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }} className="flex flex-wrap items-center justify-between gap-3">
-        <ScribbleButton variant="secondary" tone="dark" size="sm" analyticsLabel="phase7-reel-explore-capabilities">Explore Our Capabilities</ScribbleButton>
+      <motion.div initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }} animate={reduced || progress > 0.45 ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 14, filter: 'blur(8px)' }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }} className="flex flex-wrap items-center justify-end gap-3">
         <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
           Active panel: {String(selectedIndex + 1).padStart(2, '0')} / {String(PROJECTS.length).padStart(2, '0')}
         </p>
@@ -405,12 +416,23 @@ export const CommandArrivalScene = ({ scene }) => (
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
           >
-            <SceneCard className="h-full p-6">
+            <SceneCard className="relative h-full overflow-hidden p-6">
+              <motion.span
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-12 right-4 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(28,28,28,0.2)_0%,rgba(28,28,28,0)_72%)]"
+                animate={reduced ? undefined : { x: [0, 14, 0], y: [0, 10, 0] }}
+                transition={{
+                  duration: MOTION_TOKEN_CONTRACT.durations.epic,
+                  ease: MASS,
+                  repeat: Infinity,
+                  repeatType: 'mirror',
+                }}
+              />
               <motion.p variants={fadeUp(0)} className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-subtle)]">Command Arrival</motion.p>
               <motion.h1 variants={fadeUp(0.04, MOTION_TOKEN_CONTRACT.distances.panel)} className="mt-4 max-w-[16ch] font-serif text-[clamp(2rem,5vw,4rem)] leading-[1.02] text-[var(--color-ink)]">We Engineer Moments</motion.h1>
-              <motion.p variants={fadeUp(0.1)} className="mt-4 max-w-[50ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">Hero subheadline placeholder for cinematic event authority and controlled opening cadence.</motion.p>
+              <motion.p variants={fadeUp(0.1)} className="mt-4 max-w-[50ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">Immediate authority and immersive production for high-stakes events</motion.p>
               <motion.div variants={fadeUp(0.14)} className="mt-7">
-                <ScribbleButton variant="primary" tone="dark" size="md" analyticsLabel="phase5-hero-see-capabilities">See Capabilities</ScribbleButton>
+                <ScribbleButton variant="primary" tone="dark" size="md" analyticsLabel="phase9-hero-see-signature-builds">See Signature Builds</ScribbleButton>
               </motion.div>
             </SceneCard>
           </motion.div>
@@ -441,15 +463,30 @@ export const CommandArrivalScene = ({ scene }) => (
 export const AuthorityLedgerScene = ({ scene }) => (
   <FreeSceneFrame scene={scene} layout="ledger-bands" pinBehavior="none" className="scene-skeleton scene-skeleton-authority-ledger">
     {({ reduced }) => (
-      <motion.div variants={stagger(0.02, 0.12)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-3 md:grid-cols-3">
-        {METRICS.map((metric, index) => (
-          <motion.div key={metric.label} variants={fadeUp(index * 0.12)}>
-            <SceneCard>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">{metric.label}</p>
-              <p className="mt-3 font-serif text-[clamp(1.5rem,2.6vw,2.2rem)] text-[var(--color-ink)]">{metric.value}</p>
-            </SceneCard>
-          </motion.div>
-        ))}
+      <motion.div variants={stagger(0.02, 0.12)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-4">
+        <motion.div variants={fadeUp(0)}>
+          <SceneCard className="bg-[var(--color-surface-2)]">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Authority Ledger</p>
+            <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">
+              Studio-level narrative. Enterprise-level reliability.
+            </h2>
+          </SceneCard>
+        </motion.div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {AUTHORITY_MODULES.map((module, index) => (
+            <motion.div key={module.title} variants={fadeUp(index * 0.12)}>
+              <SceneCard>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">{module.title}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-muted)]">{module.detail}</p>
+              </SceneCard>
+            </motion.div>
+          ))}
+        </div>
+        <motion.div variants={fadeUp(0.16)}>
+          <ScribbleButton variant="secondary" tone="dark" size="sm" analyticsLabel="phase9-authority-discuss-scope">
+            Discuss Your Scope
+          </ScribbleButton>
+        </motion.div>
       </motion.div>
     )}
   </FreeSceneFrame>
@@ -472,15 +509,28 @@ export const SignatureReelScene = ({ scene }) => (
 export const CapabilityMatrixScene = ({ scene }) => (
   <FreeSceneFrame scene={scene} layout="matrix-asymmetric" pinBehavior="none" className="scene-skeleton scene-skeleton-capability-matrix">
     {({ reduced }) => (
-      <motion.div variants={stagger(0.02)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-3 md:grid-cols-[1.15fr_0.85fr]">
-        <motion.div variants={fadeUp(0)}><SceneCard className="h-full"><p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module 01</p><h3 className="mt-2 font-serif text-[1.18rem] text-[var(--color-ink)]">{CAPABILITIES[0]}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">Asymmetric primary module placeholder.</p></SceneCard></motion.div>
-        <div className="grid gap-3">
-          {CAPABILITIES.slice(1).map((title, index) => (
-            <motion.div key={title} variants={fadeUp((index + 1) * MOTION_TOKEN_CONTRACT.stagger.card)}>
-              <SceneCard><p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module {String(index + 2).padStart(2, '0')}</p><h3 className="mt-2 font-serif text-[1.08rem] text-[var(--color-ink)]">{title}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">Capability card placeholder.</p></SceneCard>
-            </motion.div>
-          ))}
+      <motion.div variants={stagger(0.02)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-3">
+        <motion.div variants={fadeUp(0)}>
+          <SceneCard>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Capability Matrix</p>
+            <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Technical and creative capability modules</h2>
+          </SceneCard>
+        </motion.div>
+        <div className="grid gap-3 md:grid-cols-[1.15fr_0.85fr]">
+          <motion.div variants={fadeUp(0)}><SceneCard className="h-full"><p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module 01</p><h3 className="mt-2 font-serif text-[1.18rem] text-[var(--color-ink)]">{CAPABILITIES[0]}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">Primary scenic system placeholder for stagecraft planning.</p></SceneCard></motion.div>
+          <div className="grid gap-3">
+            {CAPABILITIES.slice(1).map((title, index) => (
+              <motion.div key={title} variants={fadeUp((index + 1) * MOTION_TOKEN_CONTRACT.stagger.card)}>
+                <SceneCard><p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module {String(index + 2).padStart(2, '0')}</p><h3 className="mt-2 font-serif text-[1.08rem] text-[var(--color-ink)]">{title}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">Capability card placeholder.</p></SceneCard>
+              </motion.div>
+            ))}
+          </div>
         </div>
+        <motion.div variants={fadeUp(0.14)}>
+          <ScribbleButton variant="secondary" tone="dark" size="sm" analyticsLabel="phase9-capability-explore">
+            Explore Capabilities
+          </ScribbleButton>
+        </motion.div>
       </motion.div>
     )}
   </FreeSceneFrame>
@@ -500,8 +550,15 @@ export const OperationsSpineScene = ({ scene }) => (
             <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Operations Spine</p>
             <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Pinned 4-step process placeholder</h2>
             <p className="mt-3 text-sm text-[var(--color-ink-muted)]">Steps animate with slide-in and fade based on scroll progress.</p>
+            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
+              <motion.div
+                className="h-full rounded-full bg-[var(--color-accent)]"
+                animate={{ width: `${((active + 1) / STEPS.length) * 100}%` }}
+                transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS }}
+              />
+            </div>
             <motion.div animate={showCta ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 14, filter: 'blur(8px)' }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }} className="mt-6">
-              <ScribbleButton variant="outline" tone="dark" size="sm" analyticsLabel="phase3-operations-soft-cta">Continue Timeline</ScribbleButton>
+              <ScribbleButton variant="outline" tone="dark" size="sm" analyticsLabel="phase9-operations-review-step-details">Review Step Details</ScribbleButton>
             </motion.div>
           </SceneCard>
           <div className="grid gap-2">
@@ -526,18 +583,16 @@ export const NarrativeBridgeScene = ({ scene }) => (
   <FreeSceneFrame scene={scene} layout="bridge-centerline" pinBehavior="release-bridge" className="scene-skeleton scene-skeleton-narrative-bridge">
     {({ reduced }) => (
       <SceneCard className="grid min-h-[clamp(280px,44vh,460px)] place-items-center text-center">
-        <motion.h2 variants={stagger(0.02, MOTION_TOKEN_CONTRACT.stagger.word)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.4 }} className="max-w-[16ch] font-serif text-[clamp(1.7rem,4vw,3rem)] text-[var(--color-ink)]">
-          {['Precision', 'Turns', 'Complexity', 'Into', 'Clarity'].map((word, index) => (
-            <motion.span key={word} variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.word, 14)} className="mr-[0.26em] inline-block">{word}</motion.span>
-          ))}
+        <motion.h2 variants={fadeUp(0.02, 14)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.4 }} className="max-w-[18ch] font-serif text-[clamp(1.6rem,3.7vw,2.6rem)] text-[var(--color-ink)]">
+          Calm, composed narrative to release tension before proof theater
         </motion.h2>
-        <motion.p variants={fadeUp(0.14)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.4 }} className="mt-4 max-w-[52ch] text-sm text-[var(--color-ink-muted)]">Narrative bridge headline/subheadline placeholders only.</motion.p>
+        <motion.p variants={fadeUp(0.12)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.4 }} className="mt-4 max-w-[52ch] text-sm text-[var(--color-ink-muted)]">Bridge-centerline release copy placeholder.</motion.p>
       </SceneCard>
     )}
   </FreeSceneFrame>
 )
 
-// Scroll behavior: free proof theater with 3 credible testimonial panels.
+// Scroll behavior: free proof theater with 9 testimonial placeholders.
 // Tone layer: linen.
 // Pin status: free.
 export const ProofTheaterScene = ({ scene }) => (
@@ -546,7 +601,7 @@ export const ProofTheaterScene = ({ scene }) => (
       <div className="grid gap-4">
         <SceneCard>
           <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Proof Theater</p>
-          <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Split testimonial stage placeholders</h2>
+          <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Split testimonial rail and featured proof panel</h2>
         </SceneCard>
         <ProofTheaterSplit reduced={reduced} mediaRefs={scene.mediaPlaceholder.ref} />
       </div>
@@ -569,112 +624,139 @@ const ProofTheaterSplit = ({ reduced, mediaRefs }) => {
   }
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[0.44fr_0.56fr]">
-      <motion.aside
-        variants={stagger(0.02, MOTION_TOKEN_CONTRACT.stagger.card)}
-        initial={reduced ? false : 'hidden'}
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.25 }}
-        className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
-      >
-        <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Testimonial Selection</p>
-        <div className="mt-3 grid gap-2">
-          {TESTIMONIALS.map((item, index) => (
-            <motion.div
-              role="button"
-              tabIndex={0}
-              key={item.id}
-              variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.card, 12)}
-              onClick={() => setActiveIndex(index)}
-              onKeyDown={event => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  setActiveIndex(index)
-                }
-              }}
-              className={`rounded-xl border px-3 py-3 text-left transition ${
-                index === activeIndex
-                  ? 'border-[rgba(28,28,28,0.28)] bg-[var(--color-surface-3)]'
-                  : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-3)]'
-              }`}
-            >
-              <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{item.id}</p>
-              <p className="mt-1 text-sm font-semibold text-[var(--color-ink)]">{item.name}</p>
-              <p className="text-xs text-[var(--color-ink-muted)]">{item.role}</p>
-              <p className="text-xs text-[var(--color-ink-muted)]">{item.organization}</p>
-            </motion.div>
-          ))}
-        </div>
-      </motion.aside>
-      <SceneCard className="bg-[var(--color-surface-3)]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTestimonial.id}
-            initial={reduced ? false : { opacity: 0, y: 16, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={reduced ? undefined : { opacity: 0, y: -10, filter: 'blur(6px)' }}
-            transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}
-            className="grid gap-4"
-          >
-            <div className="grid gap-3 sm:grid-cols-[0.66fr_0.34fr]">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Selected Testimonial</p>
-                <p className="mt-3 text-base leading-relaxed text-[var(--color-ink)]">
-                  "{activeTestimonial.quote}"
-                </p>
-                <p className="mt-4 text-xs uppercase tracking-[0.1em] text-[var(--color-ink-subtle)]">Event Context</p>
-                <p className="mt-1 text-sm text-[var(--color-ink-muted)]">{activeTestimonial.eventContext}</p>
-              </div>
+    <div className="grid gap-3">
+      <div className="grid gap-3 lg:grid-cols-[0.44fr_0.56fr]">
+        <motion.aside
+          variants={stagger(0.02, MOTION_TOKEN_CONTRACT.stagger.card)}
+          initial={reduced ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
+        >
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Testimonial Selection</p>
+          <div className="mt-3 grid gap-2">
+            {TESTIMONIALS.map((item, index) => (
               <motion.div
-                initial={reduced ? false : { opacity: 0, x: 22 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS }}
-                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
+                role="button"
+                tabIndex={0}
+                key={item.id}
+                variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.card, 12)}
+                onClick={() => setActiveIndex(index)}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    setActiveIndex(index)
+                  }
+                }}
+                className={`rounded-xl border px-3 py-3 text-left transition ${
+                  index === activeIndex
+                    ? 'border-[rgba(28,28,28,0.28)] bg-[var(--color-surface-3)]'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-3)]'
+                }`}
               >
-                <div className="mx-auto h-24 w-24 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]" />
-                <p className="mt-3 text-center text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
-                  {refs[activeIndex] || `testimonial-media-${String(activeIndex + 1).padStart(2, '0')}`}
-                </p>
+                <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{item.id}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--color-ink)]">{item.name}</p>
+                <p className="text-xs text-[var(--color-ink-muted)]">{item.role}</p>
+                <p className="text-xs text-[var(--color-ink-muted)]">{item.organization}</p>
               </motion.div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div>
-                <p className="text-sm font-semibold text-[var(--color-ink)]">{activeTestimonial.name}</p>
-                <p className="text-xs text-[var(--color-ink-muted)]">
-                  {activeTestimonial.role}, {activeTestimonial.organization}
-                </p>
-                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
-                  <motion.div
-                    className="h-full rounded-full bg-[var(--color-accent)]"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS }}
-                  />
+            ))}
+          </div>
+        </motion.aside>
+        <SceneCard className="bg-[var(--color-surface-3)]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTestimonial.id}
+              initial={reduced ? false : { opacity: 0, y: 16, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={reduced ? undefined : { opacity: 0, y: -10, filter: 'blur(6px)' }}
+              transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}
+              className="grid gap-4"
+            >
+              <div className="grid gap-3 sm:grid-cols-[0.66fr_0.34fr]">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Selected Testimonial</p>
+                  <p className="mt-3 text-base leading-relaxed text-[var(--color-ink)]">
+                    "{activeTestimonial.quote}"
+                  </p>
+                  <p className="mt-4 text-xs uppercase tracking-[0.1em] text-[var(--color-ink-subtle)]">Event Context</p>
+                  <p className="mt-1 text-sm text-[var(--color-ink-muted)]">{activeTestimonial.eventContext}</p>
+                </div>
+                <motion.div
+                  initial={reduced ? false : { opacity: 0, x: 22 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS }}
+                  className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
+                >
+                  <div className="mx-auto h-24 w-24 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]" />
+                  <p className="mt-3 text-center text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                    {refs[activeIndex] || `testimonial-media-${String(activeIndex + 1).padStart(2, '0')}`}
+                  </p>
+                </motion.div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--color-ink)]">{activeTestimonial.name}</p>
+                  <p className="text-xs text-[var(--color-ink-muted)]">
+                    {activeTestimonial.role}, {activeTestimonial.organization}
+                  </p>
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
+                    <motion.div
+                      className="h-full rounded-full bg-[var(--color-accent)]"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS }}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase9-proof-prev" onClick={goPrev}>
+                    Prev
+                  </ScribbleButton>
+                  <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase9-proof-next" onClick={goNext}>
+                    Next
+                  </ScribbleButton>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase7-proof-prev" onClick={goPrev}>
-                  Prev
-                </ScribbleButton>
-                <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase7-proof-next" onClick={goNext}>
-                  Next
-                </ScribbleButton>
-              </div>
-            </div>
+            </motion.div>
+          </AnimatePresence>
+          <motion.div
+            initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}
+            className="mt-4"
+          >
+            <ScribbleButton variant="primary" tone="dark" size="md" analyticsLabel="phase9-proof-request-proposal">
+              Request a Proposal
+            </ScribbleButton>
           </motion.div>
-        </AnimatePresence>
+        </SceneCard>
+      </div>
+      <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] py-2">
         <motion.div
-          initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }}
-          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}
-          className="mt-4"
+          className="flex gap-3 px-2"
+          animate={
+            reduced
+              ? undefined
+              : { x: ['0%', '-50%'] }
+          }
+          transition={
+            reduced
+              ? undefined
+              : {
+                  duration: MOTION_TOKEN_CONTRACT.durations.epic * 8,
+                  ease: 'linear',
+                  repeat: Infinity,
+                }
+          }
         >
-          <ScribbleButton variant="primary" tone="dark" size="md" analyticsLabel="phase7-proof-request-proposal">
-            Request Proposal
-          </ScribbleButton>
+          {[...LOGOS, ...LOGOS].map((logo, index) => (
+            <span key={`${logo}-${index}`} className="whitespace-nowrap rounded-full border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+              {logo}
+            </span>
+          ))}
         </motion.div>
-      </SceneCard>
+      </div>
     </div>
   )
 }
@@ -704,7 +786,7 @@ const GlobalCommandNetworkContent = ({ scene, reduced }) => {
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[rgba(255,255,255,0.62)] to-transparent" />
       <SceneCard className="relative z-10 min-h-[340px] bg-[var(--color-surface-3)]">
         <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Global Command Network</p>
-        <p className="mt-2 text-sm text-[var(--color-ink-muted)]">Coverage node map placeholder with staggered pulse activation.</p>
+        <p className="mt-2 text-sm text-[var(--color-ink-muted)]">Animated UAE coverage map with staged pulse activation and metric confirmation.</p>
         <div className="absolute inset-x-4 bottom-4 top-20 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
           {Array.isArray(scene.mediaPlaceholder.ref)
             ? scene.mediaPlaceholder.ref.map((node, index) => (
@@ -780,7 +862,7 @@ const ConversionChamberContent = ({ scene, reduced }) => {
       >
         <SceneCard className="h-full bg-[var(--color-surface-3)] p-6">
           <motion.p variants={fadeUp(0)} className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Conversion Chamber</motion.p>
-          <motion.h2 variants={fadeUp(0.04, MOTION_TOKEN_CONTRACT.distances.panel)} className="mt-3 max-w-[18ch] font-serif text-[clamp(1.5rem,3vw,2.4rem)] text-[var(--color-ink)]">Qualified request intake placeholder</motion.h2>
+          <motion.h2 variants={fadeUp(0.04, MOTION_TOKEN_CONTRACT.distances.panel)} className="mt-3 max-w-[18ch] font-serif text-[clamp(1.5rem,3vw,2.4rem)] text-[var(--color-ink)]">Request a Private Consultation</motion.h2>
           <motion.p variants={fadeUp(0.1)} className="mt-3 text-sm text-[var(--color-ink-muted)]">Narrative lines animate with controlled stagger before form reveal.</motion.p>
           <motion.p variants={fadeUp(0.14)} className="mt-2 text-sm text-[var(--color-ink-muted)]">Placeholder media and fields are wired for swap-in with production assets.</motion.p>
           <motion.div variants={fadeUp(0.18)} className="mt-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
@@ -910,7 +992,9 @@ export const GlobalFooterScene = ({ scene }) => (
           </motion.div>
         ))}
         <motion.div variants={fadeUp(0.14)} className="md:col-span-4">
-          <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase3-footer-utility-cta">Utility CTA Placeholder</ScribbleButton>
+          <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase9-footer-utility">
+            Utility Access
+          </ScribbleButton>
         </motion.div>
       </motion.div>
     )}
