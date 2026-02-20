@@ -41,6 +41,7 @@
 
 - Added `scene-transition-hook` elements after every scene.
 - Added baseline scene entry transitions at container level (`SceneWrapper` and `ScrollLockedSection`) using motion-token timing/easing.
+- Pinned scrub is now momentum-aware (`ScrollLockedSection` velocity blend) while keeping friction-buffer rhythm.
 - Current status: chapter-level transition cues remain placeholder fade gradients with pending marker line while bespoke cross-scene dissolve/parallax handoff is still unimplemented.
 - Pinned scenes keep existing friction buffers plus transition hooks for smooth lock release staging.
 
@@ -48,6 +49,7 @@
 
 - Hero now runs layered depth planes:
   `AmbientDepthField` (background/mid/foreground), `HeroAmbientCanvas`, volumetric haze, directional light rays, and particle field.
+- Added hero vignette and subtle depth-of-field overlays to increase cinematic focus without dark-theme fallback.
 - Hero media receives graded overlay and slow parallax drift tied to scroll progress.
 - Hero copy is client-facing authority language, not internal/skeleton phrasing.
 - Optional audio cue toggle remains intentional and explicitly labeled.
@@ -75,6 +77,7 @@
 - `ScribbleButton` now uses pressure-like behavior:
   hover lift + slight scale-up, press compression, refined shadow drop, and controlled stroke-draw animation.
 - Micro variant has lower lift and tighter press scale to prevent noisy motion in dense UI zones.
+- Key conversion feedback now includes a success checkmark draw animation and elevated success panel glow.
 - Reduced-motion handling removes pressure animation and keeps immediate, stable state changes.
 
 ## Responsive & Interaction Notes

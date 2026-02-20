@@ -171,6 +171,19 @@ const revealSide = (delay = 0, distance = 24) => ({
   },
 })
 
+const revealMask = (delay = 0) => ({
+  hidden: { opacity: 0, clipPath: 'inset(0 0 100% 0 round 18px)' },
+  visible: {
+    opacity: 1,
+    clipPath: 'inset(0 0 0% 0 round 18px)',
+    transition: {
+      duration: MOTION_TOKEN_CONTRACT.durations.cinematic,
+      ease: RELEASE_EASE,
+      delay,
+    },
+  },
+})
+
 const sequence = (delayChildren = 0.04, staggerChildren = 0.08) => ({
   hidden: {},
   visible: {
@@ -352,15 +365,18 @@ const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children
 const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }) => (
   <motion.article
     layout
-    whileHover={!reduced ? { y: -5, scale: 1.008 } : undefined}
+    whileHover={!reduced ? { y: -5, scale: 1.01, rotateY: -1.4 } : undefined}
     whileTap={!reduced ? { y: -1, scale: 0.988 } : undefined}
     onClick={interactive ? onSelect : undefined}
     animate={{
       opacity: reduced ? 1 : active ? 1 : 0.62,
       scale: reduced ? 1 : active ? 1 : 0.96,
       y: reduced ? 0 : active ? 0 : 10,
+      rotateX: reduced ? 0 : active ? 0 : 3.8,
+      rotateY: reduced ? 0 : active ? 0 : -2,
     }}
     transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }}
+    style={{ transformPerspective: 980, transformStyle: 'preserve-3d' }}
     className={`cinematic-interactive-card min-w-[252px] snap-start rounded-2xl border p-3 ${
       active
         ? 'border-[rgba(234,241,255,0.44)] bg-[var(--color-surface-2)] shadow-[0_30px_70px_rgba(3,5,8,0.44)]'
@@ -424,10 +440,10 @@ const SignatureReelContent = ({ progress, reduced }) => {
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <ScribbleButton variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex - 1)} analyticsLabel="signature-prev">
+              <ScribbleButton title="Navigate to previous project case" variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex - 1)} analyticsLabel="signature-prev">
                 Previous Case
               </ScribbleButton>
-              <ScribbleButton variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex + 1)} analyticsLabel="signature-next">
+              <ScribbleButton title="Navigate to next project case" variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex + 1)} analyticsLabel="signature-next">
                 Next Case
               </ScribbleButton>
             </div>
@@ -501,7 +517,7 @@ const SignatureReelContent = ({ progress, reduced }) => {
                 <h3 className="font-serif text-[1.2rem] text-[var(--color-ink)]">{selected.title}</h3>
                 <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{selected.challenge}</p>
                 <div className="mt-4">
-                  <ScribbleButton to={`/work/${selected.slug}`} variant="primary" tone="light" size="md" analyticsLabel={`signature-case-${selected.slug}`}>
+                  <ScribbleButton title="Open full production case details" to={`/work/${selected.slug}`} variant="primary" tone="light" size="md" analyticsLabel={`signature-case-${selected.slug}`}>
                     Review Full Case
                   </ScribbleButton>
                 </div>
@@ -552,9 +568,12 @@ export const CommandArrivalScene = ({ scene }) => {
                   Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.
                 </motion.p>
                 <motion.div variants={revealLift(0.17, 10)} className="mt-8 flex flex-wrap gap-3">
-                  <ScribbleButton variant="primary" tone="light" size="md" to="/work" analyticsLabel="hero-signature-work">View Signature Work</ScribbleButton>
-                  <ScribbleButton variant="outline" tone="light" size="md" to="/contact" analyticsLabel="hero-private-brief">Start Confidential Brief</ScribbleButton>
+                  <ScribbleButton title="See flagship event case studies" variant="primary" tone="light" size="md" to="/work" analyticsLabel="hero-signature-work">View Signature Work</ScribbleButton>
+                  <ScribbleButton title="Open private project intake" variant="outline" tone="light" size="md" to="/contact" analyticsLabel="hero-private-brief">Start Confidential Brief</ScribbleButton>
                 </motion.div>
+                <motion.p variants={revealLift(0.2, 8)} className="mt-3 text-xs text-[var(--color-ink-subtle)]">
+                  Confidential intake channel. Response target: one business day.
+                </motion.p>
                 <motion.div variants={revealLift(0.23, 10)} className="mt-8 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
                   <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1">Optional Ambient Cue</span>
                   <button type="button" onClick={() => setAudioCueArmed(value => !value)} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-[var(--color-ink)] transition hover:border-[var(--color-ink)]">
@@ -584,6 +603,8 @@ export const CommandArrivalScene = ({ scene }) => {
                   <motion.div className="hero-volumetric-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.28, 0.42, 0.28] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8, ease: MASS_EASE, repeat: Infinity }} />
                   <motion.div className="hero-light-ray-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.16, 0.3, 0.16], x: [0, 20, 0] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.4, ease: AUTHORITY_EASE, repeat: Infinity }} />
                   <motion.div className="hero-particle-layer" style={reduced ? undefined : { y: particleY }} animate={reduced ? undefined : { opacity: [0.16, 0.24, 0.16] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.4, ease: RELEASE_EASE, repeat: Infinity }} />
+                  <motion.div className="hero-vignette-layer" animate={reduced ? undefined : { opacity: [0.38, 0.44, 0.38] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }} />
+                  <motion.div className="hero-dof-layer" animate={reduced ? undefined : { opacity: [0.22, 0.3, 0.22] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.1, ease: MASS_EASE, repeat: Infinity }} />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,24,32,0.18)_0%,rgba(18,24,32,0.54)_100%)]" />
                   <div className="absolute left-4 top-4 rounded-full border border-white/62 bg-white/76 px-3 py-1 text-[10px] uppercase tracking-[0.13em] text-[var(--color-ink)]">Command Floor Preview</div>
                 </div>
@@ -811,9 +832,17 @@ const ProofTheaterSplit = ({ reduced }) => {
                 transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.12, ease: MASS_EASE }}
                 className="grid gap-4"
               >
-                <div className="overflow-hidden rounded-xl border border-[var(--color-border)]">
-                  <img src={active.image} alt={active.name} loading="lazy" decoding="async" className="h-56 w-full object-cover" />
-                </div>
+                <motion.div variants={revealMask(0.02)} className="overflow-hidden rounded-xl border border-[var(--color-border)]">
+                  <motion.img
+                    src={active.image}
+                    alt={active.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-56 w-full object-cover"
+                    animate={reduced ? undefined : { scale: [1.03, 1.06, 1.03], y: [0, -5, 0] }}
+                    transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 1.8, ease: AUTHORITY_EASE, repeat: Infinity }}
+                  />
+                </motion.div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-ink-subtle)]">Featured Client Voice</p>
                   <p className="mt-3 text-base leading-relaxed text-[var(--color-ink)]">"{active.quote}"</p>
@@ -825,8 +854,8 @@ const ProofTheaterSplit = ({ reduced }) => {
                     <motion.div className="h-full rounded-full bg-[var(--color-accent)]" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }} />
                   </div>
                   <div className="flex gap-2">
-                    <ScribbleButton variant="micro" tone="light" size="sm" showArrow={false} onClick={goPrev} analyticsLabel="proof-prev">Previous</ScribbleButton>
-                    <ScribbleButton variant="micro" tone="light" size="sm" showArrow={false} onClick={goNext} analyticsLabel="proof-next">Next</ScribbleButton>
+                    <ScribbleButton title="Previous client testimonial" variant="micro" tone="light" size="sm" showArrow={false} onClick={goPrev} analyticsLabel="proof-prev">Previous</ScribbleButton>
+                    <ScribbleButton title="Next client testimonial" variant="micro" tone="light" size="sm" showArrow={false} onClick={goNext} analyticsLabel="proof-next">Next</ScribbleButton>
                   </div>
                 </div>
               </motion.div>
@@ -975,13 +1004,22 @@ const ConversionChamberContent = ({ reduced }) => {
 
         <AnimatePresence mode="wait">
           {feedbackMessage ? (
-            <motion.div key={feedbackMessage} initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? undefined : { opacity: 0, y: -6, scale: 0.98 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS_EASE }} className={`rounded-xl border px-4 py-3 ${isSuccess ? 'border-[rgba(122,218,165,0.45)] bg-[rgba(53,95,76,0.28)] text-[var(--color-ink)]' : 'border-[rgba(236,123,123,0.44)] bg-[rgba(90,37,37,0.24)] text-[var(--color-ink)]'}`}>
-              <p className="text-sm">{feedbackMessage}</p>
+            <motion.div key={feedbackMessage} initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? undefined : { opacity: 0, y: -6, scale: 0.98 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS_EASE }} className={`cinematic-feedback-panel rounded-xl border px-4 py-3 ${isSuccess ? 'is-success border-[rgba(122,218,165,0.45)] bg-[rgba(53,95,76,0.28)] text-[var(--color-ink)]' : 'border-[rgba(236,123,123,0.44)] bg-[rgba(90,37,37,0.24)] text-[var(--color-ink)]'}`}>
+              <div className="flex items-center gap-3">
+                {isSuccess ? (
+                  <span className="cinematic-success-mark" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" fill="none">
+                      <path d="M4.5 10.7l3.2 3.4 7.8-8.3" />
+                    </svg>
+                  </span>
+                ) : null}
+                <p className="text-sm">{feedbackMessage}</p>
+              </div>
             </motion.div>
           ) : null}
         </AnimatePresence>
 
-        <ScribbleButton type="submit" variant="primary" tone="light" size="md" analyticsLabel="conversion-brief-submit" disabled={isSubmitting}>
+        <ScribbleButton title="Submit private production intake form" type="submit" variant="primary" tone="light" size="md" analyticsLabel="conversion-brief-submit" disabled={isSubmitting}>
           {isSubmitting ? 'Securing Brief...' : 'Request Executive Production Consult'}
         </ScribbleButton>
 
@@ -1014,65 +1052,85 @@ export const GlobalFooterScene = ({ scene }) => (
         <SceneCard className="p-5 md:p-6">
           <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Partners</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {CLIENT_PROOF_MARKS.map(mark => (
-              <article key={mark.id} className="client-logo-panel rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4">
+            {CLIENT_PROOF_MARKS.map((mark, index) => (
+              <motion.article
+                key={mark.id}
+                initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{
+                  duration: MOTION_TOKEN_CONTRACT.durations.scene,
+                  ease: MASS_EASE,
+                  delay: reduced ? 0 : index * 0.05,
+                }}
+                whileHover={reduced ? undefined : { scale: 1.012 }}
+                className="client-logo-panel rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4"
+              >
                 {mark.logo ? (
                   <img src={mark.logo} alt={`${mark.name} logo`} loading="lazy" decoding="async" className="h-8 w-auto object-contain" />
                 ) : (
                   <p className="client-wordmark text-sm font-semibold tracking-[0.03em] text-[var(--color-ink)]">{mark.name}</p>
                 )}
                 <p className="mt-2 text-xs text-[var(--color-ink-muted)]">{mark.role}</p>
-              </article>
+              </motion.article>
             ))}
           </div>
         </SceneCard>
 
         <div className="grid gap-3 md:grid-cols-4">
-          <SceneCard>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Company</p>
-            <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-              {FOOTER_COMPANY_LINKS.map(item => (
-                <li key={item.to}>
-                  <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={item.to}>{item.label}</Link>
-                </li>
-              ))}
-            </ul>
-          </SceneCard>
+          <motion.div variants={revealLift(0.02, 10)}>
+            <SceneCard>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Company</p>
+              <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+                {FOOTER_COMPANY_LINKS.map(item => (
+                  <li key={item.to}>
+                    <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={item.to}>{item.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </SceneCard>
+          </motion.div>
 
-          <SceneCard>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Services</p>
-            <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-              {services.slice(0, 4).map(service => (
-                <li key={service.slug}>
-                  <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/services/${service.slug}`}>{service.title}</Link>
-                </li>
-              ))}
-            </ul>
-          </SceneCard>
+          <motion.div variants={revealLift(0.06, 10)}>
+            <SceneCard>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Services</p>
+              <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+                {services.slice(0, 4).map(service => (
+                  <li key={service.slug}>
+                    <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/services/${service.slug}`}>{service.title}</Link>
+                  </li>
+                ))}
+              </ul>
+            </SceneCard>
+          </motion.div>
 
-          <SceneCard>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Case Work</p>
-            <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-              {caseStudies.map(study => (
-                <li key={study.slug}>
-                  <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/work/${study.slug}`}>{study.title}</Link>
-                </li>
-              ))}
-            </ul>
-          </SceneCard>
+          <motion.div variants={revealLift(0.1, 10)}>
+            <SceneCard>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Case Work</p>
+              <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+                {caseStudies.map(study => (
+                  <li key={study.slug}>
+                    <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/work/${study.slug}`}>{study.title}</Link>
+                  </li>
+                ))}
+              </ul>
+            </SceneCard>
+          </motion.div>
 
-          <SceneCard>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Direct Contact</p>
-            <div className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-              <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="tel:+97142345678">+971 4 234 5678</a>
-              <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">hello@ghaimuae.com</a>
-              <p>Dubai Design District, UAE</p>
-            </div>
-          </SceneCard>
+          <motion.div variants={revealLift(0.14, 10)}>
+            <SceneCard>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Direct Contact</p>
+              <div className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+                <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="tel:+97142345678">+971 4 234 5678</a>
+                <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">hello@ghaimuae.com</a>
+                <p>Dubai Design District, UAE</p>
+              </div>
+            </SceneCard>
+          </motion.div>
         </div>
 
         <div className="pb-2">
-          <ScribbleButton variant="primary" tone="light" size="md" analyticsLabel="footer-command-consult" to="/contact">Request Executive Command Consult</ScribbleButton>
+          <ScribbleButton title="Open contact and schedule executive consult" variant="primary" tone="light" size="md" analyticsLabel="footer-command-consult" to="/contact">Request Executive Command Consult</ScribbleButton>
         </div>
       </motion.div>
     )}

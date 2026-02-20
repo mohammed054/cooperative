@@ -1968,6 +1968,9 @@
       rgba(255, 255, 255, 0.98) 100%
     );
   opacity: 0.9;
+  transition:
+    opacity var(--cine-transition-dramatic),
+    filter var(--cine-transition-dramatic);
 }
 
 .scene-transition-hook[data-transition-ready='true']::before {
@@ -1995,6 +1998,10 @@
     rgba(136, 146, 160, 0) 6px 12px
   );
   opacity: 0.6;
+}
+
+.scene-transition-hook[data-transition-ready='false']::before {
+  animation: scene-transition-breathe 4.6s ease-in-out infinite;
 }
 
 .scene-ambient-field {
@@ -2078,8 +2085,8 @@
   pointer-events: none;
   z-index: 2;
   background:
-    linear-gradient(180deg, rgba(7, 12, 18, 0.04) 0%, rgba(7, 12, 18, 0.34) 100%),
-    linear-gradient(90deg, rgba(227, 237, 255, 0) 0%, rgba(227, 237, 255, 0.14) 50%, rgba(227, 237, 255, 0) 100%);
+    linear-gradient(180deg, rgba(17, 24, 34, 0.03) 0%, rgba(17, 24, 34, 0.2) 100%),
+    linear-gradient(90deg, rgba(227, 237, 255, 0) 0%, rgba(227, 237, 255, 0.12) 50%, rgba(227, 237, 255, 0) 100%);
 }
 
 .command-aperture-beam {
@@ -2094,7 +2101,9 @@
 
 .hero-volumetric-layer,
 .hero-light-ray-layer,
-.hero-particle-layer {
+.hero-particle-layer,
+.hero-vignette-layer,
+.hero-dof-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -2129,6 +2138,22 @@
     100px 100px;
 }
 
+.hero-vignette-layer {
+  z-index: 5;
+  background:
+    radial-gradient(76% 70% at 50% 42%, rgba(255, 255, 255, 0) 46%, rgba(23, 28, 38, 0.22) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 54%, rgba(17, 24, 34, 0.18) 100%);
+}
+
+.hero-dof-layer {
+  z-index: 4;
+  backdrop-filter: blur(0.9px);
+  -webkit-backdrop-filter: blur(0.9px);
+  background:
+    radial-gradient(66% 40% at 50% 118%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 74%),
+    radial-gradient(28% 22% at 12% 0%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 70%);
+}
+
 .cinematic-conversion-form {
   box-shadow: 0 18px 42px rgba(19, 24, 33, 0.12);
 }
@@ -2136,6 +2161,20 @@
 .cinematic-field {
   position: relative;
   display: block;
+}
+
+.cinematic-field::after {
+  content: '';
+  position: absolute;
+  left: 0.82rem;
+  right: 0.82rem;
+  bottom: 0.42rem;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(28, 28, 28, 0.64) 0%, rgba(28, 28, 28, 0.2) 100%);
+  transition: transform var(--cine-transition-fast);
+  pointer-events: none;
 }
 
 .cinematic-field-input {
@@ -2188,6 +2227,42 @@
   border-color: rgba(28, 28, 28, 0.34);
   box-shadow: 0 0 0 4px rgba(28, 28, 28, 0.08);
   background: #ffffff;
+}
+
+.cinematic-field:focus-within::after {
+  transform: scaleX(1);
+}
+
+.cinematic-feedback-panel.is-success {
+  box-shadow:
+    0 10px 24px rgba(57, 98, 77, 0.2),
+    inset 0 0 0 1px rgba(122, 218, 165, 0.18);
+}
+
+.cinematic-success-mark {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(122, 218, 165, 0.18);
+  box-shadow: 0 0 0 4px rgba(122, 218, 165, 0.14);
+  flex-shrink: 0;
+}
+
+.cinematic-success-mark svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.cinematic-success-mark path {
+  stroke: rgba(20, 79, 53, 0.9);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: cinematic-check-draw 0.64s cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
 }
 
 .footer-micro-link {
@@ -2261,6 +2336,27 @@
   }
 }
 
+@keyframes scene-transition-breathe {
+  0% {
+    opacity: 0.84;
+    filter: saturate(0.94);
+  }
+  50% {
+    opacity: 1;
+    filter: saturate(1.02);
+  }
+  100% {
+    opacity: 0.84;
+    filter: saturate(0.94);
+  }
+}
+
+@keyframes cinematic-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .flagship-home-skeleton .scene-shell-meta {
   border-color: var(--color-border);
   background: var(--color-surface-2);
@@ -2303,7 +2399,11 @@
   .scene-ambient-layer,
   .hero-volumetric-layer,
   .hero-light-ray-layer,
-  .hero-particle-layer {
+  .hero-particle-layer,
+  .hero-vignette-layer,
+  .hero-dof-layer,
+  .scene-transition-hook[data-transition-ready='false']::before,
+  .cinematic-success-mark path {
     animation: none !important;
     transform: none !important;
   }

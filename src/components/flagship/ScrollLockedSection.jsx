@@ -40,11 +40,16 @@ const ScrollLockedSection = ({
         end: 'bottom bottom',
         pin: lockEl,
         pinSpacing: false,
-        scrub: 1.12,
+        scrub: MOTION_TOKEN_CONTRACT.scroll.inertia + 0.12,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: self => {
-          setProgress(self.progress)
+          const velocity = Math.abs(self.getVelocity())
+          const momentumGain = Math.min(0.26, velocity / 4600)
+          setProgress(previous => {
+            const blend = 0.2 + momentumGain
+            return previous + (self.progress - previous) * blend
+          })
         },
       })
     }, sectionEl)
