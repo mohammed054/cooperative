@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
@@ -605,9 +605,10 @@ const SignatureReelContent = ({ progress, reduced }) => {
 }
 
 // Command Arrival: emotional landing and authority prelude.
-export const CommandArrivalScene = ({ scene }) => {
+export const CommandArrivalScene = ({ scene, nextSceneRef }) => {
   const depthRef = useRef(null)
   const videoRef = useRef(null)
+  const eyebrowRef = useRef(null)
   const headlineRef = useRef(null)
   const subtextRef = useRef(null)
   const ctaRef = useRef(null)
@@ -625,130 +626,123 @@ export const CommandArrivalScene = ({ scene }) => {
     gsap.registerPlugin(ScrollTrigger)
 
     const root = depthRef.current
+    const heroSection = root?.closest('section')
+    const nextSection = nextSceneRef?.current
     const video = videoRef.current
+    const eyebrowNode = eyebrowRef.current
     const headlineNode = headlineRef.current
     const subtextNode = subtextRef.current
     const ctaNode = ctaRef.current
-    const heroSection = document.getElementById(scene?.id || 'command-arrival')
-    const nextSection = document.getElementById('authority-ledger')
 
     if (
       !root ||
+      !heroSection ||
+      !nextSection ||
       !video ||
+      !eyebrowNode ||
       !headlineNode ||
       !subtextNode ||
-      !ctaNode ||
-      !heroSection ||
-      !nextSection
+      !ctaNode
     ) {
       return undefined
     }
 
-    ScrollTrigger.getAll().forEach(trigger => {
-      const triggerElement = trigger.trigger
-      const pinElement = trigger.pin
-      if (
-        triggerElement === heroSection ||
-        triggerElement === nextSection ||
-        pinElement === heroSection ||
-        pinElement === nextSection
-      ) {
-        trigger.kill()
-      }
+    let context
+    const frameId = window.requestAnimationFrame(() => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+
+      context = gsap.context(() => {
+        gsap.set(heroSection, {
+          height: '100vh',
+          position: 'relative',
+          overflow: 'hidden',
+        })
+
+        gsap.set(video, {
+          scale: 1,
+          opacity: 1,
+          filter: 'brightness(1)',
+          transformOrigin: 'center center',
+        })
+        gsap.set(eyebrowNode, { opacity: 1, y: 0 })
+        gsap.set(headlineNode, { opacity: 1, y: 0 })
+        gsap.set(subtextNode, { opacity: 1 })
+        gsap.set(ctaNode, { opacity: 1 })
+        gsap.set(nextSection, { y: window.innerHeight })
+
+        gsap
+          .timeline({
+            defaults: {
+              ease: 'power3.out',
+            },
+            scrollTrigger: {
+              trigger: heroSection,
+              start: 'top top',
+              end: '+=120%',
+              pin: true,
+              scrub: true,
+              anticipatePin: 1,
+            },
+          })
+          .to(
+            eyebrowNode,
+            {
+              opacity: 0,
+              y: -120,
+              duration: 0.6,
+            },
+            0
+          )
+          .to(
+            headlineNode,
+            {
+              opacity: 0,
+              y: -120,
+              duration: 0.6,
+            },
+            0
+          )
+          .to(
+            subtextNode,
+            {
+              opacity: 0,
+              duration: 0.6,
+            },
+            0
+          )
+          .to(
+            ctaNode,
+            {
+              opacity: 0,
+              duration: 0.6,
+            },
+            0
+          )
+          .to(
+            video,
+            {
+              scale: 1.08,
+              filter: 'brightness(0.7)',
+              duration: 0.6,
+            },
+            0
+          )
+          .to(
+            nextSection,
+            {
+              y: 0,
+              duration: 0.7,
+            },
+            0.3
+          )
+      }, heroSection)
     })
 
-    const context = gsap.context(() => {
-      gsap.set(heroSection, {
-        height: '100vh',
-        position: 'relative',
-        overflow: 'hidden',
-      })
-
-      gsap.set(video, {
-        scale: 1,
-        opacity: 1,
-        filter: 'brightness(1)',
-        transformOrigin: 'center center',
-      })
-      gsap.set(headlineNode, { y: 0, opacity: 1 })
-      gsap.set(subtextNode, { y: 0, opacity: 1 })
-      gsap.set(ctaNode, { y: 0, opacity: 1 })
-      gsap.set(nextSection, {
-        y: () => window.innerHeight,
-        scale: 0.98,
-        opacity: 1,
-        transformOrigin: 'center top',
-      })
-
-      const transitionTimeline = gsap.timeline({
-        defaults: {
-          duration: 1,
-          ease: 'power3.out',
-        },
-        scrollTrigger: {
-          trigger: heroSection,
-          pin: true,
-          pinSpacing: true,
-          start: 'top top',
-          end: '+=150%',
-          scrub: true,
-          anticipatePin: 1,
-        },
-      })
-
-      transitionTimeline
-        .to(
-          nextSection,
-          {
-            y: 0,
-            scale: 1,
-            duration: 0.7,
-            ease: 'power3.out',
-          },
-          0.3
-        )
-        .to(
-          video,
-          {
-            scale: 1.08,
-            filter: 'brightness(0.7)',
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          0
-        )
-        .to(
-          headlineNode,
-          {
-            y: -120,
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          0
-        )
-        .to(
-          subtextNode,
-          {
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          0
-        )
-        .to(
-          ctaNode,
-          {
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          0
-        )
-    }, heroSection)
-
-    return () => context.revert()
-  }, [scene?.id])
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      context?.revert()
+    }
+  }, [nextSceneRef, scene?.id])
 
   return (
     <FreeSceneFrame scene={scene} pinBehavior="authority-prelude" layout="hero-command" className="scene-cinematic scene-command-arrival scene-command-arrival-full">
@@ -786,7 +780,10 @@ export const CommandArrivalScene = ({ scene }) => {
           <div className="hero-command-overlay absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
             <div className="hero-command-copy w-[90%] sm:w-[82%] lg:w-[40%] max-w-none">
               <div className="inline-flex max-w-full flex-col p-1">
-                <p className="text-xs uppercase tracking-[0.18em] text-white/80">
+                <p
+                  ref={eyebrowRef}
+                  className="text-xs uppercase tracking-[0.18em] text-white/80"
+                >
                   Executive Event Command
                 </p>
                 <h1
@@ -823,8 +820,15 @@ export const CommandArrivalScene = ({ scene }) => {
 }
 
 // Authority Ledger: real outcomes and command capability framing.
-export const AuthorityLedgerScene = ({ scene }) => {
+export const AuthorityLedgerScene = ({ scene, sectionRef }) => {
   const depthRef = useRef(null)
+  const setDepthRef = useCallback(
+    node => {
+      depthRef.current = node
+      if (sectionRef) sectionRef.current = node
+    },
+    [sectionRef]
+  )
   const { scrollYProgress } = useScroll({
     target: depthRef,
     offset: ['start end', 'end start'],
@@ -836,7 +840,7 @@ export const AuthorityLedgerScene = ({ scene }) => {
   return (
     <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
       {({ reduced }) => (
-        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-ledger">
+        <div ref={setDepthRef} className="scene-depth-stage scene-depth-stage-ledger">
           <AmbientDepthField reduced={reduced} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.44} />
 
           <motion.div variants={sequence(0.04, 0.1)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="relative z-[2] grid gap-5">
@@ -1475,3 +1479,4 @@ export const GlobalFooterScene = ({ scene }) => {
     </FreeSceneFrame>
   )
 }
+

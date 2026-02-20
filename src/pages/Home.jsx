@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   HOMEPAGE_SCENE_REGISTRY,
   HOMEPAGE_GRADIENT_BRIDGES,
@@ -89,6 +89,7 @@ if (!rhythmValidation.isValid) {
 
 const Home = () => {
   const analytics = useAnalyticsContext()
+  const authorityLedgerRef = useRef(null)
 
   useLenisScroll()
 
@@ -131,7 +132,11 @@ const Home = () => {
         if (!SceneComponent) return null
         return (
           <React.Fragment key={scene.id}>
-            <SceneComponent scene={scene} />
+            <SceneComponent
+              scene={scene}
+              nextSceneRef={scene.id === 'command-arrival' ? authorityLedgerRef : undefined}
+              sectionRef={scene.id === 'authority-ledger' ? authorityLedgerRef : undefined}
+            />
             {bridge ? (
               <div
                 aria-hidden="true"
