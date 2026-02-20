@@ -3,12 +3,9 @@ import { useReducedMotion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { MOBILE_BREAKPOINT } from '../../lib/constants'
+import { assetUrl } from '../../lib/assetUrl'
 import styles from './OperationsSpineScene.module.css'
-
-const assetUrl =
-  typeof window !== 'undefined' && window.__assetUrl
-    ? window.__assetUrl
-    : path => `/${path}`
 
 const PHASES = [
   {
@@ -48,10 +45,8 @@ const PHASES = [
 const VH_PER_PHASE = 0.9
 const pad = n => String(n).padStart(2, '0')
 
-// FIX: Breakpoint aligned between JS and CSS so pin behaviour and layout
-// changes are consistent. Mobile (< 768px) skips GSAP ScrollTrigger entirely
-// for stability; desktop retains full scroll-driven animations.
-const MOBILE_BREAKPOINT = 768
+// NOTE: MOBILE_BREAKPOINT is imported from ../../lib/constants.js for
+// consistent responsive behavior across all pinned sections.
 
 const PhaseCard = React.memo(
   React.forwardRef(({ phase, isActive }, ref) => (

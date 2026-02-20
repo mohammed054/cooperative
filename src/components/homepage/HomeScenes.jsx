@@ -14,15 +14,12 @@
  *          since the map was always empty ({}) and the block never rendered
  * - FIX 6: CTA pointer-events toggle uses data attribute instead of matching
  *          GSAP inline style strings — fragile [style*='height: auto'] selector removed
- * - FIX 7: CommandArrivalScene scroll-triggered text fade now works with mouse
- *          wheel (not just trackpad). Lenis smooth scroll intercepts wheel events
- *          and drives scroll position via its own RAF loop — GSAP's ScrollTrigger
- *          never received those updates, so the scrub timeline only progressed on
- *          touch/trackpad (which fire native scroll events Lenis passes through).
- *          Fix: a passive wheel listener fires ScrollTrigger.update() on every
- *          wheel event frame so the GSAP scrub stays in sync with Lenis position.
- *          scrub changed from true (instant) to 0.5 (slight lag) so the update
- *          cadence doesn't produce visible jumpiness on discrete wheel clicks.
+ * - FIX 7: CommandArrivalScene scroll-triggered text fade scrub timing adjusted.
+ *          Changed from scrub: true (instant) to scrub: 0.5 (slight lag) so the
+ *          animation has natural easing that smooths out discrete wheel steps.
+ *          ScrollTrigger updates are driven solely by Lenis scroll callback in
+ *          useLenisScroll.js — this single update path prevents jitter from
+ *          multiple ScrollTrigger.update() calls per frame.
  */
 
 import React, { useEffect, useRef, useState } from 'react'
@@ -33,6 +30,7 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
+  useMotionValueEvent,
 } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -43,12 +41,21 @@ import {
   SceneShell,
   SceneWrapper,
   ScrollLockedSection,
+  useProgress,
 } from '../flagship'
 import { OperationsSpineScene } from './OperationsSpineScene'
-import { MOTION_TOKEN_CONTRACT, parseBezier } from '../../motion/motionTokenContract.js'
-import { caseStudies, services, testimonials as testimonialData } from '../../data/siteData'
+import {
+  MOTION_TOKEN_CONTRACT,
+  parseBezier,
+} from '../../motion/motionTokenContract.js'
+import {
+  caseStudies,
+  services,
+  testimonials as testimonialData,
+} from '../../data/siteData'
 import { assetUrl } from '../../lib/assetUrl'
 import { isLeadCaptureConfigured, submitLead } from '../../utils/leadCapture'
+import { MOBILE_BREAKPOINT } from '../../lib/constants'
 
 const FREE = 'free'
 const PINNED = 'pinned'
@@ -96,7 +103,8 @@ const TESTIMONIALS = testimonialData
     quote: item.quote,
     context: item.project,
     location: item.location,
-    image: caseStudies[index]?.image || PROJECTS[index % PROJECTS.length]?.image,
+    image:
+      caseStudies[index]?.image || PROJECTS[index % PROJECTS.length]?.image,
   }))
 
 const FOOTER_COMPANY_LINKS = [
@@ -124,7 +132,9 @@ const AUTHORITY_METRICS = [
   {
     label: 'Cue Volume',
     value: caseStudies.reduce((sum, study) => {
-      const stat = study.stats?.find(item => /cue|reset|phase|act|screen/i.test(item.label))
+      const stat = study.stats?.find(item =>
+        /cue|reset|phase|act|screen/i.test(item.label)
+      )
       return sum + parseMetricValue(stat?.value)
     }, 0),
     suffix: '+',
@@ -247,7 +257,11 @@ const AmbientDepthField = ({
   const isInView = useInView(fieldRef, { amount: 0.1 })
 
   return (
-    <div ref={fieldRef} aria-hidden="true" className={`scene-ambient-field scene-ambient-${variant}`}>
+    <div
+      ref={fieldRef}
+      aria-hidden="true"
+      className={`scene-ambient-field scene-ambient-${variant}`}
+    >
       <motion.span
         className="scene-ambient-layer scene-ambient-back"
         style={reduced ? undefined : { y: backgroundY }}
@@ -303,9 +317,16 @@ const AmbientDepthField = ({
   )
 }
 
-const FreeSceneFrame = ({ scene, pinBehavior, layout, className = '', children }) => {
+const FreeSceneFrame = ({
+  scene,
+  pinBehavior,
+  layout,
+  className = '',
+  children,
+}) => {
   const reduced = useReducedMotion()
-  const content = typeof children === 'function' ? children({ reduced }) : children
+  const content =
+    typeof children === 'function' ? children({ reduced }) : children
 
   return (
     <>
@@ -317,7 +338,12 @@ const FreeSceneFrame = ({ scene, pinBehavior, layout, className = '', children }
         minHeight={buildHeight(scene.length)}
         className={className}
       >
-        <SceneShell scene={scene} scrollMode={FREE} pinBehavior={pinBehavior} layout={layout}>
+        <SceneShell
+          scene={scene}
+          scrollMode={FREE}
+          pinBehavior={pinBehavior}
+          layout={layout}
+        >
           {content}
         </SceneShell>
       </SceneWrapper>
@@ -326,7 +352,13 @@ const FreeSceneFrame = ({ scene, pinBehavior, layout, className = '', children }
   )
 }
 
-const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children }) => (
+const PinnedSceneFrame = ({
+  scene,
+  pinBehavior,
+  layout,
+  className = '',
+  children,
+}) => (
   <>
     <div
       aria-hidden="true"
@@ -344,8 +376,15 @@ const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children
       className={className}
     >
       {(progress, reduced) => (
-        <SceneShell scene={scene} scrollMode={PINNED} pinBehavior={pinBehavior} layout={layout}>
-          {typeof children === 'function' ? children({ progress, reduced }) : children}
+        <SceneShell
+          scene={scene}
+          scrollMode={PINNED}
+          pinBehavior={pinBehavior}
+          layout={layout}
+        >
+          {typeof children === 'function'
+            ? children({ progress, reduced })
+            : children}
         </SceneShell>
       )}
     </ScrollLockedSection>
@@ -360,7 +399,13 @@ const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children
   </>
 )
 
-const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }) => {
+const ProjectCard = ({
+  project,
+  active,
+  reduced,
+  onSelect,
+  interactive = false,
+}) => {
   const handleKeyDown = event => {
     if (!interactive) return
     if (event.key === 'Enter' || event.key === ' ') {
@@ -379,7 +424,9 @@ const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }
       role={interactive ? 'button' : undefined}
       tabIndex={interactive ? 0 : undefined}
       aria-pressed={interactive ? active : undefined}
-      aria-label={interactive ? `Select project panel: ${project.title}` : undefined}
+      aria-label={
+        interactive ? `Select project panel: ${project.title}` : undefined
+      }
       animate={{
         opacity: reduced ? 1 : active ? 1 : 0.62,
         scale: reduced ? 1 : active ? 1 : 0.96,
@@ -387,7 +434,10 @@ const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }
         rotateX: reduced ? 0 : active ? 0 : 3.8,
         rotateY: reduced ? 0 : active ? 0 : -2,
       }}
-      transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }}
+      transition={{
+        duration: MOTION_TOKEN_CONTRACT.durations.ui,
+        ease: MASS_EASE,
+      }}
       style={{ transformPerspective: 980, transformStyle: 'preserve-3d' }}
       className={`cinematic-interactive-card min-w-[252px] snap-start rounded-2xl border p-3 ${
         active
@@ -396,24 +446,39 @@ const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }
       } ${interactive ? 'cursor-pointer' : ''}`}
     >
       <div className="relative h-36 overflow-hidden rounded-xl border border-[var(--color-border)]">
-        <img src={project.image} alt={project.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={project.image}
+          alt={project.title}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(24,28,36,0.08)_0%,rgba(24,28,36,0.48)_100%)]" />
-        <p className="absolute left-3 top-3 text-[9px] uppercase tracking-[0.14em] text-white/80">{project.location}</p>
+        <p className="absolute left-3 top-3 text-[9px] uppercase tracking-[0.14em] text-white/80">
+          {project.location}
+        </p>
       </div>
-      <h3 className="mt-3 font-serif text-[1.08rem] text-[var(--color-ink)]">{project.title}</h3>
-      <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{project.subtitle}</p>
-      <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{project.outcome}</p>
+      <h3 className="mt-3 font-serif text-[1.08rem] text-[var(--color-ink)]">
+        {project.title}
+      </h3>
+      <p className="mt-2 text-sm text-[var(--color-ink-muted)]">
+        {project.subtitle}
+      </p>
+      <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+        {project.outcome}
+      </p>
     </motion.article>
   )
 }
 
-const SignatureReelContent = ({ progress, reduced }) => {
+const SignatureReelContent = () => {
+  const { progress, reduced } = useProgress()
   const mobileTrackRef = useRef(null)
-  // FIX 2: Measure actual card width at runtime instead of hardcoding 252px.
   const firstCardRef = useRef(null)
   const [cardWidth, setCardWidth] = useState(252)
   const scrollFrameRef = useRef(0)
   const [manualIndex, setManualIndex] = useState(null)
+  const [progressValue, setProgressValue] = useState(0)
 
   useEffect(() => {
     const card = firstCardRef.current
@@ -431,7 +496,14 @@ const SignatureReelContent = ({ progress, reduced }) => {
     return () => ro.disconnect()
   }, [])
 
-  const indexFromScroll = clampIndex(Math.floor(progress * PROJECTS.length), PROJECTS.length - 1)
+  useMotionValueEvent(progress, 'change', latest => {
+    setProgressValue(latest)
+  })
+
+  const indexFromScroll = clampIndex(
+    Math.floor(progressValue * PROJECTS.length),
+    PROJECTS.length - 1
+  )
 
   const manualIndexInRange =
     typeof manualIndex === 'number' &&
@@ -441,14 +513,16 @@ const SignatureReelContent = ({ progress, reduced }) => {
   const hasPrev = selectedIndex > 0
   const hasNext = selectedIndex < PROJECTS.length - 1
 
-  const tension = reduced ? 0 : Math.max(0, 1 - Math.abs(progress - 0.55) / 0.55)
+  const tension = reduced
+    ? 0
+    : Math.max(0, 1 - Math.abs(progressValue - 0.55) / 0.55)
   const apertureInset = reduced ? 0 : 8 + tension * 26
 
   const conveyorOffset = reduced ? 0 : -selectedIndex * (cardWidth + CARD_GAP)
 
-  const backgroundY = reduced ? 0 : (0.5 - progress) * 40
-  const midY = reduced ? 0 : (0.5 - progress) * 22
-  const foregroundY = reduced ? 0 : (0.5 - progress) * 14
+  const backgroundY = reduced ? 0 : (0.5 - progressValue) * 40
+  const midY = reduced ? 0 : (0.5 - progressValue) * 22
+  const foregroundY = reduced ? 0 : (0.5 - progressValue) * 14
 
   useEffect(
     () => () => {
@@ -464,9 +538,15 @@ const SignatureReelContent = ({ progress, reduced }) => {
     setManualIndex(clamped)
 
     if (!mobileTrackRef.current) return
-    const target = mobileTrackRef.current.querySelector(`[data-project-index="${clamped}"]`)
+    const target = mobileTrackRef.current.querySelector(
+      `[data-project-index="${clamped}"]`
+    )
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
+      target.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'start',
+        block: 'nearest',
+      })
     }
   }
 
@@ -522,16 +602,38 @@ const SignatureReelContent = ({ progress, reduced }) => {
         <SceneCard className="p-5 md:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="max-w-[64ch]">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Featured Engagements</p>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">
+                Featured Engagements
+              </p>
               <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,2.95vw,2.52rem)] leading-[1.06] text-[var(--color-ink)]">
                 Three recent productions where precision carried the room.
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <ScribbleButton title="Navigate to previous project case" ariaLabel="Go to previous project in signature reel" variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex - 1)} analyticsLabel="signature-prev" disabled={!hasPrev}>
+              <ScribbleButton
+                title="Navigate to previous project case"
+                ariaLabel="Go to previous project in signature reel"
+                variant="micro"
+                tone="light"
+                size="sm"
+                showArrow={false}
+                onClick={() => selectProject(selectedIndex - 1)}
+                analyticsLabel="signature-prev"
+                disabled={!hasPrev}
+              >
                 Previous Case
               </ScribbleButton>
-              <ScribbleButton title="Navigate to next project case" ariaLabel="Go to next project in signature reel" variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex + 1)} analyticsLabel="signature-next" disabled={!hasNext}>
+              <ScribbleButton
+                title="Navigate to next project case"
+                ariaLabel="Go to next project in signature reel"
+                variant="micro"
+                tone="light"
+                size="sm"
+                showArrow={false}
+                onClick={() => selectProject(selectedIndex + 1)}
+                analyticsLabel="signature-next"
+                disabled={!hasNext}
+              >
                 Next Case
               </ScribbleButton>
             </div>
@@ -546,8 +648,21 @@ const SignatureReelContent = ({ progress, reduced }) => {
             className="absolute inset-0 h-full w-full object-cover"
             initial={reduced ? false : { opacity: 0.78, scale: 1.16 }}
             style={{ scale: reduced ? 1.02 : 1.1, y: backgroundY }}
-            animate={reduced ? undefined : { opacity: 1, x: [0, -22, 0], y: [backgroundY, backgroundY + 8, backgroundY], scale: [1.1, 1.12, 1.1] }}
-            transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.2, ease: AUTHORITY_EASE, repeat: Infinity }}
+            animate={
+              reduced
+                ? undefined
+                : {
+                    opacity: 1,
+                    x: [0, -22, 0],
+                    y: [backgroundY, backgroundY + 8, backgroundY],
+                    scale: [1.1, 1.12, 1.1],
+                  }
+            }
+            transition={{
+              duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.2,
+              ease: AUTHORITY_EASE,
+              repeat: Infinity,
+            }}
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,7,12,0.46)_0%,rgba(4,7,12,0.88)_100%)]" />
           <motion.div
@@ -561,13 +676,17 @@ const SignatureReelContent = ({ progress, reduced }) => {
 
           <div className="relative z-10 grid gap-4">
             <p className="px-2 pt-2 text-[10px] uppercase tracking-[0.14em] text-white/76">
-              Active Case {String(selectedIndex + 1).padStart(2, '0')} / {String(PROJECTS.length).padStart(2, '0')}
+              Active Case {String(selectedIndex + 1).padStart(2, '0')} /{' '}
+              {String(PROJECTS.length).padStart(2, '0')}
             </p>
 
             <motion.div
               className="hidden gap-3 md:flex will-change-transform"
               animate={reduced ? undefined : { x: conveyorOffset }}
-              transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }}
+              transition={{
+                duration: MOTION_TOKEN_CONTRACT.durations.ui,
+                ease: MASS_EASE,
+              }}
             >
               {PROJECTS.map((project, index) => (
                 <motion.div
@@ -583,7 +702,11 @@ const SignatureReelContent = ({ progress, reduced }) => {
                     delay: reduced ? 0 : index * 0.03,
                   }}
                 >
-                  <ProjectCard project={project} active={index === selectedIndex} reduced={reduced} />
+                  <ProjectCard
+                    project={project}
+                    active={index === selectedIndex}
+                    reduced={reduced}
+                  />
                 </motion.div>
               ))}
             </motion.div>
@@ -598,7 +721,13 @@ const SignatureReelContent = ({ progress, reduced }) => {
             >
               {PROJECTS.map((project, index) => (
                 <div key={`mobile-${project.id}`} data-project-index={index}>
-                  <ProjectCard project={project} active={index === selectedIndex} reduced={reduced} interactive onSelect={() => selectProject(index)} />
+                  <ProjectCard
+                    project={project}
+                    active={index === selectedIndex}
+                    reduced={reduced}
+                    interactive
+                    onSelect={() => selectProject(index)}
+                  />
                 </div>
               ))}
             </div>
@@ -607,13 +736,27 @@ const SignatureReelContent = ({ progress, reduced }) => {
               key={selected.id}
               initial={reduced ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: RELEASE_EASE }}
+              transition={{
+                duration: MOTION_TOKEN_CONTRACT.durations.scene,
+                ease: RELEASE_EASE,
+              }}
             >
               <SceneCard className="border-[rgba(255,255,255,0.52)] bg-[rgba(255,255,255,0.78)] p-4 backdrop-blur-md">
-                <h3 className="font-serif text-[1.2rem] text-[var(--color-ink)]">{selected.title}</h3>
-                <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{selected.challenge}</p>
+                <h3 className="font-serif text-[1.2rem] text-[var(--color-ink)]">
+                  {selected.title}
+                </h3>
+                <p className="mt-2 text-sm text-[var(--color-ink-muted)]">
+                  {selected.challenge}
+                </p>
                 <div className="mt-4">
-                  <ScribbleButton title="Open full production case details" to={`/work/${selected.slug}`} variant="primary" tone="light" size="md" analyticsLabel={`signature-case-${selected.slug}`}>
+                  <ScribbleButton
+                    title="Open full production case details"
+                    to={`/work/${selected.slug}`}
+                    variant="primary"
+                    tone="light"
+                    size="md"
+                    analyticsLabel={`signature-case-${selected.slug}`}
+                  >
                     View Case Study
                   </ScribbleButton>
                 </div>
@@ -673,14 +816,25 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
       return undefined
     }
 
-
-    const ledgerHeadingNode = nextSection.querySelector('.authority-ledger-heading')
-    const ledgerSubcopyNode = nextSection.querySelector('.authority-ledger-subcopy')
+    const ledgerHeadingNode = nextSection.querySelector(
+      '.authority-ledger-heading'
+    )
+    const ledgerSubcopyNode = nextSection.querySelector(
+      '.authority-ledger-subcopy'
+    )
     const ledgerCtaNode = nextSection.querySelector('.authority-ledger-cta')
-    const ledgerCardNodes = Array.from(nextSection.querySelectorAll('.authority-ledger-card'))
-    const ledgerTextNodes = [ledgerHeadingNode, ledgerSubcopyNode].filter(Boolean)
+    const ledgerCardNodes = Array.from(
+      nextSection.querySelectorAll('.authority-ledger-card')
+    )
+    const ledgerTextNodes = [ledgerHeadingNode, ledgerSubcopyNode].filter(
+      Boolean
+    )
 
+    // Use ScrollTrigger.matchMedia() for responsive pinning.
+    // - Mobile (< 768px): Disables pinning, shows static hero without scroll transitions
+    // - Desktop (>= 768px): Enables full scroll-driven animation with pinning
     const context = gsap.context(() => {
+      // Base styles that apply to both mobile and desktop
       gsap.set(transitionWrapper, {
         position: 'relative',
         height: '100vh',
@@ -714,103 +868,172 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
       gsap.set(headlineNode, { opacity: 1, y: 0 })
       gsap.set(subtextNode, { opacity: 1 })
       gsap.set(ctaNode, { opacity: 1 })
-      gsap.set(ledgerTextNodes, { opacity: 0, y: 36 })
-      gsap.set(ledgerCardNodes, { opacity: 0, y: 56 })
-      if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 0, y: 42 })
 
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: transitionWrapper,
-          start: 'top top',
-          end: reducedMotion ? '+=180%' : '+=300%',
-          pin: true,
-          // FIX 7: Changed from scrub: true (instant) to scrub: 0.5 so the
-          // animation has a slight lag that smooths out the discrete jumps
-          // produced by mouse-wheel scroll steps. With scrub: true, each
-          // rAF-batched ScrollTrigger.update() caused a visible snap; 0.5
-          // gives a natural easing feel that matches trackpad behaviour.
-          scrub: 0.5,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+      ScrollTrigger.matchMedia({
+        // ── Mobile: disable pinning, show static hero content ───────────────────
+        [`(max-width: ${MOBILE_BREAKPOINT - 1}px)`]: function mobileSetup() {
+          // On mobile, just show the hero section statically without scroll transitions
+          gsap.set(ledgerTextNodes, { opacity: 1, y: 0 })
+          gsap.set(ledgerCardNodes, { opacity: 1, y: 0 })
+          if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 1, y: 0 })
 
-          onLeave: () => {
-            gsap.set(transitionWrapper, { height: 'auto', overflow: 'visible', zIndex: 'auto' })
-            gsap.set(nextSection, {
-              position: 'relative',
-              top: 'auto',
-              left: 'auto',
-              width: '100%',
-              height: 'auto',
-              y: '0%',
-              opacity: 1,
-              overflow: 'visible',
-            })
-            gsap.set(heroSection, { opacity: 0, pointerEvents: 'none' })
-            gsap.set(ledgerTextNodes, { opacity: 1, y: 0 })
-            gsap.set(ledgerCardNodes, { opacity: 1, y: 0 })
-            if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 1, y: 0 })
+          // Return cleanup for mobile context
+          return () => {
+            gsap.set(ledgerTextNodes, { clearProps: 'all' })
+            gsap.set(ledgerCardNodes, { clearProps: 'all' })
+            if (ledgerCtaNode) gsap.set(ledgerCtaNode, { clearProps: 'all' })
+          }
+        },
 
-            // FIX 6: Toggle a data attribute to re-enable CTA pointer-events
-            if (transitionWrapper) {
-              transitionWrapper.dataset.pinReleased = 'true'
-            }
-          },
+        // ── Desktop: enable pinning and scroll-driven animations ─────────────────
+        [`(min-width: ${MOBILE_BREAKPOINT}px)`]: function desktopSetup() {
+          gsap.set(ledgerTextNodes, { opacity: 0, y: 36 })
+          gsap.set(ledgerCardNodes, { opacity: 0, y: 56 })
+          if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 0, y: 42 })
 
-          onEnterBack: () => {
-            gsap.set(transitionWrapper, { height: '100vh', overflow: 'hidden', zIndex: 10 })
-            gsap.set(heroSection, {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'auto',
-              zIndex: 3,
-            })
-            gsap.set(nextSection, {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              overflow: 'hidden',
-              zIndex: 2,
-            })
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: transitionWrapper,
+              start: 'top top',
+              end: reducedMotion ? '+=180%' : '+=300%',
+              pin: true,
+              // FIX 7: Changed from scrub: true (instant) to scrub: 0.5 so the
+              // animation has a slight lag that smooths out the discrete jumps
+              // produced by mouse-wheel scroll steps. With scrub: true, each
+              // rAF-batched ScrollTrigger.update() caused a visible snap; 0.5
+              // gives a natural easing feel that matches trackpad behaviour.
+              scrub: 0.5,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
 
-            // FIX 6: Remove the data attribute to restore CTA disable state
-            if (transitionWrapper) {
-              delete transitionWrapper.dataset.pinReleased
-            }
-          },
+              onLeave: () => {
+                gsap.set(transitionWrapper, {
+                  height: 'auto',
+                  overflow: 'visible',
+                  zIndex: 'auto',
+                })
+                gsap.set(nextSection, {
+                  position: 'relative',
+                  top: 'auto',
+                  left: 'auto',
+                  width: '100%',
+                  height: 'auto',
+                  y: '0%',
+                  opacity: 1,
+                  overflow: 'visible',
+                })
+                gsap.set(heroSection, { opacity: 0, pointerEvents: 'none' })
+                gsap.set(ledgerTextNodes, { opacity: 1, y: 0 })
+                gsap.set(ledgerCardNodes, { opacity: 1, y: 0 })
+                if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 1, y: 0 })
+
+                // FIX 6: Toggle a data attribute to re-enable CTA pointer-events
+                if (transitionWrapper) {
+                  transitionWrapper.dataset.pinReleased = 'true'
+                }
+              },
+
+              onEnterBack: () => {
+                gsap.set(transitionWrapper, {
+                  height: '100vh',
+                  overflow: 'hidden',
+                  zIndex: 10,
+                })
+                gsap.set(heroSection, {
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  pointerEvents: 'auto',
+                  zIndex: 3,
+                })
+                gsap.set(nextSection, {
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  overflow: 'hidden',
+                  zIndex: 2,
+                })
+
+                // FIX 6: Remove the data attribute to restore CTA disable state
+                if (transitionWrapper) {
+                  delete transitionWrapper.dataset.pinReleased
+                }
+              },
+            },
+          })
+
+          timeline
+            .to(
+              [eyebrowNode, headlineNode],
+              { opacity: 0, y: -120, duration: 1.35, ease: 'power3.out' },
+              0
+            )
+            .to(
+              [subtextNode, ctaNode],
+              { opacity: 0, y: -60, duration: 1.35, ease: 'power3.out' },
+              0.08
+            )
+            .to(video, { scale: 1.08, duration: 3, ease: 'none' }, 0)
+            .to(
+              nextSection,
+              { y: '0%', opacity: 1, duration: 1.6, ease: 'power3.out' },
+              1.5
+            )
+            .to(
+              heroSection,
+              { opacity: 0, duration: 1.6, ease: 'power3.out' },
+              1.5
+            )
+
+          if (ledgerTextNodes.length) {
+            timeline.to(
+              ledgerTextNodes,
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.78,
+                stagger: 0.1,
+                ease: 'power2.out',
+              },
+              1.72
+            )
+          }
+
+          if (ledgerCardNodes.length) {
+            timeline.to(
+              ledgerCardNodes,
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.92,
+                stagger: 0.1,
+                ease: 'power2.out',
+              },
+              1.92
+            )
+          }
+
+          if (ledgerCtaNode) {
+            timeline.to(
+              ledgerCtaNode,
+              { opacity: 1, y: 0, duration: 0.76, ease: 'power2.out' },
+              2.18
+            )
+          }
+
+          // Return cleanup for desktop context
+          return () => {
+            if (timeline?.scrollTrigger) timeline.scrollTrigger.kill()
+            gsap.set(ledgerTextNodes, { clearProps: 'all' })
+            gsap.set(ledgerCardNodes, { clearProps: 'all' })
+            if (ledgerCtaNode) gsap.set(ledgerCtaNode, { clearProps: 'all' })
+          }
         },
       })
-
-      timeline
-        .to([eyebrowNode, headlineNode], { opacity: 0, y: -120, duration: 1.35, ease: 'power3.out' }, 0)
-        .to([subtextNode, ctaNode], { opacity: 0, y: -60, duration: 1.35, ease: 'power3.out' }, 0.08)
-        .to(video, { scale: 1.08, duration: 3, ease: 'none' }, 0)
-        .to(nextSection, { y: '0%', opacity: 1, duration: 1.6, ease: 'power3.out' }, 1.5)
-        .to(heroSection, { opacity: 0, duration: 1.6, ease: 'power3.out' }, 1.5)
-
-      if (ledgerTextNodes.length) {
-        timeline.to(
-          ledgerTextNodes,
-          { opacity: 1, y: 0, duration: 0.78, stagger: 0.1, ease: 'power2.out' },
-          1.72
-        )
-      }
-
-      if (ledgerCardNodes.length) {
-        timeline.to(
-          ledgerCardNodes,
-          { opacity: 1, y: 0, duration: 0.92, stagger: 0.1, ease: 'power2.out' },
-          1.92
-        )
-      }
-
-      if (ledgerCtaNode) {
-        timeline.to(ledgerCtaNode, { opacity: 1, y: 0, duration: 0.76, ease: 'power2.out' }, 2.18)
-      }
     }, transitionWrapper)
 
     // FIX 4: ctx.revert() is the only cleanup needed.
@@ -823,7 +1046,13 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
     <div
       ref={transitionWrapperRef}
       className="hero-authority-transition-stage"
-      style={{ position: 'relative', height: '100vh', overflow: 'hidden', isolation: 'isolate', zIndex: 1 }}
+      style={{
+        position: 'relative',
+        height: '100vh',
+        overflow: 'hidden',
+        isolation: 'isolate',
+        zIndex: 1,
+      }}
     >
       <section
         ref={heroRef}
@@ -837,7 +1066,10 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
           height: '100%',
         }}
       >
-        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-hero-full relative overflow-hidden">
+        <div
+          ref={depthRef}
+          className="scene-depth-stage scene-depth-stage-hero-full relative overflow-hidden"
+        >
           <AmbientDepthField
             reduced
             variant="hero"
@@ -870,7 +1102,10 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
           <div className="hero-command-overlay absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
             <div className="hero-command-copy w-[90%] sm:w-[82%] lg:w-[40%] max-w-none">
               <div className="inline-flex max-w-full flex-col p-1">
-                <p ref={eyebrowRef} className="text-xs uppercase tracking-[0.18em] text-white/80">
+                <p
+                  ref={eyebrowRef}
+                  className="text-xs uppercase tracking-[0.18em] text-white/80"
+                >
                   Executive Event Command
                 </p>
                 <h1
@@ -943,29 +1178,61 @@ export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
     'Executive productions stay trusted when timing, technical certainty, and delivery control are visible before the spotlight turns on.'
 
   const ledgerBody = reduced => (
-    <div ref={depthRef} className="authority-ledger scene-depth-stage scene-depth-stage-ledger">
-      <AmbientDepthField reduced={reduced} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.44} />
+    <div
+      ref={depthRef}
+      className="authority-ledger scene-depth-stage scene-depth-stage-ledger"
+    >
+      <AmbientDepthField
+        reduced={reduced}
+        variant="ledger"
+        backgroundY={backgroundY}
+        midY={midY}
+        foregroundY={foregroundY}
+        glowOpacity={0.44}
+      />
 
       <motion.div
         variants={!embedded && !reduced ? sequence(0.04, 0.1) : undefined}
         initial={!embedded && !reduced ? 'hidden' : false}
         whileInView={!embedded && !reduced ? 'visible' : undefined}
-        viewport={!embedded && !reduced ? { once: true, amount: 0.24 } : undefined}
+        viewport={
+          !embedded && !reduced ? { once: true, amount: 0.24 } : undefined
+        }
         className="authority-ledger-shell relative z-[2]"
       >
-        <motion.header variants={!embedded && !reduced ? revealLift(0.02, 12) : undefined} className="authority-ledger-intro">
-          <p className="authority-ledger-eyebrow text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Performance Record</p>
-          <h2 className="authority-ledger-heading mt-4 font-serif leading-[1.02] text-[var(--color-ink)]">{heading}</h2>
-          <p className="authority-ledger-subcopy mt-4 text-[var(--color-ink-muted)]">{body}</p>
+        <motion.header
+          variants={!embedded && !reduced ? revealLift(0.02, 12) : undefined}
+          className="authority-ledger-intro"
+        >
+          <p className="authority-ledger-eyebrow text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">
+            Performance Record
+          </p>
+          <h2 className="authority-ledger-heading mt-4 font-serif leading-[1.02] text-[var(--color-ink)]">
+            {heading}
+          </h2>
+          <p className="authority-ledger-subcopy mt-4 text-[var(--color-ink-muted)]">
+            {body}
+          </p>
         </motion.header>
 
         <div className="authority-ledger-metrics-grid">
           {AUTHORITY_METRICS.map((metric, index) => (
-            <motion.div key={metric.label} variants={!embedded && !reduced ? revealMask(index * 0.04) : undefined}>
+            <motion.div
+              key={metric.label}
+              variants={
+                !embedded && !reduced ? revealMask(index * 0.04) : undefined
+              }
+            >
               <SceneCard className="authority-ledger-card authority-ledger-metric p-4 md:p-5">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{metric.label}</p>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                  {metric.label}
+                </p>
                 <p className="authority-ledger-metric-value mt-3 font-serif leading-none text-[var(--color-ink)]">
-                  <CountUpMetric value={metric.value} suffix={metric.suffix} reduced={reduced} />
+                  <CountUpMetric
+                    value={metric.value}
+                    suffix={metric.suffix}
+                    reduced={reduced}
+                  />
                 </p>
               </SceneCard>
             </motion.div>
@@ -974,18 +1241,45 @@ export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
 
         <div className="authority-ledger-capability-grid">
           {CAPABILITY_MODULES.map((module, index) => (
-            <motion.article key={module.id} variants={!embedded && !reduced ? revealLift(index * 0.06 + 0.1, 14) : undefined}>
+            <motion.article
+              key={module.id}
+              variants={
+                !embedded && !reduced
+                  ? revealLift(index * 0.06 + 0.1, 14)
+                  : undefined
+              }
+            >
               <SceneCard className="authority-ledger-card authority-ledger-capability h-full overflow-hidden p-4 md:p-5">
-                <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="authority-ledger-media w-full rounded-xl border border-[var(--color-border)] object-cover" />
-                <p className="mt-4 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{module.title}</p>
-                <p className="mt-2 text-[clamp(0.9rem,1.15vw,1.02rem)] leading-relaxed text-[var(--color-ink-muted)]">{module.summary}</p>
+                <img
+                  src={module.image}
+                  alt={module.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="authority-ledger-media w-full rounded-xl border border-[var(--color-border)] object-cover"
+                />
+                <p className="mt-4 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                  {module.title}
+                </p>
+                <p className="mt-2 text-[clamp(0.9rem,1.15vw,1.02rem)] leading-relaxed text-[var(--color-ink-muted)]">
+                  {module.summary}
+                </p>
               </SceneCard>
             </motion.article>
           ))}
         </div>
 
-        <motion.div variants={!embedded && !reduced ? revealLift(0.24, 14) : undefined} className="authority-ledger-cta">
-          <ScribbleButton title="Open capability and delivery portfolio" variant="outline" tone="light" size="md" to="/services" analyticsLabel="authority-ledger-capabilities">
+        <motion.div
+          variants={!embedded && !reduced ? revealLift(0.24, 14) : undefined}
+          className="authority-ledger-cta"
+        >
+          <ScribbleButton
+            title="Open capability and delivery portfolio"
+            variant="outline"
+            tone="light"
+            size="md"
+            to="/services"
+            analyticsLabel="authority-ledger-capabilities"
+          >
             Explore Capabilities
           </ScribbleButton>
         </motion.div>
@@ -996,7 +1290,12 @@ export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
   if (embedded) return ledgerBody(reducedMotion)
 
   return (
-    <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
+    <FreeSceneFrame
+      scene={scene}
+      pinBehavior="evidence-ramp"
+      layout="authority-ledger"
+      className="scene-cinematic scene-authority-ledger"
+    >
       {({ reduced }) => ledgerBody(reduced)}
     </FreeSceneFrame>
   )
@@ -1004,8 +1303,13 @@ export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
 
 // Signature Reel: anchor cinematic lock moment.
 export const SignatureReelScene = ({ scene }) => (
-  <PinnedSceneFrame scene={scene} pinBehavior="command-aperture-lock" layout="command-aperture" className="scene-cinematic scene-signature-reel">
-    {({ progress, reduced }) => <SignatureReelContent progress={progress} reduced={reduced} />}
+  <PinnedSceneFrame
+    scene={scene}
+    pinBehavior="command-aperture-lock"
+    layout="command-aperture"
+    className="scene-cinematic scene-signature-reel"
+  >
+    <SignatureReelContent />
   </PinnedSceneFrame>
 )
 
@@ -1021,39 +1325,91 @@ export const CapabilityMatrixScene = ({ scene }) => {
   const foregroundY = useTransform(scrollYProgress, [0, 1], [6, -6])
 
   return (
-    <FreeSceneFrame scene={scene} pinBehavior="matrix-reveal" layout="capability-matrix" className="scene-cinematic scene-capability-matrix">
+    <FreeSceneFrame
+      scene={scene}
+      pinBehavior="matrix-reveal"
+      layout="capability-matrix"
+      className="scene-cinematic scene-capability-matrix"
+    >
       {({ reduced }) => (
-        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-matrix">
-          <AmbientDepthField reduced={reduced} variant="matrix" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.4} />
+        <div
+          ref={depthRef}
+          className="scene-depth-stage scene-depth-stage-matrix"
+        >
+          <AmbientDepthField
+            reduced={reduced}
+            variant="matrix"
+            backgroundY={backgroundY}
+            midY={midY}
+            foregroundY={foregroundY}
+            glowOpacity={0.4}
+          />
 
-          <motion.div variants={sequence(0.03, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.22 }} className="relative z-[2] grid gap-4">
+          <motion.div
+            variants={sequence(0.03, 0.08)}
+            initial={reduced ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.22 }}
+            className="relative z-[2] grid gap-4"
+          >
             <motion.div variants={revealLift(0.01, 10)}>
               <SceneCard className="p-5 md:p-6">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Capabilities</p>
-                <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.55rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Technical depth, creative precision, operational control.</h2>
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">
+                  Capabilities
+                </p>
+                <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.55rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">
+                  Technical depth, creative precision, operational control.
+                </h2>
               </SceneCard>
             </motion.div>
 
             <div className="grid gap-3 lg:grid-cols-[1.08fr_0.92fr]">
               <motion.article variants={revealSide(0.08, 20)}>
                 <SceneCard className="h-full overflow-hidden p-4 md:p-5">
-                  <img src={CAPABILITY_MODULES[0].image} alt={CAPABILITY_MODULES[0].title} loading="lazy" decoding="async" className="h-40 w-full rounded-xl border border-[var(--color-border)] object-cover" />
-                  <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Primary Capability</p>
-                  <h3 className="mt-2 font-serif text-[1.3rem] text-[var(--color-ink)]">{CAPABILITY_MODULES[0].title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{CAPABILITY_MODULES[0].detail}</p>
+                  <img
+                    src={CAPABILITY_MODULES[0].image}
+                    alt={CAPABILITY_MODULES[0].title}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-40 w-full rounded-xl border border-[var(--color-border)] object-cover"
+                  />
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                    Primary Capability
+                  </p>
+                  <h3 className="mt-2 font-serif text-[1.3rem] text-[var(--color-ink)]">
+                    {CAPABILITY_MODULES[0].title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">
+                    {CAPABILITY_MODULES[0].detail}
+                  </p>
                 </SceneCard>
               </motion.article>
 
               <div className="grid gap-3">
                 {CAPABILITY_MODULES.slice(1).map((module, index) => (
-                  <motion.article key={module.id} variants={revealLift(index * 0.06 + 0.12, 10)}>
+                  <motion.article
+                    key={module.id}
+                    variants={revealLift(index * 0.06 + 0.12, 10)}
+                  >
                     <SceneCard className="overflow-hidden">
                       <div className="grid gap-3 sm:grid-cols-[0.42fr_0.58fr]">
-                        <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover" />
+                        <img
+                          src={module.image}
+                          alt={module.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover"
+                        />
                         <div>
-                          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Track</p>
-                          <h3 className="mt-1 font-serif text-[1.06rem] text-[var(--color-ink)]">{module.title}</h3>
-                          <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{module.summary}</p>
+                          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                            Capability Track
+                          </p>
+                          <h3 className="mt-1 font-serif text-[1.06rem] text-[var(--color-ink)]">
+                            {module.title}
+                          </h3>
+                          <p className="mt-2 text-sm text-[var(--color-ink-muted)]">
+                            {module.summary}
+                          </p>
                         </div>
                       </div>
                     </SceneCard>
@@ -1085,15 +1441,73 @@ export const NarrativeBridgeScene = ({ scene }) => {
   const cardScale = useTransform(scrollYProgress, [0, 1], [0.985, 1.015])
 
   return (
-    <FreeSceneFrame scene={scene} pinBehavior="calm-release" layout="narrative-bridge" className="scene-cinematic scene-narrative-bridge">
+    <FreeSceneFrame
+      scene={scene}
+      pinBehavior="calm-release"
+      layout="narrative-bridge"
+      className="scene-cinematic scene-narrative-bridge"
+    >
       {({ reduced }) => (
-        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-bridge">
-          <AmbientDepthField reduced={reduced} variant="bridge" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.36} />
-          <motion.div style={reduced ? undefined : { y: cardY, scale: cardScale }} className="relative z-[2]">
+        <div
+          ref={depthRef}
+          className="scene-depth-stage scene-depth-stage-bridge"
+        >
+          <AmbientDepthField
+            reduced={reduced}
+            variant="bridge"
+            backgroundY={backgroundY}
+            midY={midY}
+            foregroundY={foregroundY}
+            glowOpacity={0.36}
+          />
+          <motion.div
+            style={reduced ? undefined : { y: cardY, scale: cardScale }}
+            className="relative z-[2]"
+          >
             <SceneCard className="relative grid min-h-[clamp(320px,50vh,500px)] place-items-center overflow-hidden text-center p-6 md:p-8">
-              <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Outcome Transition</motion.p>
-              <motion.h2 initial={reduced ? false : { opacity: 0, y: 16, letterSpacing: '-0.06em' }} whileInView={{ opacity: 1, y: 0, letterSpacing: '-0.03em' }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.1, ease: MASS_EASE, delay: 0.05 }} className="mt-4 max-w-[20ch] font-serif text-[clamp(1.8rem,3.9vw,2.85rem)] leading-[1.08] text-[var(--color-ink)]">Precision is only credible when proof carries the weight.</motion.h2>
-              <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE, delay: 0.12 }} className="mt-5 max-w-[60ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">The next chapter shifts from directional language to verified outcomes, named stakeholders, and delivery context.</motion.p>
+              <motion.p
+                initial={reduced ? false : { opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{
+                  duration: MOTION_TOKEN_CONTRACT.durations.scene,
+                  ease: AUTHORITY_EASE,
+                }}
+                className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]"
+              >
+                Outcome Transition
+              </motion.p>
+              <motion.h2
+                initial={
+                  reduced
+                    ? false
+                    : { opacity: 0, y: 16, letterSpacing: '-0.06em' }
+                }
+                whileInView={{ opacity: 1, y: 0, letterSpacing: '-0.03em' }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{
+                  duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.1,
+                  ease: MASS_EASE,
+                  delay: 0.05,
+                }}
+                className="mt-4 max-w-[20ch] font-serif text-[clamp(1.8rem,3.9vw,2.85rem)] leading-[1.08] text-[var(--color-ink)]"
+              >
+                Precision is only credible when proof carries the weight.
+              </motion.h2>
+              <motion.p
+                initial={reduced ? false : { opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{
+                  duration: MOTION_TOKEN_CONTRACT.durations.scene,
+                  ease: AUTHORITY_EASE,
+                  delay: 0.12,
+                }}
+                className="mt-5 max-w-[60ch] text-sm leading-relaxed text-[var(--color-ink-muted)]"
+              >
+                The next chapter shifts from directional language to verified
+                outcomes, named stakeholders, and delivery context.
+              </motion.p>
             </SceneCard>
           </motion.div>
         </div>
@@ -1108,9 +1522,14 @@ const ProofTheaterSplit = ({ reduced }) => {
   const [entryDirection, setEntryDirection] = useState(1)
   const touchStartXRef = useRef(null)
   const touchDeltaRef = useRef(0)
-  const safeIndex = clampIndex(activeIndex, Math.max(TESTIMONIALS.length - 1, 0))
+  const safeIndex = clampIndex(
+    activeIndex,
+    Math.max(TESTIMONIALS.length - 1, 0)
+  )
   const active = TESTIMONIALS[safeIndex]
-  const progress = TESTIMONIALS.length ? ((safeIndex + 1) / TESTIMONIALS.length) * 100 : 0
+  const progress = TESTIMONIALS.length
+    ? ((safeIndex + 1) / TESTIMONIALS.length) * 100
+    : 0
   const hasPrev = safeIndex > 0
   const hasNext = safeIndex < TESTIMONIALS.length - 1
 
@@ -1131,7 +1550,9 @@ const ProofTheaterSplit = ({ reduced }) => {
 
   const onTouchMove = event => {
     if (touchStartXRef.current === null) return
-    touchDeltaRef.current = (event.touches[0]?.clientX ?? touchStartXRef.current) - touchStartXRef.current
+    touchDeltaRef.current =
+      (event.touches[0]?.clientX ?? touchStartXRef.current) -
+      touchStartXRef.current
   }
 
   const onTouchEnd = () => {
@@ -1157,15 +1578,45 @@ const ProofTheaterSplit = ({ reduced }) => {
   return (
     <div className="relative grid gap-3 overflow-hidden rounded-2xl">
       <div className="relative grid gap-3 lg:grid-cols-[0.6fr_0.4fr]">
-        <SceneCard className="bg-[var(--color-surface)] p-5" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onKeyDown={onRailKeyDown} tabIndex={0} role="region" aria-label="Client testimonial carousel; use arrow keys to navigate">
+        <SceneCard
+          className="bg-[var(--color-surface)] p-5"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onKeyDown={onRailKeyDown}
+          tabIndex={0}
+          role="region"
+          aria-label="Client testimonial carousel; use arrow keys to navigate"
+        >
           {active ? (
             <AnimatePresence mode="wait">
               <motion.div
                 key={active.id}
-                initial={reduced ? false : { opacity: 0, x: entryDirection * 72, rotate: entryDirection * 3.2, scale: 0.96 }}
+                initial={
+                  reduced
+                    ? false
+                    : {
+                        opacity: 0,
+                        x: entryDirection * 72,
+                        rotate: entryDirection * 3.2,
+                        scale: 0.96,
+                      }
+                }
                 animate={{ opacity: 1, x: 0, rotate: 0, scale: 1 }}
-                exit={reduced ? undefined : { opacity: 0, x: entryDirection * -44, rotate: entryDirection * -2.2, scale: 0.98 }}
-                transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.12, ease: MASS_EASE }}
+                exit={
+                  reduced
+                    ? undefined
+                    : {
+                        opacity: 0,
+                        x: entryDirection * -44,
+                        rotate: entryDirection * -2.2,
+                        scale: 0.98,
+                      }
+                }
+                transition={{
+                  duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.12,
+                  ease: MASS_EASE,
+                }}
                 className="grid gap-4"
               >
                 <div className="overflow-hidden rounded-xl border border-[var(--color-border)]">
@@ -1178,18 +1629,65 @@ const ProofTheaterSplit = ({ reduced }) => {
                   />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-ink-subtle)]">Featured Client Voice</p>
-                  <p className="mt-3 text-base leading-relaxed text-[var(--color-ink)]">"{active.quote}"</p>
-                  <p className="mt-4 text-sm font-semibold text-[var(--color-ink)]">{active.name}</p>
-                  <p className="text-xs text-[var(--color-ink-muted)]">{active.role}, {active.organization}</p>
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-ink-subtle)]">
+                    Featured Client Voice
+                  </p>
+                  <p className="mt-3 text-base leading-relaxed text-[var(--color-ink)]">
+                    "{active.quote}"
+                  </p>
+                  <p className="mt-4 text-sm font-semibold text-[var(--color-ink)]">
+                    {active.name}
+                  </p>
+                  <p className="text-xs text-[var(--color-ink-muted)]">
+                    {active.role}, {active.organization}
+                  </p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                  <div className="relative h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]" role="progressbar" aria-label="Testimonial progression" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}>
-                    <motion.div className="h-full rounded-full bg-[var(--color-accent)]" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }} />
+                  <div
+                    className="relative h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]"
+                    role="progressbar"
+                    aria-label="Testimonial progression"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(progress)}
+                  >
+                    <motion.div
+                      className="h-full rounded-full bg-[var(--color-accent)]"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{
+                        duration: MOTION_TOKEN_CONTRACT.durations.ui,
+                        ease: MASS_EASE,
+                      }}
+                    />
                   </div>
                   <div className="flex gap-2">
-                    <ScribbleButton title="Previous client testimonial" ariaLabel="Go to previous testimonial" variant="micro" tone="light" size="sm" showArrow={false} onClick={goPrev} analyticsLabel="proof-prev" disabled={!hasPrev}>Previous</ScribbleButton>
-                    <ScribbleButton title="Next client testimonial" ariaLabel="Go to next testimonial" variant="micro" tone="light" size="sm" showArrow={false} onClick={goNext} analyticsLabel="proof-next" disabled={!hasNext}>Next</ScribbleButton>
+                    <ScribbleButton
+                      title="Previous client testimonial"
+                      ariaLabel="Go to previous testimonial"
+                      variant="micro"
+                      tone="light"
+                      size="sm"
+                      showArrow={false}
+                      onClick={goPrev}
+                      analyticsLabel="proof-prev"
+                      disabled={!hasPrev}
+                    >
+                      Previous
+                    </ScribbleButton>
+                    <ScribbleButton
+                      title="Next client testimonial"
+                      ariaLabel="Go to next testimonial"
+                      variant="micro"
+                      tone="light"
+                      size="sm"
+                      showArrow={false}
+                      onClick={goNext}
+                      analyticsLabel="proof-next"
+                      disabled={!hasNext}
+                    >
+                      Next
+                    </ScribbleButton>
                   </div>
                 </div>
               </motion.div>
@@ -1198,7 +1696,9 @@ const ProofTheaterSplit = ({ reduced }) => {
         </SceneCard>
 
         <SceneCard className="bg-[var(--color-surface-2)] p-3">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Index</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+            Client Index
+          </p>
           <div className="mt-3 grid gap-2">
             {TESTIMONIALS.map((item, index) => (
               <ScribbleButton
@@ -1216,11 +1716,23 @@ const ProofTheaterSplit = ({ reduced }) => {
                 className="proof-index-button"
               >
                 <div className="grid items-center gap-2 sm:grid-cols-[64px_1fr]">
-                  <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-12 w-full rounded-md border border-[var(--color-border)] object-cover" />
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-12 w-full rounded-md border border-[var(--color-border)] object-cover"
+                  />
                   <div>
-                    <p className="text-sm font-semibold text-[var(--color-ink)]">{item.name}</p>
-                    <p className="text-xs text-[var(--color-ink-muted)]">{item.role}</p>
-                    <p className="text-xs text-[var(--color-ink-subtle)]">{item.organization}</p>
+                    <p className="text-sm font-semibold text-[var(--color-ink)]">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-[var(--color-ink-muted)]">
+                      {item.role}
+                    </p>
+                    <p className="text-xs text-[var(--color-ink-subtle)]">
+                      {item.organization}
+                    </p>
                   </div>
                 </div>
               </ScribbleButton>
@@ -1244,14 +1756,33 @@ export const ProofTheaterScene = ({ scene }) => {
   const foregroundY = useTransform(scrollYProgress, [0, 1], [14, -10])
 
   return (
-    <FreeSceneFrame scene={scene} pinBehavior="proof-consolidation" layout="proof-theater" className="scene-cinematic scene-proof-theater">
+    <FreeSceneFrame
+      scene={scene}
+      pinBehavior="proof-consolidation"
+      layout="proof-theater"
+      className="scene-cinematic scene-proof-theater"
+    >
       {({ reduced }) => (
-        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-proof">
-          <AmbientDepthField reduced={reduced} variant="proof" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.46} />
+        <div
+          ref={depthRef}
+          className="scene-depth-stage scene-depth-stage-proof"
+        >
+          <AmbientDepthField
+            reduced={reduced}
+            variant="proof"
+            backgroundY={backgroundY}
+            midY={midY}
+            foregroundY={foregroundY}
+            glowOpacity={0.46}
+          />
           <div className="relative z-[2] grid gap-5">
             <SceneCard className="p-5 md:p-6">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Client Outcomes</p>
-              <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.56rem,2.95vw,2.44rem)] leading-[1.08] text-[var(--color-ink)]">Verified outcomes, named stakeholders, accountable delivery.</h2>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">
+                Client Outcomes
+              </p>
+              <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.56rem,2.95vw,2.44rem)] leading-[1.08] text-[var(--color-ink)]">
+                Verified outcomes, named stakeholders, accountable delivery.
+              </h2>
             </SceneCard>
             <ProofTheaterSplit reduced={reduced} />
           </div>
@@ -1310,7 +1841,9 @@ const ConversionChamberContent = ({ reduced }) => {
 
     if (!name || !company || !email || !budgetBand || !eventType || !scope) {
       setStatus('error')
-      setFeedbackMessage('Please complete all required fields before submitting.')
+      setFeedbackMessage(
+        'Please complete all required fields before submitting.'
+      )
       return
     }
 
@@ -1337,48 +1870,112 @@ const ConversionChamberContent = ({ reduced }) => {
   return (
     <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
       <SceneCard className="h-full bg-[var(--color-surface)] p-6 md:p-7">
-        <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Request Proposal</p>
-        <h2 className="mt-3 max-w-[20ch] font-serif text-[clamp(1.7rem,3.1vw,2.6rem)] leading-[1.06] text-[var(--color-ink)]">Close the narrative with a deliberate production brief</h2>
-        <p className="mt-4 max-w-[56ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">This request enters a direct producer queue. Expect response clarity, risk framing, and executable scope.</p>
+        <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">
+          Request Proposal
+        </p>
+        <h2 className="mt-3 max-w-[20ch] font-serif text-[clamp(1.7rem,3.1vw,2.6rem)] leading-[1.06] text-[var(--color-ink)]">
+          Close the narrative with a deliberate production brief
+        </h2>
+        <p className="mt-4 max-w-[56ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">
+          This request enters a direct producer queue. Expect response clarity,
+          risk framing, and executable scope.
+        </p>
         <div className="mt-5 grid gap-3">
           {[
             'Scope-first intake before creative spend.',
             'Execution constraints surfaced at day one.',
             'Decision-ready production path within 48 hours.',
           ].map(item => (
-            <p key={item} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-3 text-sm text-[var(--color-ink-muted)]">
+            <p
+              key={item}
+              className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-3 text-sm text-[var(--color-ink-muted)]"
+            >
               {item}
             </p>
           ))}
         </div>
       </SceneCard>
 
-      <motion.form onSubmit={handleSubmit} variants={sequence(0.02, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.25 }} className="cinematic-conversion-form grid gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5" aria-busy={isSubmitting}>
+      <motion.form
+        onSubmit={handleSubmit}
+        variants={sequence(0.02, 0.08)}
+        initial={reduced ? false : 'hidden'}
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+        className="cinematic-conversion-form grid gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5"
+        aria-busy={isSubmitting}
+      >
         <input type="hidden" name="source_scene" value="conversion-chamber" />
         <input type="hidden" name="source_path" value="/" />
-        <input type="text" name="website" tabIndex={-1} autoComplete="off" className="sr-only" aria-hidden="true" />
+        <input
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          className="sr-only"
+          aria-hidden="true"
+        />
 
         <FloatingField id="conversion-name" label="Name">
-          <input id="conversion-name" name="name" type="text" placeholder=" " autoComplete="name" required className="cinematic-field-input" />
+          <input
+            id="conversion-name"
+            name="name"
+            type="text"
+            placeholder=" "
+            autoComplete="name"
+            required
+            className="cinematic-field-input"
+          />
         </FloatingField>
 
         <FloatingField id="conversion-email" label="Email">
-          <input id="conversion-email" name="email" type="email" placeholder=" " autoComplete="email" required className="cinematic-field-input" />
+          <input
+            id="conversion-email"
+            name="email"
+            type="email"
+            placeholder=" "
+            autoComplete="email"
+            required
+            className="cinematic-field-input"
+          />
         </FloatingField>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <FloatingField id="conversion-company" label="Company">
-            <input id="conversion-company" name="company" type="text" placeholder=" " autoComplete="organization" required className="cinematic-field-input" />
+            <input
+              id="conversion-company"
+              name="company"
+              type="text"
+              placeholder=" "
+              autoComplete="organization"
+              required
+              className="cinematic-field-input"
+            />
           </FloatingField>
           <FloatingField id="conversion-phone" label="Phone">
-            <input id="conversion-phone" name="phone" type="tel" placeholder=" " autoComplete="tel" className="cinematic-field-input" />
+            <input
+              id="conversion-phone"
+              name="phone"
+              type="tel"
+              placeholder=" "
+              autoComplete="tel"
+              className="cinematic-field-input"
+            />
           </FloatingField>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <FloatingField id="conversion-budget" label="Budget Band">
-            <select id="conversion-budget" name="budget_band" defaultValue="" className="cinematic-field-input cinematic-select-input" required>
-              <option value="" disabled>Select budget band</option>
+            <select
+              id="conversion-budget"
+              name="budget_band"
+              defaultValue=""
+              className="cinematic-field-input cinematic-select-input"
+              required
+            >
+              <option value="" disabled>
+                Select budget band
+              </option>
               <option value="under-100k">Under 100K AED</option>
               <option value="100k-250k">100K–250K AED</option>
               <option value="250k-500k">250K–500K AED</option>
@@ -1386,8 +1983,16 @@ const ConversionChamberContent = ({ reduced }) => {
             </select>
           </FloatingField>
           <FloatingField id="conversion-event-type" label="Event Type">
-            <select id="conversion-event-type" name="event_type" defaultValue="" className="cinematic-field-input cinematic-select-input" required>
-              <option value="" disabled>Select event type</option>
+            <select
+              id="conversion-event-type"
+              name="event_type"
+              defaultValue=""
+              className="cinematic-field-input cinematic-select-input"
+              required
+            >
+              <option value="" disabled>
+                Select event type
+              </option>
               <option value="executive-summit">Executive Summit</option>
               <option value="brand-launch">Brand Launch</option>
               <option value="vip-gala">VIP Gala</option>
@@ -1397,16 +2002,42 @@ const ConversionChamberContent = ({ reduced }) => {
         </div>
 
         <FloatingField id="conversion-event-date" label="Target Date Window">
-          <input id="conversion-event-date" name="target_window" type="text" placeholder=" " className="cinematic-field-input" />
+          <input
+            id="conversion-event-date"
+            name="target_window"
+            type="text"
+            placeholder=" "
+            className="cinematic-field-input"
+          />
         </FloatingField>
 
         <FloatingField id="conversion-scope" label="Project Scope">
-          <textarea id="conversion-scope" name="scope" placeholder=" " rows={4} required className="cinematic-field-input resize-none" />
+          <textarea
+            id="conversion-scope"
+            name="scope"
+            placeholder=" "
+            rows={4}
+            required
+            className="cinematic-field-input resize-none"
+          />
         </FloatingField>
 
         <AnimatePresence mode="wait">
           {feedbackMessage ? (
-            <motion.div key={feedbackMessage} initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? undefined : { opacity: 0, y: -6, scale: 0.98 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS_EASE }} className={`cinematic-feedback-panel rounded-xl border px-4 py-3 ${isSuccess ? 'is-success border-[rgba(122,218,165,0.45)] bg-[rgba(53,95,76,0.28)] text-[var(--color-ink)]' : 'border-[rgba(236,123,123,0.44)] bg-[rgba(90,37,37,0.24)] text-[var(--color-ink)]'}`} role={isSuccess ? 'status' : 'alert'} aria-live={isSuccess ? 'polite' : 'assertive'} aria-atomic="true">
+            <motion.div
+              key={feedbackMessage}
+              initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={reduced ? undefined : { opacity: 0, y: -6, scale: 0.98 }}
+              transition={{
+                duration: MOTION_TOKEN_CONTRACT.durations.scene,
+                ease: MASS_EASE,
+              }}
+              className={`cinematic-feedback-panel rounded-xl border px-4 py-3 ${isSuccess ? 'is-success border-[rgba(122,218,165,0.45)] bg-[rgba(53,95,76,0.28)] text-[var(--color-ink)]' : 'border-[rgba(236,123,123,0.44)] bg-[rgba(90,37,37,0.24)] text-[var(--color-ink)]'}`}
+              role={isSuccess ? 'status' : 'alert'}
+              aria-live={isSuccess ? 'polite' : 'assertive'}
+              aria-atomic="true"
+            >
               <div className="flex items-center gap-3">
                 {isSuccess ? (
                   <span className="cinematic-success-mark" aria-hidden="true">
@@ -1421,12 +2052,24 @@ const ConversionChamberContent = ({ reduced }) => {
           ) : null}
         </AnimatePresence>
 
-        <ScribbleButton title="Submit private production intake form" type="submit" variant="primary" tone="light" size="md" analyticsLabel="conversion-brief-submit" disabled={isSubmitting}>
+        <ScribbleButton
+          title="Submit private production intake form"
+          type="submit"
+          variant="primary"
+          tone="light"
+          size="md"
+          analyticsLabel="conversion-brief-submit"
+          disabled={isSubmitting}
+        >
           {isSubmitting ? 'Submitting Request...' : 'Submit Request'}
         </ScribbleButton>
 
         <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
-          {isError ? 'Submission issue. Please retry or call direct.' : isSuccess ? 'Command queue confirmed.' : 'Private brief channel secured.'}
+          {isError
+            ? 'Submission issue. Please retry or call direct.'
+            : isSuccess
+              ? 'Command queue confirmed.'
+              : 'Private brief channel secured.'}
         </p>
       </motion.form>
     </div>
@@ -1435,7 +2078,12 @@ const ConversionChamberContent = ({ reduced }) => {
 
 // Conversion close: API-aware intake flow with stub fallback when no endpoint is configured.
 export const ConversionChamberScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="closing-ritual" layout="conversion-chamber" className="scene-cinematic scene-conversion-chamber">
+  <FreeSceneFrame
+    scene={scene}
+    pinBehavior="closing-ritual"
+    layout="conversion-chamber"
+    className="scene-cinematic scene-conversion-chamber"
+  >
     {({ reduced }) => <ConversionChamberContent reduced={reduced} />}
   </FreeSceneFrame>
 )
@@ -1445,23 +2093,49 @@ export const GlobalFooterScene = ({ scene }) => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <FreeSceneFrame scene={scene} pinBehavior="terminal-close" layout="global-footer" className="scene-cinematic scene-global-footer">
+    <FreeSceneFrame
+      scene={scene}
+      pinBehavior="terminal-close"
+      layout="global-footer"
+      className="scene-cinematic scene-global-footer"
+    >
       {({ reduced }) => (
-        <motion.div variants={sequence(0.05, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-4">
+        <motion.div
+          variants={sequence(0.05, 0.08)}
+          initial={reduced ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid gap-4"
+        >
           <SceneCard className="p-5 md:p-6">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Next Move</p>
-            <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.6rem,2.95vw,2.45rem)] leading-[1.08] text-[var(--color-ink)]">Precision-led production for moments where public failure is not an option.</h2>
-            <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">Regional reach across UAE, one accountable command structure, and execution discipline from scope to show close.</p>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">
+              Next Move
+            </p>
+            <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.6rem,2.95vw,2.45rem)] leading-[1.08] text-[var(--color-ink)]">
+              Precision-led production for moments where public failure is not
+              an option.
+            </h2>
+            <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">
+              Regional reach across UAE, one accountable command structure, and
+              execution discipline from scope to show close.
+            </p>
           </SceneCard>
 
           <div className="grid gap-3 md:grid-cols-4">
             <motion.div variants={revealLift(0.02, 10)}>
               <SceneCard>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Company</p>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                  Company
+                </p>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
                   {FOOTER_COMPANY_LINKS.map(item => (
                     <li key={item.to}>
-                      <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={item.to}>{item.label}</Link>
+                      <Link
+                        className="footer-micro-link transition-colors hover:text-[var(--color-ink)]"
+                        to={item.to}
+                      >
+                        {item.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -1470,11 +2144,18 @@ export const GlobalFooterScene = ({ scene }) => {
 
             <motion.div variants={revealLift(0.06, 10)}>
               <SceneCard>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Services</p>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                  Services
+                </p>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
                   {services.slice(0, 4).map(service => (
                     <li key={service.slug}>
-                      <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/services/${service.slug}`}>{service.title}</Link>
+                      <Link
+                        className="footer-micro-link transition-colors hover:text-[var(--color-ink)]"
+                        to={`/services/${service.slug}`}
+                      >
+                        {service.title}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -1483,11 +2164,18 @@ export const GlobalFooterScene = ({ scene }) => {
 
             <motion.div variants={revealLift(0.1, 10)}>
               <SceneCard>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Case Work</p>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                  Case Work
+                </p>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
                   {caseStudies.map(study => (
                     <li key={study.slug}>
-                      <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/work/${study.slug}`}>{study.title}</Link>
+                      <Link
+                        className="footer-micro-link transition-colors hover:text-[var(--color-ink)]"
+                        to={`/work/${study.slug}`}
+                      >
+                        {study.title}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -1496,10 +2184,22 @@ export const GlobalFooterScene = ({ scene }) => {
 
             <motion.div variants={revealLift(0.14, 10)}>
               <SceneCard>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Direct Contact</p>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                  Direct Contact
+                </p>
                 <div className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-                  <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="tel:+97142345678">+971 4 234 5678</a>
-                  <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">hello@ghaimuae.com</a>
+                  <a
+                    className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]"
+                    href="tel:+97142345678"
+                  >
+                    +971 4 234 5678
+                  </a>
+                  <a
+                    className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]"
+                    href="mailto:hello@ghaimuae.com"
+                  >
+                    hello@ghaimuae.com
+                  </a>
                   <p>Dubai Design District, UAE</p>
                 </div>
               </SceneCard>
@@ -1508,20 +2208,54 @@ export const GlobalFooterScene = ({ scene }) => {
 
           <SceneCard className="footer-utility-row p-4 md:p-5">
             <div className="grid gap-3 md:grid-cols-[1fr_auto_auto] md:items-center">
-              <p className="text-xs text-[var(--color-ink-subtle)]">{currentYear} Ghaim UAE. All rights reserved.</p>
+              <p className="text-xs text-[var(--color-ink-subtle)]">
+                {currentYear} Ghaim UAE. All rights reserved.
+              </p>
               <div className="flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.11em] text-[var(--color-ink-subtle)]">
-                <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to="/privacy">Privacy</Link>
-                <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to="/terms">Terms</Link>
-                <a className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">Support</a>
+                <Link
+                  className="footer-micro-link transition-colors hover:text-[var(--color-ink)]"
+                  to="/privacy"
+                >
+                  Privacy
+                </Link>
+                <Link
+                  className="footer-micro-link transition-colors hover:text-[var(--color-ink)]"
+                  to="/terms"
+                >
+                  Terms
+                </Link>
+                <a
+                  className="footer-micro-link transition-colors hover:text-[var(--color-ink)]"
+                  href="mailto:hello@ghaimuae.com"
+                >
+                  Support
+                </a>
               </div>
-              <ScribbleButton title="Open final proposal request flow" variant="micro" tone="light" size="sm" to="/contact" analyticsLabel="footer-utility-submit" showArrow={false}>
+              <ScribbleButton
+                title="Open final proposal request flow"
+                variant="micro"
+                tone="light"
+                size="sm"
+                to="/contact"
+                analyticsLabel="footer-utility-submit"
+                showArrow={false}
+              >
                 Submit Request
               </ScribbleButton>
             </div>
           </SceneCard>
 
           <div className="pb-2">
-            <ScribbleButton title="Open contact and schedule executive consult" variant="primary" tone="light" size="md" analyticsLabel="footer-command-consult" to="/contact">Request Proposal</ScribbleButton>
+            <ScribbleButton
+              title="Open contact and schedule executive consult"
+              variant="primary"
+              tone="light"
+              size="md"
+              analyticsLabel="footer-command-consult"
+              to="/contact"
+            >
+              Request Proposal
+            </ScribbleButton>
           </div>
         </motion.div>
       )}

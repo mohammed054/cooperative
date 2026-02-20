@@ -1,8 +1,13 @@
-import React, { useLayoutEffect, useRef, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import React, { useLayoutEffect, useRef } from 'react'
+import { motion, useReducedMotion, useMotionValue } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { MOTION_TOKEN_CONTRACT, parseBezier } from '../../motion/motionTokenContract.js'
+import { MOBILE_BREAKPOINT } from '../../lib/constants'
+import {
+  MOTION_TOKEN_CONTRACT,
+  parseBezier,
+} from '../../motion/motionTokenContract.js'
+import { ProgressProvider } from './ProgressContext.jsx'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
@@ -22,7 +27,7 @@ const ScrollLockedSection = ({
 }) => {
   const sectionRef = useRef(null)
   const lockRef = useRef(null)
-  const [progress, setProgress] = useState(0)
+  const progress = useMotionValue(0)
   const shouldReduceMotion = useReducedMotion()
 
   useLayoutEffect(() => {
@@ -34,27 +39,44 @@ const ScrollLockedSection = ({
     const lockEl = lockRef.current
 
     const context = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: sectionEl,
-        start: 'top top',
-        end: 'bottom bottom',
-        pin: lockEl,
-        pinSpacing: false,
-        scrub: MOTION_TOKEN_CONTRACT.scroll.inertia + 0.12,
-        anticipatePin: 1,
-        fastScrollEnd: true,
-        invalidateOnRefresh: true,
-        onRefresh: self => {
-          setProgress(Math.min(1, Math.max(0, self.progress)))
+      ScrollTrigger.matchMedia({
+        [`(max-width: ${MOBILE_BREAKPOINT - 1}px)`]: function mobileSetup() {
+          progress.set(1)
+          gsap.set(lockEl, { opacity: 1 })
+
+          return () => {
+            gsap.set(lockEl, { clearProps: 'all' })
+          }
         },
-        onUpdate: self => {
-          const nextProgress = Math.min(1, Math.max(0, self.progress))
-          const velocity = Math.abs(self.getVelocity())
-          const momentumGain = Math.min(0.26, velocity / 4600)
-          setProgress(previous => {
-            const blend = 0.2 + momentumGain
-            return previous + (nextProgress - previous) * blend
+
+        [`(min-width: ${MOBILE_BREAKPOINT}px)`]: function desktopSetup() {
+          const trigger = ScrollTrigger.create({
+            trigger: sectionEl,
+            start: 'top top',
+            end: 'bottom bottom',
+            pin: lockEl,
+            pinSpacing: false,
+            scrub: MOTION_TOKEN_CONTRACT.scroll.inertia + 0.12,
+            anticipatePin: 1,
+            fastScrollEnd: true,
+            invalidateOnRefresh: true,
+            onRefresh: self => {
+              const nextProgress = Math.min(1, Math.max(0, self.progress))
+              progress.set(nextProgress)
+            },
+            onUpdate: self => {
+              const nextProgress = Math.min(1, Math.max(0, self.progress))
+              const velocity = Math.abs(self.getVelocity())
+              const momentumGain = Math.min(0.26, velocity / 4600)
+              const previous = progress.get()
+              const blend = 0.2 + momentumGain
+              progress.set(previous + (nextProgress - previous) * blend)
+            },
           })
+
+          return () => {
+            if (trigger) trigger.kill()
+          }
         },
       })
     }, sectionEl)
@@ -62,7 +84,7 @@ const ScrollLockedSection = ({
     return () => {
       context.revert()
     }
-  }, [shouldReduceMotion])
+  }, [shouldReduceMotion, progress])
 
   const content =
     typeof children === 'function'
@@ -95,7 +117,9 @@ const ScrollLockedSection = ({
           ease: AUTHORITY_EASE,
         }}
       >
-        {content}
+        <ProgressProvider progress={progress} reduced={shouldReduceMotion}>
+          {content}
+        </ProgressProvider>
       </motion.div>
     </section>
   )
