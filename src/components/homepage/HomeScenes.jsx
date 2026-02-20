@@ -144,13 +144,6 @@ const AUTHORITY_METRICS = [
 
 const buildHeight = vh => `${vh}vh`
 const clampIndex = (value, max) => Math.max(0, Math.min(max, value))
-const TONE_LIGHTNESS = Object.freeze({
-  deep: 246,
-  dark: 255,
-  steel: 238,
-  warm: 246,
-  linen: 255,
-})
 
 const revealLift = (delay = 0, distance = 16) => ({
   hidden: { opacity: 0, y: distance },
@@ -618,7 +611,6 @@ export const CommandArrivalScene = ({ scene }) => {
   const headlineRef = useRef(null)
   const subtextRef = useRef(null)
   const ctaRef = useRef(null)
-  const heroToneOverlayRef = useRef(null)
   const mediaRef = scene?.videoSrc || scene?.media?.ref
   const heroMediaSrc = Array.isArray(mediaRef) ? mediaRef[0] : mediaRef
   const headline =
@@ -637,55 +629,56 @@ export const CommandArrivalScene = ({ scene }) => {
     const headlineNode = headlineRef.current
     const subtextNode = subtextRef.current
     const ctaNode = ctaRef.current
-    const heroToneOverlay = heroToneOverlayRef.current
     const heroSection = document.getElementById(scene?.id || 'command-arrival')
     const nextSection = document.getElementById('authority-ledger')
-    const nextEntryNode = nextSection?.querySelector(
-      '[data-cinematic-transition-entry="authority-ledger"]'
-    )
-    const nextToneBridge = nextSection?.querySelector(
-      '[data-cinematic-tone-bridge="authority-ledger"]'
-    )
 
-    if (!root || !video || !headlineNode || !subtextNode || !ctaNode || !nextSection) {
+    if (
+      !root ||
+      !video ||
+      !headlineNode ||
+      !subtextNode ||
+      !ctaNode ||
+      !heroSection ||
+      !nextSection
+    ) {
       return undefined
     }
 
-    const context = gsap.context(() => {
-      const currentTone = scene?.tone || 'deep'
-      const nextTone = nextEntryNode?.dataset?.sceneTone || 'dark'
-      const currentLightness = TONE_LIGHTNESS[currentTone] ?? 246
-      const nextLightness = TONE_LIGHTNESS[nextTone] ?? currentLightness
-      const nextIsLighter = nextLightness > currentLightness
-
-      if (heroSection) {
-        gsap.set(heroSection, { position: 'relative', zIndex: 20 })
+    ScrollTrigger.getAll().forEach(trigger => {
+      const triggerElement = trigger.trigger
+      const pinElement = trigger.pin
+      if (
+        triggerElement === heroSection ||
+        triggerElement === nextSection ||
+        pinElement === heroSection ||
+        pinElement === nextSection
+      ) {
+        trigger.kill()
       }
+    })
 
-      gsap.set(nextSection, {
+    const context = gsap.context(() => {
+      gsap.set(heroSection, {
+        height: '100vh',
         position: 'relative',
-        zIndex: 30,
-        marginTop: '-40vh',
+        overflow: 'hidden',
       })
 
-      gsap.set(video, { scale: 1, opacity: 1, transformOrigin: 'center center' })
+      gsap.set(video, {
+        scale: 1,
+        opacity: 1,
+        filter: 'brightness(1)',
+        transformOrigin: 'center center',
+      })
       gsap.set(headlineNode, { y: 0, opacity: 1 })
       gsap.set(subtextNode, { y: 0, opacity: 1 })
       gsap.set(ctaNode, { y: 0, opacity: 1 })
-      gsap.set(heroToneOverlay, { opacity: 0 })
-
-      if (nextEntryNode) {
-        gsap.set(nextEntryNode, {
-          y: 120,
-          opacity: 0,
-          scale: 0.96,
-          transformOrigin: 'center top',
-        })
-      }
-
-      if (nextToneBridge) {
-        gsap.set(nextToneBridge, { opacity: 0 })
-      }
+      gsap.set(nextSection, {
+        y: () => window.innerHeight,
+        scale: 0.98,
+        opacity: 1,
+        transformOrigin: 'center top',
+      })
 
       const transitionTimeline = gsap.timeline({
         defaults: {
@@ -693,19 +686,34 @@ export const CommandArrivalScene = ({ scene }) => {
           ease: 'power3.out',
         },
         scrollTrigger: {
-          trigger: root,
+          trigger: heroSection,
+          pin: true,
+          pinSpacing: true,
           start: 'top top',
-          end: '+=100%',
+          end: '+=150%',
           scrub: true,
+          anticipatePin: 1,
         },
       })
 
       transitionTimeline
         .to(
+          nextSection,
+          {
+            y: 0,
+            scale: 1,
+            duration: 0.7,
+            ease: 'power3.out',
+          },
+          0.3
+        )
+        .to(
           video,
           {
-            scale: 1.12,
-            opacity: 0.4,
+            scale: 1.08,
+            filter: 'brightness(0.7)',
+            duration: 0.4,
+            ease: 'power3.out',
           },
           0
         )
@@ -714,65 +722,33 @@ export const CommandArrivalScene = ({ scene }) => {
           {
             y: -120,
             opacity: 0,
+            duration: 0.4,
+            ease: 'power3.out',
           },
           0
         )
         .to(
           subtextNode,
           {
-            y: -90,
             opacity: 0,
+            duration: 0.4,
+            ease: 'power3.out',
           },
-          0.04
+          0
         )
         .to(
           ctaNode,
           {
-            y: -56,
             opacity: 0,
-            duration: 0.7,
-            ease: 'power2.out',
+            duration: 0.4,
+            ease: 'power3.out',
           },
           0
         )
-
-      if (nextEntryNode) {
-        transitionTimeline.to(
-          nextEntryNode,
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-          },
-          0
-        )
-      }
-
-      if (nextToneBridge && nextIsLighter) {
-        transitionTimeline.to(
-          nextToneBridge,
-          {
-            opacity: 0.58,
-            ease: 'power2.out',
-          },
-          0
-        )
-      }
-
-      if (heroToneOverlay && !nextIsLighter) {
-        transitionTimeline.to(
-          heroToneOverlay,
-          {
-            opacity: 0.36,
-            ease: 'power2.out',
-          },
-          0
-        )
-      }
-    })
+    }, heroSection)
 
     return () => context.revert()
-  }, [scene?.id, scene?.tone])
+  }, [scene?.id])
 
   return (
     <FreeSceneFrame scene={scene} pinBehavior="authority-prelude" layout="hero-command" className="scene-cinematic scene-command-arrival scene-command-arrival-full">
@@ -806,12 +782,6 @@ export const CommandArrivalScene = ({ scene }) => {
           <div className="hero-vignette-layer" />
           <div className="hero-dof-layer" />
           <div className="hero-command-soften-layer" />
-          <div
-            ref={heroToneOverlayRef}
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-[7]"
-            style={{ opacity: 0, background: 'rgba(8, 12, 18, 0.42)' }}
-          />
 
           <div className="hero-command-overlay absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
             <div className="hero-command-copy w-[90%] sm:w-[82%] lg:w-[40%] max-w-none">
@@ -866,24 +836,8 @@ export const AuthorityLedgerScene = ({ scene }) => {
   return (
     <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
       {({ reduced }) => (
-        <div
-          ref={depthRef}
-          className="scene-depth-stage scene-depth-stage-ledger"
-          data-cinematic-transition-entry="authority-ledger"
-          data-scene-tone={scene?.tone || 'dark'}
-          style={{ willChange: 'transform, opacity' }}
-        >
+        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-ledger">
           <AmbientDepthField reduced={reduced} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.44} />
-          <div
-            aria-hidden="true"
-            data-cinematic-tone-bridge="authority-ledger"
-            className="pointer-events-none absolute inset-0 z-[1]"
-            style={{
-              opacity: 0,
-              background:
-                'linear-gradient(180deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.28) 44%, rgba(255, 255, 255, 0) 100%)',
-            }}
-          />
 
           <motion.div variants={sequence(0.04, 0.1)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="relative z-[2] grid gap-5">
             <motion.div variants={revealLift(0.02, 12)}>
