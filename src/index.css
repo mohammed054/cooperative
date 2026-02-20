@@ -2995,10 +2995,24 @@
   }
 }
 
+/* Disable CTA while embedded inside the pinned GSAP transition */
 .hero-authority-next-stage .authority-ledger-cta {
   pointer-events: none;
 }
+/*
+  FIX 6: Re-enable CTA using a data attribute set in CommandArrivalScene's
+  onLeave GSAP callback (transitionWrapper.dataset.pinReleased = 'true').
 
-.hero-authority-transition-stage[style*='height: auto'] .authority-ledger-cta {
+  The previous rule used [style*='height: auto'] to detect when GSAP had
+  released the pin — this was extremely fragile because:
+  - It matched GSAP's specific inline style string output
+  - Any GSAP version update that writes 'height: initial' or adds whitespace
+    would silently break the re-enable
+  - Browsers that normalise inline styles would never match
+
+  The data attribute approach is explicit, readable, and stable across
+  library versions and browser style normalisation.
+*/
+[data-pin-released="true"] .authority-ledger-cta {
   pointer-events: auto;
 }

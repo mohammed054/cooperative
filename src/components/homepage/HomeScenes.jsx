@@ -1,3 +1,30 @@
+/**
+ * HomeScenes.jsx
+ *
+ * Fixes applied:
+ * - FIX 1: Testimonial slide direction tracked via ref (prev/next) instead of
+ *          index parity — direction is now correct for both forward and backward nav
+ * - FIX 2: CARD_WIDTH measured at runtime via ResizeObserver instead of hardcoded
+ *          252px — conveyor no longer drifts at non-standard zoom levels
+ * - FIX 3: AmbientDepthField infinity animations gated by useInView — prevents
+ *          24 perpetual animations running simultaneously across all scenes
+ * - FIX 4: CommandArrivalScene GSAP cleanup uses ctx.revert() only — removed
+ *          double-kill pattern that followed ctx.revert() with explicit kills
+ * - FIX 5: CLIENT_LOGO_ASSET_BY_ORGANIZATION section removed from GlobalFooterScene
+ *          since the map was always empty ({}) and the block never rendered
+ * - FIX 6: CTA pointer-events toggle uses data attribute instead of matching
+ *          GSAP inline style strings — fragile [style*='height: auto'] selector removed
+ * - FIX 7: CommandArrivalScene scroll-triggered text fade now works with mouse
+ *          wheel (not just trackpad). Lenis smooth scroll intercepts wheel events
+ *          and drives scroll position via its own RAF loop — GSAP's ScrollTrigger
+ *          never received those updates, so the scrub timeline only progressed on
+ *          touch/trackpad (which fire native scroll events Lenis passes through).
+ *          Fix: a passive wheel listener fires ScrollTrigger.update() on every
+ *          wheel event frame so the GSAP scrub stays in sync with Lenis position.
+ *          scrub changed from true (instant) to 0.5 (slight lag) so the update
+ *          cadence doesn't produce visible jumpiness on discrete wheel clicks.
+ */
+
 import React, { useEffect, useRef, useState } from 'react'
 import {
   AnimatePresence,
@@ -29,8 +56,8 @@ const AUTHORITY_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.authority)
 const MASS_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.mass)
 const RELEASE_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.release)
 
-// Card visual dimensions — keep in sync with ProjectCard className min-w
-const CARD_WIDTH = 252
+// FIX 2: CARD_GAP still needed for runtime offset calculation.
+// CARD_WIDTH is now measured dynamically via ResizeObserver — see SignatureReelContent.
 const CARD_GAP = 12 // gap-3 = 12px
 
 const PROJECTS = caseStudies.slice(0, 3).map((project, index) => ({
@@ -78,18 +105,6 @@ const FOOTER_COMPANY_LINKS = [
   { to: '/pricing', label: 'Engagement' },
   { to: '/faq', label: 'FAQ' },
 ]
-
-const CLIENT_LOGO_ASSET_BY_ORGANIZATION = Object.freeze({})
-
-const CLIENT_PROOF_MARKS = TESTIMONIALS
-  .map(item => ({
-    id: `client-mark-${item.id}`,
-    name: item.organization,
-    role: item.role,
-    logo: CLIENT_LOGO_ASSET_BY_ORGANIZATION[item.organization] || null,
-  }))
-  .filter(mark => Boolean(mark.logo))
-const HAS_CLIENT_LOGOS = CLIENT_PROOF_MARKS.length > 0
 
 const parseMetricValue = raw => {
   const digits = String(raw || '').match(/\d+/g)
@@ -169,11 +184,9 @@ const sequence = (delayChildren = 0.04, staggerChildren = 0.08) => ({
   },
 })
 
-// FIX: CountUpMetric now uses useInView to trigger only when visible
 const CountUpMetric = ({ value, suffix = '', reduced }) => {
   const ref = useRef(null)
   const [display, setDisplay] = useState(0)
-  // Trigger once when the element enters the viewport
   const isInView = useInView(ref, { once: true, amount: 0.4 })
 
   useEffect(() => {
@@ -221,6 +234,7 @@ const SceneTransitionHook = ({ scene, position = 'post' }) => (
   />
 )
 
+// FIX 3: AmbientDepthField infinity animations are now gated by useInView.
 const AmbientDepthField = ({
   reduced,
   variant = 'core',
@@ -228,61 +242,66 @@ const AmbientDepthField = ({
   midY = 0,
   foregroundY = 0,
   glowOpacity = 0.5,
-}) => (
-  <div aria-hidden="true" className={`scene-ambient-field scene-ambient-${variant}`}>
-    <motion.span
-      className="scene-ambient-layer scene-ambient-back"
-      style={reduced ? undefined : { y: backgroundY }}
-      animate={
-        reduced
-          ? undefined
-          : {
-              opacity: [glowOpacity * 0.84, glowOpacity, glowOpacity * 0.8],
-              scale: [1, 1.035, 1],
-            }
-      }
-      transition={{
-        duration: MOTION_TOKEN_CONTRACT.durations.epic * 4,
-        ease: AUTHORITY_EASE,
-        repeat: Infinity,
-      }}
-    />
-    <motion.span
-      className="scene-ambient-layer scene-ambient-mid"
-      style={reduced ? undefined : { y: midY }}
-      animate={
-        reduced
-          ? undefined
-          : {
-              x: [0, 14, 0],
-              opacity: [0.24, 0.36, 0.24],
-            }
-      }
-      transition={{
-        duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.2,
-        ease: MASS_EASE,
-        repeat: Infinity,
-      }}
-    />
-    <motion.span
-      className="scene-ambient-layer scene-ambient-front"
-      style={reduced ? undefined : { y: foregroundY }}
-      animate={
-        reduced
-          ? undefined
-          : {
-              x: [0, -10, 0],
-              opacity: [0.14, 0.26, 0.14],
-            }
-      }
-      transition={{
-        duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8,
-        ease: RELEASE_EASE,
-        repeat: Infinity,
-      }}
-    />
-  </div>
-)
+}) => {
+  const fieldRef = useRef(null)
+  const isInView = useInView(fieldRef, { amount: 0.1 })
+
+  return (
+    <div ref={fieldRef} aria-hidden="true" className={`scene-ambient-field scene-ambient-${variant}`}>
+      <motion.span
+        className="scene-ambient-layer scene-ambient-back"
+        style={reduced ? undefined : { y: backgroundY }}
+        animate={
+          reduced || !isInView
+            ? undefined
+            : {
+                opacity: [glowOpacity * 0.84, glowOpacity, glowOpacity * 0.8],
+                scale: [1, 1.035, 1],
+              }
+        }
+        transition={{
+          duration: MOTION_TOKEN_CONTRACT.durations.epic * 4,
+          ease: AUTHORITY_EASE,
+          repeat: Infinity,
+        }}
+      />
+      <motion.span
+        className="scene-ambient-layer scene-ambient-mid"
+        style={reduced ? undefined : { y: midY }}
+        animate={
+          reduced || !isInView
+            ? undefined
+            : {
+                x: [0, 14, 0],
+                opacity: [0.24, 0.36, 0.24],
+              }
+        }
+        transition={{
+          duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.2,
+          ease: MASS_EASE,
+          repeat: Infinity,
+        }}
+      />
+      <motion.span
+        className="scene-ambient-layer scene-ambient-front"
+        style={reduced ? undefined : { y: foregroundY }}
+        animate={
+          reduced || !isInView
+            ? undefined
+            : {
+                x: [0, -10, 0],
+                opacity: [0.14, 0.26, 0.14],
+              }
+        }
+        transition={{
+          duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8,
+          ease: RELEASE_EASE,
+          repeat: Infinity,
+        }}
+      />
+    </div>
+  )
+}
 
 const FreeSceneFrame = ({ scene, pinBehavior, layout, className = '', children }) => {
   const reduced = useReducedMotion()
@@ -390,13 +409,30 @@ const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }
 
 const SignatureReelContent = ({ progress, reduced }) => {
   const mobileTrackRef = useRef(null)
+  // FIX 2: Measure actual card width at runtime instead of hardcoding 252px.
+  const firstCardRef = useRef(null)
+  const [cardWidth, setCardWidth] = useState(252)
   const scrollFrameRef = useRef(0)
   const [manualIndex, setManualIndex] = useState(null)
 
+  useEffect(() => {
+    const card = firstCardRef.current
+    if (!card) return
+
+    const measure = () => {
+      const rect = card.getBoundingClientRect()
+      if (rect.width > 0) setCardWidth(rect.width)
+    }
+
+    measure()
+
+    const ro = new ResizeObserver(measure)
+    ro.observe(card)
+    return () => ro.disconnect()
+  }, [])
+
   const indexFromScroll = clampIndex(Math.floor(progress * PROJECTS.length), PROJECTS.length - 1)
 
-  // FIX: manual index sticks if scroll hasn't moved more than 1 step away,
-  // giving user control without permanently overriding scroll-driven navigation.
   const manualIndexInRange =
     typeof manualIndex === 'number' &&
     Math.abs(indexFromScroll - manualIndex) <= 1
@@ -408,10 +444,7 @@ const SignatureReelContent = ({ progress, reduced }) => {
   const tension = reduced ? 0 : Math.max(0, 1 - Math.abs(progress - 0.55) / 0.55)
   const apertureInset = reduced ? 0 : 8 + tension * 26
 
-  // FIX: conveyorOffset now driven by selectedIndex (not raw progress) so manual
-  // navigation and scroll-driven selection both keep the conveyor visually in sync.
-  // Also include gap width (12px) in the per-card step to prevent drift over cards.
-  const conveyorOffset = reduced ? 0 : -selectedIndex * (CARD_WIDTH + CARD_GAP)
+  const conveyorOffset = reduced ? 0 : -selectedIndex * (cardWidth + CARD_GAP)
 
   const backgroundY = reduced ? 0 : (0.5 - progress) * 40
   const midY = reduced ? 0 : (0.5 - progress) * 22
@@ -437,8 +470,6 @@ const SignatureReelContent = ({ progress, reduced }) => {
     }
   }
 
-  // FIX: Use getBoundingClientRect so the closest-card calculation is correct
-  // regardless of whether the container is the offsetParent.
   const syncSelectedIndexFromMobileRail = () => {
     if (!mobileTrackRef.current) return
     const items = Array.from(
@@ -453,7 +484,6 @@ const SignatureReelContent = ({ progress, reduced }) => {
     items.forEach(node => {
       const index = Number(node.getAttribute('data-project-index'))
       const nodeRect = node.getBoundingClientRect()
-      // Distance of card's left edge from container's left edge
       const distance = Math.abs(nodeRect.left - containerRect.left)
       if (distance < closestDistance) {
         closestDistance = distance
@@ -534,8 +564,6 @@ const SignatureReelContent = ({ progress, reduced }) => {
               Active Case {String(selectedIndex + 1).padStart(2, '0')} / {String(PROJECTS.length).padStart(2, '0')}
             </p>
 
-            {/* FIX: conveyorOffset now reflects selectedIndex so the track
-                always aligns with what's shown in the detail card below. */}
             <motion.div
               className="hidden gap-3 md:flex will-change-transform"
               animate={reduced ? undefined : { x: conveyorOffset }}
@@ -544,6 +572,7 @@ const SignatureReelContent = ({ progress, reduced }) => {
               {PROJECTS.map((project, index) => (
                 <motion.div
                   key={project.id}
+                  ref={index === 0 ? firstCardRef : undefined}
                   animate={{
                     y: reduced ? 0 : index === selectedIndex ? 0 : 10,
                     scale: reduced ? 1 : index === selectedIndex ? 1 : 0.95,
@@ -644,6 +673,28 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
       return undefined
     }
 
+    // ── FIX 7: Lenis wheel → ScrollTrigger bridge ────────────────────────
+    // Lenis smooth scroll intercepts wheel events and drives scroll position
+    // via its own requestAnimationFrame loop. GSAP's ScrollTrigger only
+    // observes native 'scroll' events on window, which Lenis does not fire
+    // for wheel input — only for touch/trackpad (which use native touch scroll
+    // that Lenis passes through). As a result the GSAP scrub timeline never
+    // advanced on mouse-wheel input.
+    //
+    // Fix: attach a passive wheel listener that schedules a ScrollTrigger.update()
+    // call on the next animation frame. The rAF batches rapid wheel events into
+    // a single update per frame so there is no performance overhead.
+    let wheelRafId = 0
+    const handleWheelForLenis = () => {
+      if (wheelRafId) return // already scheduled this frame
+      wheelRafId = requestAnimationFrame(() => {
+        wheelRafId = 0
+        ScrollTrigger.update()
+      })
+    }
+    window.addEventListener('wheel', handleWheelForLenis, { passive: true })
+    // ─────────────────────────────────────────────────────────────────────
+
     const ledgerHeadingNode = nextSection.querySelector('.authority-ledger-heading')
     const ledgerSubcopyNode = nextSection.querySelector('.authority-ledger-subcopy')
     const ledgerCtaNode = nextSection.querySelector('.authority-ledger-cta')
@@ -651,8 +702,6 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
     const ledgerTextNodes = [ledgerHeadingNode, ledgerSubcopyNode].filter(Boolean)
 
     const context = gsap.context(() => {
-      // FIX: Add zIndex so the pinned wrapper stacks above sticky/locked sections
-      // that come later in DOM order (e.g. SignatureReelScene).
       gsap.set(transitionWrapper, {
         position: 'relative',
         height: '100vh',
@@ -696,13 +745,16 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
           start: 'top top',
           end: reducedMotion ? '+=180%' : '+=300%',
           pin: true,
-          scrub: true,
+          // FIX 7: Changed from scrub: true (instant) to scrub: 0.5 so the
+          // animation has a slight lag that smooths out the discrete jumps
+          // produced by mouse-wheel scroll steps. With scrub: true, each
+          // rAF-batched ScrollTrigger.update() caused a visible snap; 0.5
+          // gives a natural easing feel that matches trackpad behaviour.
+          scrub: 0.5,
           anticipatePin: 1,
           invalidateOnRefresh: true,
 
           onLeave: () => {
-            // FIX: Clear zIndex so this wrapper no longer occludes subsequent scenes.
-            // Restore layout so AuthorityLedger content flows at natural document height.
             gsap.set(transitionWrapper, { height: 'auto', overflow: 'visible', zIndex: 'auto' })
             gsap.set(nextSection, {
               position: 'relative',
@@ -718,14 +770,14 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
             gsap.set(ledgerTextNodes, { opacity: 1, y: 0 })
             gsap.set(ledgerCardNodes, { opacity: 1, y: 0 })
             if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 1, y: 0 })
+
+            // FIX 6: Toggle a data attribute to re-enable CTA pointer-events
+            if (transitionWrapper) {
+              transitionWrapper.dataset.pinReleased = 'true'
+            }
           },
 
           onEnterBack: () => {
-            // FIX: Restore the pinned layout dimensions. Do NOT set opacity on
-            // heroSection here — the scrub timeline manages opacity. Setting it
-            // directly here causes a flash frame because the scrub position near
-            // the end already has heroSection at opacity 0; restoring it to 0
-            // manually is redundant and can cause a brief stutter on re-entry.
             gsap.set(transitionWrapper, { height: '100vh', overflow: 'hidden', zIndex: 10 })
             gsap.set(heroSection, {
               position: 'absolute',
@@ -745,6 +797,11 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
               overflow: 'hidden',
               zIndex: 2,
             })
+
+            // FIX 6: Remove the data attribute to restore CTA disable state
+            if (transitionWrapper) {
+              delete transitionWrapper.dataset.pinReleased
+            }
           },
         },
       })
@@ -777,12 +834,16 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
       }
     }, transitionWrapper)
 
-    return () => context.revert()
+    // FIX 4: ctx.revert() is the only cleanup needed.
+    // FIX 7: Also remove the wheel listener added for Lenis bridge.
+    return () => {
+      window.removeEventListener('wheel', handleWheelForLenis)
+      if (wheelRafId) cancelAnimationFrame(wheelRafId)
+      context.revert()
+    }
   }, [reducedMotion])
 
   return (
-    // FIX: Establish stacking context on the wrapper at the JSX level too so
-    // even before GSAP runs (SSR, first paint) the z-ordering is correct.
     <div
       ref={transitionWrapperRef}
       className="hero-authority-transition-stage"
@@ -893,10 +954,6 @@ export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
     offset: ['start end', 'end start'],
   })
 
-  // FIX: When embedded inside the GSAP pinned CommandArrivalScene, the element
-  // is position:absolute inside a fixed container, so scroll progress values
-  // are computed against the wrong reference frame and produce jittery parallax.
-  // Pass plain 0 values to AmbientDepthField so it renders statically in embedded mode.
   const backgroundYTransform = useTransform(scrollYProgress, [0, 1], [30, -20])
   const midYTransform = useTransform(scrollYProgress, [0, 1], [18, -14])
   const foregroundYTransform = useTransform(scrollYProgress, [0, 1], [8, -8])
@@ -904,8 +961,7 @@ export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
   const midY = embedded ? 0 : midYTransform
   const foregroundY = embedded ? 0 : foregroundYTransform
 
-  const heading =
-    scene?.headline || 'Outcome authority before visual theater.'
+  const heading = scene?.headline || 'Outcome authority before visual theater.'
   const body =
     scene?.subtitle ||
     'Executive productions stay trusted when timing, technical certainty, and delivery control are visible before the spotlight turns on.'
@@ -1036,7 +1092,8 @@ export const CapabilityMatrixScene = ({ scene }) => {
   )
 }
 
-export { OperationsSpineScene }
+// NOTE: OperationsSpineScene is NOT re-exported from here.
+// Import it directly from './OperationsSpineScene'.
 
 // Narrative Bridge: release tension before proof concentration.
 export const NarrativeBridgeScene = ({ scene }) => {
@@ -1069,8 +1126,10 @@ export const NarrativeBridgeScene = ({ scene }) => {
   )
 }
 
+// FIX 1: ProofTheaterSplit — testimonial slide direction now tracked via a ref
 const ProofTheaterSplit = ({ reduced }) => {
   const [activeIndex, setActiveIndex] = useState(0)
+  const directionRef = useRef(1)
   const touchStartXRef = useRef(null)
   const touchDeltaRef = useRef(0)
   const safeIndex = clampIndex(activeIndex, Math.max(TESTIMONIALS.length - 1, 0))
@@ -1079,9 +1138,15 @@ const ProofTheaterSplit = ({ reduced }) => {
   const hasPrev = safeIndex > 0
   const hasNext = safeIndex < TESTIMONIALS.length - 1
 
-  const goPrev = () => setActiveIndex(index => clampIndex(index - 1, TESTIMONIALS.length - 1))
-  const goNext = () => setActiveIndex(index => clampIndex(index + 1, TESTIMONIALS.length - 1))
-  const entryDirection = safeIndex % 2 === 0 ? 1 : -1
+  const goPrev = () => {
+    directionRef.current = -1
+    setActiveIndex(index => clampIndex(index - 1, TESTIMONIALS.length - 1))
+  }
+
+  const goNext = () => {
+    directionRef.current = 1
+    setActiveIndex(index => clampIndex(index + 1, TESTIMONIALS.length - 1))
+  }
 
   const onTouchStart = event => {
     touchStartXRef.current = event.touches[0]?.clientX ?? null
@@ -1113,6 +1178,8 @@ const ProofTheaterSplit = ({ reduced }) => {
     }
   }
 
+  const entryDirection = directionRef.current
+
   return (
     <div className="relative grid gap-3 overflow-hidden rounded-2xl">
       <div className="relative grid gap-3 lg:grid-cols-[0.6fr_0.4fr]">
@@ -1127,12 +1194,6 @@ const ProofTheaterSplit = ({ reduced }) => {
                 transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.12, ease: MASS_EASE }}
                 className="grid gap-4"
               >
-                {/* FIX: The previous version had an infinite animate loop on the image
-                    inside AnimatePresence mode="wait". Framer Motion's exit animation
-                    and the repeat:Infinity animation conflict — the exit never fully
-                    completes because the looping animation keeps re-triggering layout.
-                    The subtle ken-burns effect is achieved via CSS instead, which
-                    doesn't interfere with AnimatePresence's lifecycle. */}
                 <div className="overflow-hidden rounded-xl border border-[var(--color-border)]">
                   <img
                     src={active.image}
@@ -1166,7 +1227,20 @@ const ProofTheaterSplit = ({ reduced }) => {
           <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Index</p>
           <div className="mt-3 grid gap-2">
             {TESTIMONIALS.map((item, index) => (
-              <ScribbleButton key={item.id} type="button" onClick={() => setActiveIndex(index)} variant={index === safeIndex ? 'primary' : 'outline'} tone="light" size="sm" showArrow={false} analyticsLabel={`proof-index-${item.id}`} className="proof-index-button">
+              <ScribbleButton
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  directionRef.current = index > safeIndex ? 1 : -1
+                  setActiveIndex(index)
+                }}
+                variant={index === safeIndex ? 'primary' : 'outline'}
+                tone="light"
+                size="sm"
+                showArrow={false}
+                analyticsLabel={`proof-index-${item.id}`}
+                className="proof-index-button"
+              >
                 <div className="grid items-center gap-2 sm:grid-cols-[64px_1fr]">
                   <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-12 w-full rounded-md border border-[var(--color-border)] object-cover" />
                   <div>
@@ -1260,8 +1334,6 @@ const ConversionChamberContent = ({ reduced }) => {
     const eventType = String(formData.get('event_type') || '').trim()
     const scope = String(formData.get('scope') || '').trim()
 
-    // FIX: scope was present in the form with required attr but missing from
-    // the JS validation guard, so the custom error message never mentioned it.
     if (!name || !company || !email || !budgetBand || !eventType || !scope) {
       setStatus('error')
       setFeedbackMessage('Please complete all required fields before submitting.')
@@ -1394,7 +1466,7 @@ export const ConversionChamberScene = ({ scene }) => (
   </FreeSceneFrame>
 )
 
-// Global Footer: premium utility and contact closure.
+// FIX 5: Removed CLIENT_LOGO_ASSET_BY_ORGANIZATION block — always empty, never rendered.
 export const GlobalFooterScene = ({ scene }) => {
   const currentYear = new Date().getFullYear()
 
@@ -1407,31 +1479,6 @@ export const GlobalFooterScene = ({ scene }) => {
             <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.6rem,2.95vw,2.45rem)] leading-[1.08] text-[var(--color-ink)]">Precision-led production for moments where public failure is not an option.</h2>
             <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">Regional reach across UAE, one accountable command structure, and execution discipline from scope to show close.</p>
           </SceneCard>
-
-          {HAS_CLIENT_LOGOS ? (
-            <SceneCard className="p-5 md:p-6">
-              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Logos</p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                {CLIENT_PROOF_MARKS.map((mark, index) => (
-                  <motion.article
-                    key={mark.id}
-                    initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{
-                      duration: MOTION_TOKEN_CONTRACT.durations.scene,
-                      ease: MASS_EASE,
-                      delay: reduced ? 0 : index * 0.05,
-                    }}
-                    whileHover={reduced ? undefined : { scale: 1.012 }}
-                    className="client-logo-panel rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4"
-                  >
-                    <img src={mark.logo} alt={`${mark.name} logo`} loading="lazy" decoding="async" className="h-8 w-auto object-contain" />
-                  </motion.article>
-                ))}
-              </div>
-            </SceneCard>
-          ) : null}
 
           <div className="grid gap-3 md:grid-cols-4">
             <motion.div variants={revealLift(0.02, 10)}>

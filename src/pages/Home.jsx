@@ -2,8 +2,7 @@ import React, { useEffect } from 'react'
 import {
   HOMEPAGE_SCENE_REGISTRY,
   HOMEPAGE_GRADIENT_BRIDGES,
-  validateHomepageFoundation,
-  HOMEPAGE_FOUNDATION,
+  HOMEPAGE_FOUNDATION_ASSERTION, // FIX: import pre-computed assertion instead of re-running validation
 } from '../foundation/homepageFoundation'
 import { useAnalyticsContext } from '../hooks/useAnalyticsContext'
 import useLenisScroll from '../hooks/useLenisScroll'
@@ -17,7 +16,7 @@ import {
   ProofTheaterScene,
   SignatureReelScene,
 } from '../components/homepage/HomeScenes'
-import { OperationsSpineScene } from '../components/homepage/OperationsPhasesAndClientOutcomes'
+import { OperationsSpineScene } from '../components/homepage/OperationsSpineScene'
 
 const SCENE_COMPONENT_REGISTRY = Object.freeze({
   'command-arrival': CommandArrivalScene,
@@ -32,9 +31,11 @@ const SCENE_COMPONENT_REGISTRY = Object.freeze({
 })
 
 const SCENE_IDS = HOMEPAGE_SCENE_REGISTRY.map(scene => scene.id)
+
 const BRIDGE_BY_FROM_SCENE = new Map(
   HOMEPAGE_GRADIENT_BRIDGES.map(bridge => [bridge.fromSceneId, bridge])
 )
+
 const BRIDGE_CLASS_BY_TONE_FLOW = Object.freeze({
   'dark->steel': 'homepage-tone-bridge-dark-steel',
   'steel->warm': 'homepage-tone-bridge-steel-warm',
@@ -46,45 +47,47 @@ const getBridgeClassName = bridge => {
   return BRIDGE_CLASS_BY_TONE_FLOW[key] || 'homepage-tone-bridge-soft'
 }
 
-const PINNED_RHYTHM_ASSERTION = Object.freeze(() => {
-  const issues = []
-  const pinnedIndexes = HOMEPAGE_SCENE_REGISTRY.map((scene, index) =>
-    scene.mode === 'pinned' ? index : -1
-  ).filter(index => index >= 0)
+// FIX: Removed duplicate PINNED_RHYTHM_ASSERTION — this logic already lives in
+// homepageFoundation.js. Duplicating it here created conflicting error messages
+// and ran the same validation twice on every page load.
 
-  pinnedIndexes.forEach((index, offset) => {
-    const nextPinnedIndex = pinnedIndexes[offset + 1]
-    if (typeof nextPinnedIndex !== 'number') return
-    if (nextPinnedIndex - index <= 1) {
-      issues.push(
-        `Pinned rhythm violation: '${HOMEPAGE_SCENE_REGISTRY[index].id}' is back-to-back with '${HOMEPAGE_SCENE_REGISTRY[nextPinnedIndex].id}'.`
-      )
-    }
-  })
-
-  if (!HOMEPAGE_SCENE_REGISTRY.some(scene => scene.mode === 'pinned')) {
-    issues.push('Pinned friction points missing from registry.')
-  }
-
-  return Object.freeze({
-    isValid: issues.length === 0,
-    issues: Object.freeze(issues),
-  })
-})
-
-const foundationValidation = validateHomepageFoundation(HOMEPAGE_FOUNDATION)
-const rhythmValidation = PINNED_RHYTHM_ASSERTION()
-
-if (!foundationValidation.isValid) {
+// FIX: Use the pre-computed assertion exported from homepageFoundation.js
+// instead of calling validateHomepageFoundation() a second time.
+if (!HOMEPAGE_FOUNDATION_ASSERTION.isValid) {
   throw new Error(
-    `Homepage foundation invalid before cinematic render: ${foundationValidation.issues.join(' | ')}`
+    `Homepage foundation invalid before cinematic render: ${HOMEPAGE_FOUNDATION_ASSERTION.issues.join(' | ')}`
   )
 }
 
-if (!rhythmValidation.isValid) {
-  throw new Error(
-    `Pinned rhythm validation failed: ${rhythmValidation.issues.join(' | ')}`
-  )
+// FIX: Simple ErrorBoundary to prevent one broken scene from crashing the whole page.
+class SceneErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error, info) {
+    // In production wire this to your error reporting service (Sentry, etc.)
+    console.error(`[SceneErrorBoundary] Scene "${this.props.sceneId}" crashed:`, error, info)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Render an invisible placeholder that preserves page flow without exposing errors
+      return (
+        <div
+          aria-hidden="true"
+          style={{ minHeight: '100vh', background: 'var(--color-surface, #f6f7f9)' }}
+          data-scene-error-fallback={this.props.sceneId}
+        />
+      )
+    }
+    return this.props.children
+  }
 }
 
 const Home = () => {
@@ -131,9 +134,13 @@ const Home = () => {
 
   return (
     <div className="flagship-home flagship-home-cinematic">
-      {commandScene && authorityScene ? (
-        <CommandArrivalScene scene={commandScene} nextScene={authorityScene} />
-      ) : null}
+      {/* CommandArrival + AuthorityLedger are tightly coupled via GSAP transition */}
+      <SceneErrorBoundary sceneId="command-arrival+authority-ledger">
+        {commandScene && authorityScene ? (
+          <CommandArrivalScene scene={commandScene} nextScene={authorityScene} />
+        ) : null}
+      </SceneErrorBoundary>
+
       {authorityBridge ? (
         <div
           aria-hidden="true"
@@ -143,13 +150,17 @@ const Home = () => {
           data-bridge-to={authorityBridge.toTone}
         />
       ) : null}
+
       {downstreamScenes.map(scene => {
         const SceneComponent = SCENE_COMPONENT_REGISTRY[scene.id]
         const bridge = BRIDGE_BY_FROM_SCENE.get(scene.id)
         if (!SceneComponent) return null
         return (
           <React.Fragment key={scene.id}>
-            <SceneComponent scene={scene} />
+            {/* FIX: Each scene is isolated — a crash in one won't destroy the page */}
+            <SceneErrorBoundary sceneId={scene.id}>
+              <SceneComponent scene={scene} />
+            </SceneErrorBoundary>
             {bridge ? (
               <div
                 aria-hidden="true"

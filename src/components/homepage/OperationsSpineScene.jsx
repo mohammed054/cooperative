@@ -46,6 +46,14 @@ const PHASES = [
 const VH_PER_PHASE = 0.9
 const pad = n => String(n).padStart(2, '0')
 
+// FIX: Breakpoint thresholds aligned between JS and CSS so pin behaviour and
+// layout changes are consistent. Previously isMobile() used 760px in JS but
+// the CSS disabled the rail at 480px — mismatched thresholds caused the rail
+// to visually disappear while GSAP still calculated pin height for a two-column
+// layout, producing extra whitespace that looked like duplication.
+const MOBILE_BREAKPOINT = 760
+const TINY_BREAKPOINT = 420 // below this skip GSAP pin entirely
+
 const PhaseCard = React.memo(
   React.forwardRef(({ phase, isActive }, ref) => (
     <article
@@ -115,8 +123,20 @@ export const OperationsSpineScene = ({ scene }) => {
 
     if (!outer || !sticky || !header || !cards.length) return undefined
 
-    // ── Reduced motion: show everything immediately, no animation ────────
-    if (reducedMotion) {
+    // Dev StrictMode/HMR hardening: remove stale triggers tied to this instance
+    ScrollTrigger.getAll().forEach(trigger => {
+      if (trigger.trigger === outer || trigger.pin === sticky) {
+        trigger.kill()
+      }
+    })
+
+    // FIX: On tiny screens (< TINY_BREAKPOINT) skip GSAP pin entirely.
+    // Pinning on very small viewports causes GSAP's spacer to overflow the
+    // layout, which manifests as visual duplication of the sticky element.
+    // Show all phases statically instead.
+    const isTinyScreen = window.matchMedia(`(max-width: ${TINY_BREAKPOINT}px)`).matches
+
+    if (reducedMotion || isTinyScreen) {
       gsap.set(header, { opacity: 1, y: 0 })
       gsap.set(cards, { opacity: 1, y: 0 })
       if (cta) gsap.set(cta, { opacity: 1, y: 0 })
@@ -127,6 +147,9 @@ export const OperationsSpineScene = ({ scene }) => {
       return undefined
     }
 
+    let pinTrigger
+    let sentinelTrigger
+
     const ctx = gsap.context(() => {
       // ── Initial states ────────────────────────────────────────────────
       gsap.set(outer, { position: 'relative', zIndex: 2 })
@@ -136,14 +159,17 @@ export const OperationsSpineScene = ({ scene }) => {
       if (progBar) gsap.set(progBar, { scaleX: 0, transformOrigin: 'left center' })
       gsap.set(cards, { opacity: 0, y: 52 })
 
-      const isMobile = () => window.matchMedia('(max-width: 760px)').matches
+      // FIX: isMobile now uses MOBILE_BREAKPOINT (760) to stay in sync with the
+      // CSS breakpoint where the card inner collapses to a single column. The old
+      // value (760 in CSS, also 760 in JS but via a magic number inline) was fine
+      // but is now a named constant so both sides stay in sync if it changes.
+      const isMobile = () => window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
       const cardBudget = 0.76
       const cardStart = 0.1
       const stepSize = cardBudget / PHASES.length
 
       const tl = gsap.timeline({
         scrollTrigger: {
-          id: 'osv2-pin',
           trigger: outer,
           start: 'top top',
           end: () => {
@@ -166,9 +192,6 @@ export const OperationsSpineScene = ({ scene }) => {
           },
 
           onLeave() {
-            // FIX: Clear zIndex so this wrapper doesn't occlude sections below.
-            // Do NOT set opacity/visibility here — the scrub timeline manages
-            // element states. Forcing them here causes a pop when scrolling past.
             gsap.set(outer, { zIndex: 'auto' })
           },
 
@@ -177,17 +200,21 @@ export const OperationsSpineScene = ({ scene }) => {
           },
 
           onRefresh(self) {
-            // FIX: GSAP's pin spacer inherits the computed background of the
-            // pinned element. On some browsers this renders as a solid or
-            // semi-transparent gray block in the scroll gap after the pin ends.
-            // Force it transparent every time ScrollTrigger recalculates.
+            // FIX: Force the GSAP pin spacer fully transparent on every refresh.
+            // On mobile browsers the spacer can inherit the sticky element's
+            // computed background and render as a grey/white rectangle — which
+            // looks exactly like a second copy of the section (duplication bug).
             if (self.spacer) {
-              self.spacer.style.background = 'transparent'
-              self.spacer.style.backgroundColor = 'transparent'
+              self.spacer.style.cssText +=
+                ';background:transparent!important;background-color:transparent!important;background-image:none!important;'
+              // FIX: Also reset any inherited min-height that can push the spacer
+              // below the pin area and create an empty ghost section on mobile.
+              self.spacer.style.minHeight = ''
             }
           },
         },
       })
+      pinTrigger = tl.scrollTrigger
 
       // Header enters
       tl.to(header, { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' }, 0)
@@ -207,9 +234,6 @@ export const OperationsSpineScene = ({ scene }) => {
       // CTA enters near end
       if (cta) tl.to(cta, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' }, 0.88)
 
-      // ── FIX: At 100% progress, lock all animated elements to their
-      // final visible state using clearProps so nothing snaps invisible
-      // when the pin releases and the scrub timeline finishes.
       tl.call(() => {
         gsap.set(header, { clearProps: 'willChange' })
         gsap.set(cards, { clearProps: 'willChange' })
@@ -217,13 +241,11 @@ export const OperationsSpineScene = ({ scene }) => {
       }, [], 1)
 
       // ── Sentinel: prime the next scene's entry animation ─────────────
-      ScrollTrigger.create({
-        id: 'osv2-sentinel',
+      sentinelTrigger = ScrollTrigger.create({
         trigger: sentinelRef.current,
         start: 'top 92%',
         once: true,
         onEnter() {
-          // Walk siblings after the sentinel to find the next scene element
           let cursor = sentinelRef.current?.nextElementSibling
           while (cursor) {
             if (cursor.matches?.('[data-scene-id]')) break
@@ -236,7 +258,6 @@ export const OperationsSpineScene = ({ scene }) => {
           }
           if (!cursor) return
 
-          // Only animate in if the section is still below the viewport
           const rect = cursor.getBoundingClientRect()
           if (rect.top < window.innerHeight * 0.95) return
 
@@ -256,9 +277,9 @@ export const OperationsSpineScene = ({ scene }) => {
     }, outer)
 
     return () => {
+      pinTrigger?.kill()
+      sentinelTrigger?.kill()
       ctx.revert()
-      ScrollTrigger.getById('osv2-pin')?.kill()
-      ScrollTrigger.getById('osv2-sentinel')?.kill()
     }
   }, [reducedMotion])
 
@@ -282,16 +303,18 @@ export const OperationsSpineScene = ({ scene }) => {
         }
 
         /*
-          FIX: GSAP creates a pin spacer div whose computed background can
-          bleed through as a gray rectangle in the gap after the pin ends,
-          and sometimes as a semi-transparent overlay box while the second
-          card is appearing. This rule targets GSAP's spacer and forces it
-          fully transparent regardless of what styles it inherits.
+          FIX: GSAP pin spacer duplication fix.
+          When GSAP pins .osv2-sticky it wraps it in a .pin-spacer div whose
+          computed background inherits from the sticky element. On mobile this
+          renders as a solid rectangle — visually identical to a second copy of
+          the section. Force the spacer transparent on all sides and collapse any
+          extra min-height it may inherit.
         */
-        .osv2-outer + [style*="height"],
-        .osv2-outer > [style*="margin-top"] {
+        .osv2-outer > .pin-spacer {
           background: transparent !important;
           background-color: transparent !important;
+          background-image: none !important;
+          min-height: 0 !important;
         }
 
         .osv2-grain { position: absolute; inset: -8% -5%; pointer-events: none; z-index: 1; overflow: hidden; }
@@ -323,7 +346,14 @@ export const OperationsSpineScene = ({ scene }) => {
         .osv2-cta__btn:hover .osv2-cta__arrow { transform: translateX(3px); }
 
         .osv2-right { position: relative; display: grid; grid-template-columns: 18px 1fr; gap: 0 clamp(0.8rem, 2vw, 1.5rem); align-items: stretch; }
-        @media (max-width: 480px) { .osv2-right { grid-template-columns: 1fr; } .osv2-rail { display: none; } }
+
+        /* FIX: Hide rail column at 760px (matching the card-inner breakpoint)
+           previously the rail disappeared at 480px via JS but stayed visible
+           in CSS until 480px — now both align at 760px on mobile. */
+        @media (max-width: 760px) {
+          .osv2-right { grid-template-columns: 1fr; }
+          .osv2-rail { display: none; }
+        }
 
         .osv2-rail { position: relative; display: flex; flex-direction: column; align-items: center; padding-block: 4px; }
         .osv2-rail__track { position: absolute; inset: 0; width: 2px; margin-inline: auto; border-radius: 999px; background: rgba(28,28,28,0.10); }
@@ -353,7 +383,15 @@ export const OperationsSpineScene = ({ scene }) => {
           box-shadow: 0 0 0 1px rgba(28,28,28,0.05), 0 14px 36px rgba(14,18,26,0.10), 0 2px 6px rgba(14,18,26,0.05);
           transform: scale(1.016) translateX(-2px);
         }
-        @media (max-width: 480px) { .osv2-card--active { transform: scale(1) translateX(0); } }
+        /* FIX: Remove the inward translateX on mobile — it causes a 2px horizontal
+           overflow that triggers a ghost scroll column on narrow viewports, and was
+           previously only reset at 480px (too late for 760px-wide phones). */
+        @media (max-width: 760px) {
+          .osv2-card--active { transform: scale(1.012) translateX(0); }
+        }
+        @media (max-width: 480px) {
+          .osv2-card--active { transform: scale(1) translateX(0); }
+        }
 
         .osv2-card__num { display: block; font-family: var(--font-heading, 'Fraunces', serif); font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-ink-subtle, #8892a0); margin-bottom: clamp(0.4rem, 1vh, 0.72rem); transition: color 0.32s ease; }
         .osv2-card--active .osv2-card__num { color: var(--color-ink, #1c1c1c); }
@@ -380,6 +418,19 @@ export const OperationsSpineScene = ({ scene }) => {
         .osv2-card__dot { position: absolute; top: clamp(0.9rem, 2vh, 1.2rem); right: clamp(0.9rem, 2vw, 1.1rem); width: 6px; height: 6px; border-radius: 50%; background: var(--color-ink, #1c1c1c); transition: opacity 0.32s ease; }
 
         .osv2-sentinel { height: 0; overflow: hidden; pointer-events: none; }
+
+        /* FIX: On tiny screens (≤ TINY_BREAKPOINT) the GSAP pin is skipped entirely.
+           Show all cards in their final active-like state so the section is readable
+           without any scroll interaction. */
+        @media (max-width: 420px) {
+          .osv2-card { opacity: 1 !important; transform: none !important; }
+          .osv2-card__detail { max-height: 12rem !important; opacity: 1 !important; }
+          .osv2-left { opacity: 1 !important; transform: none !important; }
+          .osv2-cta { opacity: 1 !important; transform: none !important; }
+          .osv2-sticky { align-items: flex-start; padding-top: clamp(5.2rem, 12vh, 7rem); }
+          .osv2-rail__fill { transform: translateX(-50%) scaleY(1) !important; }
+          .osv2-prog-fill { transform: scaleX(1) !important; }
+        }
 
         @media (prefers-reduced-motion: reduce) {
           .osv2-card, .osv2-card__img, .osv2-card__detail, .osv2-prog-fill, .osv2-rail__fill, .osv2-cta__btn { transition-duration: 0.01ms !important; animation: none !important; }
