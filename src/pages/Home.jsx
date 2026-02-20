@@ -14,10 +14,10 @@ import {
   ConversionChamberScene,
   GlobalFooterScene,
   NarrativeBridgeScene,
-  OperationsSpineScene,
   ProofTheaterScene,
   SignatureReelScene,
 } from '../components/homepage/HomeScenes'
+import { OperationsSpineScene } from '../components/homepage/OperationsPhasesAndClientOutcomes'
 
 const SCENE_COMPONENT_REGISTRY = Object.freeze({
   'command-arrival': CommandArrivalScene,

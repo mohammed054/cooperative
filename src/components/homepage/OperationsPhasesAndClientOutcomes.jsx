@@ -166,21 +166,48 @@ export const OperationsSpineScene = ({ scene }) => {
           },
 
           onLeave() {
-            // FIX: Clear zIndex so this wrapper doesn't occlude sections below.
-            // Do NOT set opacity/visibility here — the scrub timeline manages
-            // element states. Forcing them here causes a pop when scrolling past.
+            // FIX: Explicitly lock all animated elements to their final visible
+            // state. The 1.5s scrub lag means elements can still be mid-tween
+            // (partially transparent / offset) when the pin releases — locking
+            // them here prevents a flash-to-invisible on forward scroll-out.
+            gsap.set(header, { opacity: 1, y: 0, clearProps: 'willChange' })
+            gsap.set(cards, { opacity: 1, y: 0, clearProps: 'willChange' })
+            if (cta) gsap.set(cta, { opacity: 1, y: 0, clearProps: 'willChange' })
+            if (railFill) gsap.set(railFill, { scaleY: 1 })
+            if (progBar) gsap.set(progBar, { scaleX: 1 })
+
+            // FIX: After the pin ends, .osv2-sticky returns to normal DOM flow
+            // BELOW the GSAP-created pin spacer. That makes .osv2-outer roughly
+            // 5.8×vh tall, so the user has to scroll through a blank "air gap"
+            // before the next section, and sees the sticky as a "duplicate" at
+            // the bottom. Collapsing it to zero height eliminates both problems.
+            gsap.set(sticky, {
+              minHeight: 0,
+              height: 0,
+              overflow: 'hidden',
+              pointerEvents: 'none',
+              visibility: 'hidden',
+            })
+
+            // Clear zIndex so this wrapper doesn't occlude sections below.
             gsap.set(outer, { zIndex: 'auto' })
           },
 
           onEnterBack() {
+            // FIX: Restore sticky before the scrub timeline re-animates content
+            // so the panel is visible on backward-scroll entry.
+            gsap.set(sticky, {
+              clearProps: 'height,minHeight,overflow,pointerEvents,visibility',
+            })
             gsap.set(outer, { zIndex: 2 })
           },
 
           onRefresh(self) {
             // FIX: GSAP's pin spacer inherits the computed background of the
             // pinned element. On some browsers this renders as a solid or
-            // semi-transparent gray block in the scroll gap after the pin ends.
-            // Force it transparent every time ScrollTrigger recalculates.
+            // semi-transparent gray block. Force it transparent every time
+            // ScrollTrigger recalculates (also handled via CSS below, but
+            // belt-and-suspenders for browsers that ignore the attr selector).
             if (self.spacer) {
               self.spacer.style.background = 'transparent'
               self.spacer.style.backgroundColor = 'transparent'
@@ -207,13 +234,18 @@ export const OperationsSpineScene = ({ scene }) => {
       // CTA enters near end
       if (cta) tl.to(cta, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' }, 0.88)
 
-      // ── FIX: At 100% progress, lock all animated elements to their
-      // final visible state using clearProps so nothing snaps invisible
-      // when the pin releases and the scrub timeline finishes.
+      // FIX: At 100 % progress, remove GSAP inline opacity/transform so CSS
+      // defaults (opacity: 1, no transform) take over. This is the safety net
+      // that keeps elements visible if the pin releases before the scrub lag
+      // resolves fully, and also cleans up will-change hints.
       tl.call(() => {
-        gsap.set(header, { clearProps: 'willChange' })
-        gsap.set(cards, { clearProps: 'willChange' })
-        if (cta) gsap.set(cta, { clearProps: 'willChange' })
+        gsap.set(header, { clearProps: 'opacity,transform,willChange' })
+        gsap.set(cards, { clearProps: 'opacity,transform,willChange' })
+        if (cta) gsap.set(cta, { clearProps: 'opacity,transform,willChange' })
+        // Rail/progBar have CSS default transforms (scaleY(0) / scaleX(0)), so
+        // do NOT clearProps on them — instead pin them explicitly at final value.
+        if (railFill) gsap.set(railFill, { scaleY: 1 })
+        if (progBar) gsap.set(progBar, { scaleX: 1 })
       }, [], 1)
 
       // ── Sentinel: prime the next scene's entry animation ─────────────
@@ -282,11 +314,19 @@ export const OperationsSpineScene = ({ scene }) => {
         }
 
         /*
-          FIX: GSAP creates a pin spacer div whose computed background can
-          bleed through as a gray rectangle in the gap after the pin ends,
-          and sometimes as a semi-transparent overlay box while the second
-          card is appearing. This rule targets GSAP's spacer and forces it
-          fully transparent regardless of what styles it inherits.
+          FIX (gray box): GSAP always stamps data-gsap-pin-spacer on the spacer
+          div it injects. Targeting it directly is more reliable than the
+          adjacent-sibling selector approach, which can miss the element if GSAP
+          restructures the DOM differently across versions or refresh cycles.
+        */
+        .osv2-outer [data-gsap-pin-spacer] {
+          background: transparent !important;
+          background-color: transparent !important;
+        }
+
+        /*
+          Belt-and-suspenders fallback using the original selector in case the
+          attribute isn't stamped yet on first paint in some environments.
         */
         .osv2-outer + [style*="height"],
         .osv2-outer > [style*="margin-top"] {
