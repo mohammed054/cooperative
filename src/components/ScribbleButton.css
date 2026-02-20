@@ -273,6 +273,20 @@
   --sb-hover-border: rgba(255, 255, 255, 0.56);
 }
 
+.scribble-button.proof-index-button {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  border-radius: 0.9rem;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: auto;
+  padding: 0.68rem 0.78rem;
+}
+
+.scribble-button.proof-index-button .scribble-text {
+  width: 100%;
+}
+
 @keyframes scribble-pressure {
   0% {
     stroke-dashoffset: 2800;

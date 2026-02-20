@@ -1,4 +1,4 @@
-# Homepage Phase 4 Structure + Cinematic Notes
+# Homepage Phase 10 Structure + Cinematic Notes
 
 ## Scene Order & Layout Contract
 
@@ -11,7 +11,7 @@
 | `operations-spine` | `steel` | `pinned` | `240vh` | process timeline with friction-led staged entries | `data-transition-ready="false"` |
 | `narrative-bridge` | `warm` | `free` | `75vh` | decompression bridge before proof | `data-transition-ready="false"` |
 | `proof-theater` | `linen` | `free` | `120vh` | rectangular featured testimonial + indexed rail | `data-transition-ready="false"` |
-| `conversion-chamber` | `deep` | `free` | `120vh` | two-column close: commitment copy + real lead form | `data-transition-ready="false"` |
+| `conversion-chamber` | `deep` | `free` | `120vh` | two-column close: commitment copy + local-state intake form | `data-transition-ready="false"` |
 | `global-footer` | `deep` | `free` | `70vh` | 4-column utility + final command CTA | `data-transition-ready="false"` |
 
 ## Motion & Tone Contract Usage
@@ -66,10 +66,10 @@
 - Project reel pulls exactly 3 real case studies (`caseStudies.slice(0, 3)`), no synthetic logo pills.
 - Testimonial rail pulls real entries from `testimonials` with rectangular media treatment.
 - Featured proof panel includes name, role, organization, quote, progress bar, and indexed selectors.
-- Footer partner strip now uses real testimonial organizations as client marks, with image-logo fallback support.
+- Footer logo strip renders only real logo assets; no pseudo wordmarks are shown when logos are unavailable.
 - Placeholder policy:
   - No fake metrics, fake logos, or generated pending testimonials are in use.
-  - TODO: approved client logo image files are still pending legal delivery; organization wordmarks are used until assets are provided.
+  - TODO: approved client logo image files are still pending legal delivery; the logo strip remains intentionally empty-state until assets are provided.
   - Remaining content dependencies are media quality upgrades only (hero master grade, optional higher-res case stills), not structural placeholders.
 
 ## CTA Micro-Polish Notes
@@ -87,6 +87,7 @@
 - Signature reel cards are keyboard-selectable on mobile/tablet (`Enter`/`Space`) with explicit focus styling.
 - Proof theater mobile: touch-swipe gesture support (left/right threshold) on featured card.
 - Proof theater featured rail supports keyboard arrow navigation (`Left`/`Right`) and progressive button disabling at bounds.
+- Interactive controls in homepage scenes are standardized on `ScribbleButton`; native `<button>` controls were removed from scene content.
 - Ambient layer intensity is reduced under `max-width: 900px`.
 - Scroll smoothing and pinned behavior are bypassed under reduced-motion for accessibility.
 - Horizontal rails now use touch momentum + overscroll containment for cleaner mobile gesture behavior.
@@ -104,5 +105,6 @@
   - keyboard traversal through project/testimonial rails
   - screen-reader announcement of conversion feedback states
   - reduced-motion mode preserving layout and interaction clarity
-- Lead capture requires configured webhook (`VITE_LEAD_WEBHOOK_URL`) for production submissions.
+- Homepage lead capture currently runs local-state submission simulation.
+- TODO: integrate final backend/API endpoint at the marked Phase 10 hook in `src/components/homepage/HomeSceneSkeletons.jsx`.
 - Deploy target can be Netlify, Vercel, or internal host once manual QA items are cleared.

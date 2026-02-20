@@ -17,7 +17,6 @@ import {
 import { MOTION_TOKEN_CONTRACT, parseBezier } from '../../motion/motionTokenContract.js'
 import { caseStudies, services, testimonials as testimonialData } from '../../data/siteData'
 import { assetUrl } from '../../lib/assetUrl'
-import { useLeadSubmission } from '../../hooks/useLeadSubmission'
 
 const FREE = 'free'
 const PINNED = 'pinned'
@@ -103,10 +102,7 @@ const FOOTER_COMPANY_LINKS = [
 ]
 
 const CLIENT_LOGO_ASSET_BY_ORGANIZATION = Object.freeze({
-  // TODO(phase7-assets): Replace null values with approved client logo files when legal assets are delivered.
-  'Skyline Ventures': null,
-  'Prestige Group': null,
-  'Elite Hospitality': null,
+  // TODO(phase10-assets): Add approved client logo files when legal release is complete.
 })
 
 const CLIENT_PROOF_MARKS = TESTIMONIALS.map(item => ({
@@ -115,6 +111,7 @@ const CLIENT_PROOF_MARKS = TESTIMONIALS.map(item => ({
   role: item.role,
   logo: CLIENT_LOGO_ASSET_BY_ORGANIZATION[item.organization] || null,
 }))
+const HAS_CLIENT_LOGOS = CLIENT_PROOF_MARKS.some(mark => Boolean(mark.logo))
 
 const parseMetricValue = raw => {
   const digits = String(raw || '').match(/\d+/g)
@@ -501,7 +498,7 @@ const SignatureReelContent = ({ progress, reduced }) => {
         <SceneCard className="p-5 md:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="max-w-[64ch]">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Signature Reel</p>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Featured Engagements</p>
               <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,2.95vw,2.52rem)] leading-[1.06] text-[var(--color-ink)]">
                 Three recent productions where precision carried the room.
               </h2>
@@ -592,7 +589,7 @@ const SignatureReelContent = ({ progress, reduced }) => {
                 <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{selected.challenge}</p>
                 <div className="mt-4">
                   <ScribbleButton title="Open full production case details" to={`/work/${selected.slug}`} variant="primary" tone="light" size="md" analyticsLabel={`signature-case-${selected.slug}`}>
-                    Review Full Case
+                    View Case Study
                   </ScribbleButton>
                 </div>
               </SceneCard>
@@ -642,17 +639,25 @@ export const CommandArrivalScene = ({ scene }) => {
                   Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.
                 </motion.p>
                 <motion.div variants={revealLift(0.17, 10)} className="mt-8 flex flex-wrap gap-3">
-                  <ScribbleButton title="See flagship event case studies" variant="primary" tone="light" size="md" to="/work" analyticsLabel="hero-signature-work">View Signature Work</ScribbleButton>
-                  <ScribbleButton title="Open private project intake" variant="outline" tone="light" size="md" to="/contact" analyticsLabel="hero-private-brief">Start Confidential Brief</ScribbleButton>
+                  <ScribbleButton title="Explore flagship event capability and portfolio" variant="primary" tone="light" size="md" to="/work" analyticsLabel="hero-signature-work">Explore Capabilities</ScribbleButton>
+                  <ScribbleButton title="Open private project intake" variant="outline" tone="light" size="md" to="/contact" analyticsLabel="hero-private-brief">Request Proposal</ScribbleButton>
                 </motion.div>
                 <motion.p variants={revealLift(0.2, 8)} className="mt-3 text-xs text-[var(--color-ink-subtle)]">
                   Confidential intake channel. Response target: one business day.
                 </motion.p>
                 <motion.div variants={revealLift(0.23, 10)} className="mt-8 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
                   <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1">Optional Ambient Cue</span>
-                  <button type="button" onClick={() => setAudioCueArmed(value => !value)} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-[var(--color-ink)] transition hover:border-[var(--color-ink)]">
+                  <ScribbleButton
+                    type="button"
+                    onClick={() => setAudioCueArmed(value => !value)}
+                    variant="micro"
+                    tone="light"
+                    size="sm"
+                    showArrow={false}
+                    analyticsLabel="hero-audio-toggle"
+                  >
                     {audioCueArmed ? 'Audio Cue Active' : 'Activate Audio Cue'}
-                  </button>
+                  </ScribbleButton>
                 </motion.div>
               </SceneCard>
             </motion.div>
@@ -698,7 +703,7 @@ export const AuthorityLedgerScene = ({ scene }) => (
       <motion.div variants={sequence(0.04, 0.1)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="grid gap-5">
         <motion.div variants={revealLift(0.02, 12)}>
           <SceneCard className="p-5 md:p-6">
-            <p className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Authority Ledger</p>
+            <p className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Performance Record</p>
             <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.07] text-[var(--color-ink)]">Outcome authority before visual theater.</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {AUTHORITY_METRICS.map(metric => (
@@ -740,7 +745,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
       <motion.div variants={sequence(0.03, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.22 }} className="grid gap-4">
         <motion.div variants={revealLift(0.01, 10)}>
           <SceneCard className="p-5 md:p-6">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Capability Matrix</p>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Capabilities</p>
             <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.55rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Technical depth, creative precision, operational control.</h2>
           </SceneCard>
         </motion.div>
@@ -794,14 +799,14 @@ export const OperationsSpineScene = ({ scene }) => (
 
           <div className="relative z-[2] grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
             <SceneCard className="relative h-fit p-5 md:p-6">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Operations Spine</p>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Delivery Framework</p>
               <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.56rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Process pressure translated into composure at showtime.</h2>
               <p className="mt-4 max-w-[56ch] text-sm text-[var(--color-ink-muted)]">Scroll holds tension while each command phase locks before advancing.</p>
               <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]" role="progressbar" aria-label="Operations spine progression" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(railProgress)}>
                 <motion.div className="h-full rounded-full bg-[var(--color-accent)]" animate={{ width: `${railProgress}%` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }} />
               </div>
               <motion.div animate={ctaVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="mt-6">
-                <ScribbleButton variant="outline" tone="light" size="sm" to="/process" analyticsLabel="operations-process">Review Full Process Architecture</ScribbleButton>
+                <ScribbleButton variant="outline" tone="light" size="sm" to="/process" analyticsLabel="operations-process">Explore Capabilities</ScribbleButton>
               </motion.div>
             </SceneCard>
 
@@ -853,7 +858,7 @@ export const NarrativeBridgeScene = ({ scene }) => (
   <FreeSceneFrame scene={scene} pinBehavior="calm-release" layout="narrative-bridge" className="scene-cinematic scene-narrative-bridge">
     {({ reduced }) => (
       <SceneCard className="relative grid min-h-[clamp(320px,50vh,500px)] place-items-center overflow-hidden text-center p-6 md:p-8">
-        <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Narrative Release</motion.p>
+        <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Outcome Transition</motion.p>
         <motion.h2 initial={reduced ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.1, ease: MASS_EASE, delay: 0.05 }} className="mt-4 max-w-[20ch] font-serif text-[clamp(1.8rem,3.9vw,2.85rem)] leading-[1.08] text-[var(--color-ink)]">Precision is only credible when proof carries the weight.</motion.h2>
         <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE, delay: 0.12 }} className="mt-5 max-w-[60ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">The next chapter shifts from directional language to verified outcomes, named stakeholders, and delivery context.</motion.p>
       </SceneCard>
@@ -951,10 +956,10 @@ const ProofTheaterSplit = ({ reduced }) => {
         </SceneCard>
 
         <SceneCard className="bg-[var(--color-surface-2)] p-3">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Proof Index</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Index</p>
           <div className="mt-3 grid gap-2">
             {TESTIMONIALS.map((item, index) => (
-              <button key={item.id} type="button" onClick={() => setActiveIndex(index)} className={`cinematic-interactive-card grid w-full gap-2 rounded-xl border px-3 py-3 text-left transition ${index === safeIndex ? 'border-[rgba(216,230,255,0.42)] bg-[var(--color-surface)]' : 'border-[var(--color-border)] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface)]'}`}>
+              <ScribbleButton key={item.id} type="button" onClick={() => setActiveIndex(index)} variant={index === safeIndex ? 'primary' : 'outline'} tone="light" size="sm" showArrow={false} analyticsLabel={`proof-index-${item.id}`} className="proof-index-button">
                 <div className="grid items-center gap-2 sm:grid-cols-[64px_1fr]">
                   <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-12 w-full rounded-md border border-[var(--color-border)] object-cover" />
                   <div>
@@ -963,7 +968,7 @@ const ProofTheaterSplit = ({ reduced }) => {
                     <p className="text-xs text-[var(--color-ink-subtle)]">{item.organization}</p>
                   </div>
                 </div>
-              </button>
+              </ScribbleButton>
             ))}
           </div>
         </SceneCard>
@@ -990,7 +995,7 @@ export const ProofTheaterScene = ({ scene }) => {
           <AmbientDepthField reduced={reduced} variant="proof" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.46} />
           <div className="relative z-[2] grid gap-5">
             <SceneCard className="p-5 md:p-6">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Proof Theater</p>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Client Outcomes</p>
               <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.56rem,2.95vw,2.44rem)] leading-[1.08] text-[var(--color-ink)]">Verified outcomes, named stakeholders, accountable delivery.</h2>
             </SceneCard>
             <ProofTheaterSplit reduced={reduced} />
@@ -1008,21 +1013,46 @@ const FloatingField = ({ id, label, children }) => (
 )
 
 const ConversionChamberContent = ({ reduced }) => {
-  const { submit, isSubmitting, isSuccess, isError, feedbackMessage } = useLeadSubmission({
-    formName: 'homepage-command-brief',
-    successMessage:
-      'Brief received. A senior producer will contact you within one business day.',
-  })
+  const [status, setStatus] = useState('idle')
+  const [feedbackMessage, setFeedbackMessage] = useState('')
+  const isSubmitting = status === 'submitting'
+  const isSuccess = status === 'success'
+  const isError = status === 'error'
 
   const handleSubmit = async event => {
     event.preventDefault()
-    await submit(event.currentTarget)
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    const honeypotValue = String(formData.get('website') || '').trim()
+
+    if (honeypotValue) return
+
+    const name = String(formData.get('name') || '').trim()
+    const email = String(formData.get('email') || '').trim()
+
+    if (!name || !email) {
+      setStatus('error')
+      setFeedbackMessage('Please provide your name and email before submitting.')
+      return
+    }
+
+    setStatus('submitting')
+    setFeedbackMessage('')
+
+    await new Promise(resolve => window.setTimeout(resolve, 720))
+
+    // TODO(phase10-api): Replace local success simulation with backend submission when API endpoint is approved.
+    setStatus('success')
+    setFeedbackMessage(
+      'Request received. A senior producer will contact you within one business day.'
+    )
+    form.reset()
   }
 
   return (
     <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
       <SceneCard className="h-full bg-[var(--color-surface)] p-6 md:p-7">
-        <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Private Engagement Chamber</p>
+        <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Request Proposal</p>
         <h2 className="mt-3 max-w-[20ch] font-serif text-[clamp(1.7rem,3.1vw,2.6rem)] leading-[1.06] text-[var(--color-ink)]">Close the narrative with a deliberate production brief</h2>
         <p className="mt-4 max-w-[56ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">This request enters a direct producer queue. Expect response clarity, risk framing, and executable scope.</p>
         <div className="mt-5 grid gap-3">
@@ -1107,7 +1137,7 @@ const ConversionChamberContent = ({ reduced }) => {
         </AnimatePresence>
 
         <ScribbleButton title="Submit private production intake form" type="submit" variant="primary" tone="light" size="md" analyticsLabel="conversion-brief-submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Securing Brief...' : 'Request Executive Production Consult'}
+          {isSubmitting ? 'Submitting Request...' : 'Submit Request'}
         </ScribbleButton>
 
         <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
@@ -1118,7 +1148,7 @@ const ConversionChamberContent = ({ reduced }) => {
   )
 }
 
-// Conversion Chamber: real lead capture, cinematic closure.
+// Conversion close: local-state intake simulation until backend endpoint is approved.
 export const ConversionChamberScene = ({ scene }) => (
   <FreeSceneFrame scene={scene} pinBehavior="closing-ritual" layout="conversion-chamber" className="scene-cinematic scene-conversion-chamber">
     {({ reduced }) => <ConversionChamberContent reduced={reduced} />}
@@ -1131,37 +1161,40 @@ export const GlobalFooterScene = ({ scene }) => (
     {({ reduced }) => (
       <motion.div variants={sequence(0.05, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-4">
         <SceneCard className="p-5 md:p-6">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Final Step</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Next Move</p>
           <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.6rem,2.95vw,2.45rem)] leading-[1.08] text-[var(--color-ink)]">Precision-led production for moments where public failure is not an option.</h2>
           <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">Regional reach across UAE, one accountable command structure, and execution discipline from scope to show close.</p>
         </SceneCard>
 
         <SceneCard className="p-5 md:p-6">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Partners</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {CLIENT_PROOF_MARKS.map((mark, index) => (
-              <motion.article
-                key={mark.id}
-                initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{
-                  duration: MOTION_TOKEN_CONTRACT.durations.scene,
-                  ease: MASS_EASE,
-                  delay: reduced ? 0 : index * 0.05,
-                }}
-                whileHover={reduced ? undefined : { scale: 1.012 }}
-                className="client-logo-panel rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4"
-              >
-                {mark.logo ? (
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Logos</p>
+          {HAS_CLIENT_LOGOS ? (
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {CLIENT_PROOF_MARKS.filter(mark => Boolean(mark.logo)).map((mark, index) => (
+                <motion.article
+                  key={mark.id}
+                  initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{
+                    duration: MOTION_TOKEN_CONTRACT.durations.scene,
+                    ease: MASS_EASE,
+                    delay: reduced ? 0 : index * 0.05,
+                  }}
+                  whileHover={reduced ? undefined : { scale: 1.012 }}
+                  className="client-logo-panel rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4"
+                >
                   <img src={mark.logo} alt={`${mark.name} logo`} loading="lazy" decoding="async" className="h-8 w-auto object-contain" />
-                ) : (
-                  <p className="client-wordmark text-sm font-semibold tracking-[0.03em] text-[var(--color-ink)]">{mark.name}</p>
-                )}
-                <p className="mt-2 text-xs text-[var(--color-ink-muted)]">{mark.role}</p>
-              </motion.article>
-            ))}
-          </div>
+                </motion.article>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4">
+              <p className="text-sm text-[var(--color-ink-muted)]">
+                Client logo assets are pending legal release and will be added in the next publish cycle.
+              </p>
+            </div>
+          )}
         </SceneCard>
 
         <div className="grid gap-3 md:grid-cols-4">
@@ -1217,7 +1250,7 @@ export const GlobalFooterScene = ({ scene }) => (
         </div>
 
         <div className="pb-2">
-          <ScribbleButton title="Open contact and schedule executive consult" variant="primary" tone="light" size="md" analyticsLabel="footer-command-consult" to="/contact">Request Executive Command Consult</ScribbleButton>
+          <ScribbleButton title="Open contact and schedule executive consult" variant="primary" tone="light" size="md" analyticsLabel="footer-command-consult" to="/contact">Request Proposal</ScribbleButton>
         </div>
       </motion.div>
     )}

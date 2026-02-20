@@ -69,8 +69,8 @@ export const SCENE_DEFINITION_TEMPLATE = Object.freeze({
   transitionReady: false,
   mediaPlaceholder: {
     type: 'video',
-    key: 'placeholder-key',
-    ref: 'placeholder-ref',
+    key: 'media-key',
+    ref: 'media-ref',
   },
 })
 
