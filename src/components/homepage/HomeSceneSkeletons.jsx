@@ -333,7 +333,7 @@ const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children
     <div
       aria-hidden="true"
       className="scene-friction-buffer"
-      style={{ '--scene-buffer-height': '9vh' }}
+      style={{ '--scene-buffer-height': 'clamp(3.2rem, 8vh, 6rem)' }}
       data-buffer-for={scene.id}
       data-buffer-position="pre"
     />
@@ -354,7 +354,7 @@ const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children
     <div
       aria-hidden="true"
       className="scene-friction-buffer"
-      style={{ '--scene-buffer-height': '9vh' }}
+      style={{ '--scene-buffer-height': 'clamp(3.2rem, 8vh, 6rem)' }}
       data-buffer-for={scene.id}
       data-buffer-position="post"
     />
@@ -362,44 +362,66 @@ const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children
   </>
 )
 
-const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }) => (
-  <motion.article
-    layout
-    whileHover={!reduced ? { y: -5, scale: 1.01, rotateY: -1.4 } : undefined}
-    whileTap={!reduced ? { y: -1, scale: 0.988 } : undefined}
-    onClick={interactive ? onSelect : undefined}
-    animate={{
-      opacity: reduced ? 1 : active ? 1 : 0.62,
-      scale: reduced ? 1 : active ? 1 : 0.96,
-      y: reduced ? 0 : active ? 0 : 10,
-      rotateX: reduced ? 0 : active ? 0 : 3.8,
-      rotateY: reduced ? 0 : active ? 0 : -2,
-    }}
-    transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }}
-    style={{ transformPerspective: 980, transformStyle: 'preserve-3d' }}
-    className={`cinematic-interactive-card min-w-[252px] snap-start rounded-2xl border p-3 ${
-      active
-        ? 'border-[rgba(234,241,255,0.44)] bg-[var(--color-surface-2)] shadow-[0_30px_70px_rgba(3,5,8,0.44)]'
-        : 'border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_14px_30px_rgba(4,6,10,0.24)]'
-    } ${interactive ? 'cursor-pointer' : ''}`}
-  >
-    <div className="relative h-36 overflow-hidden rounded-xl border border-[var(--color-border)]">
-      <img src={project.image} alt={project.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(24,28,36,0.08)_0%,rgba(24,28,36,0.48)_100%)]" />
-      <p className="absolute left-3 top-3 text-[9px] uppercase tracking-[0.14em] text-white/80">{project.location}</p>
-    </div>
-    <h3 className="mt-3 font-serif text-[1.08rem] text-[var(--color-ink)]">{project.title}</h3>
-    <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{project.subtitle}</p>
-    <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{project.outcome}</p>
-  </motion.article>
-)
+const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }) => {
+  const handleKeyDown = event => {
+    if (!interactive) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onSelect?.()
+    }
+  }
+
+  return (
+    <motion.article
+      layout
+      whileHover={!reduced ? { y: -5, scale: 1.01, rotateY: -1.4 } : undefined}
+      whileTap={!reduced ? { y: -1, scale: 0.988 } : undefined}
+      onClick={interactive ? onSelect : undefined}
+      onKeyDown={interactive ? handleKeyDown : undefined}
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      aria-pressed={interactive ? active : undefined}
+      aria-label={interactive ? `Select project panel: ${project.title}` : undefined}
+      animate={{
+        opacity: reduced ? 1 : active ? 1 : 0.62,
+        scale: reduced ? 1 : active ? 1 : 0.96,
+        y: reduced ? 0 : active ? 0 : 10,
+        rotateX: reduced ? 0 : active ? 0 : 3.8,
+        rotateY: reduced ? 0 : active ? 0 : -2,
+      }}
+      transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }}
+      style={{ transformPerspective: 980, transformStyle: 'preserve-3d' }}
+      className={`cinematic-interactive-card min-w-[252px] snap-start rounded-2xl border p-3 ${
+        active
+          ? 'border-[rgba(234,241,255,0.44)] bg-[var(--color-surface-2)] shadow-[0_30px_70px_rgba(3,5,8,0.44)]'
+          : 'border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_14px_30px_rgba(4,6,10,0.24)]'
+      } ${interactive ? 'cursor-pointer' : ''}`}
+    >
+      <div className="relative h-36 overflow-hidden rounded-xl border border-[var(--color-border)]">
+        <img src={project.image} alt={project.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(24,28,36,0.08)_0%,rgba(24,28,36,0.48)_100%)]" />
+        <p className="absolute left-3 top-3 text-[9px] uppercase tracking-[0.14em] text-white/80">{project.location}</p>
+      </div>
+      <h3 className="mt-3 font-serif text-[1.08rem] text-[var(--color-ink)]">{project.title}</h3>
+      <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{project.subtitle}</p>
+      <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{project.outcome}</p>
+    </motion.article>
+  )
+}
+
 const SignatureReelContent = ({ progress, reduced }) => {
   const mobileTrackRef = useRef(null)
+  const scrollFrameRef = useRef(0)
   const [manualIndex, setManualIndex] = useState(null)
 
   const indexFromScroll = clampIndex(Math.floor(progress * PROJECTS.length), PROJECTS.length - 1)
-  const selectedIndex = typeof manualIndex === 'number' ? manualIndex : indexFromScroll
+  const manualIndexInRange =
+    typeof manualIndex === 'number' &&
+    Math.abs(indexFromScroll - manualIndex) <= 1
+  const selectedIndex = manualIndexInRange ? manualIndex : indexFromScroll
   const selected = PROJECTS[selectedIndex]
+  const hasPrev = selectedIndex > 0
+  const hasNext = selectedIndex < PROJECTS.length - 1
 
   const tension = reduced ? 0 : Math.max(0, 1 - Math.abs(progress - 0.55) / 0.55)
   const apertureInset = reduced ? 0 : 8 + tension * 26
@@ -407,6 +429,15 @@ const SignatureReelContent = ({ progress, reduced }) => {
   const backgroundY = reduced ? 0 : (0.5 - progress) * 40
   const midY = reduced ? 0 : (0.5 - progress) * 22
   const foregroundY = reduced ? 0 : (0.5 - progress) * 14
+
+  useEffect(
+    () => () => {
+      if (scrollFrameRef.current) {
+        window.cancelAnimationFrame(scrollFrameRef.current)
+      }
+    },
+    []
+  )
 
   const selectProject = index => {
     const clamped = clampIndex(index, PROJECTS.length - 1)
@@ -417,6 +448,42 @@ const SignatureReelContent = ({ progress, reduced }) => {
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
     }
+  }
+
+  const syncSelectedIndexFromMobileRail = () => {
+    if (!mobileTrackRef.current) return
+    const items = Array.from(
+      mobileTrackRef.current.querySelectorAll('[data-project-index]')
+    )
+    if (!items.length) return
+
+    const currentLeft = mobileTrackRef.current.scrollLeft
+    let closestIndex = 0
+    let closestDistance = Number.POSITIVE_INFINITY
+
+    items.forEach(node => {
+      const index = Number(node.getAttribute('data-project-index'))
+      const distance = Math.abs(node.offsetLeft - currentLeft)
+      if (distance < closestDistance) {
+        closestDistance = distance
+        closestIndex = index
+      }
+    })
+
+    if (Number.isFinite(closestIndex) && closestIndex !== manualIndex) {
+      setManualIndex(clampIndex(closestIndex, PROJECTS.length - 1))
+    }
+  }
+
+  const handleMobileTrackScroll = () => {
+    if (!mobileTrackRef.current) return
+    if (scrollFrameRef.current) {
+      window.cancelAnimationFrame(scrollFrameRef.current)
+    }
+    scrollFrameRef.current = window.requestAnimationFrame(() => {
+      scrollFrameRef.current = 0
+      syncSelectedIndexFromMobileRail()
+    })
   }
 
   return (
@@ -440,10 +507,10 @@ const SignatureReelContent = ({ progress, reduced }) => {
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <ScribbleButton title="Navigate to previous project case" variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex - 1)} analyticsLabel="signature-prev">
+              <ScribbleButton title="Navigate to previous project case" ariaLabel="Go to previous project in signature reel" variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex - 1)} analyticsLabel="signature-prev" disabled={!hasPrev}>
                 Previous Case
               </ScribbleButton>
-              <ScribbleButton title="Navigate to next project case" variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex + 1)} analyticsLabel="signature-next">
+              <ScribbleButton title="Navigate to next project case" ariaLabel="Go to next project in signature reel" variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex + 1)} analyticsLabel="signature-next" disabled={!hasNext}>
                 Next Case
               </ScribbleButton>
             </div>
@@ -499,7 +566,14 @@ const SignatureReelContent = ({ progress, reduced }) => {
               ))}
             </motion.div>
 
-            <div ref={mobileTrackRef} className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 md:hidden" style={{ touchAction: 'pan-x' }}>
+            <div
+              ref={mobileTrackRef}
+              className="cinematic-horizontal-rail flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 md:hidden"
+              style={{ touchAction: 'pan-x' }}
+              onScroll={handleMobileTrackScroll}
+              role="region"
+              aria-label="Signature projects horizontal rail"
+            >
               {PROJECTS.map((project, index) => (
                 <div key={`mobile-${project.id}`} data-project-index={index}>
                   <ProjectCard project={project} active={index === selectedIndex} reduced={reduced} interactive onSelect={() => selectProject(index)} />
@@ -723,7 +797,7 @@ export const OperationsSpineScene = ({ scene }) => (
               <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Operations Spine</p>
               <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.56rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Process pressure translated into composure at showtime.</h2>
               <p className="mt-4 max-w-[56ch] text-sm text-[var(--color-ink-muted)]">Scroll holds tension while each command phase locks before advancing.</p>
-              <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
+              <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]" role="progressbar" aria-label="Operations spine progression" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(railProgress)}>
                 <motion.div className="h-full rounded-full bg-[var(--color-accent)]" animate={{ width: `${railProgress}%` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }} />
               </div>
               <motion.div animate={ctaVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="mt-6">
@@ -794,6 +868,8 @@ const ProofTheaterSplit = ({ reduced }) => {
   const safeIndex = clampIndex(activeIndex, Math.max(TESTIMONIALS.length - 1, 0))
   const active = TESTIMONIALS[safeIndex]
   const progress = TESTIMONIALS.length ? ((safeIndex + 1) / TESTIMONIALS.length) * 100 : 0
+  const hasPrev = safeIndex > 0
+  const hasNext = safeIndex < TESTIMONIALS.length - 1
 
   const goPrev = () => setActiveIndex(index => clampIndex(index - 1, TESTIMONIALS.length - 1))
   const goNext = () => setActiveIndex(index => clampIndex(index + 1, TESTIMONIALS.length - 1))
@@ -818,10 +894,21 @@ const ProofTheaterSplit = ({ reduced }) => {
     touchDeltaRef.current = 0
   }
 
+  const onRailKeyDown = event => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault()
+      goPrev()
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault()
+      goNext()
+    }
+  }
+
   return (
     <div className="relative grid gap-3 overflow-hidden rounded-2xl">
       <div className="relative grid gap-3 lg:grid-cols-[0.6fr_0.4fr]">
-        <SceneCard className="bg-[var(--color-surface)] p-5" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+        <SceneCard className="bg-[var(--color-surface)] p-5" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onKeyDown={onRailKeyDown} tabIndex={0} role="region" aria-label="Client testimonial carousel; use arrow keys to navigate">
           {active ? (
             <AnimatePresence mode="wait">
               <motion.div
@@ -850,12 +937,12 @@ const ProofTheaterSplit = ({ reduced }) => {
                   <p className="text-xs text-[var(--color-ink-muted)]">{active.role}, {active.organization}</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                  <div className="relative h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
+                  <div className="relative h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]" role="progressbar" aria-label="Testimonial progression" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}>
                     <motion.div className="h-full rounded-full bg-[var(--color-accent)]" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }} />
                   </div>
                   <div className="flex gap-2">
-                    <ScribbleButton title="Previous client testimonial" variant="micro" tone="light" size="sm" showArrow={false} onClick={goPrev} analyticsLabel="proof-prev">Previous</ScribbleButton>
-                    <ScribbleButton title="Next client testimonial" variant="micro" tone="light" size="sm" showArrow={false} onClick={goNext} analyticsLabel="proof-next">Next</ScribbleButton>
+                    <ScribbleButton title="Previous client testimonial" ariaLabel="Go to previous testimonial" variant="micro" tone="light" size="sm" showArrow={false} onClick={goPrev} analyticsLabel="proof-prev" disabled={!hasPrev}>Previous</ScribbleButton>
+                    <ScribbleButton title="Next client testimonial" ariaLabel="Go to next testimonial" variant="micro" tone="light" size="sm" showArrow={false} onClick={goNext} analyticsLabel="proof-next" disabled={!hasNext}>Next</ScribbleButton>
                   </div>
                 </div>
               </motion.div>
@@ -951,7 +1038,7 @@ const ConversionChamberContent = ({ reduced }) => {
         </div>
       </SceneCard>
 
-      <motion.form onSubmit={handleSubmit} variants={sequence(0.02, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.25 }} className="cinematic-conversion-form grid gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
+      <motion.form onSubmit={handleSubmit} variants={sequence(0.02, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.25 }} className="cinematic-conversion-form grid gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5" aria-busy={isSubmitting}>
         <input type="hidden" name="source_scene" value="conversion-chamber" />
         <input type="hidden" name="source_path" value="/" />
         <input type="text" name="website" tabIndex={-1} autoComplete="off" className="sr-only" aria-hidden="true" />
@@ -1004,7 +1091,7 @@ const ConversionChamberContent = ({ reduced }) => {
 
         <AnimatePresence mode="wait">
           {feedbackMessage ? (
-            <motion.div key={feedbackMessage} initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? undefined : { opacity: 0, y: -6, scale: 0.98 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS_EASE }} className={`cinematic-feedback-panel rounded-xl border px-4 py-3 ${isSuccess ? 'is-success border-[rgba(122,218,165,0.45)] bg-[rgba(53,95,76,0.28)] text-[var(--color-ink)]' : 'border-[rgba(236,123,123,0.44)] bg-[rgba(90,37,37,0.24)] text-[var(--color-ink)]'}`}>
+            <motion.div key={feedbackMessage} initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? undefined : { opacity: 0, y: -6, scale: 0.98 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS_EASE }} className={`cinematic-feedback-panel rounded-xl border px-4 py-3 ${isSuccess ? 'is-success border-[rgba(122,218,165,0.45)] bg-[rgba(53,95,76,0.28)] text-[var(--color-ink)]' : 'border-[rgba(236,123,123,0.44)] bg-[rgba(90,37,37,0.24)] text-[var(--color-ink)]'}`} role={isSuccess ? 'status' : 'alert'} aria-live={isSuccess ? 'polite' : 'assertive'} aria-atomic="true">
               <div className="flex items-center gap-3">
                 {isSuccess ? (
                   <span className="cinematic-success-mark" aria-hidden="true">

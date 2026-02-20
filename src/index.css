@@ -1925,6 +1925,28 @@
   will-change: transform;
 }
 
+.cinematic-horizontal-rail {
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.cinematic-horizontal-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.cinematic-horizontal-rail > * {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.cinematic-interactive-card[role='button']:focus-visible,
+.cinematic-scene-card[role='region']:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
 .cinematic-pin-stage::before {
   content: '';
   position: absolute;

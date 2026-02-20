@@ -84,6 +84,24 @@
   box-shadow: 0 12px 26px rgba(8, 11, 16, 0.22);
 }
 
+.scribble-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  transform: none;
+  filter: saturate(0.82);
+  box-shadow: none;
+}
+
+.scribble-button:disabled::after {
+  display: none;
+}
+
+.scribble-button:disabled .scribble-svg path {
+  animation: none;
+  stroke-dashoffset: 0;
+  opacity: 0.15;
+}
+
 .scribble-button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 3px;
@@ -132,6 +150,11 @@
 .scribble-button:hover .scribble-svg path {
   opacity: 0.4;
   animation: scribble-pressure var(--sb-stroke-duration) cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
+}
+
+.scribble-button:disabled:hover .scribble-svg path,
+.scribble-button:disabled:active .scribble-svg path {
+  animation: none;
 }
 
 .scribble-button:active .scribble-svg path {

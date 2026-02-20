@@ -83,18 +83,26 @@
 ## Responsive & Interaction Notes
 
 - Signature reel desktop: conveyor track tied to pinned progress.
-- Signature reel mobile: `snap-x` horizontal track with manual `scrollIntoView` targeting.
+- Signature reel mobile: `snap-x` horizontal track with manual `scrollIntoView` targeting and scroll-synced selected-state updates.
+- Signature reel cards are keyboard-selectable on mobile/tablet (`Enter`/`Space`) with explicit focus styling.
 - Proof theater mobile: touch-swipe gesture support (left/right threshold) on featured card.
+- Proof theater featured rail supports keyboard arrow navigation (`Left`/`Right`) and progressive button disabling at bounds.
 - Ambient layer intensity is reduced under `max-width: 900px`.
 - Scroll smoothing and pinned behavior are bypassed under reduced-motion for accessibility.
+- Horizontal rails now use touch momentum + overscroll containment for cleaner mobile gesture behavior.
 
 ## Final QA + Deployment Checklist
 
 - `npm run build` must pass before deploy.
+- `npm run lint` and `npm run test:run` must pass before deploy.
 - Manual QA required in browser for:
   - pinned lock/release behavior (`signature-reel`, `operations-spine`)
   - horizontal reel touch/drag behavior on mobile
   - testimonial swipe + nav button parity
   - ScribbleButton hover/press/focus states
+- Accessibility QA required in browser for:
+  - keyboard traversal through project/testimonial rails
+  - screen-reader announcement of conversion feedback states
+  - reduced-motion mode preserving layout and interaction clarity
 - Lead capture requires configured webhook (`VITE_LEAD_WEBHOOK_URL`) for production submissions.
 - Deploy target can be Netlify, Vercel, or internal host once manual QA items are cleared.
