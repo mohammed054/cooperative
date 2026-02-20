@@ -604,7 +604,6 @@ const SignatureReelContent = ({ progress, reduced }) => {
 
 // Command Arrival: emotional landing and authority prelude.
 export const CommandArrivalScene = ({ scene }) => {
-  const [audioCueArmed, setAudioCueArmed] = useState(false)
   const depthRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: depthRef,
@@ -615,12 +614,20 @@ export const CommandArrivalScene = ({ scene }) => {
   const foregroundY = useTransform(scrollYProgress, [0, 1], [16, -12])
   const rayY = useTransform(scrollYProgress, [0, 1], [0, -34])
   const particleY = useTransform(scrollYProgress, [0, 1], [16, -18])
-  const heroMediaSrc = Array.isArray(scene.media.ref) ? scene.media.ref[0] : scene.media.ref
+  const mediaRef = scene?.videoSrc || scene?.media?.ref
+  const heroMediaSrc = Array.isArray(mediaRef) ? mediaRef[0] : mediaRef
+  const headline =
+    scene?.headline ||
+    'We command public moments where failure is visible and expensive.'
+  const subtitle =
+    scene?.subtitle ||
+    'Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.'
+  const ctaText = scene?.ctaText || 'See Signature Builds'
 
   return (
     <FreeSceneFrame scene={scene} pinBehavior="authority-prelude" layout="hero-command" className="scene-cinematic scene-command-arrival scene-command-arrival-full">
       {({ reduced }) => (
-        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-hero-full">
+        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-hero-full relative overflow-hidden">
           <AmbientDepthField
             reduced={reduced}
             variant="hero"
@@ -630,19 +637,25 @@ export const CommandArrivalScene = ({ scene }) => {
             glowOpacity={0.58}
           />
 
-          <motion.video
-            className="hero-command-video"
-            src={heroMediaSrc}
-            preload="metadata"
-            muted={!audioCueArmed}
-            loop
-            playsInline
-            autoPlay
-            initial={reduced ? false : { opacity: 0.74, scale: 1.1 }}
-            style={reduced ? undefined : { y: backgroundY }}
-            animate={reduced ? undefined : { opacity: 1, scale: [1.02, 1.06, 1.02] }}
-            transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }}
-          />
+          <div className="absolute inset-0 z-0">
+            <motion.video
+              className="hero-command-video h-full w-full object-cover"
+              src={heroMediaSrc}
+              preload="metadata"
+              muted
+              loop
+              playsInline
+              autoPlay
+              initial={reduced ? false : { opacity: 0.74, scale: 1.1 }}
+              style={reduced ? undefined : { y: backgroundY }}
+              animate={reduced ? undefined : { opacity: 1, scale: [1.02, 1.06, 1.02] }}
+              transition={{
+                duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6,
+                ease: AUTHORITY_EASE,
+                repeat: Infinity,
+              }}
+            />
+          </div>
 
           <HeroAmbientCanvas />
           <motion.div className="hero-volumetric-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.3, 0.44, 0.3] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8, ease: MASS_EASE, repeat: Infinity }} />
@@ -651,59 +664,45 @@ export const CommandArrivalScene = ({ scene }) => {
           <motion.div className="hero-vignette-layer" animate={reduced ? undefined : { opacity: [0.38, 0.46, 0.38] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }} />
           <motion.div className="hero-dof-layer" animate={reduced ? undefined : { opacity: [0.22, 0.3, 0.22] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.1, ease: MASS_EASE, repeat: Infinity }} />
           <div className="hero-command-soften-layer" />
-          <div className="hero-command-bottom-fade" />
 
-          <div className="hero-command-grid">
-            <motion.div variants={sequence(0.04, MOTION_TOKEN_CONTRACT.stagger.line)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.28 }}>
-              <SceneCard className="hero-command-copy-card relative overflow-hidden p-7 md:p-10">
-                <motion.p variants={revealLift(0.02, 10)} className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-subtle)]">Executive Event Command</motion.p>
-                <motion.h1 variants={revealLift(0.06, 16)} className="mt-5 max-w-[16ch] font-serif text-[clamp(2.3rem,5.4vw,4.8rem)] leading-[0.98] tracking-[-0.03em] text-[var(--color-ink)]">
-                  We command public moments where failure is visible and expensive.
+          <div className="hero-command-overlay absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
+            <motion.div
+              variants={sequence(0.04, MOTION_TOKEN_CONTRACT.stagger.line)}
+              initial={reduced ? false : 'hidden'}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.28 }}
+              className="hero-command-copy w-[90%] sm:w-[82%] lg:w-[40%] max-w-none"
+            >
+              <div className="inline-flex max-w-full flex-col p-1">
+                <motion.p variants={revealLift(0.02, 10)} className="text-xs uppercase tracking-[0.18em] text-white/80">
+                  Executive Event Command
+                </motion.p>
+                <motion.h1
+                  variants={revealLift(0.06, 16)}
+                  className="mt-4 max-w-[16ch] font-serif text-[clamp(1.9rem,7.8vw,5.4rem)] leading-[0.98] tracking-[-0.03em] text-white"
+                >
+                  {headline}
                 </motion.h1>
-                <motion.p variants={revealLift(0.12, 12)} className="mt-6 max-w-[58ch] text-base leading-relaxed text-[var(--color-ink-muted)]">
-                  Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.
+                <motion.p
+                  variants={revealLift(0.12, 12)}
+                  className="mt-5 max-w-[38ch] text-[clamp(0.98rem,2.15vw,1.45rem)] leading-relaxed text-white/90"
+                >
+                  {subtitle}
                 </motion.p>
-                <motion.div variants={revealLift(0.17, 10)} className="mt-8 flex flex-wrap gap-3">
-                  <ScribbleButton title="Open flagship case reel and signature builds" variant="primary" tone="light" size="md" to="/work" analyticsLabel="hero-signature-work">See Signature Builds</ScribbleButton>
-                  <ScribbleButton title="Open private project intake" variant="outline" tone="light" size="md" to="/contact" analyticsLabel="hero-private-brief">Request Proposal</ScribbleButton>
-                </motion.div>
-                <motion.p variants={revealLift(0.2, 8)} className="mt-3 text-xs text-[var(--color-ink-subtle)]">
-                  Confidential intake channel. Response target: one business day.
-                </motion.p>
-              </SceneCard>
-            </motion.div>
-
-            <motion.aside variants={revealSide(0.08, 24)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="hero-command-accent-stack">
-              <SceneCard className="hero-command-accent-card p-5">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Live Briefing</p>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-muted)]">Cross-disciplinary command line active across planning, technical production, and show control.</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {AUTHORITY_METRICS.slice(0, 3).map(metric => (
-                    <span key={metric.label} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
-                      {metric.label}
-                    </span>
-                  ))}
-                </div>
-              </SceneCard>
-
-              <SceneCard className="hero-command-accent-card p-5">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Ambient Control</p>
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-[10px] uppercase tracking-[0.13em] text-[var(--color-ink-subtle)]">Audio Cue</span>
+                <motion.div variants={revealLift(0.17, 10)} className="mt-8">
                   <ScribbleButton
-                    type="button"
-                    onClick={() => setAudioCueArmed(value => !value)}
-                    variant="micro"
+                    title="Open flagship case reel and signature builds"
+                    variant="primary"
                     tone="light"
-                    size="sm"
-                    showArrow={false}
-                    analyticsLabel="hero-audio-toggle"
+                    size="md"
+                    to="/work"
+                    analyticsLabel="hero-signature-work"
                   >
-                    {audioCueArmed ? 'Audio Cue Active' : 'Activate Audio Cue'}
+                    {ctaText}
                   </ScribbleButton>
-                </div>
-              </SceneCard>
-            </motion.aside>
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
         </div>
       )}

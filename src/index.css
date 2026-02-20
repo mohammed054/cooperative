@@ -1936,15 +1936,49 @@
   width: 100%;
   max-width: 100%;
   margin: 0;
+  min-height: 100vh;
+  height: 100vh;
 }
 
 .scene-command-arrival-full .scene-shell-body {
   min-height: 100vh;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.scene-command-arrival-full.flagship-scene {
+  min-height: 100vh;
+  height: 100vh;
+}
+
+.scene-command-arrival-full.flagship-scene .flagship-scene-content {
+  min-height: 100vh;
+  height: 100vh;
+  padding-block: 0 !important;
+  margin: 0;
+}
+
+.flagship-home-cinematic .scene-command-arrival-full.flagship-scene::after {
+  background: none;
+}
+
+/* Keep the homepage hero truly full-bleed without chapter overlap cutting into it. */
+.flagship-home-cinematic .scene-cinematic + .scene-cinematic {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Remove transition hook glow under the first hero so no light band appears at the fold. */
+.scene-transition-hook[data-scene-id='command-arrival']::before,
+.scene-transition-hook[data-scene-id='command-arrival']::after {
+  display: none;
 }
 
 .scene-depth-stage-hero-full {
   position: relative;
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
   min-height: 100vh;
   isolation: isolate;
   overflow: hidden;
@@ -1959,9 +1993,13 @@
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   object-fit: cover;
   z-index: 0;
+}
+
+.hero-command-overlay {
+  pointer-events: auto;
 }
 
 .hero-command-soften-layer {
@@ -1969,10 +2007,18 @@
   inset: 0;
   z-index: 6;
   pointer-events: none;
-  background:
-    radial-gradient(58% 42% at 24% 32%, rgba(247, 250, 255, 0.42), rgba(247, 250, 255, 0) 74%),
-    linear-gradient(106deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.02) 48%, rgba(255, 255, 255, 0) 82%);
-  mix-blend-mode: screen;
+  background: linear-gradient(110deg, rgba(0, 0, 0, 0.36) 0%, rgba(0, 0, 0, 0.16) 46%, rgba(0, 0, 0, 0.08) 100%);
+}
+
+@supports (height: 100dvh) {
+  .scene-command-arrival-full .scene-shell,
+  .scene-command-arrival-full .scene-shell-body,
+  .scene-command-arrival-full.flagship-scene,
+  .scene-command-arrival-full.flagship-scene .flagship-scene-content,
+  .scene-depth-stage-hero-full {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
 }
 
 .hero-command-bottom-fade {
@@ -1983,7 +2029,7 @@
   height: clamp(74px, 16vh, 180px);
   z-index: 7;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(246, 247, 249, 0.94) 72%, rgba(255, 255, 255, 1) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.46) 100%);
 }
 
 .hero-command-grid {
@@ -2260,6 +2306,10 @@
     align-items: end;
     padding-top: clamp(5.7rem, 13vh, 8.2rem);
     padding-bottom: clamp(2.2rem, 5vh, 3.2rem);
+  }
+
+  .hero-command-copy {
+    width: 90% !important;
   }
 
   .hero-command-accent-stack {

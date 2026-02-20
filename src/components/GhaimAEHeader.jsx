@@ -13,7 +13,6 @@ const GhaimAEHeader = () => {
   const location = useLocation()
 
   const [scrolled, setScrolled] = useState(false)
-  const [isHidden, setIsHidden] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeMenu, setActiveMenu] = useState(null)
   const [isHovering, setIsHovering] = useState(false)
@@ -21,9 +20,7 @@ const GhaimAEHeader = () => {
 
   const lastScrollYRef = useRef(0)
   const scrollRafRef = useRef(null)
-  const hiddenRef = useRef(false)
   const scrolledRef = useRef(false)
-  const mobileOpenRef = useRef(false)
   const closeTimeoutRef = useRef(null)
   const mobileMenuButtonRef = useRef(null)
 
@@ -67,32 +64,10 @@ const GhaimAEHeader = () => {
   // ----------------------------
   useEffect(() => {
     const TOP_THRESHOLD = 8
-    const HIDE_START_Y = 120
-    const HIDE_DELTA = 14
-    const REVEAL_DELTA = -8
 
     const applyScrollState = () => {
       const currentY = Math.max(window.scrollY, 0)
-      const delta = currentY - lastScrollYRef.current
       const nextScrolled = currentY > TOP_THRESHOLD
-      let nextHidden = hiddenRef.current
-
-      if (mobileOpenRef.current || currentY <= TOP_THRESHOLD) {
-        nextHidden = false
-      } else {
-        // Calmer behavior: hide only on intentional downward velocity and
-        // reveal quickly when the user reverses direction.
-        if (currentY > HIDE_START_Y && delta > HIDE_DELTA) {
-          nextHidden = true
-        } else if (delta < REVEAL_DELTA) {
-          nextHidden = false
-        }
-      }
-
-      if (nextHidden !== hiddenRef.current) {
-        hiddenRef.current = nextHidden
-        setIsHidden(nextHidden)
-      }
 
       if (nextScrolled !== scrolledRef.current) {
         scrolledRef.current = nextScrolled
@@ -110,10 +85,8 @@ const GhaimAEHeader = () => {
 
     lastScrollYRef.current = Math.max(window.scrollY, 0)
     scrolledRef.current = lastScrollYRef.current > TOP_THRESHOLD
-    hiddenRef.current = false
 
     setScrolled(scrolledRef.current)
-    setIsHidden(false)
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
@@ -121,11 +94,6 @@ const GhaimAEHeader = () => {
       if (scrollRafRef.current !== null) cancelAnimationFrame(scrollRafRef.current)
     }
   }, [])
-
-  useEffect(() => {
-    mobileOpenRef.current = mobileOpen
-    if (mobileOpen) hiddenRef.current = false
-  }, [mobileOpen])
 
   useEffect(() => {
     const handleResize = () => {
@@ -204,6 +172,8 @@ const GhaimAEHeader = () => {
 
   const isHome = location.pathname === '/'
   const headerIsLight = isHome && !scrolled && !mobileOpen
+  const shouldUseSolidHeader =
+    mobileOpen || !isHome || scrolled || (isHovering && !headerIsLight)
 
   const isActivePage = href => {
     if (href === '/') return location.pathname === '/'
@@ -219,12 +189,12 @@ const GhaimAEHeader = () => {
     <>
       <motion.header
         initial={false}
-        animate={{ y: isHidden ? '-100%' : '0%', opacity: isHidden ? 0 : 1 }}
+        animate={{ y: '0%', opacity: 1 }}
         transition={{ duration: 0.26, ease: [0.33, 1, 0.68, 1] }}
         className={[
           'fixed left-0 right-0 top-0 z-50 border-b will-change-transform',
           'transition-[background-color,box-shadow,backdrop-filter] duration-300 ease-out',
-          isHovering || !headerIsLight
+          shouldUseSolidHeader
             ? 'bg-white/95 border-border shadow-lg backdrop-blur'
             : 'bg-transparent border-transparent shadow-none backdrop-blur-0',
         ].join(' ')}

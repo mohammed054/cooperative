@@ -94,7 +94,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'command-arrival',
     tone: 'deep',
-    length: 110,
+    length: 100,
     mode: 'free',
     entryCue: 'hero-pre-roll',
     exitCue: 'hero-lock-release',
@@ -105,6 +105,11 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
       key: 'hero-video',
       ref: assetUrl('videos/background.mp4'),
     },
+    videoSrc: assetUrl('videos/background.mp4'),
+    headline: 'We command public moments where failure is visible and expensive.',
+    subtitle:
+      'Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.',
+    ctaText: 'See Signature Builds',
   },
   // Free evidence ledger scan; dark tone, accelerated comprehension rhythm.
   // Pin status: free
