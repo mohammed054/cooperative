@@ -1129,7 +1129,7 @@ export const NarrativeBridgeScene = ({ scene }) => {
 // FIX 1: ProofTheaterSplit — testimonial slide direction now tracked via a ref
 const ProofTheaterSplit = ({ reduced }) => {
   const [activeIndex, setActiveIndex] = useState(0)
-  const directionRef = useRef(1)
+  const [entryDirection, setEntryDirection] = useState(1)
   const touchStartXRef = useRef(null)
   const touchDeltaRef = useRef(0)
   const safeIndex = clampIndex(activeIndex, Math.max(TESTIMONIALS.length - 1, 0))
@@ -1139,12 +1139,12 @@ const ProofTheaterSplit = ({ reduced }) => {
   const hasNext = safeIndex < TESTIMONIALS.length - 1
 
   const goPrev = () => {
-    directionRef.current = -1
+    setEntryDirection(-1)
     setActiveIndex(index => clampIndex(index - 1, TESTIMONIALS.length - 1))
   }
 
   const goNext = () => {
-    directionRef.current = 1
+    setEntryDirection(1)
     setActiveIndex(index => clampIndex(index + 1, TESTIMONIALS.length - 1))
   }
 
@@ -1177,8 +1177,6 @@ const ProofTheaterSplit = ({ reduced }) => {
       goNext()
     }
   }
-
-  const entryDirection = directionRef.current
 
   return (
     <div className="relative grid gap-3 overflow-hidden rounded-2xl">
@@ -1231,7 +1229,7 @@ const ProofTheaterSplit = ({ reduced }) => {
                 key={item.id}
                 type="button"
                 onClick={() => {
-                  directionRef.current = index > safeIndex ? 1 : -1
+                  setEntryDirection(index > safeIndex ? 1 : -1)
                   setActiveIndex(index)
                 }}
                 variant={index === safeIndex ? 'primary' : 'outline'}

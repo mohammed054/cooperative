@@ -142,9 +142,10 @@ export const OperationsSpineScene = ({ scene }) => {
       if (cta) gsap.set(cta, { opacity: 1, y: 0 })
       if (railFill) gsap.set(railFill, { scaleY: 1 })
       if (progBar) gsap.set(progBar, { scaleX: 1 })
-      setActiveIdx(PHASES.length - 1)
-      activeIdxRef.current = PHASES.length - 1
-      return undefined
+      const finalIdx = PHASES.length - 1
+      activeIdxRef.current = finalIdx
+      const rafId = window.requestAnimationFrame(() => setActiveIdx(finalIdx))
+      return () => window.cancelAnimationFrame(rafId)
     }
 
     let pinTrigger
