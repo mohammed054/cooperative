@@ -80,11 +80,12 @@ const HeroAmbientCanvas = () => {
       camera.updateProjectionMatrix()
     }
 
-    const clock = new THREE.Clock()
+    const timer = new THREE.Timer()
     let animationFrameId = 0
 
     const render = () => {
-      const elapsed = clock.getElapsedTime()
+      timer.update()
+      const elapsed = timer.getElapsed()
 
       pointsGroup.rotation.y = elapsed * 0.05
       pointsGroup.rotation.x = Math.sin(elapsed * 0.28) * 0.07
