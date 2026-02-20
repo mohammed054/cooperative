@@ -1,8 +1,12 @@
 import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { assetUrl } from '../lib/assetUrl'
 import ScribbleButton from './ScribbleButton'
 import { CinematicPage } from './CinematicPage'
+
+// Motion-aware Link for animated internal navigation
+const MotionLink = motion(Link)
 
 // ── Data ─────────────────────────────────────────────────
 const categories = ['All', 'Weddings', 'Corporate', 'Birthday', 'Product Launch']
@@ -71,9 +75,9 @@ const MobileProjectCard = ({ project, index }) => {
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <motion.a
+    <MotionLink
       ref={ref}
-      href="/work"
+      to="/work"
       initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
@@ -84,7 +88,6 @@ const MobileProjectCard = ({ project, index }) => {
         borderBottom: '1px solid rgba(0,0,0,0.07)',
       }}
     >
-      {/* Image — 3/2 ratio, full width */}
       <div style={{
         position: 'relative',
         width: '100%',
@@ -105,7 +108,6 @@ const MobileProjectCard = ({ project, index }) => {
             objectFit: 'cover',
           }}
         />
-        {/* Category badge — top left */}
         <span style={{
           position: 'absolute',
           top: '12px',
@@ -124,7 +126,6 @@ const MobileProjectCard = ({ project, index }) => {
         </span>
       </div>
 
-      {/* Meta row */}
       <div style={{
         padding: '16px 20px 20px',
         display: 'flex',
@@ -152,7 +153,6 @@ const MobileProjectCard = ({ project, index }) => {
           </p>
         </div>
 
-        {/* Circle arrow */}
         <div style={{
           flexShrink: 0,
           width: '34px',
@@ -168,7 +168,7 @@ const MobileProjectCard = ({ project, index }) => {
           </svg>
         </div>
       </div>
-    </motion.a>
+    </MotionLink>
   )
 }
 
@@ -180,9 +180,9 @@ const DesktopProjectCard = ({ project }) => {
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <motion.a
+    <MotionLink
       ref={ref}
-      href="/work"
+      to="/work"
       initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -194,7 +194,6 @@ const DesktopProjectCard = ({ project }) => {
         color: 'inherit',
       }}
     >
-      {/* Image */}
       <div style={{
         position: 'relative',
         overflow: 'hidden',
@@ -218,8 +217,6 @@ const DesktopProjectCard = ({ project }) => {
             filter: hovered ? 'brightness(0.78)' : 'brightness(0.92)',
           }}
         />
-
-        {/* Category */}
         <span style={{
           position: 'absolute',
           top: '14px',
@@ -236,8 +233,6 @@ const DesktopProjectCard = ({ project }) => {
         }}>
           {project.category}
         </span>
-
-        {/* Arrow on hover */}
         <div style={{
           position: 'absolute',
           bottom: '14px',
@@ -259,7 +254,6 @@ const DesktopProjectCard = ({ project }) => {
         </div>
       </div>
 
-      {/* Text */}
       <div style={{ paddingTop: '14px' }}>
         <h3 className="font-serif" style={{
           fontSize: '18px',
@@ -275,7 +269,7 @@ const DesktopProjectCard = ({ project }) => {
           {project.location}
         </p>
       </div>
-    </motion.a>
+    </MotionLink>
   )
 }
 
@@ -308,7 +302,6 @@ export default function OurProjects() {
         style={{ background: 'transparent' }}
       >
 
-      {/* ── Header ─────────────────────────────────────── */}
       <motion.div
         ref={headerRef}
         variants={headingVariants}
@@ -341,9 +334,9 @@ export default function OurProjects() {
               A gallery of recent rooms and builds.
             </h2>
 
-            {/* Desktop CTA — lives in header, not a whole separate section */}
-            <a
-              href="/work"
+            {/* Desktop CTA */}
+            <MotionLink
+              to="/work"
               className="hidden md:inline-flex"
               style={{
                 alignItems: 'center',
@@ -364,12 +357,12 @@ export default function OurProjects() {
               <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
                 <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </a>
+            </MotionLink>
           </div>
         </div>
       </motion.div>
 
-      {/* ── Filter strip ───────────────────────────────── */}
+      {/* Filter strip */}
       <div style={{
         borderTop: '1px solid rgba(0,0,0,0.07)',
         borderBottom: '1px solid rgba(0,0,0,0.07)',
@@ -377,15 +370,7 @@ export default function OurProjects() {
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'none',
       }}>
-        <div
-          className="mx-auto sm:px-6 lg:px-8"
-          style={{
-            maxWidth: '1280px',
-            display: 'flex',
-            gap: '8px',
-            padding: '12px 20px',
-          }}
-        >
+        <div className="mx-auto sm:px-6 lg:px-8" style={{ maxWidth: '1280px', display: 'flex', gap: '8px', padding: '12px 20px' }}>
           {categories.map(cat => (
             <FilterPill
               key={cat}
@@ -397,10 +382,8 @@ export default function OurProjects() {
         </div>
       </div>
 
-      {/* ── Grid ───────────────────────────────────────── */}
+      {/* Grid */}
       <div className="mx-auto sm:px-6 lg:px-8" style={{ maxWidth: '1280px', padding: '0 0' }}>
-
-        {/* MOBILE — full-width stacked cards */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCategory + '-mobile'}
@@ -416,7 +399,6 @@ export default function OurProjects() {
           </motion.div>
         </AnimatePresence>
 
-        {/* DESKTOP — clean 2 or 3-col grid */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCategory + '-desktop'}
@@ -437,27 +419,12 @@ export default function OurProjects() {
         </AnimatePresence>
       </div>
 
-      {/* ── Mobile CTA ─────────────────────────────────── */}
-      <div
-        className="md:hidden"
-        style={{
-          padding: '28px 20px 42px',
-          borderTop: '1px solid rgba(0,0,0,0.05)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-        }}
-      >
-        <ScribbleButton
-          to="/contact"
-          className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-ink text-white px-6 py-3 text-sm font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.15)] transition hover:bg-ink-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-        >
+      {/* Mobile CTA */}
+      <div className="md:hidden" style={{ padding: '28px 20px 42px', borderTop: '1px solid rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <ScribbleButton to="/contact" className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-ink text-white px-6 py-3 text-sm font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.15)] transition hover:bg-ink-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
           Request a proposal
         </ScribbleButton>
-        <ScribbleButton
-          to="/work"
-          className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-border text-ink px-6 py-3 text-sm font-semibold transition hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-        >
+        <ScribbleButton to="/work" className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-border text-ink px-6 py-3 text-sm font-semibold transition hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
           View case studies
         </ScribbleButton>
       </div>

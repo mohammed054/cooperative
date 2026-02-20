@@ -673,27 +673,6 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
       return undefined
     }
 
-    // ── FIX 7: Lenis wheel → ScrollTrigger bridge ────────────────────────
-    // Lenis smooth scroll intercepts wheel events and drives scroll position
-    // via its own requestAnimationFrame loop. GSAP's ScrollTrigger only
-    // observes native 'scroll' events on window, which Lenis does not fire
-    // for wheel input — only for touch/trackpad (which use native touch scroll
-    // that Lenis passes through). As a result the GSAP scrub timeline never
-    // advanced on mouse-wheel input.
-    //
-    // Fix: attach a passive wheel listener that schedules a ScrollTrigger.update()
-    // call on the next animation frame. The rAF batches rapid wheel events into
-    // a single update per frame so there is no performance overhead.
-    let wheelRafId = 0
-    const handleWheelForLenis = () => {
-      if (wheelRafId) return // already scheduled this frame
-      wheelRafId = requestAnimationFrame(() => {
-        wheelRafId = 0
-        ScrollTrigger.update()
-      })
-    }
-    window.addEventListener('wheel', handleWheelForLenis, { passive: true })
-    // ─────────────────────────────────────────────────────────────────────
 
     const ledgerHeadingNode = nextSection.querySelector('.authority-ledger-heading')
     const ledgerSubcopyNode = nextSection.querySelector('.authority-ledger-subcopy')
@@ -835,10 +814,7 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
     }, transitionWrapper)
 
     // FIX 4: ctx.revert() is the only cleanup needed.
-    // FIX 7: Also remove the wheel listener added for Lenis bridge.
     return () => {
-      window.removeEventListener('wheel', handleWheelForLenis)
-      if (wheelRafId) cancelAnimationFrame(wheelRafId)
       context.revert()
     }
   }, [reducedMotion])

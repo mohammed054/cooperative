@@ -1,5 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import styles from './OperationsSpineScene.module.css'
@@ -128,155 +129,162 @@ export const OperationsSpineScene = ({ scene }) => {
       }
     })
 
-    // FIX: On mobile screens (< 768px) skip GSAP ScrollTrigger entirely.
-    // Pinning and complex transforms on mobile cause layout instability,
-    // spacer overflow, and visual duplication. Show all phases stacked statically.
-    const isMobile = window.innerWidth < 768
-
-    if (reducedMotion || isMobile) {
-      gsap.set(header, { opacity: 1, y: 0 })
-      gsap.set(cards, { opacity: 1, y: 0 })
-      if (cta) gsap.set(cta, { opacity: 1, y: 0 })
-      if (railFill) gsap.set(railFill, { scaleY: 1 })
-      if (progBar) gsap.set(progBar, { scaleX: 1 })
-      const finalIdx = PHASES.length - 1
-      activeIdxRef.current = finalIdx
-      const rafId = window.requestAnimationFrame(() => setActiveIdx(finalIdx))
-      return () => window.cancelAnimationFrame(rafId)
-    }
-
-    let pinTrigger
-    let sentinelTrigger
+    // FIX: Use ScrollTrigger.matchMedia() for responsive pinning.
+    // This properly handles breakpoint changes by cleaning up and reinitializing
+    // ScrollTriggers when the viewport crosses mobile/desktop breakpoints.
+    // - Mobile (< 768px): Disables pinning, shows static layout
+    // - Desktop (>= 768px): Enables full scroll-driven animations with pinning
 
     const ctx = gsap.context(() => {
-      // ── Initial states ────────────────────────────────────────────────
-      gsap.set(outer, { position: 'relative', zIndex: 2 })
-      gsap.set(header, { opacity: 0, y: 36 })
-      if (cta) gsap.set(cta, { opacity: 0, y: 20 })
-      if (railFill) gsap.set(railFill, { scaleY: 0, transformOrigin: 'top center' })
-      if (progBar) gsap.set(progBar, { scaleX: 0, transformOrigin: 'left center' })
-      gsap.set(cards, { opacity: 0, y: 52 })
+      ScrollTrigger.matchMedia({
+        // ── Mobile: disable pinning, show static layout ───────────────────
+        [`(max-width: ${MOBILE_BREAKPOINT - 1}px)`]: function mobileSetup() {
+          gsap.set(header, { opacity: 1, y: 0 })
+          gsap.set(cards, { opacity: 1, y: 0 })
+          if (cta) gsap.set(cta, { opacity: 1, y: 0 })
+          if (railFill) gsap.set(railFill, { scaleY: 1 })
+          if (progBar) gsap.set(progBar, { scaleX: 1 })
+          const finalIdx = PHASES.length - 1
+          activeIdxRef.current = finalIdx
+          setActiveIdx(finalIdx)
 
-      // FIX: isMobile now uses MOBILE_BREAKPOINT (760) to stay in sync with the
-      // CSS breakpoint where the card inner collapses to a single column. The old
-      // value (760 in CSS, also 760 in JS but via a magic number inline) was fine
-      // but is now a named constant so both sides stay in sync if it changes.
-      const isMobile = () => window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
-      const cardBudget = 0.76
-      const cardStart = 0.1
-      const stepSize = cardBudget / PHASES.length
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: outer,
-          start: 'top top',
-          end: () => {
-            const perStep = isMobile() ? VH_PER_PHASE * 0.6 : VH_PER_PHASE
-            return `+=${window.innerHeight * (PHASES.length * perStep + 1.2)}`
-          },
-          pin: sticky,
-          pinSpacing: true,
-          scrub: 1.5,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-
-          onUpdate(self) {
-            const cp = Math.max(0, (self.progress - cardStart) / cardBudget)
-            const next = Math.min(PHASES.length - 1, Math.floor(cp * PHASES.length))
-            if (next !== activeIdxRef.current) {
-              activeIdxRef.current = next
-              setActiveIdx(next)
-            }
-          },
-
-          onLeave() {
-            gsap.set(outer, { zIndex: 'auto' })
-          },
-
-          onEnterBack() {
-            gsap.set(outer, { zIndex: 2 })
-          },
-
-          onRefresh(self) {
-            // FIX: Force the GSAP pin spacer fully transparent on every refresh.
-            // On mobile browsers the spacer can inherit the sticky element's
-            // computed background and render as a grey/white rectangle — which
-            // looks exactly like a second copy of the section (duplication bug).
-            if (self.spacer) {
-              self.spacer.style.cssText +=
-                ';background:transparent!important;background-color:transparent!important;background-image:none!important;'
-              // FIX: Also reset any inherited min-height that can push the spacer
-              // below the pin area and create an empty ghost section on mobile.
-              self.spacer.style.minHeight = ''
-            }
-          },
-        },
-      })
-      pinTrigger = tl.scrollTrigger
-
-      // Header enters
-      tl.to(header, { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' }, 0)
-
-      // Rail grows
-      if (railFill) tl.to(railFill, { scaleY: 1, duration: 0.86, ease: 'none' }, 0.06)
-
-      // Progress bar grows
-      if (progBar) tl.to(progBar, { scaleX: 1, duration: 0.86, ease: 'power1.inOut' }, 0.06)
-
-      // Cards stagger in sequentially
-      cards.forEach((card, i) => {
-        const at = cardStart + i * stepSize
-        tl.to(card, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }, at)
-      })
-
-      // CTA enters near end
-      if (cta) tl.to(cta, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' }, 0.88)
-
-      tl.call(() => {
-        gsap.set(header, { clearProps: 'willChange' })
-        gsap.set(cards, { clearProps: 'willChange' })
-        if (cta) gsap.set(cta, { clearProps: 'willChange' })
-      }, [], 1)
-
-      // ── Sentinel: prime the next scene's entry animation ─────────────
-      sentinelTrigger = ScrollTrigger.create({
-        trigger: sentinelRef.current,
-        start: 'top 92%',
-        once: true,
-        onEnter() {
-          let cursor = sentinelRef.current?.nextElementSibling
-          while (cursor) {
-            if (cursor.matches?.('[data-scene-id]')) break
-            const nested = cursor.querySelector?.('[data-scene-id]')
-            if (nested) {
-              cursor = nested
-              break
-            }
-            cursor = cursor.nextElementSibling
+          // Return cleanup for mobile context
+          return () => {
+            gsap.set(header, { clearProps: 'all' })
+            gsap.set(cards, { clearProps: 'all' })
+            if (cta) gsap.set(cta, { clearProps: 'all' })
+            if (railFill) gsap.set(railFill, { clearProps: 'all' })
+            if (progBar) gsap.set(progBar, { clearProps: 'all' })
           }
-          if (!cursor) return
+        },
 
-          const rect = cursor.getBoundingClientRect()
-          if (rect.top < window.innerHeight * 0.95) return
+        // ── Desktop: enable pinning and scroll-driven animations ───────────
+        [`(min-width: ${MOBILE_BREAKPOINT}px)`]: function desktopSetup() {
+          // ── Initial states ────────────────────────────────────────────────
+          gsap.set(outer, { position: 'relative', zIndex: 2 })
+          gsap.set(header, { opacity: 0, y: 36 })
+          if (cta) gsap.set(cta, { opacity: 0, y: 20 })
+          if (railFill) gsap.set(railFill, { scaleY: 0, transformOrigin: 'top center' })
+          if (progBar) gsap.set(progBar, { scaleX: 0, transformOrigin: 'left center' })
+          gsap.set(cards, { opacity: 0, y: 52 })
 
-          gsap.fromTo(
-            cursor,
-            { y: 72, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.92,
-              ease: 'power3.out',
-              clearProps: 'y,opacity',
-            }
-          )
+          const cardBudget = 0.76
+          const cardStart = 0.1
+          const stepSize = cardBudget / PHASES.length
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: outer,
+              start: 'top top',
+              end: () => `+=${window.innerHeight * (PHASES.length * VH_PER_PHASE + 1.2)}`,
+              pin: sticky,
+              pinSpacing: true,
+              scrub: 1.5,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+
+              onUpdate(self) {
+                const cp = Math.max(0, (self.progress - cardStart) / cardBudget)
+                const next = Math.min(PHASES.length - 1, Math.floor(cp * PHASES.length))
+                if (next !== activeIdxRef.current) {
+                  activeIdxRef.current = next
+                  setActiveIdx(next)
+                }
+              },
+
+              onLeave() {
+                gsap.set(outer, { zIndex: 'auto' })
+              },
+
+              onEnterBack() {
+                gsap.set(outer, { zIndex: 2 })
+              },
+
+              onRefresh(self) {
+                // Force the GSAP pin spacer fully transparent on every refresh.
+                if (self.spacer) {
+                  self.spacer.style.cssText +=
+                    ';background:transparent!important;background-color:transparent!important;background-image:none!important;'
+                  self.spacer.style.minHeight = ''
+                }
+              },
+            },
+          })
+
+          // Header enters
+          tl.to(header, { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' }, 0)
+
+          // Rail grows
+          if (railFill) tl.to(railFill, { scaleY: 1, duration: 0.86, ease: 'none' }, 0.06)
+
+          // Progress bar grows
+          if (progBar) tl.to(progBar, { scaleX: 1, duration: 0.86, ease: 'power1.inOut' }, 0.06)
+
+          // Cards stagger in sequentially
+          cards.forEach((card, i) => {
+            const at = cardStart + i * stepSize
+            tl.to(card, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }, at)
+          })
+
+          // CTA enters near end
+          if (cta) tl.to(cta, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' }, 0.88)
+
+          tl.call(() => {
+            gsap.set(header, { clearProps: 'willChange' })
+            gsap.set(cards, { clearProps: 'willChange' })
+            if (cta) gsap.set(cta, { clearProps: 'willChange' })
+          }, [], 1)
+
+          // ── Sentinel: prime the next scene's entry animation ─────────────
+          const sentinelTrigger = ScrollTrigger.create({
+            trigger: sentinelRef.current,
+            start: 'top 92%',
+            once: true,
+            onEnter() {
+              let cursor = sentinelRef.current?.nextElementSibling
+              while (cursor) {
+                if (cursor.matches?.('[data-scene-id]')) break
+                const nested = cursor.querySelector?.('[data-scene-id]')
+                if (nested) {
+                  cursor = nested
+                  break
+                }
+                cursor = cursor.nextElementSibling
+              }
+              if (!cursor) return
+
+              const rect = cursor.getBoundingClientRect()
+              if (rect.top < window.innerHeight * 0.95) return
+
+              gsap.fromTo(
+                cursor,
+                { y: 72, opacity: 0 },
+                {
+                  y: 0,
+                  opacity: 1,
+                  duration: 0.92,
+                  ease: 'power3.out',
+                  clearProps: 'y,opacity',
+                }
+              )
+            },
+          })
+
+          // Return cleanup for desktop context
+          return () => {
+            if (sentinelTrigger) sentinelTrigger.kill()
+            if (tl?.scrollTrigger) tl.scrollTrigger.kill()
+            gsap.set(header, { clearProps: 'all' })
+            gsap.set(cards, { clearProps: 'all' })
+            if (cta) gsap.set(cta, { clearProps: 'all' })
+            if (railFill) gsap.set(railFill, { clearProps: 'all' })
+            if (progBar) gsap.set(progBar, { clearProps: 'all' })
+          }
         },
       })
     }, outer)
 
     return () => {
-      pinTrigger?.kill()
-      sentinelTrigger?.kill()
       ctx.revert()
     }
   }, [reducedMotion])
@@ -344,15 +352,15 @@ export const OperationsSpineScene = ({ scene }) => {
             </div>
 
             <div ref={ctaRef} className={styles.osv2Cta}>
-              <a
-                href="/process"
+              <Link
+                to="/process"
                 className={styles.osv2CtaBtn}
                 title="View the full delivery process documentation"
                 aria-label="View full delivery process"
               >
                 View Full Process
                 <span className={styles.osv2CtaArrow} aria-hidden="true">→</span>
-              </a>
+              </Link>
             </div>
           </div>
 
