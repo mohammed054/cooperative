@@ -426,8 +426,9 @@ const SignatureReelContent = ({ progress, reduced }) => {
             src={selected.image}
             alt={selected.title}
             className="absolute inset-0 h-full w-full object-cover"
+            initial={reduced ? false : { opacity: 0.78, scale: 1.16 }}
             style={{ scale: reduced ? 1.02 : 1.1, y: backgroundY }}
-            animate={reduced ? undefined : { x: [0, -22, 0], y: [backgroundY, backgroundY + 8, backgroundY] }}
+            animate={reduced ? undefined : { opacity: 1, x: [0, -22, 0], y: [backgroundY, backgroundY + 8, backgroundY], scale: [1.1, 1.12, 1.1] }}
             transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.2, ease: AUTHORITY_EASE, repeat: Infinity }}
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,7,12,0.46)_0%,rgba(4,7,12,0.88)_100%)]" />
@@ -441,7 +442,7 @@ const SignatureReelContent = ({ progress, reduced }) => {
           />
 
           <div className="relative z-10 grid gap-4">
-          <p className="px-2 pt-2 text-[10px] uppercase tracking-[0.14em] text-white/76">
+            <p className="px-2 pt-2 text-[10px] uppercase tracking-[0.14em] text-white/76">
               Active Case {String(selectedIndex + 1).padStart(2, '0')} / {String(PROJECTS.length).padStart(2, '0')}
             </p>
 
@@ -560,8 +561,9 @@ export const CommandArrivalScene = ({ scene }) => {
                     loop
                     playsInline
                     autoPlay
+                    initial={reduced ? false : { opacity: 0.76, scale: 1.14 }}
                     style={{ scale: reduced ? 1.02 : 1.08 }}
-                    animate={reduced ? undefined : { x: [0, -12, 0], y: [0, 9, 0], scale: [1.08, 1.105, 1.08] }}
+                    animate={reduced ? undefined : { opacity: 1, x: [0, -12, 0], y: [0, 9, 0], scale: [1.08, 1.105, 1.08] }}
                     transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }}
                   />
                   <HeroAmbientCanvas />

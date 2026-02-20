@@ -1939,6 +1939,15 @@
   isolation: isolate;
 }
 
+.scene-transition-shell {
+  will-change: opacity, transform;
+}
+
+.flagship-scene[data-transition-ready='false'] .scene-transition-shell {
+  /* Pending chapter-level transition choreography: keep subtle baseline fade/slide only. */
+  transform-origin: center top;
+}
+
 .scene-transition-hook {
   position: relative;
   height: 0;

@@ -1,13 +1,15 @@
 import React, { useLayoutEffect, useRef, useState } from 'react'
-import { useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { MOTION_TOKEN_CONTRACT, parseBezier } from '../../motion/motionTokenContract.js'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
 }
 
 const joinClasses = (...classes) => classes.filter(Boolean).join(' ')
+const AUTHORITY_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.authority)
 
 const ScrollLockedSection = ({
   id,
@@ -72,9 +74,19 @@ const ScrollLockedSection = ({
       )}
       style={{ '--scene-min-height': height }}
     >
-      <div ref={lockRef} className="flagship-lock-inner">
+      <motion.div
+        ref={lockRef}
+        className="flagship-lock-inner scene-transition-shell"
+        initial={shouldReduceMotion ? false : { opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: false, amount: 0.2 }}
+        transition={{
+          duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.06,
+          ease: AUTHORITY_EASE,
+        }}
+      >
         {content}
-      </div>
+      </motion.div>
     </section>
   )
 }

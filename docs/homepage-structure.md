@@ -40,7 +40,8 @@
 ## Scene Transition Hooks
 
 - Added `scene-transition-hook` elements after every scene.
-- Current status: placeholder transition cues with fade gradients and pending marker line while cinematic cross-scene dissolve remains unimplemented.
+- Added baseline scene entry transitions at container level (`SceneWrapper` and `ScrollLockedSection`) using motion-token timing/easing.
+- Current status: chapter-level transition cues remain placeholder fade gradients with pending marker line while bespoke cross-scene dissolve/parallax handoff is still unimplemented.
 - Pinned scenes keep existing friction buffers plus transition hooks for smooth lock release staging.
 
 ## Hero + Ambient Polish
