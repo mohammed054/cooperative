@@ -1,27 +1,27 @@
-# Homepage Phase 10 Structure + Cinematic Notes
+# Homepage Phase 11 Structure + Cinematic Notes
 
 ## Scene Order & Layout Contract
 
 | Scene ID | Tone Key | Mode | Length | Layout Intent | Transition Flag |
 | --- | --- | --- | --- | --- | --- |
-| `command-arrival` | `deep` | `free` | `110vh` | two-column authority hero + media chamber | `data-transition-ready="false"` |
-| `authority-ledger` | `dark` | `free` | `85vh` | proof-first metrics + capability cards | `data-transition-ready="false"` |
-| `signature-reel` | `dark` | `pinned` | `220vh` | anchor moment, scroll-locked aperture + horizontal conveyor | `data-transition-ready="false"` |
-| `capability-matrix` | `steel` | `free` | `100vh` | primary capability lane + secondary tracks | `data-transition-ready="false"` |
-| `operations-spine` | `steel` | `pinned` | `240vh` | process timeline with friction-led staged entries | `data-transition-ready="false"` |
-| `narrative-bridge` | `warm` | `free` | `75vh` | decompression bridge before proof | `data-transition-ready="false"` |
-| `proof-theater` | `linen` | `free` | `120vh` | rectangular featured testimonial + indexed rail | `data-transition-ready="false"` |
-| `conversion-chamber` | `deep` | `free` | `120vh` | two-column close: commitment copy + local-state intake form | `data-transition-ready="false"` |
-| `global-footer` | `deep` | `free` | `70vh` | 4-column utility + final command CTA | `data-transition-ready="false"` |
+| `command-arrival` | `deep` | `free` | `110vh` | two-column authority hero + media chamber | `data-transition-ready="true"` |
+| `authority-ledger` | `dark` | `free` | `85vh` | proof-first metrics + capability cards | `data-transition-ready="true"` |
+| `signature-reel` | `dark` | `pinned` | `220vh` | anchor moment, scroll-locked aperture + horizontal conveyor | `data-transition-ready="true"` |
+| `capability-matrix` | `steel` | `free` | `100vh` | primary capability lane + secondary tracks | `data-transition-ready="true"` |
+| `operations-spine` | `steel` | `pinned` | `240vh` | process timeline with friction-led staged entries | `data-transition-ready="true"` |
+| `narrative-bridge` | `warm` | `free` | `75vh` | decompression bridge before proof | `data-transition-ready="true"` |
+| `proof-theater` | `linen` | `free` | `120vh` | rectangular featured testimonial + indexed rail | `data-transition-ready="true"` |
+| `conversion-chamber` | `dark` | `free` | `120vh` | two-column close: commitment copy + local-state intake form | `data-transition-ready="true"` |
+| `global-footer` | `deep` | `free` | `70vh` | 4-column utility + final command CTA | `data-transition-ready="true"` |
 
 ## Motion & Tone Contract Usage
 
 - Motion timing/easing/distance/stagger are sourced from `MOTION_TOKEN_CONTRACT` and parsed via `parseBezier`.
 - Scroll orchestration uses Lenis + GSAP ScrollTrigger pinning for `signature-reel` and `operations-spine`.
 - Pinned scenes run with explicit pre/post friction buffers to reduce pin-entry jump.
-- Scene metadata now ships with `data-theme="light"` and `data-transition-ready="false"` on both free and pinned scenes.
+- Scene metadata now ships with `data-theme="light"` and `data-transition-ready="true"` on both free and pinned scenes.
 - Tone arc is enforced by registry sequencing:
-  `deep -> dark -> dark -> steel -> steel -> warm -> linen -> deep -> deep`.
+  `deep -> dark -> dark -> steel -> steel -> warm -> linen -> dark -> deep`.
 - Cinematic scene styling is routed through `.flagship-home-cinematic` tone tokens and per-scene mesh overlays in `src/index.css`.
 - Default runtime palette is enforced as light across all tone keys:
   - `surface`: `#f6f7f9`
@@ -42,8 +42,12 @@
 - Added `scene-transition-hook` elements after every scene.
 - Added baseline scene entry transitions at container level (`SceneWrapper` and `ScrollLockedSection`) using motion-token timing/easing.
 - Pinned scrub is now momentum-aware (`ScrollLockedSection` velocity blend) while keeping friction-buffer rhythm.
-- Current status: chapter-level transition cues remain placeholder fade gradients with pending marker line while bespoke cross-scene dissolve/parallax handoff is still unimplemented.
-- Pinned scenes keep existing friction buffers plus transition hooks for smooth lock release staging.
+- Added explicit tone bridge overlays in `Home.jsx` using foundation bridge definitions:
+  - `dark -> steel`
+  - `steel -> warm`
+  - `linen -> dark`
+- Pinned scenes keep explicit pre/post friction buffers with cinematic gradients for smooth lock release staging.
+- Pending markers were removed from transition hooks for production state.
 
 ## Hero + Ambient Polish
 
@@ -57,6 +61,7 @@
 ## Ambient Depth Across Scenes
 
 - `signature-reel`, `operations-spine`, and `proof-theater` now include scene-specific ambient variants.
+- `authority-ledger`, `capability-matrix`, and `narrative-bridge` now include dedicated ambient depth variants and scroll-coupled parallax drift.
 - Ambient layers are pointer-safe, low-opacity, and non-blocking to CTAs.
 - Parallax depth is split into three planes with independent motion cadences.
 - Reduced-motion path disables ambient animation and transform drift.

@@ -697,40 +697,55 @@ export const CommandArrivalScene = ({ scene }) => {
 }
 
 // Authority Ledger: real outcomes and command capability framing.
-export const AuthorityLedgerScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
-    {({ reduced }) => (
-      <motion.div variants={sequence(0.04, 0.1)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="grid gap-5">
-        <motion.div variants={revealLift(0.02, 12)}>
-          <SceneCard className="p-5 md:p-6">
-            <p className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Performance Record</p>
-            <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.07] text-[var(--color-ink)]">Outcome authority before visual theater.</h2>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {AUTHORITY_METRICS.map(metric => (
-                <div key={metric.label} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3">
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{metric.label}</p>
-                  <p className="mt-2 font-serif text-[1.45rem] leading-none text-[var(--color-ink)]"><CountUpMetric value={metric.value} suffix={metric.suffix} reduced={reduced} /></p>
+export const AuthorityLedgerScene = ({ scene }) => {
+  const depthRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: depthRef,
+    offset: ['start end', 'end start'],
+  })
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [30, -20])
+  const midY = useTransform(scrollYProgress, [0, 1], [18, -14])
+  const foregroundY = useTransform(scrollYProgress, [0, 1], [8, -8])
+
+  return (
+    <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
+      {({ reduced }) => (
+        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-ledger">
+          <AmbientDepthField reduced={reduced} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.44} />
+
+          <motion.div variants={sequence(0.04, 0.1)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="relative z-[2] grid gap-5">
+            <motion.div variants={revealLift(0.02, 12)}>
+              <SceneCard className="p-5 md:p-6">
+                <p className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Performance Record</p>
+                <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.07] text-[var(--color-ink)]">Outcome authority before visual theater.</h2>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {AUTHORITY_METRICS.map((metric, index) => (
+                    <motion.div key={metric.label} variants={revealMask(index * 0.03)} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3">
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{metric.label}</p>
+                      <p className="mt-2 font-serif text-[1.45rem] leading-none text-[var(--color-ink)]"><CountUpMetric value={metric.value} suffix={metric.suffix} reduced={reduced} /></p>
+                    </motion.div>
+                  ))}
                 </div>
+              </SceneCard>
+            </motion.div>
+
+            <div className="grid gap-3 md:grid-cols-3">
+              {CAPABILITY_MODULES.map((module, index) => (
+                <motion.article key={module.id} variants={revealLift(index * 0.05 + 0.08, 12)}>
+                  <SceneCard className="h-full overflow-hidden">
+                    <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover" />
+                    <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{module.title}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{module.summary}</p>
+                  </SceneCard>
+                </motion.article>
               ))}
             </div>
-          </SceneCard>
-        </motion.div>
-
-        <div className="grid gap-3 md:grid-cols-3">
-          {CAPABILITY_MODULES.map((module, index) => (
-            <motion.article key={module.id} variants={revealLift(index * 0.05 + 0.08, 12)}>
-              <SceneCard className="h-full overflow-hidden">
-                <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover" />
-                <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{module.title}</p>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{module.summary}</p>
-              </SceneCard>
-            </motion.article>
-          ))}
+          </motion.div>
         </div>
-      </motion.div>
-    )}
-  </FreeSceneFrame>
-)
+      )}
+    </FreeSceneFrame>
+  )
+}
 
 // Signature Reel: anchor cinematic lock moment.
 export const SignatureReelScene = ({ scene }) => (
@@ -739,48 +754,63 @@ export const SignatureReelScene = ({ scene }) => (
   </PinnedSceneFrame>
 )
 // Capability Matrix: layered craft capabilities with depth.
-export const CapabilityMatrixScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="matrix-reveal" layout="capability-matrix" className="scene-cinematic scene-capability-matrix">
-    {({ reduced }) => (
-      <motion.div variants={sequence(0.03, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.22 }} className="grid gap-4">
-        <motion.div variants={revealLift(0.01, 10)}>
-          <SceneCard className="p-5 md:p-6">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Capabilities</p>
-            <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.55rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Technical depth, creative precision, operational control.</h2>
-          </SceneCard>
-        </motion.div>
+export const CapabilityMatrixScene = ({ scene }) => {
+  const depthRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: depthRef,
+    offset: ['start end', 'end start'],
+  })
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [24, -14])
+  const midY = useTransform(scrollYProgress, [0, 1], [14, -10])
+  const foregroundY = useTransform(scrollYProgress, [0, 1], [6, -6])
 
-        <div className="grid gap-3 lg:grid-cols-[1.08fr_0.92fr]">
-          <motion.article variants={revealSide(0.08, 20)}>
-            <SceneCard className="h-full overflow-hidden p-4 md:p-5">
-              <img src={CAPABILITY_MODULES[0].image} alt={CAPABILITY_MODULES[0].title} loading="lazy" decoding="async" className="h-40 w-full rounded-xl border border-[var(--color-border)] object-cover" />
-              <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Primary Capability</p>
-              <h3 className="mt-2 font-serif text-[1.3rem] text-[var(--color-ink)]">{CAPABILITY_MODULES[0].title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{CAPABILITY_MODULES[0].detail}</p>
-            </SceneCard>
-          </motion.article>
+  return (
+    <FreeSceneFrame scene={scene} pinBehavior="matrix-reveal" layout="capability-matrix" className="scene-cinematic scene-capability-matrix">
+      {({ reduced }) => (
+        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-matrix">
+          <AmbientDepthField reduced={reduced} variant="matrix" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.4} />
 
-          <div className="grid gap-3">
-            {CAPABILITY_MODULES.slice(1).map((module, index) => (
-              <motion.article key={module.id} variants={revealLift(index * 0.06 + 0.12, 10)}>
-                <SceneCard className="overflow-hidden">
-                  <div className="grid gap-3 sm:grid-cols-[0.42fr_0.58fr]">
-                    <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover" />
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Track</p>
-                      <h3 className="mt-1 font-serif text-[1.06rem] text-[var(--color-ink)]">{module.title}</h3>
-                      <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{module.summary}</p>
-                    </div>
-                  </div>
+          <motion.div variants={sequence(0.03, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.22 }} className="relative z-[2] grid gap-4">
+            <motion.div variants={revealLift(0.01, 10)}>
+              <SceneCard className="p-5 md:p-6">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Capabilities</p>
+                <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.55rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Technical depth, creative precision, operational control.</h2>
+              </SceneCard>
+            </motion.div>
+
+            <div className="grid gap-3 lg:grid-cols-[1.08fr_0.92fr]">
+              <motion.article variants={revealSide(0.08, 20)}>
+                <SceneCard className="h-full overflow-hidden p-4 md:p-5">
+                  <img src={CAPABILITY_MODULES[0].image} alt={CAPABILITY_MODULES[0].title} loading="lazy" decoding="async" className="h-40 w-full rounded-xl border border-[var(--color-border)] object-cover" />
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Primary Capability</p>
+                  <h3 className="mt-2 font-serif text-[1.3rem] text-[var(--color-ink)]">{CAPABILITY_MODULES[0].title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{CAPABILITY_MODULES[0].detail}</p>
                 </SceneCard>
               </motion.article>
-            ))}
-          </div>
+
+              <div className="grid gap-3">
+                {CAPABILITY_MODULES.slice(1).map((module, index) => (
+                  <motion.article key={module.id} variants={revealLift(index * 0.06 + 0.12, 10)}>
+                    <SceneCard className="overflow-hidden">
+                      <div className="grid gap-3 sm:grid-cols-[0.42fr_0.58fr]">
+                        <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover" />
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Track</p>
+                          <h3 className="mt-1 font-serif text-[1.06rem] text-[var(--color-ink)]">{module.title}</h3>
+                          <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{module.summary}</p>
+                        </div>
+                      </div>
+                    </SceneCard>
+                  </motion.article>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
-    )}
-  </FreeSceneFrame>
-)
+      )}
+    </FreeSceneFrame>
+  )
+}
 
 // Operations Spine: pinned process friction and staged control.
 export const OperationsSpineScene = ({ scene }) => (
@@ -854,17 +884,35 @@ export const OperationsSpineScene = ({ scene }) => (
 )
 
 // Narrative Bridge: release tension before proof concentration.
-export const NarrativeBridgeScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="calm-release" layout="narrative-bridge" className="scene-cinematic scene-narrative-bridge">
-    {({ reduced }) => (
-      <SceneCard className="relative grid min-h-[clamp(320px,50vh,500px)] place-items-center overflow-hidden text-center p-6 md:p-8">
-        <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Outcome Transition</motion.p>
-        <motion.h2 initial={reduced ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.1, ease: MASS_EASE, delay: 0.05 }} className="mt-4 max-w-[20ch] font-serif text-[clamp(1.8rem,3.9vw,2.85rem)] leading-[1.08] text-[var(--color-ink)]">Precision is only credible when proof carries the weight.</motion.h2>
-        <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE, delay: 0.12 }} className="mt-5 max-w-[60ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">The next chapter shifts from directional language to verified outcomes, named stakeholders, and delivery context.</motion.p>
-      </SceneCard>
-    )}
-  </FreeSceneFrame>
-)
+export const NarrativeBridgeScene = ({ scene }) => {
+  const depthRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: depthRef,
+    offset: ['start end', 'end start'],
+  })
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [20, -12])
+  const midY = useTransform(scrollYProgress, [0, 1], [12, -8])
+  const foregroundY = useTransform(scrollYProgress, [0, 1], [6, -4])
+  const cardY = useTransform(scrollYProgress, [0, 1], [10, -8])
+  const cardScale = useTransform(scrollYProgress, [0, 1], [0.985, 1.015])
+
+  return (
+    <FreeSceneFrame scene={scene} pinBehavior="calm-release" layout="narrative-bridge" className="scene-cinematic scene-narrative-bridge">
+      {({ reduced }) => (
+        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-bridge">
+          <AmbientDepthField reduced={reduced} variant="bridge" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.36} />
+          <motion.div style={reduced ? undefined : { y: cardY, scale: cardScale }} className="relative z-[2]">
+            <SceneCard className="relative grid min-h-[clamp(320px,50vh,500px)] place-items-center overflow-hidden text-center p-6 md:p-8">
+              <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Outcome Transition</motion.p>
+              <motion.h2 initial={reduced ? false : { opacity: 0, y: 16, letterSpacing: '-0.06em' }} whileInView={{ opacity: 1, y: 0, letterSpacing: '-0.03em' }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.1, ease: MASS_EASE, delay: 0.05 }} className="mt-4 max-w-[20ch] font-serif text-[clamp(1.8rem,3.9vw,2.85rem)] leading-[1.08] text-[var(--color-ink)]">Precision is only credible when proof carries the weight.</motion.h2>
+              <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE, delay: 0.12 }} className="mt-5 max-w-[60ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">The next chapter shifts from directional language to verified outcomes, named stakeholders, and delivery context.</motion.p>
+            </SceneCard>
+          </motion.div>
+        </div>
+      )}
+    </FreeSceneFrame>
+  )
+}
 
 const ProofTheaterSplit = ({ reduced }) => {
   const [activeIndex, setActiveIndex] = useState(0)

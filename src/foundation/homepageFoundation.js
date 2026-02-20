@@ -37,7 +37,7 @@ export const TONE_STATE_MACHINE = Object.freeze({
     'steel',
     'warm',
     'linen',
-    'deep',
+    'dark',
     'deep',
   ]),
 })
@@ -98,7 +98,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'hero-pre-roll',
     exitCue: 'hero-lock-release',
     ctaSlot: 'soft-primary',
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'video',
       key: 'hero-video',
@@ -115,7 +115,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'ledger-evidence-rise',
     exitCue: 'ledger-handoff',
     ctaSlot: null,
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'authority-ledger-media',
@@ -132,7 +132,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'reel-pre-pin-buffer',
     exitCue: 'reel-release-snap',
     ctaSlot: 'mid-journey',
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'image-sequence',
       key: 'project-reel-images',
@@ -153,7 +153,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'matrix-lateral-reveal',
     exitCue: 'matrix-collapse',
     ctaSlot: null,
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'capability-media',
@@ -170,7 +170,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'spine-pre-pin-buffer',
     exitCue: 'spine-release',
     ctaSlot: 'post-step-three',
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'operations-spine-media',
@@ -187,7 +187,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'bridge-decompress',
     exitCue: 'bridge-soft-release',
     ctaSlot: null,
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'narrative-bridge-media',
@@ -204,7 +204,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'proof-stage-open',
     exitCue: 'proof-logo-carry',
     ctaSlot: 'proof-reinforcement',
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'testimonial-media',
@@ -219,13 +219,13 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   // Pin status: free
   {
     id: 'conversion-chamber',
-    tone: 'deep',
+    tone: 'dark',
     length: 120,
     mode: 'free',
     entryCue: 'conversion-panel-arm',
     exitCue: 'conversion-submit-release',
     ctaSlot: 'hard-conversion',
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'conversion-media',
@@ -242,7 +242,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'footer-tone-carry',
     exitCue: 'footer-terminal',
     ctaSlot: 'utility',
-    transitionReady: false,
+    transitionReady: true,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'footer-media',
@@ -267,11 +267,11 @@ export const HOMEPAGE_GRADIENT_BRIDGES = Object.freeze([
     toTone: 'warm',
   },
   {
-    id: 'bridge-linen-to-deep',
+    id: 'bridge-linen-to-dark',
     fromSceneId: 'proof-theater',
     toSceneId: 'conversion-chamber',
     fromTone: 'linen',
-    toTone: 'deep',
+    toTone: 'dark',
   },
 ])
 

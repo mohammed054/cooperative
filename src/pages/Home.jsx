@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import {
   HOMEPAGE_SCENE_REGISTRY,
+  HOMEPAGE_GRADIENT_BRIDGES,
   validateHomepageFoundation,
   HOMEPAGE_FOUNDATION,
 } from '../foundation/homepageFoundation'
@@ -31,6 +32,19 @@ const SCENE_COMPONENT_REGISTRY = Object.freeze({
 })
 
 const SCENE_IDS = HOMEPAGE_SCENE_REGISTRY.map(scene => scene.id)
+const BRIDGE_BY_FROM_SCENE = new Map(
+  HOMEPAGE_GRADIENT_BRIDGES.map(bridge => [bridge.fromSceneId, bridge])
+)
+const BRIDGE_CLASS_BY_TONE_FLOW = Object.freeze({
+  'dark->steel': 'homepage-tone-bridge-dark-steel',
+  'steel->warm': 'homepage-tone-bridge-steel-warm',
+  'linen->dark': 'homepage-tone-bridge-linen-dark',
+})
+
+const getBridgeClassName = bridge => {
+  const key = `${bridge.fromTone}->${bridge.toTone}`
+  return BRIDGE_CLASS_BY_TONE_FLOW[key] || 'homepage-tone-bridge-soft'
+}
 
 const PINNED_RHYTHM_ASSERTION = Object.freeze(() => {
   const issues = []
@@ -113,8 +127,22 @@ const Home = () => {
     <div className="flagship-home flagship-home-cinematic">
       {HOMEPAGE_SCENE_REGISTRY.map(scene => {
         const SceneComponent = SCENE_COMPONENT_REGISTRY[scene.id]
+        const bridge = BRIDGE_BY_FROM_SCENE.get(scene.id)
         if (!SceneComponent) return null
-        return <SceneComponent key={scene.id} scene={scene} />
+        return (
+          <React.Fragment key={scene.id}>
+            <SceneComponent scene={scene} />
+            {bridge ? (
+              <div
+                aria-hidden="true"
+                className={`homepage-tone-bridge ${getBridgeClassName(bridge)}`}
+                data-bridge-id={bridge.id}
+                data-bridge-from={bridge.fromTone}
+                data-bridge-to={bridge.toTone}
+              />
+            ) : null}
+          </React.Fragment>
+        )
       })}
     </div>
   )
