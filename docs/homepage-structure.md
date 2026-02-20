@@ -2,26 +2,46 @@
 
 ## Scene Order & Layout Contract
 
-| Scene ID | Tone | Mode | Length | Layout Intent | Primary CTA Surface |
+| Scene ID | Tone Key | Mode | Length | Layout Intent | Transition Flag |
 | --- | --- | --- | --- | --- | --- |
-| `command-arrival` | `deep` | `free` | `110vh` | two-column authority hero + media chamber | `View Signature Work`, `Start Confidential Brief` |
-| `authority-ledger` | `dark` | `free` | `85vh` | proof-first metrics + capability cards | none (information-first) |
-| `signature-reel` | `dark` | `pinned` | `220vh` | anchor moment, scroll-locked aperture + horizontal conveyor | `Previous Case`, `Next Case`, `Review Full Case` |
-| `capability-matrix` | `steel` | `free` | `100vh` | primary capability lane + secondary tracks | none (information-first) |
-| `operations-spine` | `steel` | `pinned` | `240vh` | process timeline with friction-led staged entries | `Review Full Process Architecture` |
-| `narrative-bridge` | `warm` | `free` | `75vh` | decompression bridge before proof | none |
-| `proof-theater` | `linen` | `free` | `120vh` | rectangular featured testimonial + indexed rail | `Previous`, `Next` |
-| `conversion-chamber` | `deep` | `free` | `120vh` | two-column close: commitment copy + real lead form | `Request Executive Production Consult` |
-| `global-footer` | `deep` | `free` | `70vh` | 4-column utility + final command CTA | `Request Executive Command Consult` |
+| `command-arrival` | `deep` | `free` | `110vh` | two-column authority hero + media chamber | `data-transition-ready="false"` |
+| `authority-ledger` | `dark` | `free` | `85vh` | proof-first metrics + capability cards | `data-transition-ready="false"` |
+| `signature-reel` | `dark` | `pinned` | `220vh` | anchor moment, scroll-locked aperture + horizontal conveyor | `data-transition-ready="false"` |
+| `capability-matrix` | `steel` | `free` | `100vh` | primary capability lane + secondary tracks | `data-transition-ready="false"` |
+| `operations-spine` | `steel` | `pinned` | `240vh` | process timeline with friction-led staged entries | `data-transition-ready="false"` |
+| `narrative-bridge` | `warm` | `free` | `75vh` | decompression bridge before proof | `data-transition-ready="false"` |
+| `proof-theater` | `linen` | `free` | `120vh` | rectangular featured testimonial + indexed rail | `data-transition-ready="false"` |
+| `conversion-chamber` | `deep` | `free` | `120vh` | two-column close: commitment copy + real lead form | `data-transition-ready="false"` |
+| `global-footer` | `deep` | `free` | `70vh` | 4-column utility + final command CTA | `data-transition-ready="false"` |
 
 ## Motion & Tone Contract Usage
 
 - Motion timing/easing/distance/stagger are sourced from `MOTION_TOKEN_CONTRACT` and parsed via `parseBezier`.
 - Scroll orchestration uses Lenis + GSAP ScrollTrigger pinning for `signature-reel` and `operations-spine`.
 - Pinned scenes run with explicit pre/post friction buffers to reduce pin-entry jump.
+- Scene metadata now ships with `data-theme="light"` and `data-transition-ready="false"` on both free and pinned scenes.
 - Tone arc is enforced by registry sequencing:
   `deep -> dark -> dark -> steel -> steel -> warm -> linen -> deep -> deep`.
 - Cinematic scene styling is routed through `.flagship-home-cinematic` tone tokens and per-scene mesh overlays in `src/index.css`.
+- Default runtime palette is enforced as light across all tone keys:
+  - `surface`: `#f6f7f9`
+  - `surface-2`: `#ffffff`
+  - `surface-3`: `#eef1f6`
+  - `bg-main`: `#ffffff`
+  - `bg-muted`: `#f6f7f9`
+  - `ink`: `#1c1c1c`
+  - `ink-muted`: `#5c6470`
+  - `ink-subtle`: `#8892a0`
+  - `accent`: `#1a1a1a`
+  - `accent-strong`: `#0f0f0f`
+  - `accent-soft`: `rgba(26,26,26,0.12)`
+  - `border`: `rgba(28,28,28,0.12)`
+
+## Scene Transition Hooks
+
+- Added `scene-transition-hook` elements after every scene.
+- Current status: placeholder transition cues with fade gradients and pending marker line while cinematic cross-scene dissolve remains unimplemented.
+- Pinned scenes keep existing friction buffers plus transition hooks for smooth lock release staging.
 
 ## Hero + Ambient Polish
 

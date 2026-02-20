@@ -8,11 +8,15 @@ const SceneWrapper = ({
   className = '',
   minHeight = '100vh',
   tone = 'light',
+  theme = 'light',
+  transitionReady = false,
   style,
 }) => (
   <section
     id={id}
     data-scene-id={id}
+    data-theme={theme}
+    data-transition-ready={String(Boolean(transitionReady))}
     className={joinClasses(
       'flagship-scene',
       `flagship-scene-${tone}`,

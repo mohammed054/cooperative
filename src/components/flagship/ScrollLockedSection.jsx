@@ -15,6 +15,8 @@ const ScrollLockedSection = ({
   className = '',
   tone = 'dark',
   height = '240vh',
+  theme = 'light',
+  transitionReady = false,
 }) => {
   const sectionRef = useRef(null)
   const lockRef = useRef(null)
@@ -59,6 +61,8 @@ const ScrollLockedSection = ({
     <section
       id={id}
       data-scene-id={id}
+      data-theme={theme}
+      data-transition-ready={String(Boolean(transitionReady))}
       ref={sectionRef}
       className={joinClasses(
         'flagship-scene',

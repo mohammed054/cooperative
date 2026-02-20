@@ -205,6 +205,16 @@ const SceneCard = ({ children, className = '', ...rest }) => (
   </div>
 )
 
+const SceneTransitionHook = ({ scene, position = 'post' }) => (
+  <div
+    aria-hidden="true"
+    className={`scene-transition-hook scene-transition-hook-${position}`}
+    data-scene-id={scene.id}
+    data-theme="light"
+    data-transition-ready={String(Boolean(scene.transitionReady))}
+  />
+)
+
 const AmbientDepthField = ({
   reduced,
   variant = 'core',
@@ -273,11 +283,21 @@ const FreeSceneFrame = ({ scene, pinBehavior, layout, className = '', children }
   const content = typeof children === 'function' ? children({ reduced }) : children
 
   return (
-    <SceneWrapper id={scene.id} tone={scene.tone} minHeight={buildHeight(scene.length)} className={className}>
-      <SceneShell scene={scene} scrollMode={FREE} pinBehavior={pinBehavior} layout={layout}>
-        {content}
-      </SceneShell>
-    </SceneWrapper>
+    <>
+      <SceneWrapper
+        id={scene.id}
+        tone={scene.tone}
+        theme="light"
+        transitionReady={scene.transitionReady}
+        minHeight={buildHeight(scene.length)}
+        className={className}
+      >
+        <SceneShell scene={scene} scrollMode={FREE} pinBehavior={pinBehavior} layout={layout}>
+          {content}
+        </SceneShell>
+      </SceneWrapper>
+      <SceneTransitionHook scene={scene} position="post" />
+    </>
   )
 }
 
@@ -290,7 +310,14 @@ const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children
       data-buffer-for={scene.id}
       data-buffer-position="pre"
     />
-    <ScrollLockedSection id={scene.id} tone={scene.tone} height={buildHeight(scene.length)} className={className}>
+    <ScrollLockedSection
+      id={scene.id}
+      tone={scene.tone}
+      theme="light"
+      transitionReady={scene.transitionReady}
+      height={buildHeight(scene.length)}
+      className={className}
+    >
       {(progress, reduced) => (
         <SceneShell scene={scene} scrollMode={PINNED} pinBehavior={pinBehavior} layout={layout}>
           {typeof children === 'function' ? children({ progress, reduced }) : children}
@@ -304,6 +331,7 @@ const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children
       data-buffer-for={scene.id}
       data-buffer-position="post"
     />
+    <SceneTransitionHook scene={scene} position="post" />
   </>
 )
 
@@ -327,7 +355,7 @@ const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }
   >
     <div className="relative h-36 overflow-hidden rounded-xl border border-[var(--color-border)]">
       <img src={project.image} alt={project.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,8,14,0.12)_0%,rgba(5,8,14,0.74)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(24,28,36,0.08)_0%,rgba(24,28,36,0.48)_100%)]" />
       <p className="absolute left-3 top-3 text-[9px] uppercase tracking-[0.14em] text-white/80">{project.location}</p>
     </div>
     <h3 className="mt-3 font-serif text-[1.08rem] text-[var(--color-ink)]">{project.title}</h3>
@@ -413,7 +441,7 @@ const SignatureReelContent = ({ progress, reduced }) => {
           />
 
           <div className="relative z-10 grid gap-4">
-            <p className="px-2 pt-2 text-[10px] uppercase tracking-[0.14em] text-white/72">
+          <p className="px-2 pt-2 text-[10px] uppercase tracking-[0.14em] text-white/76">
               Active Case {String(selectedIndex + 1).padStart(2, '0')} / {String(PROJECTS.length).padStart(2, '0')}
             </p>
 
@@ -454,9 +482,9 @@ const SignatureReelContent = ({ progress, reduced }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: RELEASE_EASE }}
             >
-              <SceneCard className="border-white/25 bg-black/32 p-4 backdrop-blur-sm">
-                <h3 className="font-serif text-[1.2rem] text-white">{selected.title}</h3>
-                <p className="mt-2 text-sm text-white/80">{selected.challenge}</p>
+              <SceneCard className="border-[rgba(255,255,255,0.52)] bg-[rgba(255,255,255,0.78)] p-4 backdrop-blur-md">
+                <h3 className="font-serif text-[1.2rem] text-[var(--color-ink)]">{selected.title}</h3>
+                <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{selected.challenge}</p>
                 <div className="mt-4">
                   <ScribbleButton to={`/work/${selected.slug}`} variant="primary" tone="light" size="md" analyticsLabel={`signature-case-${selected.slug}`}>
                     Review Full Case
@@ -540,8 +568,8 @@ export const CommandArrivalScene = ({ scene }) => {
                   <motion.div className="hero-volumetric-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.28, 0.42, 0.28] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8, ease: MASS_EASE, repeat: Infinity }} />
                   <motion.div className="hero-light-ray-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.16, 0.3, 0.16], x: [0, 20, 0] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.4, ease: AUTHORITY_EASE, repeat: Infinity }} />
                   <motion.div className="hero-particle-layer" style={reduced ? undefined : { y: particleY }} animate={reduced ? undefined : { opacity: [0.16, 0.24, 0.16] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.4, ease: RELEASE_EASE, repeat: Infinity }} />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,14,0.32)_0%,rgba(5,9,15,0.78)_100%)]" />
-                  <div className="absolute left-4 top-4 rounded-full border border-white/28 bg-black/36 px-3 py-1 text-[10px] uppercase tracking-[0.13em] text-white/86">Command Floor Preview</div>
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,24,32,0.18)_0%,rgba(18,24,32,0.54)_100%)]" />
+                  <div className="absolute left-4 top-4 rounded-full border border-white/62 bg-white/76 px-3 py-1 text-[10px] uppercase tracking-[0.13em] text-[var(--color-ink)]">Command Floor Preview</div>
                 </div>
               </SceneCard>
             </motion.div>

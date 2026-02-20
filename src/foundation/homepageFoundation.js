@@ -17,6 +17,7 @@ import { MOTION_TOKEN_CONTRACT } from '../motion/motionTokenContract.js'
  * @property {string} entryCue
  * @property {string} exitCue
  * @property {string | null} ctaSlot
+ * @property {boolean} transitionReady
  * @property {SceneMediaPlaceholder} mediaPlaceholder
  */
 
@@ -49,6 +50,7 @@ export const SCENE_DEFINITION_SCHEMA = Object.freeze({
   entryCue: 'string',
   exitCue: 'string',
   ctaSlot: 'string | null',
+  transitionReady: 'boolean',
   mediaPlaceholder: {
     type: "('video'|'image-sequence'|'media-collection'|'map-nodes')",
     key: 'string',
@@ -64,6 +66,7 @@ export const SCENE_DEFINITION_TEMPLATE = Object.freeze({
   entryCue: 'scene-entry-cue',
   exitCue: 'scene-exit-cue',
   ctaSlot: null,
+  transitionReady: false,
   mediaPlaceholder: {
     type: 'video',
     key: 'placeholder-key',
@@ -95,6 +98,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'hero-pre-roll',
     exitCue: 'hero-lock-release',
     ctaSlot: 'soft-primary',
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'video',
       key: 'hero-video',
@@ -111,6 +115,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'ledger-evidence-rise',
     exitCue: 'ledger-handoff',
     ctaSlot: null,
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'authority-ledger-media',
@@ -127,6 +132,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'reel-pre-pin-buffer',
     exitCue: 'reel-release-snap',
     ctaSlot: 'mid-journey',
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'image-sequence',
       key: 'project-reel-images',
@@ -147,6 +153,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'matrix-lateral-reveal',
     exitCue: 'matrix-collapse',
     ctaSlot: null,
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'capability-media',
@@ -163,6 +170,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'spine-pre-pin-buffer',
     exitCue: 'spine-release',
     ctaSlot: 'post-step-three',
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'operations-spine-media',
@@ -179,6 +187,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'bridge-decompress',
     exitCue: 'bridge-soft-release',
     ctaSlot: null,
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'narrative-bridge-media',
@@ -195,6 +204,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'proof-stage-open',
     exitCue: 'proof-logo-carry',
     ctaSlot: 'proof-reinforcement',
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'testimonial-media',
@@ -215,6 +225,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'conversion-panel-arm',
     exitCue: 'conversion-submit-release',
     ctaSlot: 'hard-conversion',
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'conversion-media',
@@ -231,6 +242,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     entryCue: 'footer-tone-carry',
     exitCue: 'footer-terminal',
     ctaSlot: 'utility',
+    transitionReady: false,
     mediaPlaceholder: {
       type: 'media-collection',
       key: 'footer-media',
@@ -302,6 +314,10 @@ export const validateHomepageFoundation = foundation => {
 
   if (!scenes.every(scene => VALID_MODES.has(scene.mode))) {
     issues.push("Every scene mode must be either 'free' or 'pinned'.")
+  }
+
+  if (!scenes.every(scene => typeof scene.transitionReady === 'boolean')) {
+    issues.push("Every scene must declare a boolean 'transitionReady' flag.")
   }
 
   const pinnedIds = scenes.filter(scene => scene.mode === 'pinned').map(scene => scene.id)
