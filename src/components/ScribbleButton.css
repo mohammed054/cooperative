@@ -10,6 +10,9 @@
   --sb-padding-y: 0.72rem;
   --sb-font-size: 0.79rem;
   --sb-letter: 0.1em;
+  --sb-hover-lift: -2px;
+  --sb-pressure-scale: 0.972;
+  --sb-stroke-duration: 0.74s;
 
   position: relative;
   display: inline-flex;
@@ -29,6 +32,7 @@
   text-transform: uppercase;
   text-decoration: none;
   box-shadow: var(--sb-shadow);
+  filter: saturate(0.95);
   overflow: hidden;
   cursor: pointer;
   transform: translateZ(0);
@@ -37,19 +41,47 @@
     border-color var(--cine-transition-medium),
     color var(--cine-transition-medium),
     box-shadow var(--cine-transition-medium),
-    transform var(--cine-transition-fast);
+    transform var(--cine-transition-fast),
+    filter var(--cine-transition-medium);
+}
+
+.scribble-button::after {
+  content: '';
+  position: absolute;
+  inset: -20% auto -20% -130%;
+  width: 72%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.38) 48%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-22deg);
+  opacity: 0;
+  transition:
+    left var(--cine-transition-dramatic),
+    opacity var(--cine-transition-medium);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .scribble-button:hover {
   background: var(--sb-hover-bg);
   color: var(--sb-hover-fg);
   border-color: var(--sb-hover-border);
-  transform: translateY(-1px);
+  transform: translateY(var(--sb-hover-lift)) scale(1.01);
   box-shadow: 0 18px 42px rgba(8, 11, 16, 0.28);
+  filter: saturate(1.05);
+}
+
+.scribble-button:hover::after {
+  left: 150%;
+  opacity: 1;
 }
 
 .scribble-button:active {
-  transform: translateY(0);
+  transform: translateY(0.5px) scale(var(--sb-pressure-scale));
+  box-shadow: 0 12px 26px rgba(8, 11, 16, 0.22);
 }
 
 .scribble-button:focus-visible {
@@ -89,14 +121,22 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
-  opacity: 0.28;
+  opacity: 0.26;
   stroke-dasharray: 2800;
   stroke-dashoffset: 2800;
-  transition: stroke-dashoffset 0.7s cubic-bezier(0.2, 0.85, 0.25, 1);
+  transition:
+    stroke-dashoffset var(--sb-stroke-duration) cubic-bezier(0.2, 0.85, 0.25, 1),
+    opacity var(--cine-transition-medium);
 }
 
 .scribble-button:hover .scribble-svg path {
-  stroke-dashoffset: 0;
+  opacity: 0.4;
+  animation: scribble-pressure var(--sb-stroke-duration) cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
+}
+
+.scribble-button:active .scribble-svg path {
+  stroke-dashoffset: 780;
+  opacity: 0.46;
 }
 
 .no-scribble .scribble-svg {
@@ -190,6 +230,8 @@
   --sb-padding-y: 0.42rem;
   --sb-font-size: 0.64rem;
   --sb-letter: 0.13em;
+  --sb-hover-lift: -1px;
+  --sb-pressure-scale: 0.986;
   min-height: 2.02rem;
   --sb-bg: transparent;
   --sb-fg: #2a2f37;
@@ -208,6 +250,18 @@
   --sb-hover-border: rgba(255, 255, 255, 0.56);
 }
 
+@keyframes scribble-pressure {
+  0% {
+    stroke-dashoffset: 2800;
+  }
+  62% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 320;
+  }
+}
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .sb-variant-secondary {
     backdrop-filter: none;
@@ -217,5 +271,23 @@
 
   .sb-tone-light.sb-variant-secondary {
     --sb-bg: rgba(19, 23, 31, 0.88);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scribble-button::after {
+    display: none;
+  }
+
+  .scribble-button:hover,
+  .scribble-button:active {
+    transform: none;
+    filter: none;
+  }
+
+  .scribble-button:hover .scribble-svg path,
+  .scribble-button:active .scribble-svg path {
+    animation: none;
+    stroke-dashoffset: 0;
   }
 }

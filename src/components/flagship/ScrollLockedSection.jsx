@@ -36,7 +36,8 @@ const ScrollLockedSection = ({
         end: 'bottom bottom',
         pin: lockEl,
         pinSpacing: false,
-        scrub: 0.8,
+        scrub: 1.12,
+        anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: self => {
           setProgress(self.progress)

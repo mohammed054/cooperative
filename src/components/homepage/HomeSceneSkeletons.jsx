@@ -1,198 +1,279 @@
-import React, { useRef, useState } from 'react'
+﻿import React, { useEffect, useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
   useReducedMotion,
+  useScroll,
+  useTransform,
 } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import ScribbleButton from '../ScribbleButton'
-import { SceneShell, SceneWrapper, ScrollLockedSection } from '../flagship'
+import {
+  HeroAmbientCanvas,
+  SceneShell,
+  SceneWrapper,
+  ScrollLockedSection,
+} from '../flagship'
 import { MOTION_TOKEN_CONTRACT, parseBezier } from '../../motion/motionTokenContract.js'
 import { caseStudies, services, testimonials as testimonialData } from '../../data/siteData'
 import { assetUrl } from '../../lib/assetUrl'
+import { useLeadSubmission } from '../../hooks/useLeadSubmission'
 
-const EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.authority)
-const MASS = parseBezier(MOTION_TOKEN_CONTRACT.easing.mass)
 const FREE = 'free'
 const PINNED = 'pinned'
-
-const AUTHORITY_MODULES = [
-  {
-    title: 'Creative Direction',
-    detail:
-      'Studio-level narrative control built for high-stakes brand moments.',
-    image: assetUrl('images/event-planning-in-action.png'),
-  },
-  {
-    title: 'Technical Command',
-    detail:
-      'Show systems architecture with disciplined execution and redundancy.',
-    image: assetUrl('images/av-setup.png'),
-  },
-  {
-    title: 'Executive Delivery',
-    detail:
-      'Enterprise-ready operations cadence for leadership and stakeholder events.',
-    image: assetUrl('images/always-on-time.png'),
-  },
-]
+const AUTHORITY_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.authority)
+const MASS_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.mass)
+const RELEASE_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.release)
 
 const PROJECTS = caseStudies.slice(0, 3).map((project, index) => ({
-  id: `project-${String(index + 1).padStart(2, '0')}`,
+  id: `case-${String(index + 1).padStart(2, '0')}`,
   title: project.title,
   subtitle: project.summary,
+  challenge: project.challenge,
+  outcome: project.results?.[0] || 'Delivered without timeline drift.',
   image: project.image,
   location: project.location,
+  slug: project.slug,
 }))
 
-const CAPABILITIES = [
-  {
-    title: 'Stagecraft & Scenic',
-    copy: 'Scenic systems and stage architecture tailored for executive sightlines and camera readiness.',
-    image: assetUrl('images/full-production.png'),
-  },
-  {
-    title: 'AV Systems',
-    copy: 'Integrated signal flow and operator control for critical live content delivery.',
-    image: assetUrl('images/av-setup.png'),
-  },
-  {
-    title: 'Lighting Narrative',
-    copy: 'Lighting composition that supports pacing, focus, and presentation hierarchy.',
-    image: assetUrl('images/lighting-effects.png'),
-  },
-]
+const CAPABILITY_MODULES = services.slice(0, 3).map((service, index) => ({
+  id: service.slug,
+  title: service.title,
+  summary: service.summary,
+  detail: service.description,
+  standards: service.standards?.slice(0, 2) || [],
+  image:
+    [
+      assetUrl('images/full-production.png'),
+      assetUrl('images/lighting-effects.png'),
+      assetUrl('images/av-setup.png'),
+    ][index] || assetUrl('images/full-production.png'),
+}))
 
-const STEPS = [
+const TESTIMONIALS = testimonialData
+  .filter(item => item?.name && item?.quote)
+  .slice(0, 3)
+  .map((item, index) => ({
+    id: item.id || `testimonial-${String(index + 1).padStart(2, '0')}`,
+    name: item.name,
+    role: item.role,
+    organization: item.company,
+    quote: item.quote,
+    context: item.project,
+    location: item.location,
+    image: caseStudies[index]?.image || PROJECTS[index % PROJECTS.length]?.image,
+  }))
+
+const OPERATIONS_STEPS = [
   {
     id: '01',
-    title: 'Strategic intake',
+    title: 'Executive Briefing',
     detail:
-      'Objectives, constraints, and leadership requirements are aligned into an executable scope.',
+      'Scope, stakeholders, and decision constraints are locked before creative routing begins.',
     image: assetUrl('images/process-bg.jpg'),
   },
   {
     id: '02',
-    title: 'System alignment',
+    title: 'Systems Alignment',
     detail:
-      'Creative, technical, and logistics teams move under one command cadence.',
+      'Production, venue, and technical teams align under one command structure.',
     image: assetUrl('images/event-planning.png'),
   },
   {
     id: '03',
-    title: 'Rehearsal discipline',
+    title: 'Rehearsal Control',
     detail:
-      'Show flow and cueing are validated before live audience exposure.',
+      'Cue integrity and fallback logic are validated under full run conditions.',
     image: assetUrl('images/event-planning-in-action.png'),
   },
   {
     id: '04',
-    title: 'Live execution',
+    title: 'Live Command',
     detail:
-      'Senior-led floor command protects timing, transitions, and delivery quality.',
+      'Floor leadership executes timing and transitions with protected authority.',
     image: assetUrl('images/full-production.png'),
   },
 ]
 
-const TESTIMONIAL_TARGET_COUNT = 9
-
-const TESTIMONIALS = Array.from({ length: TESTIMONIAL_TARGET_COUNT }, (_, index) => {
-  const source = testimonialData[index]
-  const fallbackStudy = caseStudies[index % caseStudies.length]
-
-  if (source) {
-    return {
-      id: source.id || `testimonial-${String(index + 1).padStart(2, '0')}`,
-      name: source.name,
-      role: source.role,
-      organization: source.company,
-      quote: source.quote,
-      eventContext: source.project,
-      outcome: `Delivered in ${source.location}`,
-      image: caseStudies[index]?.image || assetUrl(`images/event${index + 1}.jpg`),
-      verification: 'verified',
-    }
-  }
-
-  return {
-    id: `testimonial-pending-${String(index + 1).padStart(2, '0')}`,
-    name: 'Client profile pending release',
-    role: 'Executive Stakeholder',
-    organization: fallbackStudy.title,
-    quote: 'Verified testimonial copy pending client publication approval.',
-    eventContext: fallbackStudy.summary,
-    outcome: 'Reserved slot for an approved client statement.',
-    image: fallbackStudy.image,
-    verification: 'pending',
-  }
-})
-
-const LOGOS = [
-  'MERIDIAN',
-  'NOVA',
-  'ALTIUS',
-  'LUMERA',
-  'SILQ',
-  'ORBITAL',
-  'KINETIC',
-  'ASTRA',
+const FOOTER_COMPANY_LINKS = [
+  { to: '/about', label: 'Company' },
+  { to: '/process', label: 'Process' },
+  { to: '/pricing', label: 'Engagement' },
+  { to: '/faq', label: 'FAQ' },
 ]
 
-const FOOTER_COMPANY_LINKS = [
-  { to: '/about', label: 'About' },
-  { to: '/process', label: 'Process' },
-  { to: '/pricing', label: 'Pricing' },
-  { to: '/faq', label: 'FAQ' },
+const parseMetricValue = raw => {
+  const digits = String(raw || '').match(/\d+/g)
+  return digits ? Number(digits.join('')) : 0
+}
+
+const AUTHORITY_METRICS = [
+  { label: 'Events Delivered', value: caseStudies.length, suffix: '' },
+  {
+    label: 'Guests Managed',
+    value: caseStudies.reduce((sum, study) => {
+      const stat = study.stats?.find(item => /guest/i.test(item.label))
+      return sum + parseMetricValue(stat?.value)
+    }, 0),
+    suffix: '+',
+  },
+  {
+    label: 'Cue Volume',
+    value: caseStudies.reduce((sum, study) => {
+      const stat = study.stats?.find(item => /cue|reset|phase|act|screen/i.test(item.label))
+      return sum + parseMetricValue(stat?.value)
+    }, 0),
+    suffix: '+',
+  },
+  { label: 'Verified Testimonials', value: TESTIMONIALS.length, suffix: '' },
 ]
 
 const buildHeight = vh => `${vh}vh`
 const clampIndex = (value, max) => Math.max(0, Math.min(max, value))
 
-const fadeUp = (delay = 0, distance = MOTION_TOKEN_CONTRACT.distances.copy) => ({
-  hidden: {
-    opacity: 0,
-    y: distance,
-    filter: `blur(${MOTION_TOKEN_CONTRACT.blur.entry}px)`,
-  },
+const revealLift = (delay = 0, distance = 16) => ({
+  hidden: { opacity: 0, y: distance },
   visible: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
     transition: {
-      duration: MOTION_TOKEN_CONTRACT.durations.scene,
-      ease: EASE,
+      duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.08,
+      ease: AUTHORITY_EASE,
       delay,
     },
   },
 })
 
-const stagger = (
-  delayChildren = 0.04,
-  staggerChildren = MOTION_TOKEN_CONTRACT.stagger.card
-) => ({
-  hidden: {},
-  visible: { transition: { delayChildren, staggerChildren } },
+const revealSide = (delay = 0, distance = 24) => ({
+  hidden: { opacity: 0, x: distance },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.1,
+      ease: MASS_EASE,
+      delay,
+    },
+  },
 })
 
-const SceneCard = ({ children, className = '' }) => (
+const sequence = (delayChildren = 0.04, staggerChildren = 0.08) => ({
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren,
+      staggerChildren,
+    },
+  },
+})
+
+const CountUpMetric = ({ value, suffix = '', reduced }) => {
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    if (reduced) return undefined
+
+    const duration = 920
+    const start = performance.now()
+    let frameId = 0
+
+    const tick = now => {
+      const progress = Math.min(1, (now - start) / duration)
+      const eased = 1 - (1 - progress) ** 3
+      setDisplay(Math.round(value * eased))
+      if (progress < 1) frameId = window.requestAnimationFrame(tick)
+    }
+
+    frameId = window.requestAnimationFrame(tick)
+    return () => window.cancelAnimationFrame(frameId)
+  }, [reduced, value])
+
+  return (
+    <span>
+      {reduced ? value : display}
+      {suffix}
+    </span>
+  )
+}
+
+const SceneCard = ({ children, className = '', ...rest }) => (
   <div
-    className={`rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 shadow-[0_14px_26px_rgba(28,28,28,0.06)] ${className}`}
+    className={`cinematic-scene-card rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)]/88 p-4 shadow-[0_20px_46px_rgba(8,12,20,0.28)] backdrop-blur-[2px] ${className}`}
+    {...rest}
   >
     {children}
   </div>
 )
 
-const FreeSceneFrame = ({ scene, pinBehavior = 'none', layout, className = '', children }) => {
+const AmbientDepthField = ({
+  reduced,
+  variant = 'core',
+  backgroundY = 0,
+  midY = 0,
+  foregroundY = 0,
+  glowOpacity = 0.5,
+}) => (
+  <div aria-hidden="true" className={`scene-ambient-field scene-ambient-${variant}`}>
+    <motion.span
+      className="scene-ambient-layer scene-ambient-back"
+      style={reduced ? undefined : { y: backgroundY }}
+      animate={
+        reduced
+          ? undefined
+          : {
+              opacity: [glowOpacity * 0.84, glowOpacity, glowOpacity * 0.8],
+              scale: [1, 1.035, 1],
+            }
+      }
+      transition={{
+        duration: MOTION_TOKEN_CONTRACT.durations.epic * 4,
+        ease: AUTHORITY_EASE,
+        repeat: Infinity,
+      }}
+    />
+    <motion.span
+      className="scene-ambient-layer scene-ambient-mid"
+      style={reduced ? undefined : { y: midY }}
+      animate={
+        reduced
+          ? undefined
+          : {
+              x: [0, 14, 0],
+              opacity: [0.24, 0.36, 0.24],
+            }
+      }
+      transition={{
+        duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.2,
+        ease: MASS_EASE,
+        repeat: Infinity,
+      }}
+    />
+    <motion.span
+      className="scene-ambient-layer scene-ambient-front"
+      style={reduced ? undefined : { y: foregroundY }}
+      animate={
+        reduced
+          ? undefined
+          : {
+              x: [0, -10, 0],
+              opacity: [0.14, 0.26, 0.14],
+            }
+      }
+      transition={{
+        duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8,
+        ease: RELEASE_EASE,
+        repeat: Infinity,
+      }}
+    />
+  </div>
+)
+
+const FreeSceneFrame = ({ scene, pinBehavior, layout, className = '', children }) => {
   const reduced = useReducedMotion()
   const content = typeof children === 'function' ? children({ reduced }) : children
 
   return (
-    <SceneWrapper
-      id={scene.id}
-      tone={scene.tone}
-      minHeight={buildHeight(scene.length)}
-      className={className}
-    >
+    <SceneWrapper id={scene.id} tone={scene.tone} minHeight={buildHeight(scene.length)} className={className}>
       <SceneShell scene={scene} scrollMode={FREE} pinBehavior={pinBehavior} layout={layout}>
         {content}
       </SceneShell>
@@ -200,28 +281,18 @@ const FreeSceneFrame = ({ scene, pinBehavior = 'none', layout, className = '', c
   )
 }
 
-const PinnedSceneFrame = ({ scene, layout, className = '', children }) => (
+const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children }) => (
   <>
     <div
       aria-hidden="true"
       className="scene-friction-buffer"
-      style={{ '--scene-buffer-height': '10vh' }}
+      style={{ '--scene-buffer-height': '9vh' }}
       data-buffer-for={scene.id}
       data-buffer-position="pre"
     />
-    <ScrollLockedSection
-      id={scene.id}
-      tone={scene.tone}
-      height={buildHeight(scene.length)}
-      className={className}
-    >
+    <ScrollLockedSection id={scene.id} tone={scene.tone} height={buildHeight(scene.length)} className={className}>
       {(progress, reduced) => (
-        <SceneShell
-          scene={scene}
-          scrollMode={PINNED}
-          pinBehavior="scroll-lock-placeholder"
-          layout={layout}
-        >
+        <SceneShell scene={scene} scrollMode={PINNED} pinBehavior={pinBehavior} layout={layout}>
           {typeof children === 'function' ? children({ progress, reduced }) : children}
         </SceneShell>
       )}
@@ -229,399 +300,408 @@ const PinnedSceneFrame = ({ scene, layout, className = '', children }) => (
     <div
       aria-hidden="true"
       className="scene-friction-buffer"
-      style={{ '--scene-buffer-height': '10vh' }}
+      style={{ '--scene-buffer-height': '9vh' }}
       data-buffer-for={scene.id}
       data-buffer-position="post"
     />
   </>
 )
 
-const ProjectPanelCard = ({
-  project,
-  mediaRef,
-  isActive,
-  reduced,
-  interactive = false,
-  onSelect,
-}) => (
+const ProjectCard = ({ project, active, reduced, onSelect, interactive = false }) => (
   <motion.article
     layout
-    whileHover={interactive && !reduced ? { y: -4 } : undefined}
+    whileHover={!reduced ? { y: -5, scale: 1.008 } : undefined}
+    whileTap={!reduced ? { y: -1, scale: 0.988 } : undefined}
     onClick={interactive ? onSelect : undefined}
     animate={{
-      opacity: reduced ? 1 : isActive ? 1 : 0.58,
-      scale: reduced ? 1 : isActive ? 1 : 0.96,
-      y: reduced ? 0 : isActive ? 0 : 8,
+      opacity: reduced ? 1 : active ? 1 : 0.62,
+      scale: reduced ? 1 : active ? 1 : 0.96,
+      y: reduced ? 0 : active ? 0 : 10,
     }}
-    transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS }}
-    className={`min-w-[250px] snap-start rounded-2xl border p-3 shadow-[0_12px_24px_rgba(28,28,28,0.06)] ${
-      isActive
-        ? 'border-[rgba(28,28,28,0.28)] bg-[var(--color-surface-2)]'
-        : 'border-[var(--color-border)] bg-[var(--color-surface-2)]'
+    transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }}
+    className={`cinematic-interactive-card min-w-[252px] snap-start rounded-2xl border p-3 ${
+      active
+        ? 'border-[rgba(234,241,255,0.44)] bg-[var(--color-surface-2)] shadow-[0_30px_70px_rgba(3,5,8,0.44)]'
+        : 'border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_14px_30px_rgba(4,6,10,0.24)]'
     } ${interactive ? 'cursor-pointer' : ''}`}
   >
-    <div className="relative h-36 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-      <img
-        src={project.image}
-        alt={project.title}
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
-      <div className="absolute left-2 top-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-2 py-1 text-[9px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
-        {mediaRef}
-      </div>
+    <div className="relative h-36 overflow-hidden rounded-xl border border-[var(--color-border)]">
+      <img src={project.image} alt={project.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,8,14,0.12)_0%,rgba(5,8,14,0.74)_100%)]" />
+      <p className="absolute left-3 top-3 text-[9px] uppercase tracking-[0.14em] text-white/80">{project.location}</p>
     </div>
-    <p className="mt-3 text-[10px] uppercase tracking-[0.13em] text-[var(--color-ink-subtle)]">{project.id}</p>
-    <h3 className="mt-1 font-serif text-lg text-[var(--color-ink)]">{project.title}</h3>
+    <h3 className="mt-3 font-serif text-[1.08rem] text-[var(--color-ink)]">{project.title}</h3>
     <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{project.subtitle}</p>
-    <p className="mt-1 text-xs text-[var(--color-ink-subtle)]">{project.location}</p>
-    <div className="mt-3">
-      <ScribbleButton
-        variant="micro"
-        tone="dark"
-        size="sm"
-        showArrow={false}
-        analyticsLabel={`phase9-reel-brief-${project.id}`}
-        onClick={event => event.stopPropagation()}
-      >
-        Start a Similar Brief
-      </ScribbleButton>
-    </div>
+    <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{project.outcome}</p>
   </motion.article>
 )
-
-const SignatureReelContent = ({ scene, progress, reduced }) => {
+const SignatureReelContent = ({ progress, reduced }) => {
   const mobileTrackRef = useRef(null)
-  const mediaRefs = Array.isArray(scene.mediaPlaceholder.ref)
-    ? scene.mediaPlaceholder.ref
-    : [scene.mediaPlaceholder.ref]
-  const activeFromScroll = clampIndex(
-    Math.floor(progress * PROJECTS.length),
-    PROJECTS.length - 1
-  )
   const [manualIndex, setManualIndex] = useState(null)
-  const selectedIndex =
-    typeof manualIndex === 'number' ? manualIndex : activeFromScroll
-  const x = reduced ? 0 : -progress * (PROJECTS.length - 2) * 210
-  const bgParallaxX = reduced ? 0 : -progress * 64
-  const fgParallaxX = reduced ? 0 : progress * 46
 
-  const scrollToCard = index => {
-    setManualIndex(clampIndex(index, PROJECTS.length - 1))
+  const indexFromScroll = clampIndex(Math.floor(progress * PROJECTS.length), PROJECTS.length - 1)
+  const selectedIndex = typeof manualIndex === 'number' ? manualIndex : indexFromScroll
+  const selected = PROJECTS[selectedIndex]
+
+  const tension = reduced ? 0 : Math.max(0, 1 - Math.abs(progress - 0.55) / 0.55)
+  const apertureInset = reduced ? 0 : 8 + tension * 26
+  const conveyorOffset = reduced ? 0 : -progress * (PROJECTS.length - 1) * 252
+  const backgroundY = reduced ? 0 : (0.5 - progress) * 40
+  const midY = reduced ? 0 : (0.5 - progress) * 22
+  const foregroundY = reduced ? 0 : (0.5 - progress) * 14
+
+  const selectProject = index => {
+    const clamped = clampIndex(index, PROJECTS.length - 1)
+    setManualIndex(clamped)
+
     if (!mobileTrackRef.current) return
-    const target = mobileTrackRef.current.querySelector(`[data-project-index="${index}"]`)
+    const target = mobileTrackRef.current.querySelector(`[data-project-index="${clamped}"]`)
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
     }
   }
 
   return (
-    <div className="grid gap-4">
-      <SceneCard>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Signature Reel</p>
-            <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Pinned horizontal signature conveyor</h2>
+    <div className="scene-depth-stage scene-depth-stage-signature grid gap-5">
+      <AmbientDepthField
+        reduced={reduced}
+        variant="signature"
+        backgroundY={backgroundY}
+        midY={midY}
+        foregroundY={foregroundY}
+        glowOpacity={0.62}
+      />
+
+      <div className="relative z-[2] grid gap-5">
+        <SceneCard className="p-5 md:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="max-w-[64ch]">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Anchor Moment</p>
+              <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,2.95vw,2.52rem)] leading-[1.06] text-[var(--color-ink)]">
+                Command Aperture - scroll-locked tension and release
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <ScribbleButton variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex - 1)} analyticsLabel="signature-prev">
+                Previous Case
+              </ScribbleButton>
+              <ScribbleButton variant="micro" tone="light" size="sm" showArrow={false} onClick={() => selectProject(selectedIndex + 1)} analyticsLabel="signature-next">
+                Next Case
+              </ScribbleButton>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <ScribbleButton
-              variant="micro"
-              tone="dark"
-              size="sm"
-              showArrow={false}
-              analyticsLabel="phase7-reel-prev"
-              onClick={() => scrollToCard(selectedIndex - 1)}
+        </SceneCard>
+
+        <div className="command-aperture-stage relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 md:p-4">
+          <motion.img
+            key={selected.id}
+            src={selected.image}
+            alt={selected.title}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ scale: reduced ? 1.02 : 1.1, y: backgroundY }}
+            animate={reduced ? undefined : { x: [0, -22, 0], y: [backgroundY, backgroundY + 8, backgroundY] }}
+            transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.2, ease: AUTHORITY_EASE, repeat: Infinity }}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,7,12,0.46)_0%,rgba(4,7,12,0.88)_100%)]" />
+          <motion.div
+            aria-hidden="true"
+            className="command-aperture-beam pointer-events-none absolute inset-0 z-[1]"
+            style={{
+              y: midY,
+              clipPath: `inset(0 ${apertureInset}% 0 ${apertureInset}% round 24px)`,
+            }}
+          />
+
+          <div className="relative z-10 grid gap-4">
+            <p className="px-2 pt-2 text-[10px] uppercase tracking-[0.14em] text-white/72">
+              Active Case {String(selectedIndex + 1).padStart(2, '0')} / {String(PROJECTS.length).padStart(2, '0')}
+            </p>
+
+            <motion.div
+              className="hidden gap-3 md:flex will-change-transform"
+              animate={reduced ? undefined : { x: conveyorOffset }}
+              transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }}
             >
-              Prev
-            </ScribbleButton>
-            <ScribbleButton
-              variant="micro"
-              tone="dark"
-              size="sm"
-              showArrow={false}
-              analyticsLabel="phase7-reel-next"
-              onClick={() => scrollToCard(selectedIndex + 1)}
+              {PROJECTS.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  animate={{
+                    y: reduced ? 0 : index === selectedIndex ? 0 : 10,
+                    scale: reduced ? 1 : index === selectedIndex ? 1 : 0.95,
+                  }}
+                  transition={{
+                    duration: MOTION_TOKEN_CONTRACT.durations.scene,
+                    ease: MASS_EASE,
+                    delay: reduced ? 0 : index * 0.03,
+                  }}
+                >
+                  <ProjectCard project={project} active={index === selectedIndex} reduced={reduced} />
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <div ref={mobileTrackRef} className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 md:hidden" style={{ touchAction: 'pan-x' }}>
+              {PROJECTS.map((project, index) => (
+                <div key={`mobile-${project.id}`} data-project-index={index}>
+                  <ProjectCard project={project} active={index === selectedIndex} reduced={reduced} interactive onSelect={() => selectProject(index)} />
+                </div>
+              ))}
+            </div>
+
+            <motion.div
+              key={selected.id}
+              initial={reduced ? false : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: RELEASE_EASE }}
             >
-              Next
-            </ScribbleButton>
+              <SceneCard className="border-white/25 bg-black/32 p-4 backdrop-blur-sm">
+                <h3 className="font-serif text-[1.2rem] text-white">{selected.title}</h3>
+                <p className="mt-2 text-sm text-white/80">{selected.challenge}</p>
+                <div className="mt-4">
+                  <ScribbleButton to={`/work/${selected.slug}`} variant="primary" tone="light" size="md" analyticsLabel={`signature-case-${selected.slug}`}>
+                    Review Full Case
+                  </ScribbleButton>
+                </div>
+              </SceneCard>
+            </motion.div>
           </div>
         </div>
-      </SceneCard>
-      <div className="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-3)] p-3">
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 w-[32%] rounded-r-[30%] bg-[radial-gradient(circle_at_center,rgba(28,28,28,0.08)_0%,rgba(28,28,28,0)_72%)]"
-          style={{ x: bgParallaxX }}
-        />
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-[26%] rounded-l-[28%] bg-[radial-gradient(circle_at_center,rgba(28,28,28,0.1)_0%,rgba(28,28,28,0)_74%)]"
-          style={{ x: fgParallaxX }}
-        />
-        <motion.div
-          variants={stagger(0.02, 0.12)}
-          initial={reduced ? false : 'hidden'}
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.22 }}
-          className="relative z-10 hidden gap-3 md:flex"
-          style={{ x }}
-        >
-          {PROJECTS.map((project, index) => (
-            <motion.div key={project.id} variants={fadeUp(index * 0.03, 22)}>
-              <ProjectPanelCard
-                project={project}
-                mediaRef={mediaRefs[index] || `project-reel-${String(index + 1).padStart(2, '0')}`}
-                reduced={reduced}
-                isActive={index === selectedIndex}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
-        <motion.div
-          ref={mobileTrackRef}
-          variants={stagger(0.02, 0.12)}
-          initial={reduced ? false : 'hidden'}
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.22 }}
-          className="relative z-10 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 md:hidden"
-          style={{ touchAction: 'pan-x' }}
-        >
-          {PROJECTS.map((project, index) => (
-            <motion.div
-              key={`mobile-${project.id}`}
-              data-project-index={index}
-              variants={fadeUp(index * 0.03, 22)}
-            >
-              <ProjectPanelCard
-                project={project}
-                mediaRef={mediaRefs[index] || `project-reel-${String(index + 1).padStart(2, '0')}`}
-                reduced={reduced}
-                isActive={index === selectedIndex}
-                interactive
-                onSelect={() => scrollToCard(index)}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
-      <motion.div initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }} animate={reduced || progress > 0.45 ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 14, filter: 'blur(8px)' }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }} className="flex flex-wrap items-center justify-end gap-3">
-        <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
-          Active panel: {String(selectedIndex + 1).padStart(2, '0')} / {String(PROJECTS.length).padStart(2, '0')}
-        </p>
-      </motion.div>
     </div>
   )
 }
 
-// Scroll behavior: free with hero lock and micro-pause after lock.
-// Tone layer: deep (mapped to light surface system).
-// Pin status: free.
-export const CommandArrivalScene = ({ scene }) => (
-  <>
-    <FreeSceneFrame
-      scene={scene}
-      layout="hero-split"
-      pinBehavior="micro-pause-after-lock"
-      className="scene-skeleton scene-skeleton-command-arrival"
-    >
+// Command Arrival: emotional landing and authority prelude.
+export const CommandArrivalScene = ({ scene }) => {
+  const [audioCueArmed, setAudioCueArmed] = useState(false)
+  const depthRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: depthRef,
+    offset: ['start end', 'end start'],
+  })
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [56, -42])
+  const midY = useTransform(scrollYProgress, [0, 1], [28, -24])
+  const foregroundY = useTransform(scrollYProgress, [0, 1], [16, -12])
+  const rayY = useTransform(scrollYProgress, [0, 1], [0, -34])
+  const particleY = useTransform(scrollYProgress, [0, 1], [16, -18])
+
+  return (
+    <FreeSceneFrame scene={scene} pinBehavior="authority-prelude" layout="hero-command" className="scene-cinematic scene-command-arrival">
       {({ reduced }) => (
-        <div className="grid min-h-[clamp(460px,68vh,760px)] gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-          <motion.div
-            variants={stagger()}
-            initial={reduced ? false : 'hidden'}
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-          >
-            <SceneCard className="relative h-full overflow-hidden p-6">
-              <motion.span
-                aria-hidden="true"
-                className="pointer-events-none absolute -top-12 right-4 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(28,28,28,0.2)_0%,rgba(28,28,28,0)_72%)]"
-                animate={reduced ? undefined : { x: [0, 14, 0], y: [0, 10, 0] }}
-                transition={{
-                  duration: MOTION_TOKEN_CONTRACT.durations.epic,
-                  ease: MASS,
-                  repeat: Infinity,
-                  repeatType: 'mirror',
-                }}
-              />
-              <motion.p variants={fadeUp(0)} className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-subtle)]">Command Arrival</motion.p>
-              <motion.h1
-                variants={stagger(0.02, MOTION_TOKEN_CONTRACT.stagger.line)}
-                initial={reduced ? false : 'hidden'}
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }}
-                className="mt-4 max-w-[16ch] font-serif text-[clamp(2rem,5vw,4rem)] leading-[1.02] text-[var(--color-ink)]"
-              >
-                {['We Engineer', 'Moments'].map((line, index) => (
-                  <motion.span
-                    key={line}
-                    variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.line, MOTION_TOKEN_CONTRACT.distances.panel * 0.4)}
-                    className="block"
-                  >
-                    {line}
-                  </motion.span>
-                ))}
-              </motion.h1>
-              <motion.p variants={fadeUp(0.1)} className="mt-4 max-w-[50ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">Immediate authority and immersive production for high-stakes events</motion.p>
-              <motion.div variants={fadeUp(0.14)} className="mt-7">
-                <ScribbleButton variant="primary" tone="dark" size="md" analyticsLabel="phase9-hero-see-signature-builds">See Signature Builds</ScribbleButton>
-              </motion.div>
-            </SceneCard>
-          </motion.div>
-          <motion.div initial={reduced ? false : { opacity: 0, y: 24, filter: 'blur(8px)' }} whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}>
-            <SceneCard className="h-full">
-              <div className="relative min-h-[300px] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-3)]">
-                <video
-                  className="absolute inset-0 h-full w-full object-cover"
-                  src={Array.isArray(scene.mediaPlaceholder.ref) ? scene.mediaPlaceholder.ref[0] : scene.mediaPlaceholder.ref}
-                  preload="metadata"
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent" />
-                <div className="absolute left-4 top-4 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-white/90">Hero video</div>
-              </div>
-            </SceneCard>
-          </motion.div>
+        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-hero">
+          <AmbientDepthField
+            reduced={reduced}
+            variant="hero"
+            backgroundY={backgroundY}
+            midY={midY}
+            foregroundY={foregroundY}
+            glowOpacity={0.58}
+          />
+
+          <div className="relative z-[2] grid min-h-[clamp(620px,92vh,980px)] gap-5 lg:grid-cols-[1.04fr_0.96fr]">
+            <motion.div variants={sequence(0.04, MOTION_TOKEN_CONTRACT.stagger.line)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.28 }}>
+              <SceneCard className="relative h-full overflow-hidden p-7 md:p-10">
+                <motion.p variants={revealLift(0.02, 10)} className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-subtle)]">Executive Event Command</motion.p>
+                <motion.h1 variants={revealLift(0.06, 16)} className="mt-5 max-w-[16ch] font-serif text-[clamp(2.3rem,5.4vw,4.8rem)] leading-[0.98] tracking-[-0.03em] text-[var(--color-ink)]">
+                  We command public moments where failure is visible and expensive.
+                </motion.h1>
+                <motion.p variants={revealLift(0.12, 12)} className="mt-6 max-w-[58ch] text-base leading-relaxed text-[var(--color-ink-muted)]">
+                  Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.
+                </motion.p>
+                <motion.div variants={revealLift(0.17, 10)} className="mt-8 flex flex-wrap gap-3">
+                  <ScribbleButton variant="primary" tone="light" size="md" to="/work" analyticsLabel="hero-signature-work">View Signature Work</ScribbleButton>
+                  <ScribbleButton variant="outline" tone="light" size="md" to="/contact" analyticsLabel="hero-private-brief">Start Confidential Brief</ScribbleButton>
+                </motion.div>
+                <motion.div variants={revealLift(0.23, 10)} className="mt-8 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
+                  <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1">Optional Ambient Cue</span>
+                  <button type="button" onClick={() => setAudioCueArmed(value => !value)} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-[var(--color-ink)] transition hover:border-[var(--color-ink)]">
+                    {audioCueArmed ? 'Audio Cue Active' : 'Activate Audio Cue'}
+                  </button>
+                </motion.div>
+              </SceneCard>
+            </motion.div>
+
+            <motion.div variants={revealSide(0.08, 24)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }}>
+              <SceneCard className="h-full p-3">
+                <div className="hero-media-shell relative min-h-[420px] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+                  <motion.video
+                    className="absolute inset-0 h-full w-full object-cover"
+                    src={Array.isArray(scene.mediaPlaceholder.ref) ? scene.mediaPlaceholder.ref[0] : scene.mediaPlaceholder.ref}
+                    preload="metadata"
+                    muted={!audioCueArmed}
+                    loop
+                    playsInline
+                    autoPlay
+                    style={{ scale: reduced ? 1.02 : 1.08 }}
+                    animate={reduced ? undefined : { x: [0, -12, 0], y: [0, 9, 0], scale: [1.08, 1.105, 1.08] }}
+                    transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }}
+                  />
+                  <HeroAmbientCanvas />
+                  <motion.div className="hero-volumetric-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.28, 0.42, 0.28] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8, ease: MASS_EASE, repeat: Infinity }} />
+                  <motion.div className="hero-light-ray-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.16, 0.3, 0.16], x: [0, 20, 0] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.4, ease: AUTHORITY_EASE, repeat: Infinity }} />
+                  <motion.div className="hero-particle-layer" style={reduced ? undefined : { y: particleY }} animate={reduced ? undefined : { opacity: [0.16, 0.24, 0.16] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.4, ease: RELEASE_EASE, repeat: Infinity }} />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,14,0.32)_0%,rgba(5,9,15,0.78)_100%)]" />
+                  <div className="absolute left-4 top-4 rounded-full border border-white/28 bg-black/36 px-3 py-1 text-[10px] uppercase tracking-[0.13em] text-white/86">Command Floor Preview</div>
+                </div>
+              </SceneCard>
+            </motion.div>
+          </div>
         </div>
       )}
     </FreeSceneFrame>
-    <div
-      aria-hidden="true"
-      className="scene-friction-buffer"
-      style={{ '--scene-buffer-height': '8vh' }}
-      data-buffer-for={scene.id}
-      data-buffer-position="post"
-    />
-  </>
-)
+  )
+}
 
-// Scroll behavior: free metric scan with stagger.
-// Tone layer: dark (mapped to light surface system).
-// Pin status: free.
+// Authority Ledger: real outcomes and command capability framing.
 export const AuthorityLedgerScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} layout="ledger-bands" pinBehavior="none" className="scene-skeleton scene-skeleton-authority-ledger">
+  <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
     {({ reduced }) => (
-      <motion.div variants={stagger(0.02, 0.12)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-4">
-        <motion.div variants={fadeUp(0)}>
-          <SceneCard className="bg-[var(--color-surface-2)]">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Authority Ledger</p>
-            <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">
-              Studio-level narrative. Enterprise-level reliability.
-            </h2>
+      <motion.div variants={sequence(0.04, 0.1)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="grid gap-5">
+        <motion.div variants={revealLift(0.02, 12)}>
+          <SceneCard className="p-5 md:p-6">
+            <p className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Authority Ledger</p>
+            <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.07] text-[var(--color-ink)]">Outcome authority before visual theater.</h2>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {AUTHORITY_METRICS.map(metric => (
+                <div key={metric.label} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{metric.label}</p>
+                  <p className="mt-2 font-serif text-[1.45rem] leading-none text-[var(--color-ink)]"><CountUpMetric value={metric.value} suffix={metric.suffix} reduced={reduced} /></p>
+                </div>
+              ))}
+            </div>
           </SceneCard>
         </motion.div>
+
         <div className="grid gap-3 md:grid-cols-3">
-          {AUTHORITY_MODULES.map((module, index) => (
-            <motion.div key={module.title} variants={fadeUp(index * 0.12)}>
-              <SceneCard>
-                <img
-                  src={module.image}
-                  alt={module.title}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover"
-                />
-                <p className="mt-3 text-[10px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">{module.title}</p>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-muted)]">{module.detail}</p>
+          {CAPABILITY_MODULES.map((module, index) => (
+            <motion.article key={module.id} variants={revealLift(index * 0.05 + 0.08, 12)}>
+              <SceneCard className="h-full overflow-hidden">
+                <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover" />
+                <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{module.title}</p>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{module.summary}</p>
               </SceneCard>
-            </motion.div>
+            </motion.article>
           ))}
         </div>
-        <motion.div variants={fadeUp(0.16)}>
-          <ScribbleButton variant="secondary" tone="dark" size="sm" analyticsLabel="phase9-authority-discuss-scope">
-            Discuss Your Scope
-          </ScribbleButton>
-        </motion.div>
       </motion.div>
     )}
   </FreeSceneFrame>
 )
 
-// Scroll behavior: pinned project reel; card fade/scale follows scroll progress.
-// Tone layer: dark (mapped to light surface system).
-// Pin status: pinned.
+// Signature Reel: anchor cinematic lock moment.
 export const SignatureReelScene = ({ scene }) => (
-  <PinnedSceneFrame scene={scene} layout="horizontal-reel" className="scene-skeleton scene-skeleton-signature-reel !bg-none bg-[var(--color-surface-3)]">
-    {({ progress, reduced }) => (
-      <SignatureReelContent scene={scene} progress={progress} reduced={reduced} />
-    )}
+  <PinnedSceneFrame scene={scene} pinBehavior="command-aperture-lock" layout="command-aperture" className="scene-cinematic scene-signature-reel">
+    {({ progress, reduced }) => <SignatureReelContent progress={progress} reduced={reduced} />}
   </PinnedSceneFrame>
 )
-
-// Scroll behavior: free asymmetric capability modules.
-// Tone layer: steel (mapped to light surface system).
-// Pin status: free.
+// Capability Matrix: layered craft capabilities with depth.
 export const CapabilityMatrixScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} layout="matrix-asymmetric" pinBehavior="none" className="scene-skeleton scene-skeleton-capability-matrix">
+  <FreeSceneFrame scene={scene} pinBehavior="matrix-reveal" layout="capability-matrix" className="scene-cinematic scene-capability-matrix">
     {({ reduced }) => (
-      <motion.div variants={stagger(0.02)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-3">
-        <motion.div variants={fadeUp(0)}>
-          <SceneCard>
+      <motion.div variants={sequence(0.03, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.22 }} className="grid gap-4">
+        <motion.div variants={revealLift(0.01, 10)}>
+          <SceneCard className="p-5 md:p-6">
             <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Capability Matrix</p>
-            <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Technical and creative capability modules</h2>
+            <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.55rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Technical depth, creative precision, operational control.</h2>
           </SceneCard>
         </motion.div>
-        <div className="grid gap-3 md:grid-cols-[1.15fr_0.85fr]">
-          <motion.div variants={fadeUp(0)}><SceneCard className="h-full"><img src={CAPABILITIES[0].image} alt={CAPABILITIES[0].title} loading="lazy" decoding="async" className="h-28 w-full rounded-xl border border-[var(--color-border)] object-cover" /><p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module 01</p><h3 className="mt-2 font-serif text-[1.18rem] text-[var(--color-ink)]">{CAPABILITIES[0].title}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">{CAPABILITIES[0].copy}</p></SceneCard></motion.div>
+
+        <div className="grid gap-3 lg:grid-cols-[1.08fr_0.92fr]">
+          <motion.article variants={revealSide(0.08, 20)}>
+            <SceneCard className="h-full overflow-hidden p-4 md:p-5">
+              <img src={CAPABILITY_MODULES[0].image} alt={CAPABILITY_MODULES[0].title} loading="lazy" decoding="async" className="h-40 w-full rounded-xl border border-[var(--color-border)] object-cover" />
+              <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Primary Capability</p>
+              <h3 className="mt-2 font-serif text-[1.3rem] text-[var(--color-ink)]">{CAPABILITY_MODULES[0].title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{CAPABILITY_MODULES[0].detail}</p>
+            </SceneCard>
+          </motion.article>
+
           <div className="grid gap-3">
-            {CAPABILITIES.slice(1).map((capability, index) => (
-              <motion.div key={capability.title} variants={fadeUp((index + 1) * MOTION_TOKEN_CONTRACT.stagger.card)}>
-                <SceneCard><img src={capability.image} alt={capability.title} loading="lazy" decoding="async" className="h-20 w-full rounded-xl border border-[var(--color-border)] object-cover" /><p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Module {String(index + 2).padStart(2, '0')}</p><h3 className="mt-2 font-serif text-[1.08rem] text-[var(--color-ink)]">{capability.title}</h3><p className="mt-2 text-sm text-[var(--color-ink-muted)]">{capability.copy}</p></SceneCard>
-              </motion.div>
+            {CAPABILITY_MODULES.slice(1).map((module, index) => (
+              <motion.article key={module.id} variants={revealLift(index * 0.06 + 0.12, 10)}>
+                <SceneCard className="overflow-hidden">
+                  <div className="grid gap-3 sm:grid-cols-[0.42fr_0.58fr]">
+                    <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover" />
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Capability Track</p>
+                      <h3 className="mt-1 font-serif text-[1.06rem] text-[var(--color-ink)]">{module.title}</h3>
+                      <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{module.summary}</p>
+                    </div>
+                  </div>
+                </SceneCard>
+              </motion.article>
             ))}
           </div>
         </div>
-        <motion.div variants={fadeUp(0.14)}>
-          <ScribbleButton variant="secondary" tone="dark" size="sm" analyticsLabel="phase9-capability-explore">
-            Explore Capabilities
-          </ScribbleButton>
-        </motion.div>
       </motion.div>
     )}
   </FreeSceneFrame>
 )
 
-// Scroll behavior: pinned timeline with slide/fade and CTA after step 3.
-// Tone layer: steel (mapped to light surface system).
-// Pin status: pinned.
+// Operations Spine: pinned process friction and staged control.
 export const OperationsSpineScene = ({ scene }) => (
-  <PinnedSceneFrame scene={scene} layout="timeline-spine" className="scene-skeleton scene-skeleton-operations-spine">
+  <PinnedSceneFrame scene={scene} pinBehavior="precision-friction" layout="operations-spine" className="scene-cinematic scene-operations-spine">
     {({ progress, reduced }) => {
-      const active = Math.min(STEPS.length - 1, Math.floor(progress * STEPS.length))
-      const showCta = reduced || active >= 2
+      const activeStep = Math.min(OPERATIONS_STEPS.length - 1, Math.floor(progress * OPERATIONS_STEPS.length))
+      const railProgress = ((activeStep + 1) / OPERATIONS_STEPS.length) * 100
+      const ctaVisible = reduced || progress > 0.62
+      const backgroundY = reduced ? 0 : (0.5 - progress) * 34
+      const midY = reduced ? 0 : (0.5 - progress) * 20
+      const foregroundY = reduced ? 0 : (0.5 - progress) * 10
+
       return (
-        <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-          <SceneCard className="h-fit">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Operations Spine</p>
-            <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Pinned 4-step process placeholder</h2>
-            <p className="mt-3 text-sm text-[var(--color-ink-muted)]">Steps animate with slide-in and fade based on scroll progress.</p>
-            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
-              <motion.div
-                className="h-full rounded-full bg-[var(--color-accent)]"
-                animate={{ width: `${((active + 1) / STEPS.length) * 100}%` }}
-                transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS }}
-              />
+        <div className="scene-depth-stage scene-depth-stage-operations">
+          <AmbientDepthField reduced={reduced} variant="operations" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.54} />
+
+          <div className="relative z-[2] grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+            <SceneCard className="relative h-fit p-5 md:p-6">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Operations Spine</p>
+              <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.56rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Process pressure translated into composure at showtime.</h2>
+              <p className="mt-4 max-w-[56ch] text-sm text-[var(--color-ink-muted)]">Scroll holds tension while each command phase locks before advancing.</p>
+              <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
+                <motion.div className="h-full rounded-full bg-[var(--color-accent)]" animate={{ width: `${railProgress}%` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }} />
+              </div>
+              <motion.div animate={ctaVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="mt-6">
+                <ScribbleButton variant="outline" tone="light" size="sm" to="/process" analyticsLabel="operations-process">Review Full Process Architecture</ScribbleButton>
+              </motion.div>
+            </SceneCard>
+
+            <div className="relative grid gap-3 pl-5">
+              <div aria-hidden="true" className="absolute inset-y-2 left-1 w-[2px] rounded-full bg-[var(--color-accent-soft)]" />
+              <motion.div aria-hidden="true" className="absolute left-[3px] top-2 w-[3px] rounded-full bg-[var(--color-accent)]" animate={{ height: `calc(${railProgress}% - 0.4rem)` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: AUTHORITY_EASE }} style={{ minHeight: '1rem' }} />
+
+              {OPERATIONS_STEPS.map((step, index) => {
+                const isActive = index === activeStep
+                const distanceFromActive = Math.abs(index - activeStep)
+
+                return (
+                  <motion.article
+                    key={step.id}
+                    initial={reduced ? false : { opacity: 0, x: 28, scale: 0.97 }}
+                    animate={{
+                      opacity: reduced ? 1 : isActive ? 1 : 0.54,
+                      x: reduced ? 0 : isActive ? 0 : 14 + distanceFromActive * 4,
+                      scale: reduced ? 1 : isActive ? 1 : 0.976,
+                    }}
+                    transition={
+                      reduced
+                        ? { duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }
+                        : { type: 'spring', stiffness: 240, damping: 21, mass: 0.78 }
+                    }
+                    className={`rounded-2xl border p-4 ${isActive ? 'border-[rgba(223,234,255,0.48)] bg-[var(--color-surface-2)]' : 'border-[var(--color-border)] bg-[var(--color-surface)]'}`}
+                  >
+                    <div className="grid gap-3 sm:grid-cols-[96px_1fr] sm:items-start">
+                      <img src={step.image} alt={step.title} loading="lazy" decoding="async" className="h-20 w-full rounded-lg border border-[var(--color-border)] object-cover" />
+                      <div>
+                        <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Phase {step.id}</p>
+                        <h3 className="mt-2 font-serif text-[1.06rem] text-[var(--color-ink)]">{step.title}</h3>
+                        <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{step.detail}</p>
+                      </div>
+                    </div>
+                  </motion.article>
+                )
+              })}
             </div>
-            <motion.div animate={showCta ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 14, filter: 'blur(8px)' }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }} className="mt-6">
-              <ScribbleButton variant="outline" tone="dark" size="sm" analyticsLabel="phase9-operations-review-step-details">Review Step Details</ScribbleButton>
-            </motion.div>
-          </SceneCard>
-          <div className="grid gap-2">
-            {STEPS.map((step, index) => (
-              <motion.article key={step} animate={{ opacity: reduced ? 1 : index === active ? 1 : 0.44, x: reduced ? 0 : index === active ? 0 : 26 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: EASE }} className={`rounded-2xl border p-4 ${index === active ? 'border-[rgba(28,28,28,0.28)] bg-[var(--color-surface-2)]' : 'border-[var(--color-border)] bg-[var(--color-surface)]'}`}>
-                <img src={step.image} alt={step.title} loading="lazy" decoding="async" className="h-14 w-20 rounded-lg border border-[var(--color-border)] object-cover" />
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Step {step.id}</p>
-                  <h3 className="mt-2 font-serif text-[1.05rem] text-[var(--color-ink)]">{step.title}</h3>
-                  <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{step.detail}</p>
-                </div>
-              </motion.article>
-            ))}
           </div>
         </div>
       )
@@ -629,381 +709,311 @@ export const OperationsSpineScene = ({ scene }) => (
   </PinnedSceneFrame>
 )
 
-// Scroll behavior: free narrative bridge with word stagger.
-// Tone layer: warm.
-// Pin status: free.
+// Narrative Bridge: release tension before proof concentration.
 export const NarrativeBridgeScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} layout="bridge-centerline" pinBehavior="release-bridge" className="scene-skeleton scene-skeleton-narrative-bridge">
+  <FreeSceneFrame scene={scene} pinBehavior="calm-release" layout="narrative-bridge" className="scene-cinematic scene-narrative-bridge">
     {({ reduced }) => (
-      <SceneCard className="grid min-h-[clamp(280px,44vh,460px)] place-items-center text-center">
-        <motion.h2 variants={fadeUp(0.02, 14)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.4 }} className="max-w-[18ch] font-serif text-[clamp(1.6rem,3.7vw,2.6rem)] text-[var(--color-ink)]">
-          Calm, composed narrative to release tension before proof theater
-        </motion.h2>
-        <motion.p variants={fadeUp(0.12)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.4 }} className="mt-4 max-w-[52ch] text-sm text-[var(--color-ink-muted)]">Bridge-centerline release copy placeholder.</motion.p>
+      <SceneCard className="relative grid min-h-[clamp(320px,50vh,500px)] place-items-center overflow-hidden text-center p-6 md:p-8">
+        <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Narrative Release</motion.p>
+        <motion.h2 initial={reduced ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.1, ease: MASS_EASE, delay: 0.05 }} className="mt-4 max-w-[20ch] font-serif text-[clamp(1.8rem,3.9vw,2.85rem)] leading-[1.08] text-[var(--color-ink)]">Precision is only credible when proof carries the weight.</motion.h2>
+        <motion.p initial={reduced ? false : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE, delay: 0.12 }} className="mt-5 max-w-[60ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">The next chapter shifts from directional language to verified outcomes, named stakeholders, and delivery context.</motion.p>
       </SceneCard>
     )}
   </FreeSceneFrame>
 )
 
-// Scroll behavior: free proof theater with available testimonial assets.
-// Tone layer: linen.
-// Pin status: free.
-export const ProofTheaterScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} layout="proof-stage" pinBehavior="none" className="scene-skeleton scene-skeleton-proof-theater !bg-none bg-[var(--color-surface-3)]">
-    {({ reduced }) => (
-      <div className="grid gap-4">
-        <SceneCard>
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Proof Theater</p>
-          <h2 className="mt-2 font-serif text-[clamp(1.4rem,2.8vw,2.2rem)] text-[var(--color-ink)]">Split testimonial rail and featured proof panel</h2>
-        </SceneCard>
-        <ProofTheaterSplit reduced={reduced} mediaRefs={scene.mediaPlaceholder.ref} />
-      </div>
-    )}
-  </FreeSceneFrame>
-)
-
-const ProofTheaterSplit = ({ reduced, mediaRefs }) => {
-  const refs = Array.isArray(mediaRefs) ? mediaRefs : [mediaRefs]
+const ProofTheaterSplit = ({ reduced }) => {
   const [activeIndex, setActiveIndex] = useState(0)
-  const activeTestimonial = TESTIMONIALS[activeIndex]
-  const progress = ((activeIndex + 1) / TESTIMONIALS.length) * 100
+  const touchStartXRef = useRef(null)
+  const touchDeltaRef = useRef(0)
+  const safeIndex = clampIndex(activeIndex, Math.max(TESTIMONIALS.length - 1, 0))
+  const active = TESTIMONIALS[safeIndex]
+  const progress = TESTIMONIALS.length ? ((safeIndex + 1) / TESTIMONIALS.length) * 100 : 0
 
-  const goPrev = () => {
-    setActiveIndex(prev => clampIndex(prev - 1, TESTIMONIALS.length - 1))
+  const goPrev = () => setActiveIndex(index => clampIndex(index - 1, TESTIMONIALS.length - 1))
+  const goNext = () => setActiveIndex(index => clampIndex(index + 1, TESTIMONIALS.length - 1))
+  const entryDirection = safeIndex % 2 === 0 ? 1 : -1
+
+  const onTouchStart = event => {
+    touchStartXRef.current = event.touches[0]?.clientX ?? null
+    touchDeltaRef.current = 0
   }
 
-  const goNext = () => {
-    setActiveIndex(prev => clampIndex(prev + 1, TESTIMONIALS.length - 1))
+  const onTouchMove = event => {
+    if (touchStartXRef.current === null) return
+    touchDeltaRef.current = (event.touches[0]?.clientX ?? touchStartXRef.current) - touchStartXRef.current
+  }
+
+  const onTouchEnd = () => {
+    if (touchStartXRef.current === null) return
+    const threshold = 46
+    if (touchDeltaRef.current <= -threshold) goNext()
+    if (touchDeltaRef.current >= threshold) goPrev()
+    touchStartXRef.current = null
+    touchDeltaRef.current = 0
   }
 
   return (
-    <div className="grid gap-3">
-      <div className="grid gap-3 lg:grid-cols-[0.56fr_0.44fr]">
-        <SceneCard className="bg-[var(--color-surface-3)]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTestimonial.id}
-              initial={reduced ? false : { opacity: 0, y: 16, filter: 'blur(8px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={reduced ? undefined : { opacity: 0, y: -10, filter: 'blur(6px)' }}
-              transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}
-              className="grid gap-4"
-            >
-              <div className="grid gap-3 sm:grid-cols-[0.66fr_0.34fr]">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Selected Testimonial</p>
-                  <p className="mt-3 text-base leading-relaxed text-[var(--color-ink)]">
-                    "{activeTestimonial.quote}"
-                  </p>
-                  <p className="mt-4 text-xs uppercase tracking-[0.1em] text-[var(--color-ink-subtle)]">Event Context</p>
-                  <p className="mt-1 text-sm text-[var(--color-ink-muted)]">{activeTestimonial.eventContext}</p>
+    <div className="relative grid gap-3 overflow-hidden rounded-2xl">
+      <div className="relative grid gap-3 lg:grid-cols-[0.6fr_0.4fr]">
+        <SceneCard className="bg-[var(--color-surface)] p-5" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+          {active ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.id}
+                initial={reduced ? false : { opacity: 0, x: entryDirection * 72, rotate: entryDirection * 3.2, scale: 0.96 }}
+                animate={{ opacity: 1, x: 0, rotate: 0, scale: 1 }}
+                exit={reduced ? undefined : { opacity: 0, x: entryDirection * -44, rotate: entryDirection * -2.2, scale: 0.98 }}
+                transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.12, ease: MASS_EASE }}
+                className="grid gap-4"
+              >
+                <div className="overflow-hidden rounded-xl border border-[var(--color-border)]">
+                  <img src={active.image} alt={active.name} loading="lazy" decoding="async" className="h-56 w-full object-cover" />
                 </div>
-                <motion.div
-                  initial={reduced ? false : { opacity: 0, x: 22 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS }}
-                  className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
-                >
-                  <img
-                    src={activeTestimonial.image}
-                    alt={activeTestimonial.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="mx-auto h-24 w-24 rounded-full border border-[var(--color-border)] object-cover"
-                  />
-                  <p className="mt-3 text-center text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
-                    {refs[activeIndex] || activeTestimonial.id}
-                  </p>
-                </motion.div>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
                 <div>
-                  <p className="text-sm font-semibold text-[var(--color-ink)]">{activeTestimonial.name}</p>
-                  <p className="text-xs text-[var(--color-ink-muted)]">
-                    {activeTestimonial.role}, {activeTestimonial.organization}
-                  </p>
-                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
-                    <motion.div
-                      className="h-full rounded-full bg-[var(--color-accent)]"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progress}%` }}
-                      transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS }}
-                    />
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-ink-subtle)]">Featured Client Voice</p>
+                  <p className="mt-3 text-base leading-relaxed text-[var(--color-ink)]">"{active.quote}"</p>
+                  <p className="mt-4 text-sm font-semibold text-[var(--color-ink)]">{active.name}</p>
+                  <p className="text-xs text-[var(--color-ink-muted)]">{active.role}, {active.organization}</p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                  <div className="relative h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]">
+                    <motion.div className="h-full rounded-full bg-[var(--color-accent)]" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }} />
+                  </div>
+                  <div className="flex gap-2">
+                    <ScribbleButton variant="micro" tone="light" size="sm" showArrow={false} onClick={goPrev} analyticsLabel="proof-prev">Previous</ScribbleButton>
+                    <ScribbleButton variant="micro" tone="light" size="sm" showArrow={false} onClick={goNext} analyticsLabel="proof-next">Next</ScribbleButton>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase9-proof-prev" onClick={goPrev}>
-                    Prev
-                  </ScribbleButton>
-                  <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase9-proof-next" onClick={goNext}>
-                    Next
-                  </ScribbleButton>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-          <motion.div
-            initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }}
-            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}
-            className="mt-4"
-          >
-            <ScribbleButton variant="primary" tone="dark" size="md" analyticsLabel="phase9-proof-request-proposal">
-              Request a Proposal
-            </ScribbleButton>
-          </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          ) : null}
         </SceneCard>
-        <motion.aside
-          variants={stagger(0.02, MOTION_TOKEN_CONTRACT.stagger.card)}
-          initial={reduced ? false : 'hidden'}
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
-          className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
-        >
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Testimonial Selection</p>
+
+        <SceneCard className="bg-[var(--color-surface-2)] p-3">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Proof Index</p>
           <div className="mt-3 grid gap-2">
             {TESTIMONIALS.map((item, index) => (
-              <motion.div
-                role="button"
-                tabIndex={0}
-                key={item.id}
-                variants={fadeUp(index * MOTION_TOKEN_CONTRACT.stagger.card, 12)}
-                onClick={() => setActiveIndex(index)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    setActiveIndex(index)
-                  }
-                }}
-                className={`rounded-xl border px-3 py-3 text-left transition ${
-                  index === activeIndex
-                    ? 'border-[rgba(28,28,28,0.28)] bg-[var(--color-surface-3)]'
-                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-3)]'
-                }`}
-              >
-                <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">{item.id}</p>
-                <p className="mt-1 text-sm font-semibold text-[var(--color-ink)]">{item.name}</p>
-                <p className="text-xs text-[var(--color-ink-muted)]">{item.role}</p>
-                <p className="text-xs text-[var(--color-ink-muted)]">{item.organization}</p>
-              </motion.div>
+              <button key={item.id} type="button" onClick={() => setActiveIndex(index)} className={`cinematic-interactive-card grid w-full gap-2 rounded-xl border px-3 py-3 text-left transition ${index === safeIndex ? 'border-[rgba(216,230,255,0.42)] bg-[var(--color-surface)]' : 'border-[var(--color-border)] bg-[var(--color-surface-2)] hover:bg-[var(--color-surface)]'}`}>
+                <div className="grid items-center gap-2 sm:grid-cols-[64px_1fr]">
+                  <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-12 w-full rounded-md border border-[var(--color-border)] object-cover" />
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--color-ink)]">{item.name}</p>
+                    <p className="text-xs text-[var(--color-ink-muted)]">{item.role}</p>
+                    <p className="text-xs text-[var(--color-ink-subtle)]">{item.organization}</p>
+                  </div>
+                </div>
+              </button>
             ))}
           </div>
-        </motion.aside>
-      </div>
-      <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] py-2">
-        <motion.div
-          className="flex gap-3 px-2"
-          animate={
-            reduced
-              ? undefined
-              : { x: ['0%', '-50%'] }
-          }
-          transition={
-            reduced
-              ? undefined
-              : {
-                  duration: MOTION_TOKEN_CONTRACT.durations.epic * 8,
-                  ease: 'linear',
-                  repeat: Infinity,
-                }
-          }
-        >
-          {[...LOGOS, ...LOGOS].map((logo, index) => (
-            <span key={`${logo}-${index}`} className="whitespace-nowrap rounded-full border border-[var(--color-border)] bg-[var(--color-surface-3)] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
-              {logo}
-            </span>
-          ))}
-        </motion.div>
+        </SceneCard>
       </div>
     </div>
   )
 }
 
-const ConversionChamberContent = ({ scene, reduced }) => {
-  const [isSubmitted, setIsSubmitted] = useState(false)
+// Proof Theater: rectangular, project-style testimonial presentation.
+export const ProofTheaterScene = ({ scene }) => {
+  const depthRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: depthRef,
+    offset: ['start end', 'end start'],
+  })
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [42, -30])
+  const midY = useTransform(scrollYProgress, [0, 1], [26, -18])
+  const foregroundY = useTransform(scrollYProgress, [0, 1], [14, -10])
 
-  const handleSubmit = event => {
+  return (
+    <FreeSceneFrame scene={scene} pinBehavior="proof-consolidation" layout="proof-theater" className="scene-cinematic scene-proof-theater">
+      {({ reduced }) => (
+        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-proof">
+          <AmbientDepthField reduced={reduced} variant="proof" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.46} />
+          <div className="relative z-[2] grid gap-5">
+            <SceneCard className="p-5 md:p-6">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Proof Theater</p>
+              <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.56rem,2.95vw,2.44rem)] leading-[1.08] text-[var(--color-ink)]">Verified outcomes, named stakeholders, accountable delivery.</h2>
+            </SceneCard>
+            <ProofTheaterSplit reduced={reduced} />
+          </div>
+        </div>
+      )}
+    </FreeSceneFrame>
+  )
+}
+const FloatingField = ({ id, label, children }) => (
+  <label htmlFor={id} className="cinematic-field">
+    {children}
+    <span className="cinematic-field-label">{label}</span>
+  </label>
+)
+
+const ConversionChamberContent = ({ reduced }) => {
+  const { submit, isSubmitting, isSuccess, isError, feedbackMessage } = useLeadSubmission({
+    formName: 'homepage-command-brief',
+    successMessage:
+      'Brief received. A senior producer will contact you within one business day.',
+  })
+
+  const handleSubmit = async event => {
     event.preventDefault()
-    setIsSubmitted(true)
+    await submit(event.currentTarget)
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <motion.div
-        variants={stagger(0.04, MOTION_TOKEN_CONTRACT.stagger.line)}
-        initial={reduced ? false : 'hidden'}
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        <SceneCard className="h-full bg-[var(--color-surface-3)] p-6">
-          <motion.p variants={fadeUp(0)} className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Conversion Chamber</motion.p>
-          <motion.h2 variants={fadeUp(0.04, MOTION_TOKEN_CONTRACT.distances.panel)} className="mt-3 max-w-[18ch] font-serif text-[clamp(1.5rem,3vw,2.4rem)] text-[var(--color-ink)]">Request a Private Consultation</motion.h2>
-          <motion.p variants={fadeUp(0.1)} className="mt-3 text-sm text-[var(--color-ink-muted)]">Narrative lines animate with controlled stagger before form reveal.</motion.p>
-          <motion.p variants={fadeUp(0.14)} className="mt-2 text-sm text-[var(--color-ink-muted)]">Placeholder media and fields are wired for swap-in with production assets.</motion.p>
-          <motion.div variants={fadeUp(0.18)} className="mt-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">Media placeholder</p>
-            <p className="mt-2 text-sm text-[var(--color-ink-muted)]">
-              {Array.isArray(scene.mediaPlaceholder.ref)
-                ? scene.mediaPlaceholder.ref[0]
-                : scene.mediaPlaceholder.ref}
+    <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+      <SceneCard className="h-full bg-[var(--color-surface)] p-6 md:p-7">
+        <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Private Engagement Chamber</p>
+        <h2 className="mt-3 max-w-[20ch] font-serif text-[clamp(1.7rem,3.1vw,2.6rem)] leading-[1.06] text-[var(--color-ink)]">Close the narrative with a deliberate production brief</h2>
+        <p className="mt-4 max-w-[56ch] text-sm leading-relaxed text-[var(--color-ink-muted)]">This request enters a direct producer queue. Expect response clarity, risk framing, and executable scope.</p>
+        <div className="mt-5 grid gap-3">
+          {[
+            'Scope-first intake before creative spend.',
+            'Execution constraints surfaced at day one.',
+            'Decision-ready production path within 48 hours.',
+          ].map(item => (
+            <p key={item} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-3 text-sm text-[var(--color-ink-muted)]">
+              {item}
             </p>
-            <div className="mt-3 h-20 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]" />
-          </motion.div>
-        </SceneCard>
-      </motion.div>
-      <motion.form
-        onSubmit={handleSubmit}
-        variants={stagger(0.03, MOTION_TOKEN_CONTRACT.stagger.line)}
-        initial={reduced ? false : 'hidden'}
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.25 }}
-        className="grid gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5"
-      >
-        <motion.label variants={fadeUp(0.03)} className="grid gap-1">
-          <span className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Name</span>
-          <input type="text" placeholder="Placeholder name" className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)]" />
-        </motion.label>
-        <motion.label variants={fadeUp(0.07)} className="grid gap-1">
-          <span className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Company</span>
-          <input type="text" placeholder="Placeholder company" className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)]" />
-        </motion.label>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <motion.label variants={fadeUp(0.1)} className="grid gap-1">
-            <span className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Budget</span>
-            <select className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)]">
-              <option>Placeholder budget</option>
-            </select>
-          </motion.label>
-          <motion.label variants={fadeUp(0.12)} className="grid gap-1">
-            <span className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Event Type</span>
-            <select className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)]">
-              <option>Placeholder type</option>
-            </select>
-          </motion.label>
+          ))}
         </div>
+      </SceneCard>
+
+      <motion.form onSubmit={handleSubmit} variants={sequence(0.02, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.25 }} className="cinematic-conversion-form grid gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
+        <input type="hidden" name="source_scene" value="conversion-chamber" />
+        <input type="hidden" name="source_path" value="/" />
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" className="sr-only" aria-hidden="true" />
+
+        <FloatingField id="conversion-name" label="Name">
+          <input id="conversion-name" name="name" type="text" placeholder=" " autoComplete="name" required className="cinematic-field-input" />
+        </FloatingField>
+
+        <FloatingField id="conversion-email" label="Email">
+          <input id="conversion-email" name="email" type="email" placeholder=" " autoComplete="email" required className="cinematic-field-input" />
+        </FloatingField>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <FloatingField id="conversion-company" label="Company">
+            <input id="conversion-company" name="company" type="text" placeholder=" " autoComplete="organization" className="cinematic-field-input" />
+          </FloatingField>
+          <FloatingField id="conversion-phone" label="Phone">
+            <input id="conversion-phone" name="phone" type="tel" placeholder=" " autoComplete="tel" className="cinematic-field-input" />
+          </FloatingField>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <FloatingField id="conversion-budget" label="Budget Band">
+            <select id="conversion-budget" name="budget_band" defaultValue="" className="cinematic-field-input cinematic-select-input" required>
+              <option value="" disabled>Select budget band</option>
+              <option value="under-100k">Under 100K AED</option>
+              <option value="100k-250k">100K-250K AED</option>
+              <option value="250k-500k">250K-500K AED</option>
+              <option value="500k-plus">500K+ AED</option>
+            </select>
+          </FloatingField>
+          <FloatingField id="conversion-event-type" label="Event Type">
+            <select id="conversion-event-type" name="event_type" defaultValue="" className="cinematic-field-input cinematic-select-input" required>
+              <option value="" disabled>Select event type</option>
+              <option value="executive-summit">Executive Summit</option>
+              <option value="brand-launch">Brand Launch</option>
+              <option value="vip-gala">VIP Gala</option>
+              <option value="technical-showcase">Technical Showcase</option>
+            </select>
+          </FloatingField>
+        </div>
+
+        <FloatingField id="conversion-event-date" label="Target Date Window">
+          <input id="conversion-event-date" name="target_window" type="text" placeholder=" " className="cinematic-field-input" />
+        </FloatingField>
+
+        <FloatingField id="conversion-scope" label="Project Scope">
+          <textarea id="conversion-scope" name="scope" placeholder=" " rows={4} required className="cinematic-field-input resize-none" />
+        </FloatingField>
+
         <AnimatePresence mode="wait">
-          {isSubmitted ? (
-            <motion.div
-              key="conversion-confirmed"
-              initial={reduced ? false : { opacity: 0, y: 10, filter: 'blur(8px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={reduced ? undefined : { opacity: 0, y: -8, filter: 'blur(6px)' }}
-              transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}
-              className="rounded-xl border border-[rgba(16,185,129,0.38)] bg-[rgba(16,185,129,0.12)] px-4 py-3"
-            >
-              <p className="text-xs uppercase tracking-[0.12em] text-emerald-700">Request queued</p>
-              <p className="mt-1 text-sm text-[var(--color-ink-muted)]">Confirmation placeholder animation completed.</p>
+          {feedbackMessage ? (
+            <motion.div key={feedbackMessage} initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? undefined : { opacity: 0, y: -6, scale: 0.98 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: MASS_EASE }} className={`rounded-xl border px-4 py-3 ${isSuccess ? 'border-[rgba(122,218,165,0.45)] bg-[rgba(53,95,76,0.28)] text-[var(--color-ink)]' : 'border-[rgba(236,123,123,0.44)] bg-[rgba(90,37,37,0.24)] text-[var(--color-ink)]'}`}>
+              <p className="text-sm">{feedbackMessage}</p>
             </motion.div>
-          ) : (
-            <motion.div
-              key="conversion-submit"
-              initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={reduced ? undefined : { opacity: 0, y: -8, filter: 'blur(6px)' }}
-              transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: EASE }}
-            >
-              <ScribbleButton
-                type="submit"
-                variant="primary"
-                tone="dark"
-                size="md"
-                analyticsLabel="phase8-conversion-submit-request"
-              >
-                Submit Request
-              </ScribbleButton>
-            </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
+
+        <ScribbleButton type="submit" variant="primary" tone="light" size="md" analyticsLabel="conversion-brief-submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Securing Brief...' : 'Request Executive Production Consult'}
+        </ScribbleButton>
+
+        <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+          {isError ? 'Submission issue. Please retry or call direct.' : isSuccess ? 'Command queue confirmed.' : 'Private brief channel secured.'}
+        </p>
       </motion.form>
     </div>
   )
 }
 
-// Scroll behavior: free conversion split with form placeholders.
-// Tone layer: deep (mapped to light surface system).
-// Pin status: free.
+// Conversion Chamber: real lead capture, cinematic closure.
 export const ConversionChamberScene = ({ scene }) => (
-  <FreeSceneFrame
-    scene={scene}
-    layout="conversion-split"
-    pinBehavior="none"
-    className="scene-skeleton scene-skeleton-conversion-chamber !bg-none bg-[var(--color-surface)]"
-  >
-    {({ reduced }) => (
-      <ConversionChamberContent scene={scene} reduced={reduced} />
-    )}
+  <FreeSceneFrame scene={scene} pinBehavior="closing-ritual" layout="conversion-chamber" className="scene-cinematic scene-conversion-chamber">
+    {({ reduced }) => <ConversionChamberContent reduced={reduced} />}
   </FreeSceneFrame>
 )
 
-// Scroll behavior: free footer continuation with utility CTA.
-// Tone layer: deep (mapped to light surface system).
-// Pin status: free.
+// Global Footer: premium utility and contact closure.
 export const GlobalFooterScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} layout="footer-columns" pinBehavior="none" className="scene-skeleton scene-skeleton-global-footer">
+  <FreeSceneFrame scene={scene} pinBehavior="terminal-close" layout="global-footer" className="scene-cinematic scene-global-footer">
     {({ reduced }) => (
-      <motion.div variants={stagger(0.03, MOTION_TOKEN_CONTRACT.stagger.card)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-3 md:grid-cols-4">
-        <motion.div variants={fadeUp(0)}>
+      <motion.div variants={sequence(0.05, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-4">
+        <SceneCard className="p-5 md:p-6">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Global Closure</p>
+          <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.6rem,2.95vw,2.45rem)] leading-[1.08] text-[var(--color-ink)]">Precision-led production for moments where public failure is not an option.</h2>
+          <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">Regional reach across UAE, one accountable command structure, and execution discipline from scope to show close.</p>
+        </SceneCard>
+
+        <div className="grid gap-3 md:grid-cols-4">
           <SceneCard>
             <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Company</p>
             <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
               {FOOTER_COMPANY_LINKS.map(item => (
                 <li key={item.to}>
-                  <Link className="transition-colors hover:text-[var(--color-ink)]" to={item.to}>
-                    {item.label}
-                  </Link>
+                  <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={item.to}>{item.label}</Link>
                 </li>
               ))}
             </ul>
           </SceneCard>
-        </motion.div>
-        <motion.div variants={fadeUp(MOTION_TOKEN_CONTRACT.stagger.card)}>
+
           <SceneCard>
             <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Services</p>
             <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
               {services.slice(0, 4).map(service => (
                 <li key={service.slug}>
-                  <Link className="transition-colors hover:text-[var(--color-ink)]" to={`/services/${service.slug}`}>
-                    {service.title}
-                  </Link>
+                  <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/services/${service.slug}`}>{service.title}</Link>
                 </li>
               ))}
             </ul>
           </SceneCard>
-        </motion.div>
-        <motion.div variants={fadeUp(MOTION_TOKEN_CONTRACT.stagger.card * 2)}>
+
           <SceneCard>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Work</p>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Case Work</p>
             <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
               {caseStudies.map(study => (
                 <li key={study.slug}>
-                  <Link className="transition-colors hover:text-[var(--color-ink)]" to={`/work/${study.slug}`}>
-                    {study.title}
-                  </Link>
+                  <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/work/${study.slug}`}>{study.title}</Link>
                 </li>
               ))}
             </ul>
           </SceneCard>
-        </motion.div>
-        <motion.div variants={fadeUp(MOTION_TOKEN_CONTRACT.stagger.card * 3)}>
+
           <SceneCard>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Contact</p>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Direct Contact</p>
             <div className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-              <a className="block transition-colors hover:text-[var(--color-ink)]" href="tel:+97142345678">
-                +971 4 234 5678
-              </a>
-              <a className="block transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">
-                hello@ghaimuae.com
-              </a>
-              <p>Dubai Design District</p>
+              <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="tel:+97142345678">+971 4 234 5678</a>
+              <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">hello@ghaimuae.com</a>
+              <p>Dubai Design District, UAE</p>
             </div>
           </SceneCard>
-        </motion.div>
-        <motion.div variants={fadeUp(0.14)} className="md:col-span-4">
-          <ScribbleButton variant="micro" tone="dark" size="sm" showArrow={false} analyticsLabel="phase9-footer-utility" to="/contact">
-            Utility Access
-          </ScribbleButton>
-        </motion.div>
+        </div>
+
+        <div className="pb-2">
+          <ScribbleButton variant="primary" tone="light" size="md" analyticsLabel="footer-command-consult" to="/contact">Request Executive Command Consult</ScribbleButton>
+        </div>
       </motion.div>
     )}
   </FreeSceneFrame>

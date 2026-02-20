@@ -73,7 +73,7 @@ export const SCENE_DEFINITION_TEMPLATE = Object.freeze({
 
 /**
  * Homepage scene registry (foundation-only, no scene content).
- * Locked order for Phase 2 scaffold:
+ * Locked homepage scene order:
  * 1. CommandArrival
  * 2. AuthorityLedger
  * 3. SignatureReel (pinned)

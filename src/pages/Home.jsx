@@ -32,7 +32,7 @@ const SCENE_COMPONENT_REGISTRY = Object.freeze({
 
 const SCENE_IDS = HOMEPAGE_SCENE_REGISTRY.map(scene => scene.id)
 
-const PHASE_TWO_RHYTHM_ASSERTION = Object.freeze(() => {
+const PINNED_RHYTHM_ASSERTION = Object.freeze(() => {
   const issues = []
   const pinnedIndexes = HOMEPAGE_SCENE_REGISTRY.map((scene, index) =>
     scene.mode === 'pinned' ? index : -1
@@ -59,17 +59,17 @@ const PHASE_TWO_RHYTHM_ASSERTION = Object.freeze(() => {
 })
 
 const foundationValidation = validateHomepageFoundation(HOMEPAGE_FOUNDATION)
-const rhythmValidation = PHASE_TWO_RHYTHM_ASSERTION()
+const rhythmValidation = PINNED_RHYTHM_ASSERTION()
 
 if (!foundationValidation.isValid) {
   throw new Error(
-    `Homepage foundation invalid before Phase 2 skeleton render: ${foundationValidation.issues.join(' | ')}`
+    `Homepage foundation invalid before cinematic render: ${foundationValidation.issues.join(' | ')}`
   )
 }
 
 if (!rhythmValidation.isValid) {
   throw new Error(
-    `Phase 2 rhythm validation failed: ${rhythmValidation.issues.join(' | ')}`
+    `Pinned rhythm validation failed: ${rhythmValidation.issues.join(' | ')}`
   )
 }
 
@@ -92,7 +92,7 @@ const Home = () => {
           seen.add(id)
           analytics.trackEvent(
             'scene_view',
-            'Homepage Skeleton Scene',
+            'Homepage Cinematic Scene',
             id,
             SCENE_IDS.indexOf(id) + 1
           )
@@ -110,7 +110,7 @@ const Home = () => {
   }, [analytics])
 
   return (
-    <div className="flagship-home flagship-home-skeleton" data-home-skeleton="phase-2">
+    <div className="flagship-home flagship-home-cinematic">
       {HOMEPAGE_SCENE_REGISTRY.map(scene => {
         const SceneComponent = SCENE_COMPONENT_REGISTRY[scene.id]
         if (!SceneComponent) return null
