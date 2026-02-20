@@ -102,6 +102,20 @@ const FOOTER_COMPANY_LINKS = [
   { to: '/faq', label: 'FAQ' },
 ]
 
+const CLIENT_LOGO_ASSET_BY_ORGANIZATION = Object.freeze({
+  // TODO(phase7-assets): Replace null values with approved client logo files when legal assets are delivered.
+  'Skyline Ventures': null,
+  'Prestige Group': null,
+  'Elite Hospitality': null,
+})
+
+const CLIENT_PROOF_MARKS = TESTIMONIALS.map(item => ({
+  id: `client-mark-${item.id}`,
+  name: item.organization,
+  role: item.role,
+  logo: CLIENT_LOGO_ASSET_BY_ORGANIZATION[item.organization] || null,
+}))
+
 const parseMetricValue = raw => {
   const digits = String(raw || '').match(/\d+/g)
   return digits ? Number(digits.join('')) : 0
@@ -404,9 +418,9 @@ const SignatureReelContent = ({ progress, reduced }) => {
         <SceneCard className="p-5 md:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="max-w-[64ch]">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Anchor Moment</p>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Signature Reel</p>
               <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,2.95vw,2.52rem)] leading-[1.06] text-[var(--color-ink)]">
-                Command Aperture - scroll-locked tension and release
+                Three recent productions where precision carried the room.
               </h2>
             </div>
             <div className="flex items-center gap-2">
@@ -992,9 +1006,25 @@ export const GlobalFooterScene = ({ scene }) => (
     {({ reduced }) => (
       <motion.div variants={sequence(0.05, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-4">
         <SceneCard className="p-5 md:p-6">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Global Closure</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Final Step</p>
           <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.6rem,2.95vw,2.45rem)] leading-[1.08] text-[var(--color-ink)]">Precision-led production for moments where public failure is not an option.</h2>
           <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">Regional reach across UAE, one accountable command structure, and execution discipline from scope to show close.</p>
+        </SceneCard>
+
+        <SceneCard className="p-5 md:p-6">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Partners</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {CLIENT_PROOF_MARKS.map(mark => (
+              <article key={mark.id} className="client-logo-panel rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4">
+                {mark.logo ? (
+                  <img src={mark.logo} alt={`${mark.name} logo`} loading="lazy" decoding="async" className="h-8 w-auto object-contain" />
+                ) : (
+                  <p className="client-wordmark text-sm font-semibold tracking-[0.03em] text-[var(--color-ink)]">{mark.name}</p>
+                )}
+                <p className="mt-2 text-xs text-[var(--color-ink-muted)]">{mark.role}</p>
+              </article>
+            ))}
+          </div>
         </SceneCard>
 
         <div className="grid gap-3 md:grid-cols-4">

@@ -64,8 +64,10 @@
 - Project reel pulls exactly 3 real case studies (`caseStudies.slice(0, 3)`), no synthetic logo pills.
 - Testimonial rail pulls real entries from `testimonials` with rectangular media treatment.
 - Featured proof panel includes name, role, organization, quote, progress bar, and indexed selectors.
+- Footer partner strip now uses real testimonial organizations as client marks, with image-logo fallback support.
 - Placeholder policy:
   - No fake metrics, fake logos, or generated pending testimonials are in use.
+  - TODO: approved client logo image files are still pending legal delivery; organization wordmarks are used until assets are provided.
   - Remaining content dependencies are media quality upgrades only (hero master grade, optional higher-res case stills), not structural placeholders.
 
 ## CTA Micro-Polish Notes

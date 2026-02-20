@@ -2198,6 +2198,20 @@
     transform var(--cine-transition-fast);
 }
 
+.client-logo-panel {
+  min-height: 5.1rem;
+  display: grid;
+  align-content: center;
+  transition:
+    transform var(--cine-transition-fast),
+    border-color var(--cine-transition-fast),
+    box-shadow var(--cine-transition-fast);
+}
+
+.client-wordmark {
+  letter-spacing: 0.03em;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .cinematic-scene-card:hover,
   .cinematic-interactive-card:hover {
@@ -2211,6 +2225,12 @@
 
   .footer-micro-link:hover {
     transform: translateX(3px);
+  }
+
+  .client-logo-panel:hover {
+    transform: translateY(-2px);
+    border-color: rgba(28, 28, 28, 0.22);
+    box-shadow: 0 12px 24px rgba(28, 28, 28, 0.08);
   }
 }
 
