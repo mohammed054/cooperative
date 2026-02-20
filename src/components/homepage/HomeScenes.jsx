@@ -6,6 +6,8 @@ import {
   useScroll,
   useTransform,
 } from 'framer-motion'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Link } from 'react-router-dom'
 import ScribbleButton from '../ScribbleButton'
 import {
@@ -142,6 +144,13 @@ const AUTHORITY_METRICS = [
 
 const buildHeight = vh => `${vh}vh`
 const clampIndex = (value, max) => Math.max(0, Math.min(max, value))
+const TONE_LIGHTNESS = Object.freeze({
+  deep: 246,
+  dark: 255,
+  steel: 238,
+  warm: 246,
+  linen: 255,
+})
 
 const revealLift = (delay = 0, distance = 16) => ({
   hidden: { opacity: 0, y: distance },
@@ -605,15 +614,11 @@ const SignatureReelContent = ({ progress, reduced }) => {
 // Command Arrival: emotional landing and authority prelude.
 export const CommandArrivalScene = ({ scene }) => {
   const depthRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: depthRef,
-    offset: ['start end', 'end start'],
-  })
-  const backgroundY = useTransform(scrollYProgress, [0, 1], [56, -42])
-  const midY = useTransform(scrollYProgress, [0, 1], [28, -24])
-  const foregroundY = useTransform(scrollYProgress, [0, 1], [16, -12])
-  const rayY = useTransform(scrollYProgress, [0, 1], [0, -34])
-  const particleY = useTransform(scrollYProgress, [0, 1], [16, -18])
+  const videoRef = useRef(null)
+  const headlineRef = useRef(null)
+  const subtextRef = useRef(null)
+  const ctaRef = useRef(null)
+  const heroToneOverlayRef = useRef(null)
   const mediaRef = scene?.videoSrc || scene?.media?.ref
   const heroMediaSrc = Array.isArray(mediaRef) ? mediaRef[0] : mediaRef
   const headline =
@@ -624,21 +629,167 @@ export const CommandArrivalScene = ({ scene }) => {
     'Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.'
   const ctaText = scene?.ctaText || 'See Signature Builds'
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger)
+
+    const root = depthRef.current
+    const video = videoRef.current
+    const headlineNode = headlineRef.current
+    const subtextNode = subtextRef.current
+    const ctaNode = ctaRef.current
+    const heroToneOverlay = heroToneOverlayRef.current
+    const heroSection = document.getElementById(scene?.id || 'command-arrival')
+    const nextSection = document.getElementById('authority-ledger')
+    const nextEntryNode = nextSection?.querySelector(
+      '[data-cinematic-transition-entry="authority-ledger"]'
+    )
+    const nextToneBridge = nextSection?.querySelector(
+      '[data-cinematic-tone-bridge="authority-ledger"]'
+    )
+
+    if (!root || !video || !headlineNode || !subtextNode || !ctaNode || !nextSection) {
+      return undefined
+    }
+
+    const context = gsap.context(() => {
+      const currentTone = scene?.tone || 'deep'
+      const nextTone = nextEntryNode?.dataset?.sceneTone || 'dark'
+      const currentLightness = TONE_LIGHTNESS[currentTone] ?? 246
+      const nextLightness = TONE_LIGHTNESS[nextTone] ?? currentLightness
+      const nextIsLighter = nextLightness > currentLightness
+
+      if (heroSection) {
+        gsap.set(heroSection, { position: 'relative', zIndex: 20 })
+      }
+
+      gsap.set(nextSection, {
+        position: 'relative',
+        zIndex: 30,
+        marginTop: '-40vh',
+      })
+
+      gsap.set(video, { scale: 1, opacity: 1, transformOrigin: 'center center' })
+      gsap.set(headlineNode, { y: 0, opacity: 1 })
+      gsap.set(subtextNode, { y: 0, opacity: 1 })
+      gsap.set(ctaNode, { y: 0, opacity: 1 })
+      gsap.set(heroToneOverlay, { opacity: 0 })
+
+      if (nextEntryNode) {
+        gsap.set(nextEntryNode, {
+          y: 120,
+          opacity: 0,
+          scale: 0.96,
+          transformOrigin: 'center top',
+        })
+      }
+
+      if (nextToneBridge) {
+        gsap.set(nextToneBridge, { opacity: 0 })
+      }
+
+      const transitionTimeline = gsap.timeline({
+        defaults: {
+          duration: 1,
+          ease: 'power3.out',
+        },
+        scrollTrigger: {
+          trigger: root,
+          start: 'top top',
+          end: '+=100%',
+          scrub: true,
+        },
+      })
+
+      transitionTimeline
+        .to(
+          video,
+          {
+            scale: 1.12,
+            opacity: 0.4,
+          },
+          0
+        )
+        .to(
+          headlineNode,
+          {
+            y: -120,
+            opacity: 0,
+          },
+          0
+        )
+        .to(
+          subtextNode,
+          {
+            y: -90,
+            opacity: 0,
+          },
+          0.04
+        )
+        .to(
+          ctaNode,
+          {
+            y: -56,
+            opacity: 0,
+            duration: 0.7,
+            ease: 'power2.out',
+          },
+          0
+        )
+
+      if (nextEntryNode) {
+        transitionTimeline.to(
+          nextEntryNode,
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+          },
+          0
+        )
+      }
+
+      if (nextToneBridge && nextIsLighter) {
+        transitionTimeline.to(
+          nextToneBridge,
+          {
+            opacity: 0.58,
+            ease: 'power2.out',
+          },
+          0
+        )
+      }
+
+      if (heroToneOverlay && !nextIsLighter) {
+        transitionTimeline.to(
+          heroToneOverlay,
+          {
+            opacity: 0.36,
+            ease: 'power2.out',
+          },
+          0
+        )
+      }
+    })
+
+    return () => context.revert()
+  }, [scene?.id, scene?.tone])
+
   return (
     <FreeSceneFrame scene={scene} pinBehavior="authority-prelude" layout="hero-command" className="scene-cinematic scene-command-arrival scene-command-arrival-full">
-      {({ reduced }) => (
+      {() => (
         <div ref={depthRef} className="scene-depth-stage scene-depth-stage-hero-full relative overflow-hidden">
           <AmbientDepthField
-            reduced={reduced}
+            reduced
             variant="hero"
-            backgroundY={backgroundY}
-            midY={midY}
-            foregroundY={foregroundY}
+            backgroundY={0}
+            midY={0}
+            foregroundY={0}
             glowOpacity={0.58}
           />
 
           <div className="absolute inset-0 z-0">
-            <motion.video
+            <video
+              ref={videoRef}
               className="hero-command-video h-full w-full object-cover"
               src={heroMediaSrc}
               preload="metadata"
@@ -646,49 +797,41 @@ export const CommandArrivalScene = ({ scene }) => {
               loop
               playsInline
               autoPlay
-              initial={reduced ? false : { opacity: 0.74, scale: 1.1 }}
-              style={reduced ? undefined : { y: backgroundY }}
-              animate={reduced ? undefined : { opacity: 1, scale: [1.02, 1.06, 1.02] }}
-              transition={{
-                duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6,
-                ease: AUTHORITY_EASE,
-                repeat: Infinity,
-              }}
             />
           </div>
 
           <HeroAmbientCanvas />
-          <motion.div className="hero-volumetric-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.3, 0.44, 0.3] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8, ease: MASS_EASE, repeat: Infinity }} />
-          <motion.div className="hero-particle-layer" style={reduced ? undefined : { y: particleY }} animate={reduced ? undefined : { opacity: [0.16, 0.24, 0.16] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.4, ease: RELEASE_EASE, repeat: Infinity }} />
-          <motion.div className="hero-vignette-layer" animate={reduced ? undefined : { opacity: [0.38, 0.46, 0.38] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }} />
-          <motion.div className="hero-dof-layer" animate={reduced ? undefined : { opacity: [0.22, 0.3, 0.22] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.1, ease: MASS_EASE, repeat: Infinity }} />
+          <div className="hero-volumetric-layer" />
+          <div className="hero-particle-layer" />
+          <div className="hero-vignette-layer" />
+          <div className="hero-dof-layer" />
           <div className="hero-command-soften-layer" />
+          <div
+            ref={heroToneOverlayRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-[7]"
+            style={{ opacity: 0, background: 'rgba(8, 12, 18, 0.42)' }}
+          />
 
           <div className="hero-command-overlay absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
-            <motion.div
-              variants={sequence(0.04, MOTION_TOKEN_CONTRACT.stagger.line)}
-              initial={reduced ? false : 'hidden'}
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.28 }}
-              className="hero-command-copy w-[90%] sm:w-[82%] lg:w-[40%] max-w-none"
-            >
+            <div className="hero-command-copy w-[90%] sm:w-[82%] lg:w-[40%] max-w-none">
               <div className="inline-flex max-w-full flex-col p-1">
-                <motion.p variants={revealLift(0.02, 10)} className="text-xs uppercase tracking-[0.18em] text-white/80">
+                <p className="text-xs uppercase tracking-[0.18em] text-white/80">
                   Executive Event Command
-                </motion.p>
-                <motion.h1
-                  variants={revealLift(0.06, 16)}
+                </p>
+                <h1
+                  ref={headlineRef}
                   className="mt-4 max-w-[16ch] font-serif text-[clamp(1.9rem,7.8vw,5.4rem)] leading-[0.98] tracking-[-0.03em] text-white"
                 >
                   {headline}
-                </motion.h1>
-                <motion.p
-                  variants={revealLift(0.12, 12)}
+                </h1>
+                <p
+                  ref={subtextRef}
                   className="mt-5 max-w-[38ch] text-[clamp(0.98rem,2.15vw,1.45rem)] leading-relaxed text-white/90"
                 >
                   {subtitle}
-                </motion.p>
-                <motion.div variants={revealLift(0.17, 10)} className="mt-8">
+                </p>
+                <div ref={ctaRef} className="mt-8">
                   <ScribbleButton
                     title="Open flagship case reel and signature builds"
                     variant="primary"
@@ -699,9 +842,9 @@ export const CommandArrivalScene = ({ scene }) => {
                   >
                     {ctaText}
                   </ScribbleButton>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       )}
@@ -723,8 +866,24 @@ export const AuthorityLedgerScene = ({ scene }) => {
   return (
     <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
       {({ reduced }) => (
-        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-ledger">
+        <div
+          ref={depthRef}
+          className="scene-depth-stage scene-depth-stage-ledger"
+          data-cinematic-transition-entry="authority-ledger"
+          data-scene-tone={scene?.tone || 'dark'}
+          style={{ willChange: 'transform, opacity' }}
+        >
           <AmbientDepthField reduced={reduced} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.44} />
+          <div
+            aria-hidden="true"
+            data-cinematic-tone-bridge="authority-ledger"
+            className="pointer-events-none absolute inset-0 z-[1]"
+            style={{
+              opacity: 0,
+              background:
+                'linear-gradient(180deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.28) 44%, rgba(255, 255, 255, 0) 100%)',
+            }}
+          />
 
           <motion.div variants={sequence(0.04, 0.1)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="relative z-[2] grid gap-5">
             <motion.div variants={revealLift(0.02, 12)}>
