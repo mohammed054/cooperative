@@ -1397,7 +1397,7 @@
 
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .flagship-shell {
     width: min(1180px, calc(100% - 1.4rem));
   }
@@ -1785,7 +1785,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .authority-ledger {
     padding-block: clamp(2.7rem, 7.8vh, 4.6rem);
     padding-inline: clamp(0.78rem, 4.6vw, 1.2rem);
@@ -2954,7 +2954,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .ops-spine-headline {
     font-size: clamp(1.55rem, 6.8vw, 2.1rem);
   }
