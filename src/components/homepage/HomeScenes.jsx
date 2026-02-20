@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
+  useInView,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -16,6 +17,7 @@ import {
   SceneWrapper,
   ScrollLockedSection,
 } from '../flagship'
+import { OperationsSpineScene } from './OperationsSpineScene'
 import { MOTION_TOKEN_CONTRACT, parseBezier } from '../../motion/motionTokenContract.js'
 import { caseStudies, services, testimonials as testimonialData } from '../../data/siteData'
 import { assetUrl } from '../../lib/assetUrl'
@@ -26,6 +28,10 @@ const PINNED = 'pinned'
 const AUTHORITY_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.authority)
 const MASS_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.mass)
 const RELEASE_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.release)
+
+// Card visual dimensions — keep in sync with ProjectCard className min-w
+const CARD_WIDTH = 252
+const CARD_GAP = 12 // gap-3 = 12px
 
 const PROJECTS = caseStudies.slice(0, 3).map((project, index) => ({
   id: `case-${String(index + 1).padStart(2, '0')}`,
@@ -65,37 +71,6 @@ const TESTIMONIALS = testimonialData
     location: item.location,
     image: caseStudies[index]?.image || PROJECTS[index % PROJECTS.length]?.image,
   }))
-
-const OPERATIONS_STEPS = [
-  {
-    id: '01',
-    title: 'Executive Briefing',
-    detail:
-      'Scope, stakeholders, and decision constraints are locked before creative routing begins.',
-    image: assetUrl('images/process-bg.jpg'),
-  },
-  {
-    id: '02',
-    title: 'Systems Alignment',
-    detail:
-      'Production, venue, and technical teams align under one command structure.',
-    image: assetUrl('images/event-planning.png'),
-  },
-  {
-    id: '03',
-    title: 'Rehearsal Control',
-    detail:
-      'Cue integrity and fallback logic are validated under full run conditions.',
-    image: assetUrl('images/event-planning-in-action.png'),
-  },
-  {
-    id: '04',
-    title: 'Live Command',
-    detail:
-      'Floor leadership executes timing and transitions with protected authority.',
-    image: assetUrl('images/full-production.png'),
-  },
-]
 
 const FOOTER_COMPANY_LINKS = [
   { to: '/about', label: 'Company' },
@@ -194,11 +169,15 @@ const sequence = (delayChildren = 0.04, staggerChildren = 0.08) => ({
   },
 })
 
+// FIX: CountUpMetric now uses useInView to trigger only when visible
 const CountUpMetric = ({ value, suffix = '', reduced }) => {
+  const ref = useRef(null)
   const [display, setDisplay] = useState(0)
+  // Trigger once when the element enters the viewport
+  const isInView = useInView(ref, { once: true, amount: 0.4 })
 
   useEffect(() => {
-    if (reduced) return undefined
+    if (!isInView || reduced) return undefined
 
     const duration = 920
     const start = performance.now()
@@ -213,10 +192,10 @@ const CountUpMetric = ({ value, suffix = '', reduced }) => {
 
     frameId = window.requestAnimationFrame(tick)
     return () => window.cancelAnimationFrame(frameId)
-  }, [reduced, value])
+  }, [isInView, reduced, value])
 
   return (
-    <span>
+    <span ref={ref}>
       {reduced ? value : display}
       {suffix}
     </span>
@@ -415,6 +394,9 @@ const SignatureReelContent = ({ progress, reduced }) => {
   const [manualIndex, setManualIndex] = useState(null)
 
   const indexFromScroll = clampIndex(Math.floor(progress * PROJECTS.length), PROJECTS.length - 1)
+
+  // FIX: manual index sticks if scroll hasn't moved more than 1 step away,
+  // giving user control without permanently overriding scroll-driven navigation.
   const manualIndexInRange =
     typeof manualIndex === 'number' &&
     Math.abs(indexFromScroll - manualIndex) <= 1
@@ -425,7 +407,12 @@ const SignatureReelContent = ({ progress, reduced }) => {
 
   const tension = reduced ? 0 : Math.max(0, 1 - Math.abs(progress - 0.55) / 0.55)
   const apertureInset = reduced ? 0 : 8 + tension * 26
-  const conveyorOffset = reduced ? 0 : -progress * (PROJECTS.length - 1) * 252
+
+  // FIX: conveyorOffset now driven by selectedIndex (not raw progress) so manual
+  // navigation and scroll-driven selection both keep the conveyor visually in sync.
+  // Also include gap width (12px) in the per-card step to prevent drift over cards.
+  const conveyorOffset = reduced ? 0 : -selectedIndex * (CARD_WIDTH + CARD_GAP)
+
   const backgroundY = reduced ? 0 : (0.5 - progress) * 40
   const midY = reduced ? 0 : (0.5 - progress) * 22
   const foregroundY = reduced ? 0 : (0.5 - progress) * 14
@@ -450,6 +437,8 @@ const SignatureReelContent = ({ progress, reduced }) => {
     }
   }
 
+  // FIX: Use getBoundingClientRect so the closest-card calculation is correct
+  // regardless of whether the container is the offsetParent.
   const syncSelectedIndexFromMobileRail = () => {
     if (!mobileTrackRef.current) return
     const items = Array.from(
@@ -457,13 +446,15 @@ const SignatureReelContent = ({ progress, reduced }) => {
     )
     if (!items.length) return
 
-    const currentLeft = mobileTrackRef.current.scrollLeft
+    const containerRect = mobileTrackRef.current.getBoundingClientRect()
     let closestIndex = 0
     let closestDistance = Number.POSITIVE_INFINITY
 
     items.forEach(node => {
       const index = Number(node.getAttribute('data-project-index'))
-      const distance = Math.abs(node.offsetLeft - currentLeft)
+      const nodeRect = node.getBoundingClientRect()
+      // Distance of card's left edge from container's left edge
+      const distance = Math.abs(nodeRect.left - containerRect.left)
       if (distance < closestDistance) {
         closestDistance = distance
         closestIndex = index
@@ -543,6 +534,8 @@ const SignatureReelContent = ({ progress, reduced }) => {
               Active Case {String(selectedIndex + 1).padStart(2, '0')} / {String(PROJECTS.length).padStart(2, '0')}
             </p>
 
+            {/* FIX: conveyorOffset now reflects selectedIndex so the track
+                always aligns with what's shown in the detail card below. */}
             <motion.div
               className="hidden gap-3 md:flex will-change-transform"
               animate={reduced ? undefined : { x: conveyorOffset }}
@@ -605,13 +598,17 @@ const SignatureReelContent = ({ progress, reduced }) => {
 }
 
 // Command Arrival: emotional landing and authority prelude.
-export const CommandArrivalScene = ({ scene, nextSceneRef }) => {
+export const CommandArrivalScene = ({ scene, nextScene }) => {
+  const transitionWrapperRef = useRef(null)
+  const heroRef = useRef(null)
+  const nextRef = useRef(null)
   const depthRef = useRef(null)
   const videoRef = useRef(null)
   const eyebrowRef = useRef(null)
   const headlineRef = useRef(null)
   const subtextRef = useRef(null)
   const ctaRef = useRef(null)
+  const reducedMotion = useReducedMotion()
   const mediaRef = scene?.videoSrc || scene?.media?.ref
   const heroMediaSrc = Array.isArray(mediaRef) ? mediaRef[0] : mediaRef
   const headline =
@@ -625,9 +622,9 @@ export const CommandArrivalScene = ({ scene, nextSceneRef }) => {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
-    const root = depthRef.current
-    const heroSection = root?.closest('section')
-    const nextSection = nextSceneRef?.current
+    const transitionWrapper = transitionWrapperRef.current
+    const heroSection = heroRef.current
+    const nextSection = nextRef.current
     const video = videoRef.current
     const eyebrowNode = eyebrowRef.current
     const headlineNode = headlineRef.current
@@ -635,7 +632,7 @@ export const CommandArrivalScene = ({ scene, nextSceneRef }) => {
     const ctaNode = ctaRef.current
 
     if (
-      !root ||
+      !transitionWrapper ||
       !heroSection ||
       !nextSection ||
       !video ||
@@ -647,108 +644,162 @@ export const CommandArrivalScene = ({ scene, nextSceneRef }) => {
       return undefined
     }
 
-    let context
-    const frameId = window.requestAnimationFrame(() => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+    const ledgerHeadingNode = nextSection.querySelector('.authority-ledger-heading')
+    const ledgerSubcopyNode = nextSection.querySelector('.authority-ledger-subcopy')
+    const ledgerCtaNode = nextSection.querySelector('.authority-ledger-cta')
+    const ledgerCardNodes = Array.from(nextSection.querySelectorAll('.authority-ledger-card'))
+    const ledgerTextNodes = [ledgerHeadingNode, ledgerSubcopyNode].filter(Boolean)
 
-      context = gsap.context(() => {
-        gsap.set(heroSection, {
-          height: '100vh',
-          position: 'relative',
-          overflow: 'hidden',
-        })
+    const context = gsap.context(() => {
+      // FIX: Add zIndex so the pinned wrapper stacks above sticky/locked sections
+      // that come later in DOM order (e.g. SignatureReelScene).
+      gsap.set(transitionWrapper, {
+        position: 'relative',
+        height: '100vh',
+        overflow: 'hidden',
+        zIndex: 10,
+        background:
+          'linear-gradient(180deg, #ffffff 0%, #f8f9fb 50%, #f0f3f8 100%)',
+      })
+      gsap.set(heroSection, {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        opacity: 1,
+        zIndex: 3,
+      })
+      gsap.set(nextSection, {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        y: '50%',
+        opacity: 0,
+        zIndex: 2,
+        overflow: 'hidden',
+      })
+      gsap.set(video, { scale: 1, transformOrigin: 'center center' })
+      gsap.set(eyebrowNode, { opacity: 1, y: 0 })
+      gsap.set(headlineNode, { opacity: 1, y: 0 })
+      gsap.set(subtextNode, { opacity: 1 })
+      gsap.set(ctaNode, { opacity: 1 })
+      gsap.set(ledgerTextNodes, { opacity: 0, y: 36 })
+      gsap.set(ledgerCardNodes, { opacity: 0, y: 56 })
+      if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 0, y: 42 })
 
-        gsap.set(video, {
-          scale: 1,
-          opacity: 1,
-          filter: 'brightness(1)',
-          transformOrigin: 'center center',
-        })
-        gsap.set(eyebrowNode, { opacity: 1, y: 0 })
-        gsap.set(headlineNode, { opacity: 1, y: 0 })
-        gsap.set(subtextNode, { opacity: 1 })
-        gsap.set(ctaNode, { opacity: 1 })
-        gsap.set(nextSection, { y: window.innerHeight })
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: transitionWrapper,
+          start: 'top top',
+          end: reducedMotion ? '+=180%' : '+=300%',
+          pin: true,
+          scrub: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: heroSection,
-            start: 'top top',
-            end: '+=100%',
-            pin: true,
-            scrub: true,
-            anticipatePin: 1,
+          onLeave: () => {
+            // FIX: Clear zIndex so this wrapper no longer occludes subsequent scenes.
+            // Restore layout so AuthorityLedger content flows at natural document height.
+            gsap.set(transitionWrapper, { height: 'auto', overflow: 'visible', zIndex: 'auto' })
+            gsap.set(nextSection, {
+              position: 'relative',
+              top: 'auto',
+              left: 'auto',
+              width: '100%',
+              height: 'auto',
+              y: '0%',
+              opacity: 1,
+              overflow: 'visible',
+            })
+            gsap.set(heroSection, { opacity: 0, pointerEvents: 'none' })
+            gsap.set(ledgerTextNodes, { opacity: 1, y: 0 })
+            gsap.set(ledgerCardNodes, { opacity: 1, y: 0 })
+            if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 1, y: 0 })
           },
-        })
 
-        tl.to(
-          eyebrowNode,
-          {
-            opacity: 0,
-            y: -120,
-            duration: 0.4,
-            ease: 'power3.out',
+          onEnterBack: () => {
+            // FIX: Restore the pinned layout dimensions. Do NOT set opacity on
+            // heroSection here — the scrub timeline manages opacity. Setting it
+            // directly here causes a flash frame because the scrub position near
+            // the end already has heroSection at opacity 0; restoring it to 0
+            // manually is redundant and can cause a brief stutter on re-entry.
+            gsap.set(transitionWrapper, { height: '100vh', overflow: 'hidden', zIndex: 10 })
+            gsap.set(heroSection, {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'auto',
+              zIndex: 3,
+            })
+            gsap.set(nextSection, {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              overflow: 'hidden',
+              zIndex: 2,
+            })
           },
-          0
-        )
-        tl.to(
-          headlineNode,
-          {
-            opacity: 0,
-            y: -120,
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          0
-        )
-        tl.to(
-          subtextNode,
-          {
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          0
-        )
-        tl.to(
-          ctaNode,
-          {
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          0
-        )
-        tl.to(
-          video,
-          {
-            scale: 1.08,
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          0
-        )
-        tl.to(
-          nextSection,
-          {
-            y: 0,
-            duration: 0.7,
-            ease: 'power3.out',
-          },
-          0.3
-        )
-      }, heroSection)
-    })
+        },
+      })
 
-    return () => {
-      window.cancelAnimationFrame(frameId)
-      context?.revert()
-    }
-  }, [nextSceneRef, scene?.id])
+      timeline
+        .to([eyebrowNode, headlineNode], { opacity: 0, y: -120, duration: 1.35, ease: 'power3.out' }, 0)
+        .to([subtextNode, ctaNode], { opacity: 0, y: -60, duration: 1.35, ease: 'power3.out' }, 0.08)
+        .to(video, { scale: 1.08, duration: 3, ease: 'none' }, 0)
+        .to(nextSection, { y: '0%', opacity: 1, duration: 1.6, ease: 'power3.out' }, 1.5)
+        .to(heroSection, { opacity: 0, duration: 1.6, ease: 'power3.out' }, 1.5)
+
+      if (ledgerTextNodes.length) {
+        timeline.to(
+          ledgerTextNodes,
+          { opacity: 1, y: 0, duration: 0.78, stagger: 0.1, ease: 'power2.out' },
+          1.72
+        )
+      }
+
+      if (ledgerCardNodes.length) {
+        timeline.to(
+          ledgerCardNodes,
+          { opacity: 1, y: 0, duration: 0.92, stagger: 0.1, ease: 'power2.out' },
+          1.92
+        )
+      }
+
+      if (ledgerCtaNode) {
+        timeline.to(ledgerCtaNode, { opacity: 1, y: 0, duration: 0.76, ease: 'power2.out' }, 2.18)
+      }
+    }, transitionWrapper)
+
+    return () => context.revert()
+  }, [reducedMotion])
 
   return (
-    <FreeSceneFrame scene={scene} pinBehavior="authority-prelude" layout="hero-command" className="scene-cinematic scene-command-arrival scene-command-arrival-full">
-      {() => (
+    // FIX: Establish stacking context on the wrapper at the JSX level too so
+    // even before GSAP runs (SSR, first paint) the z-ordering is correct.
+    <div
+      ref={transitionWrapperRef}
+      className="hero-authority-transition-stage"
+      style={{ position: 'relative', height: '100vh', overflow: 'hidden', isolation: 'isolate', zIndex: 1 }}
+    >
+      <section
+        ref={heroRef}
+        id={scene.id}
+        className="hero-authority-hero-stage"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+        }}
+      >
         <div ref={depthRef} className="scene-depth-stage scene-depth-stage-hero-full relative overflow-hidden">
           <AmbientDepthField
             reduced
@@ -782,10 +833,7 @@ export const CommandArrivalScene = ({ scene, nextSceneRef }) => {
           <div className="hero-command-overlay absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
             <div className="hero-command-copy w-[90%] sm:w-[82%] lg:w-[40%] max-w-none">
               <div className="inline-flex max-w-full flex-col p-1">
-                <p
-                  ref={eyebrowRef}
-                  className="text-xs uppercase tracking-[0.18em] text-white/80"
-                >
+                <p ref={eyebrowRef} className="text-xs uppercase tracking-[0.18em] text-white/80">
                   Executive Event Command
                 </p>
                 <h1
@@ -816,70 +864,108 @@ export const CommandArrivalScene = ({ scene, nextSceneRef }) => {
             </div>
           </div>
         </div>
-      )}
-    </FreeSceneFrame>
+      </section>
+
+      <section
+        ref={nextRef}
+        id={nextScene?.id || 'authority-ledger'}
+        className="hero-authority-next-stage"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        {nextScene ? <AuthorityLedgerScene scene={nextScene} embedded /> : null}
+      </section>
+    </div>
   )
 }
 
 // Authority Ledger: real outcomes and command capability framing.
-export const AuthorityLedgerScene = ({ scene, sectionRef }) => {
+export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
   const depthRef = useRef(null)
-  const setDepthRef = useCallback(
-    node => {
-      depthRef.current = node
-      if (sectionRef) sectionRef.current = node
-    },
-    [sectionRef]
-  )
+  const reducedMotion = useReducedMotion()
   const { scrollYProgress } = useScroll({
     target: depthRef,
     offset: ['start end', 'end start'],
   })
-  const backgroundY = useTransform(scrollYProgress, [0, 1], [30, -20])
-  const midY = useTransform(scrollYProgress, [0, 1], [18, -14])
-  const foregroundY = useTransform(scrollYProgress, [0, 1], [8, -8])
+
+  // FIX: When embedded inside the GSAP pinned CommandArrivalScene, the element
+  // is position:absolute inside a fixed container, so scroll progress values
+  // are computed against the wrong reference frame and produce jittery parallax.
+  // Pass plain 0 values to AmbientDepthField so it renders statically in embedded mode.
+  const backgroundYTransform = useTransform(scrollYProgress, [0, 1], [30, -20])
+  const midYTransform = useTransform(scrollYProgress, [0, 1], [18, -14])
+  const foregroundYTransform = useTransform(scrollYProgress, [0, 1], [8, -8])
+  const backgroundY = embedded ? 0 : backgroundYTransform
+  const midY = embedded ? 0 : midYTransform
+  const foregroundY = embedded ? 0 : foregroundYTransform
+
+  const heading =
+    scene?.headline || 'Outcome authority before visual theater.'
+  const body =
+    scene?.subtitle ||
+    'Executive productions stay trusted when timing, technical certainty, and delivery control are visible before the spotlight turns on.'
+
+  const ledgerBody = reduced => (
+    <div ref={depthRef} className="authority-ledger scene-depth-stage scene-depth-stage-ledger">
+      <AmbientDepthField reduced={reduced} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.44} />
+
+      <motion.div
+        variants={!embedded && !reduced ? sequence(0.04, 0.1) : undefined}
+        initial={!embedded && !reduced ? 'hidden' : false}
+        whileInView={!embedded && !reduced ? 'visible' : undefined}
+        viewport={!embedded && !reduced ? { once: true, amount: 0.24 } : undefined}
+        className="authority-ledger-shell relative z-[2]"
+      >
+        <motion.header variants={!embedded && !reduced ? revealLift(0.02, 12) : undefined} className="authority-ledger-intro">
+          <p className="authority-ledger-eyebrow text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Performance Record</p>
+          <h2 className="authority-ledger-heading mt-4 font-serif leading-[1.02] text-[var(--color-ink)]">{heading}</h2>
+          <p className="authority-ledger-subcopy mt-4 text-[var(--color-ink-muted)]">{body}</p>
+        </motion.header>
+
+        <div className="authority-ledger-metrics-grid">
+          {AUTHORITY_METRICS.map((metric, index) => (
+            <motion.div key={metric.label} variants={!embedded && !reduced ? revealMask(index * 0.04) : undefined}>
+              <SceneCard className="authority-ledger-card authority-ledger-metric p-4 md:p-5">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{metric.label}</p>
+                <p className="authority-ledger-metric-value mt-3 font-serif leading-none text-[var(--color-ink)]">
+                  <CountUpMetric value={metric.value} suffix={metric.suffix} reduced={reduced} />
+                </p>
+              </SceneCard>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="authority-ledger-capability-grid">
+          {CAPABILITY_MODULES.map((module, index) => (
+            <motion.article key={module.id} variants={!embedded && !reduced ? revealLift(index * 0.06 + 0.1, 14) : undefined}>
+              <SceneCard className="authority-ledger-card authority-ledger-capability h-full overflow-hidden p-4 md:p-5">
+                <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="authority-ledger-media w-full rounded-xl border border-[var(--color-border)] object-cover" />
+                <p className="mt-4 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{module.title}</p>
+                <p className="mt-2 text-[clamp(0.9rem,1.15vw,1.02rem)] leading-relaxed text-[var(--color-ink-muted)]">{module.summary}</p>
+              </SceneCard>
+            </motion.article>
+          ))}
+        </div>
+
+        <motion.div variants={!embedded && !reduced ? revealLift(0.24, 14) : undefined} className="authority-ledger-cta">
+          <ScribbleButton title="Open capability and delivery portfolio" variant="outline" tone="light" size="md" to="/services" analyticsLabel="authority-ledger-capabilities">
+            Explore Capabilities
+          </ScribbleButton>
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+
+  if (embedded) return ledgerBody(reducedMotion)
 
   return (
     <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
-      {({ reduced }) => (
-        <div ref={setDepthRef} className="scene-depth-stage scene-depth-stage-ledger">
-          <AmbientDepthField reduced={reduced} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.44} />
-
-          <motion.div variants={sequence(0.04, 0.1)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="relative z-[2] grid gap-5">
-            <motion.div variants={revealLift(0.02, 12)}>
-              <SceneCard className="p-5 md:p-6">
-                <p className="text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Performance Record</p>
-                <h2 className="mt-3 max-w-[24ch] font-serif text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.07] text-[var(--color-ink)]">Outcome authority before visual theater.</h2>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  {AUTHORITY_METRICS.map((metric, index) => (
-                    <motion.div key={metric.label} variants={revealMask(index * 0.03)} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3">
-                      <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{metric.label}</p>
-                      <p className="mt-2 font-serif text-[1.45rem] leading-none text-[var(--color-ink)]"><CountUpMetric value={metric.value} suffix={metric.suffix} reduced={reduced} /></p>
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="mt-5">
-                  <ScribbleButton title="Open capability and delivery portfolio" variant="outline" tone="light" size="sm" to="/services" analyticsLabel="authority-ledger-capabilities">
-                    Explore Capabilities
-                  </ScribbleButton>
-                </div>
-              </SceneCard>
-            </motion.div>
-
-            <div className="grid gap-3 md:grid-cols-3">
-              {CAPABILITY_MODULES.map((module, index) => (
-                <motion.article key={module.id} variants={revealLift(index * 0.05 + 0.08, 12)}>
-                  <SceneCard className="h-full overflow-hidden">
-                    <img src={module.image} alt={module.title} loading="lazy" decoding="async" className="h-24 w-full rounded-xl border border-[var(--color-border)] object-cover" />
-                    <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{module.title}</p>
-                    <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{module.summary}</p>
-                  </SceneCard>
-                </motion.article>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      )}
+      {({ reduced }) => ledgerBody(reduced)}
     </FreeSceneFrame>
   )
 }
@@ -890,6 +976,7 @@ export const SignatureReelScene = ({ scene }) => (
     {({ progress, reduced }) => <SignatureReelContent progress={progress} reduced={reduced} />}
   </PinnedSceneFrame>
 )
+
 // Capability Matrix: layered craft capabilities with depth.
 export const CapabilityMatrixScene = ({ scene }) => {
   const depthRef = useRef(null)
@@ -949,76 +1036,7 @@ export const CapabilityMatrixScene = ({ scene }) => {
   )
 }
 
-// Operations Spine: pinned process friction and staged control.
-export const OperationsSpineScene = ({ scene }) => (
-  <PinnedSceneFrame scene={scene} pinBehavior="precision-friction" layout="operations-spine" className="scene-cinematic scene-operations-spine">
-    {({ progress, reduced }) => {
-      const activeStep = Math.min(OPERATIONS_STEPS.length - 1, Math.floor(progress * OPERATIONS_STEPS.length))
-      const railProgress = ((activeStep + 1) / OPERATIONS_STEPS.length) * 100
-      const ctaVisible = reduced || progress > 0.62
-      const backgroundY = reduced ? 0 : (0.5 - progress) * 34
-      const midY = reduced ? 0 : (0.5 - progress) * 20
-      const foregroundY = reduced ? 0 : (0.5 - progress) * 10
-
-      return (
-        <div className="scene-depth-stage scene-depth-stage-operations">
-          <AmbientDepthField reduced={reduced} variant="operations" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.54} />
-
-          <div className="relative z-[2] grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
-            <SceneCard className="relative h-fit p-5 md:p-6">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Delivery Framework</p>
-              <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.56rem,2.95vw,2.42rem)] leading-[1.08] text-[var(--color-ink)]">Process pressure translated into composure at showtime.</h2>
-              <p className="mt-4 max-w-[56ch] text-sm text-[var(--color-ink-muted)]">Scroll holds tension while each command phase locks before advancing.</p>
-              <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[var(--color-accent-soft)]" role="progressbar" aria-label="Operations spine progression" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(railProgress)}>
-                <motion.div className="h-full rounded-full bg-[var(--color-accent)]" animate={{ width: `${railProgress}%` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }} />
-              </div>
-              <motion.div animate={ctaVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene, ease: AUTHORITY_EASE }} className="mt-6">
-                <ScribbleButton variant="outline" tone="light" size="sm" to="/process" analyticsLabel="operations-process">Explore Capabilities</ScribbleButton>
-              </motion.div>
-            </SceneCard>
-
-            <div className="relative grid gap-3 pl-5">
-              <div aria-hidden="true" className="absolute inset-y-2 left-1 w-[2px] rounded-full bg-[var(--color-accent-soft)]" />
-              <motion.div aria-hidden="true" className="absolute left-[3px] top-2 w-[3px] rounded-full bg-[var(--color-accent)]" animate={{ height: `calc(${railProgress}% - 0.4rem)` }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: AUTHORITY_EASE }} style={{ minHeight: '1rem' }} />
-
-              {OPERATIONS_STEPS.map((step, index) => {
-                const isActive = index === activeStep
-                const distanceFromActive = Math.abs(index - activeStep)
-
-                return (
-                  <motion.article
-                    key={step.id}
-                    initial={reduced ? false : { opacity: 0, x: 28, scale: 0.97 }}
-                    animate={{
-                      opacity: reduced ? 1 : isActive ? 1 : 0.54,
-                      x: reduced ? 0 : isActive ? 0 : 14 + distanceFromActive * 4,
-                      scale: reduced ? 1 : isActive ? 1 : 0.976,
-                    }}
-                    transition={
-                      reduced
-                        ? { duration: MOTION_TOKEN_CONTRACT.durations.ui, ease: MASS_EASE }
-                        : { type: 'spring', stiffness: 240, damping: 21, mass: 0.78 }
-                    }
-                    className={`rounded-2xl border p-4 ${isActive ? 'border-[rgba(223,234,255,0.48)] bg-[var(--color-surface-2)]' : 'border-[var(--color-border)] bg-[var(--color-surface)]'}`}
-                  >
-                    <div className="grid gap-3 sm:grid-cols-[96px_1fr] sm:items-start">
-                      <img src={step.image} alt={step.title} loading="lazy" decoding="async" className="h-20 w-full rounded-lg border border-[var(--color-border)] object-cover" />
-                      <div>
-                        <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Phase {step.id}</p>
-                        <h3 className="mt-2 font-serif text-[1.06rem] text-[var(--color-ink)]">{step.title}</h3>
-                        <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{step.detail}</p>
-                      </div>
-                    </div>
-                  </motion.article>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      )
-    }}
-  </PinnedSceneFrame>
-)
+export { OperationsSpineScene }
 
 // Narrative Bridge: release tension before proof concentration.
 export const NarrativeBridgeScene = ({ scene }) => {
@@ -1109,17 +1127,21 @@ const ProofTheaterSplit = ({ reduced }) => {
                 transition={{ duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.12, ease: MASS_EASE }}
                 className="grid gap-4"
               >
-                <motion.div variants={revealMask(0.02)} className="overflow-hidden rounded-xl border border-[var(--color-border)]">
-                  <motion.img
+                {/* FIX: The previous version had an infinite animate loop on the image
+                    inside AnimatePresence mode="wait". Framer Motion's exit animation
+                    and the repeat:Infinity animation conflict — the exit never fully
+                    completes because the looping animation keeps re-triggering layout.
+                    The subtle ken-burns effect is achieved via CSS instead, which
+                    doesn't interfere with AnimatePresence's lifecycle. */}
+                <div className="overflow-hidden rounded-xl border border-[var(--color-border)]">
+                  <img
                     src={active.image}
                     alt={active.name}
                     loading="lazy"
                     decoding="async"
-                    className="h-56 w-full object-cover"
-                    animate={reduced ? undefined : { scale: [1.03, 1.06, 1.03], y: [0, -5, 0] }}
-                    transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 1.8, ease: AUTHORITY_EASE, repeat: Infinity }}
+                    className={`h-56 w-full object-cover ${reduced ? '' : 'proof-image-kenburns'}`}
                   />
-                </motion.div>
+                </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.15em] text-[var(--color-ink-subtle)]">Featured Client Voice</p>
                   <p className="mt-3 text-base leading-relaxed text-[var(--color-ink)]">"{active.quote}"</p>
@@ -1190,6 +1212,7 @@ export const ProofTheaterScene = ({ scene }) => {
     </FreeSceneFrame>
   )
 }
+
 const FloatingField = ({ id, label, children }) => (
   <label htmlFor={id} className="cinematic-field">
     {children}
@@ -1235,10 +1258,13 @@ const ConversionChamberContent = ({ reduced }) => {
     const email = String(formData.get('email') || '').trim()
     const budgetBand = String(formData.get('budget_band') || '').trim()
     const eventType = String(formData.get('event_type') || '').trim()
+    const scope = String(formData.get('scope') || '').trim()
 
-    if (!name || !company || !email || !budgetBand || !eventType) {
+    // FIX: scope was present in the form with required attr but missing from
+    // the JS validation guard, so the custom error message never mentioned it.
+    if (!name || !company || !email || !budgetBand || !eventType || !scope) {
       setStatus('error')
-      setFeedbackMessage('Please complete Name, Company, Budget Band, Event Type, and Email before submitting.')
+      setFeedbackMessage('Please complete all required fields before submitting.')
       return
     }
 
@@ -1308,8 +1334,8 @@ const ConversionChamberContent = ({ reduced }) => {
             <select id="conversion-budget" name="budget_band" defaultValue="" className="cinematic-field-input cinematic-select-input" required>
               <option value="" disabled>Select budget band</option>
               <option value="under-100k">Under 100K AED</option>
-              <option value="100k-250k">100K-250K AED</option>
-              <option value="250k-500k">250K-500K AED</option>
+              <option value="100k-250k">100K–250K AED</option>
+              <option value="250k-500k">250K–500K AED</option>
               <option value="500k-plus">500K+ AED</option>
             </select>
           </FloatingField>
@@ -1481,4 +1507,3 @@ export const GlobalFooterScene = ({ scene }) => {
     </FreeSceneFrame>
   )
 }
-

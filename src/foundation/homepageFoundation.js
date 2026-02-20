@@ -116,7 +116,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'authority-ledger',
     tone: 'dark',
-    length: 85,
+    length: 100,
     mode: 'free',
     entryCue: 'ledger-evidence-rise',
     exitCue: 'ledger-handoff',

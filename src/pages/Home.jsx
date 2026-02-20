@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import {
   HOMEPAGE_SCENE_REGISTRY,
   HOMEPAGE_GRADIENT_BRIDGES,
@@ -89,7 +89,12 @@ if (!rhythmValidation.isValid) {
 
 const Home = () => {
   const analytics = useAnalyticsContext()
-  const authorityLedgerRef = useRef(null)
+  const commandScene = HOMEPAGE_SCENE_REGISTRY.find(scene => scene.id === 'command-arrival')
+  const authorityScene = HOMEPAGE_SCENE_REGISTRY.find(scene => scene.id === 'authority-ledger')
+  const authorityBridge = BRIDGE_BY_FROM_SCENE.get('authority-ledger')
+  const downstreamScenes = HOMEPAGE_SCENE_REGISTRY.filter(
+    scene => scene.id !== 'command-arrival' && scene.id !== 'authority-ledger'
+  )
 
   useLenisScroll()
 
@@ -126,17 +131,25 @@ const Home = () => {
 
   return (
     <div className="flagship-home flagship-home-cinematic">
-      {HOMEPAGE_SCENE_REGISTRY.map(scene => {
+      {commandScene && authorityScene ? (
+        <CommandArrivalScene scene={commandScene} nextScene={authorityScene} />
+      ) : null}
+      {authorityBridge ? (
+        <div
+          aria-hidden="true"
+          className={`homepage-tone-bridge ${getBridgeClassName(authorityBridge)}`}
+          data-bridge-id={authorityBridge.id}
+          data-bridge-from={authorityBridge.fromTone}
+          data-bridge-to={authorityBridge.toTone}
+        />
+      ) : null}
+      {downstreamScenes.map(scene => {
         const SceneComponent = SCENE_COMPONENT_REGISTRY[scene.id]
         const bridge = BRIDGE_BY_FROM_SCENE.get(scene.id)
         if (!SceneComponent) return null
         return (
           <React.Fragment key={scene.id}>
-            <SceneComponent
-              scene={scene}
-              nextSceneRef={scene.id === 'command-arrival' ? authorityLedgerRef : undefined}
-              sectionRef={scene.id === 'authority-ledger' ? authorityLedgerRef : undefined}
-            />
+            <SceneComponent scene={scene} />
             {bridge ? (
               <div
                 aria-hidden="true"
