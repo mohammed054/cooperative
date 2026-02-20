@@ -659,7 +659,6 @@ export const CommandArrivalScene = ({ scene }) => {
 
           <HeroAmbientCanvas />
           <motion.div className="hero-volumetric-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.3, 0.44, 0.3] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8, ease: MASS_EASE, repeat: Infinity }} />
-          <motion.div className="hero-light-ray-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.18, 0.32, 0.18], x: [0, 20, 0] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.4, ease: AUTHORITY_EASE, repeat: Infinity }} />
           <motion.div className="hero-particle-layer" style={reduced ? undefined : { y: particleY }} animate={reduced ? undefined : { opacity: [0.16, 0.24, 0.16] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.4, ease: RELEASE_EASE, repeat: Infinity }} />
           <motion.div className="hero-vignette-layer" animate={reduced ? undefined : { opacity: [0.38, 0.46, 0.38] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }} />
           <motion.div className="hero-dof-layer" animate={reduced ? undefined : { opacity: [0.22, 0.3, 0.22] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.1, ease: MASS_EASE, repeat: Infinity }} />

@@ -8,9 +8,9 @@ export const MegaMenu = ({ activeItem, setActiveMenu }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+      initial={{ opacity: 0, y: 0, scale: 0.995 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+      exit={{ opacity: 0, y: 0, scale: 0.995 }}
       transition={{
         duration: 0.25,
         ease: [0.16, 1, 0.3, 1],
@@ -20,7 +20,7 @@ export const MegaMenu = ({ activeItem, setActiveMenu }) => {
       onMouseEnter={() => setActiveMenu(activeItem.label)}
       onMouseLeave={() => setActiveMenu(null)}
     >
-      <div className="border-t border-border bg-white shadow-[0_18px_50px_rgba(15,23,42,0.12)]">
+      <div className="bg-white shadow-[0_18px_50px_rgba(15,23,42,0.12)]">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 8 }}

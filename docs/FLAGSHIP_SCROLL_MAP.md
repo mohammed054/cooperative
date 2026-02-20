@@ -1,43 +1,176 @@
-# Flagship Scroll Map
+# Flagship Homepage Current-State Audit
 
-This map defines the cinematic narrative flow, motion rhythm, and conversion sequence for the flagship homepage.
+Scope: `src/pages/Home.jsx`, `src/components/homepage/HomeScenes.jsx`, `src/foundation/homepageFoundation.js`, `src/components/flagship/*`, `src/components/ScribbleButton.*`, `src/index.css`, `src/data/siteData.js`, `src/utils/leadCapture.js`.
 
-## Motion Token References
+Method: Code and style inspection only. No assumptions beyond what is explicitly implemented.
 
-- `duration.base`: `0.6s`
-- `duration.slow`: `0.9s`
-- `ease.cinematic`: `cubic-bezier(0.22,0.61,0.36,1)`
-- `distance.fadeUp`: `40px`
-- `blur.entry`: `8px -> 0px`
-- `stagger.card`: `0.12s`
-- `stagger.word`: `0.06s`
-- `overlay.fade`: `0.5s`
+## 1. Scene Structure
 
-## Scene Sequence
+| Order | Scene ID | Tone Key | Scroll Mode | Pin Status | Declared Length | Implementation State | Content Types Present |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | `command-arrival` | `deep` | `free` | Not pinned | `100vh` | Implemented | Video, headline, subtitle, CTA |
+| 2 | `authority-ledger` | `dark` | `free` | Not pinned | `85vh` | Implemented | Metrics, capability cards, CTA |
+| 3 | `signature-reel` | `dark` | `pinned` | Pinned | `220vh` | Implemented | Project rail, active case panel, CTA |
+| 4 | `capability-matrix` | `steel` | `free` | Not pinned | `100vh` | Implemented | Capability media cards |
+| 5 | `operations-spine` | `steel` | `pinned` | Pinned | `240vh` | Implemented | Step timeline, images, progress rail, CTA |
+| 6 | `narrative-bridge` | `warm` | `free` | Not pinned | `75vh` | Implemented | Text-only bridge card |
+| 7 | `proof-theater` | `linen` | `free` | Not pinned | `120vh` | Implemented | Testimonial carousel + index rail |
+| 8 | `conversion-chamber` | `dark` | `free` | Not pinned | `120vh` | Implemented | Form + persuasion copy |
+| 9 | `global-footer` | `deep` | `free` | Not pinned | `70vh` | Implemented | Link columns, utility row, CTAs |
 
-| Scene Name               | Scene ID                   | Scroll Behavior           | Background                                             | Motion & Entrance                                                                                                  | Transition Bridge                              | CTA Placement                                                    | Placeholder Media                                                 | Core Copy                                                                        |
-| ------------------------ | -------------------------- | ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Hero Authority           | `hero`                     | Free (`min-height:100vh`) | Deep cinematic gradient + ambient volumetric particles | Primary headline word-stagger (`stagger.word`), secondary stat fade-up (`distance.fadeUp`), ambient Three.js drift | Downward soft veil into lighter layer          | Soft CTA overlay with scribble button: **"We Engineer Moments"** | Hero video (`public/videos/background.mp4`) + dark fallback image | "Production direction for rooms that cannot slip."                               |
-| Brand Positioning        | `brand-positioning`        | Free (`min-height:100vh`) | Warm neutral gradient                                  | Split-layout text fade-up + logo band stagger (`stagger.card`)                                                     | Light-to-neutral gradient bridge               | Secondary CTA: "See Signature Builds"                            | Editorial image panel                                             | "Studio-grade execution, senior-led from design to show call."                   |
-| Signature Showcase       | `signature-showcase`       | Free (`min-height:100vh`) | High-contrast dark texture + glow accents              | MediaReveal cards with staggered scale/opacity, subtle parallax                                                    | Dark bridge with bloom edge                    | Inline CTA chip on featured case                                 | Showcase gallery cards                                            | "Flagship launches, summits, and private experiences engineered with precision." |
-| Capability Establishment | `capability-establishment` | Scroll-locked (`240vh`)   | Dark-to-steel gradient                                 | Pinned card deck with GSAP timeline; card progression at `0.12s` cadence                                           | Mid-scene overlay fade (`overlay.fade`)        | Sticky side CTA: "Discuss Your Scope"                            | Capability cards + iconography                                    | "AV, lighting, scenic, and show control under one accountable command."          |
-| Process Depth            | `process-depth`            | Scroll-locked (`260vh`)   | Deep charcoal to graphite                              | Pinned step timeline with headline swaps and progress rail                                                         | Neutral release bridge toward cinematic finale | Micro CTA after step 3                                           | Process diagram + checklist panel                                 | "Diagnose. Design. Deploy. Direct."                                              |
-| Cinematic Finale         | `cinematic-finale`         | Free (`min-height:110vh`) | Light-meets-dark blended gradient                      | Heroic statement deblur (`blur.entry`) + phrase stagger                                                            | Soft dissolve to social proof                  | CTA pulse: "View Client Outcomes"                                | Full-width reveal media                                           | "Every cue feels effortless because control is invisible."                       |
-| Social Proof             | `social-proof`             | Free (`min-height:100vh`) | Elegant warm surface                                   | Testimonial cards fade-up + logo strip marquee                                                                     | Warm-to-cool bridge                            | CTA in proof rail: "Read More Testimonials"                      | Testimonial portrait + logos                                      | "Trusted by teams who cannot miss."                                              |
-| Global Presence          | `global-presence`          | Free (`min-height:100vh`) | Atmospheric world-map gradient                         | Region markers stagger in, counters count-up, subtle map drift                                                     | Cool gradient bridge to conversion             | CTA near stats: "Check UAE Coverage"                             | Stylized map + metrics                                            | "UAE-wide production reach with local operational intelligence."                 |
-| Conversion Gravity       | `conversion-gravity`       | Free (`min-height:100vh`) | Premium dark panel with spotlight overlays             | Form and headline reveal in sequence (`duration.base` then `duration.slow`)                                        | Fade into footer                               | High-intent CTA scribble: **"Request a Private Consultation"**   | Conversion panel + lead form                                      | "Share event type, budget, and target date. We respond within 24 hours."         |
-| Footer Continuation      | `footer`                   | Free (`min-height:auto`)  | Soft editorial neutral                                 | Subtle fade-in lists and legal links                                                                               | N/A                                            | Utility CTA: "Schedule Intro Call"                               | Brand mark + link columns                                         | "Built for high-stakes events, delivered with composure."                        |
+Scene-level placeholders/skeletons:
 
-## Conversion Psychology Placement
+| Area | Current State |
+| --- | --- |
+| Scene structure | Not skeleton. Full scene sequence and components are wired. |
+| Media in scenes | Real asset paths from `public/images/*` and `public/videos/background.mp4`. |
+| Testimonials | Populated from `src/data/siteData.js` (3 entries). |
+| Project panels | Populated from `caseStudies` (first 3). |
+| Client logo strip in footer | Empty in runtime: `CLIENT_LOGO_ASSET_BY_ORGANIZATION` is an empty object, so logo section does not render. |
 
-- Early soft CTA appears in `hero` as low-friction directional action.
-- Qualification fields appear only in `conversion-gravity` to preserve premium flow:
-  - Event type dropdown (lead qualification intent)
-  - Budget selector (lead fit scoring)
-- Form friction remains minimal (name, email, optional phone, event type, budget, brief).
+## 2. Hero / Landing Section (`command-arrival`)
 
-## Scroll Rhythm Summary
+### Video and dimensions
+- Hero video source resolves from scene media (`/videos/background.mp4`).
+- `motion.video` is full-bleed (`absolute inset-0`, `w-full h-full`, `object-cover`).
+- Scene is forced to full viewport height (`100vh`, with `100dvh` support).
 
-- Free narrative scenes: `hero`, `brand-positioning`, `signature-showcase`, `cinematic-finale`, `social-proof`, `global-presence`, `conversion-gravity`, `footer`
-- Locked depth scenes: `capability-establishment` (`240vh`), `process-depth` (`260vh`)
-- Bridge overlays between dark/light contexts to avoid hard visual cuts.
+### Overlay text and style
+- Eyebrow: `Executive Event Command`.
+- Headline: `We command public moments where failure is visible and expensive.` (scene fallback and registry value match).
+- Body copy: full paragraph about narrative direction/technical systems/floor authority.
+- Primary CTA: ScribbleButton text `See Signature Builds`, links to `/work`.
+- Overlay stack includes: `HeroAmbientCanvas` (Three.js), volumetric/light ray/particle/vignette/DOF layers, plus `hero-command-soften-layer`.
+
+### White gaps / blocking overlays
+- Transition hook visuals are globally disabled for homepage scenes.
+- Special rule removes transition hook under first scene (`command-arrival`) to avoid light band.
+- Hero has multiple non-interactive visual overlays (`pointer-events: none`), plus content overlay container (`pointer-events: auto`).
+
+### CTA and ScribbleButton usage
+- CTA uses `ScribbleButton` variant `primary`, `tone="light"`, size `md`, link mode (`to`).
+- ScribbleButton includes optional scribble SVG stroke animation, hover shine layer, uppercase label, optional arrow.
+
+### Desktop vs mobile behavior
+- Same scene component on both.
+- Copy width changes by breakpoint (`w-[90%]` to `lg:w-[40%]`).
+- Hero layout CSS has mobile adjustments (`@media (max-width: 900px)`), including narrower container and single-column behavior.
+
+## 3. Signature Reel and Project Panels
+
+### Project placeholders and count
+- Exactly 3 project panels (`caseStudies.slice(0, 3)`).
+- Each panel has image, location tag, title, subtitle, and outcome line.
+
+### Horizontal scroll behavior
+- Pinned scene progress controls selected card index: `Math.floor(progress * PROJECTS.length)` (clamped).
+- Desktop (`md+`): horizontal conveyor (`motion.div`) translates by progress (`x: conveyorOffset`).
+- Mobile (`<md`): native horizontal rail (`overflow-x-auto`, snap) with manual card selection + scroll sync.
+
+### Pinned scroll implementation
+- `ScrollLockedSection` uses GSAP `ScrollTrigger` pinning:
+  - `pin: lockEl`
+  - `pinSpacing: false`
+  - `scrub` based on motion token inertia
+- Pinned scenes have pre/post friction buffers (`scene-friction-buffer`) with gradient backgrounds.
+
+### Testimonial rail layout and media styling
+- `proof-theater` is free-scroll, not pinned.
+- Left panel: active testimonial image (`h-56`, cover), quote, identity, progress bar, prev/next micro CTAs.
+- Right panel: index rail of testimonial buttons with small preview images.
+- Supports keyboard arrows and touch swipe threshold for carousel navigation.
+
+## 4. Conversion Chamber (`conversion-chamber`)
+
+### Form fields present
+- Hidden: `source_scene`, `source_path`, honeypot `website`.
+- Visible required: `name`, `email`, `company`, `budget_band`, `event_type`, `scope`.
+- Visible optional: `phone`, `target_window`.
+
+### Submission behavior
+- Client validation blocks submit if required fields are empty.
+- If lead capture env is configured: submits to webhook via `submitLead`.
+- If not configured: uses stub delay (`680ms`) and returns success mode `stub`.
+- Success and error messages render in animated feedback panel.
+
+### CTA implementation
+- Submit button is `ScribbleButton` variant `primary`, tone `light`.
+- Label toggles to `Submitting Request...` while submitting.
+
+## 5. Footer (`global-footer` scene)
+
+### Column structure
+- Top message card (`Next Move`).
+- Optional client logo strip (currently not rendered because no logos).
+- Four utility columns:
+  - Company links
+  - Services links
+  - Case Work links
+  - Direct Contact
+- Utility row with copyright, policy links, and micro CTA.
+- Final standalone CTA button (`Request Proposal`).
+
+### Placeholders / skeleton / unstyled
+- No skeleton wrappers.
+- Client logo block is conditionally empty due no mapped logo assets.
+- All rendered footer blocks have explicit styling via scene cards and typography classes.
+
+## 6. Motion & Tonal System
+
+### Motion patterns and triggers
+- Page-level smooth scrolling via Lenis (`useLenisScroll`) unless reduced motion.
+- Scene entry wrappers animate with opacity + Y translate (`SceneWrapper`, `ScrollLockedSection`).
+- Repeated reveal helpers:
+  - `revealLift`: fade + upward translate
+  - `revealSide`: fade + lateral translate
+  - `revealMask`: clip-path reveal
+  - `sequence`: stagger orchestration
+- Ambient layers in multiple scenes animate infinitely (opacity, x/y drift, mild scale).
+- Pinned sections: `signature-reel` and `operations-spine` use GSAP pinning and progress-driven UI state.
+
+### Repeated fadeUp + blur patterns
+- Repeated fade/slide-up is pervasive (`revealLift` and in-view motion blocks).
+- Blur usage is mostly visual-surface blur (`backdrop-filter`) on cards/fields/hero layers, not repeated text blur transitions.
+
+### Tonal enforcement vs rendered colors
+- Foundation tone keys: `deep`, `dark`, `steel`, `warm`, `linen`.
+- Tone flow is validated in code against registry.
+- Actual rendered scene palettes are all light-mode token sets (`--color-ink` dark text on light surfaces) even for `dark`/`deep` keys.
+- `theme="light"` is passed to all scenes and hooks.
+
+## 7. Typography & Hierarchy
+
+### Fonts
+- Heading font: `Fraunces`.
+- Body font: `Manrope`.
+- Loaded via Google Fonts import + local `@font-face` declarations.
+
+### Heading/body style tendencies
+- Headlines: serif, negative tracking, clamp-based responsive sizes.
+- Body: smaller neutral sans styles (`text-sm`/clamped body scales).
+- Eyebrows: uppercase, high letter-spacing, micro sizes.
+
+### Copy and CTA text character
+- Tone is assertive/authority-driven and consistent across sections.
+- Copy is authored content, not lorem ipsum.
+- CTA labels are specific and repeated across sections (`See Signature Builds`, `Explore Capabilities`, `Submit Request`, `Request Proposal`, etc.).
+
+## 8. Gaps and Issues (Current-State Only)
+
+- Client logo proof strip in footer does not render because logo map is empty.
+- Scene metadata/data attributes are present throughout DOM (`data-scene-id`, `data-scroll-mode`, `data-pin-behavior`, media refs, transition flags). These are not visually styled as debug UI, but they are visible in markup.
+- Tone naming (`dark`, `deep`) does not correspond to dark visual rendering; scene backgrounds remain light gradients.
+- Pre/post friction buffers around pinned scenes add visible gradient bands between sections by design.
+- Several CSS classes exist for hero card/grid variants (`hero-command-grid`, `hero-command-copy-card`, `hero-command-accent-card`) but the hero JSX currently renders a simpler overlay composition.
+
+## 9. Overall Assessment
+
+- Current state classification: **partially fleshed production scaffold**.
+- Not a bare skeleton: all 9 scenes render structured content, media, and interaction.
+- Most production-ready areas: hero, pinned signature reel mechanics, operations spine mechanics, conversion form behavior, and global footer utility structure.
+- Placeholder/unfinished indicators that remain:
+  - Footer client logo module is effectively empty at runtime.
+  - Some structural CSS scaffolding exists without matching scene JSX usage.
+- Critical visual/functional state notes:
+  - Pinned/free choreography is implemented and functional in code.
+  - Theme/tone semantics and actual rendered palette are currently light-first across all scenes.

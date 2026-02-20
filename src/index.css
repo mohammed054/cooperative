@@ -1752,6 +1752,13 @@
   animation: scene-transition-breathe 4.6s ease-in-out infinite;
 }
 
+/* Homepage: remove hanging transition bands between scenes. */
+.flagship-home-cinematic .scene-transition-hook::before,
+.flagship-home-cinematic .scene-transition-hook::after {
+  display: none;
+  animation: none !important;
+}
+
 .homepage-tone-bridge {
   position: relative;
   height: 0;
