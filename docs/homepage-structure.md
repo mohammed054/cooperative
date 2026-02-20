@@ -1,66 +1,78 @@
-# Homepage Phase 12 Structure + Production Notes
+# Homepage Final Production Structure
 
-## Scene Order & Layout Contract
+## Scene Registry Order (Locked)
 
-| Scene ID | Tone | Mode | Length | Layout Intent | Primary CTA | Scene Media Refs (`data-media-refs`) |
-| --- | --- | --- | --- | --- | --- | --- |
-| `command-arrival` | `deep` | `free` | `110vh` | authority-led hero split (copy + cinematic media chamber) | `Explore Capabilities`, `Request Proposal` | `videos/background.mp4` |
-| `authority-ledger` | `dark` | `free` | `85vh` | outcome metrics and proof-led capability framing | `Explore Capabilities` | `images/event1.jpg`, `images/full-production.png` |
-| `signature-reel` | `dark` | `pinned` | `220vh` | anchor reel, scroll-locked conveyor + aperture stage | `View Case Study` | `images/event1.jpg`, `images/event2.jpg`, `images/event3.jpg` |
-| `capability-matrix` | `steel` | `free` | `100vh` | primary capability lane + supporting craft modules | `Explore Capabilities` | `images/full-production.png`, `images/lighting-effects.png`, `images/av-setup.png` |
-| `operations-spine` | `steel` | `pinned` | `240vh` | staged process timeline with progressive step lock | `Explore Capabilities` | `images/process-bg.jpg`, `images/event-planning.png`, `images/event-planning-in-action.png`, `images/full-production.png` |
-| `narrative-bridge` | `warm` | `free` | `75vh` | decompression bridge before proof concentration | `Request Proposal` | `images/country-bg.jpg` |
-| `proof-theater` | `linen` | `free` | `120vh` | rectangular featured testimonial + indexed rail | `Request Proposal` | `images/event1.jpg`, `images/event2.jpg`, `images/event3.jpg` |
-| `conversion-chamber` | `dark` | `free` | `120vh` | commitment close with qualified lead capture | `Submit Request` | `images/product-large.jpg` |
-| `global-footer` | `deep` | `free` | `70vh` | utility closure + direct contact and proposal path | `Request Proposal` | `images/logo.webp` |
+| Order | Scene ID | Mode | Tone | Length | Core Purpose |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `command-arrival` | `free` | `deep` | `110vh` | full-viewport hero film with authority overlay and primary CTA |
+| 2 | `authority-ledger` | `free` | `dark` | `85vh` | outcome metrics, capability signals, and supporting CTA |
+| 3 | `signature-reel` | `pinned` | `dark` | `220vh` | horizontal project conveyor with progress-driven reveal |
+| 4 | `capability-matrix` | `free` | `steel` | `100vh` | asymmetric capability layout and craft depth |
+| 5 | `operations-spine` | `pinned` | `steel` | `240vh` | staged process spine with friction and scrub progression |
+| 6 | `narrative-bridge` | `free` | `warm` | `75vh` | narrative decompression into proof chapter |
+| 7 | `proof-theater` | `free` | `linen` | `120vh` | testimonial showcase (rectangular media + controlled nav) |
+| 8 | `conversion-chamber` | `free` | `dark` | `120vh` | qualified lead capture with success/error feedback |
+| 9 | `global-footer` | `free` | `deep` | `70vh` | 4-column utility + legal/support utility row + final CTA |
 
-## Motion + Tone Contract
+## Hero / Command Arrival
 
-- Runtime orchestration uses Lenis (`useLenisScroll`) + GSAP ScrollTrigger pinning in `signature-reel` and `operations-spine`.
-- Pinned sections use explicit pre/post friction buffers (`scene-friction-buffer`) to smooth entry and release.
-- Scene transitions run on container shells (`SceneWrapper`, `ScrollLockedSection`) with `MOTION_TOKEN_CONTRACT` easing/duration.
-- Transition status is explicit per scene via `data-transition-ready`.
-- Light-theme default is enforced across all tones using cinematic token surfaces:
-  - `surface #f6f7f9`, `surface-2 #ffffff`, `surface-3 #eef1f6`
-  - `ink #1c1c1c`, `ink-muted #5c6470`, `ink-subtle #8892a0`
-  - `accent #1a1a1a`, `accent-strong #0f0f0f`, `border rgba(28,28,28,0.12)`
-- Tone flow remains locked to:
-  `deep -> dark -> dark -> steel -> steel -> warm -> linen -> dark -> deep`.
+- Hero is full viewport (`100vh`) with edge-to-edge background video (`autoplay`, `muted`, `loop`, `playsInline`).
+- Left-aligned authority stack contains eyebrow, headline, subcopy, and primary CTA `See Signature Builds`.
+- Right column is a restrained accent stack (briefing + control notes) to preserve hierarchy.
+- Hero exit includes bottom fade plus scene transition hook to carry a smooth light-to-light handoff.
 
-## Ambient Layering & Hero Polish
+## Authority Ledger
 
-- Hero uses layered depth planes: `AmbientDepthField` + `HeroAmbientCanvas` + volumetric/ray/particle/vignette/DOF overlays.
-- Reel, operations, proof, ledger, matrix, and bridge scenes each include scene-specific ambient variants.
-- Ambient motion is reduced or disabled when `prefers-reduced-motion` is active.
+- Free-scroll chapter with metric band and capability cards.
+- Uses real media where available from scene media contract.
+- Includes `ScribbleButton` CTA to services/capabilities.
 
-## Project/Testimonial/Proof Integration
+## Signature Reel
 
-- Signature reel is populated from real case studies (`caseStudies.slice(0, 3)`), with desktop conveyor and mobile snap rail.
-- Testimonial rail is populated from real testimonial records (`testimonials.slice(0, 3)`), with rectangular media and keyed progression.
-- Prev/Next controls and index selectors use `ScribbleButton` and bounded active-index logic.
-- Client logo strip renders only when real logo assets are configured; otherwise it is omitted from output.
+- Pinned conveyor with exactly 3 real project panels (rectangular image + title + summary/outcome).
+- Scroll progress updates active project; desktop conveyor animates with progress offset.
+- Prev/Next controls use `ScribbleButton`.
+- Mobile rail uses `snap-x` and `scrollIntoView` to preserve deterministic selection.
 
-## Conversion & Lead Capture
+## Capability Matrix + Operations Spine
 
-- Conversion form fields: `Name`, `Email`, `Company`, `Phone`, `Budget Band`, `Event Type`, `Target Date Window`, `Project Scope`.
-- Required validation enforces `Name`, `Email`, `Company`, `Budget Band`, `Event Type`, and `Project Scope`.
-- Submission path:
-  - Live webhook when `VITE_LEAD_WEBHOOK_URL` is configured (`submitLead`).
-  - Timed stub acknowledgement when webhook is not configured.
-- Success and failure states are surfaced in an ARIA-live feedback panel with clear status handling.
+- Capability matrix remains free-scroll with asymmetric card composition.
+- Operations spine remains pinned with active-step logic, progress rail, and staged spring transitions.
+- Friction buffers remain in place before and after pinned chapters.
 
-## Responsive + Accessibility Notes
+## Narrative Bridge + Proof + Conversion
 
-- Signature reel mobile uses `snap-x` + `scrollIntoView` syncing and keyboard activation on cards.
-- Proof theater supports touch-swipe (`threshold 46px`) and keyboard arrow navigation.
-- All scene-level actions use `ScribbleButton` for consistent hover/focus/active behavior.
-- Reduced-motion mode disables animated drift/ambient loops and preserves layout integrity.
+- Narrative bridge copy is client-facing and transitions to proof without internal naming leaks.
+- Proof theater uses rectangular media, named clients/roles, quote rotation, arrow navigation, and animated progress bar.
+- Conversion chamber validates Name, Company, Budget, Event Type, Email; submits via webhook when configured or controlled stub when not.
 
-## Maintainer Notes
+## Global Footer
 
-- Scene media metadata is emitted in `SceneShell` (`data-media-type`, `data-media-key`, `data-media-refs`) from the foundation registry.
-- Foundation contract now uses `scene.media` (not scaffold placeholder naming).
-- To enable live lead capture in production, set:
-  - `VITE_LEAD_WEBHOOK_URL`
-  - optional `VITE_LEAD_WEBHOOK_KEY`
-- To display client logos in footer, map organization names to logo assets in `CLIENT_LOGO_ASSET_BY_ORGANIZATION`.
+- Four primary columns: Company, Services, Work, Contact.
+- Utility row includes legal/support links and a utility CTA.
+- Final high-intent CTA remains `Request Proposal`.
+
+## Motion + Interaction Contract
+
+- Lenis smooth scroll is active globally.
+- Pinned chapters run via ScrollTrigger scrub with momentum-aware progression.
+- Motion vocabulary mixes reveal lift, side reveal, mask reveal, spring timeline entries, and ambient parallax layers.
+- `ScribbleButton` is used for scene-level actions and chapter navigation controls.
+
+## Theme Contract (Default Light)
+
+- `surface #f6f7f9`
+- `surface-2 #ffffff`
+- `surface-3 #eef1f6`
+- `bg-main #ffffff`
+- `ink #1c1c1c`
+- `ink-muted #5c6470`
+- `ink-subtle #8892a0`
+- `accent #1a1a1a`
+- `border rgba(28, 28, 28, 0.12)`
+
+## Production Integrity Notes
+
+- SceneShell emits final runtime metadata (`data-scene-shell`, `data-media-*`, `data-scroll-mode`, `data-pin-behavior`).
+- No debug overlays or scaffold metadata are rendered in scene UI.
+- Scene order, pinned/free behavior, and tone flow remain aligned with foundation registry.

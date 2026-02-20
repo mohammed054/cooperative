@@ -1932,6 +1932,94 @@
   opacity: 0.72;
 }
 
+.scene-command-arrival-full .scene-shell {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.scene-command-arrival-full .scene-shell-body {
+  min-height: 100vh;
+}
+
+.scene-depth-stage-hero-full {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.scene-depth-stage-hero-full .scene-ambient-field {
+  inset: -8% -5%;
+  z-index: 2;
+}
+
+.hero-command-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.hero-command-soften-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background:
+    radial-gradient(58% 42% at 24% 32%, rgba(247, 250, 255, 0.42), rgba(247, 250, 255, 0) 74%),
+    linear-gradient(106deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.02) 48%, rgba(255, 255, 255, 0) 82%);
+  mix-blend-mode: screen;
+}
+
+.hero-command-bottom-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(74px, 16vh, 180px);
+  z-index: 7;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(246, 247, 249, 0.94) 72%, rgba(255, 255, 255, 1) 100%);
+}
+
+.hero-command-grid {
+  position: relative;
+  z-index: 10;
+  width: min(1240px, calc(100% - 2.5rem));
+  margin: 0 auto;
+  min-height: 100vh;
+  display: grid;
+  align-items: end;
+  gap: clamp(0.8rem, 2.4vw, 2rem);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  padding-top: clamp(6.4rem, 12vh, 9.6rem);
+  padding-bottom: clamp(2.7rem, 6vh, 4.8rem);
+}
+
+.hero-command-copy-card {
+  background: rgba(255, 255, 255, 0.84);
+  border-color: rgba(28, 28, 28, 0.12);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.hero-command-accent-stack {
+  display: grid;
+  gap: 0.75rem;
+  align-content: end;
+}
+
+.hero-command-accent-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(28, 28, 28, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
 .hero-media-shell {
   isolation: isolate;
 }
@@ -2144,6 +2232,12 @@
     border-color: rgba(28, 28, 28, 0.22);
     box-shadow: 0 12px 24px rgba(28, 28, 28, 0.08);
   }
+
+  .hero-command-copy-card:hover,
+  .hero-command-accent-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(16, 22, 33, 0.16);
+  }
 }
 
 @media (max-width: 900px) {
@@ -2158,6 +2252,31 @@
 
   .hero-light-ray-layer {
     opacity: 0.08;
+  }
+
+  .hero-command-grid {
+    width: min(1220px, calc(100% - 1.4rem));
+    grid-template-columns: 1fr;
+    align-items: end;
+    padding-top: clamp(5.7rem, 13vh, 8.2rem);
+    padding-bottom: clamp(2.2rem, 5vh, 3.2rem);
+  }
+
+  .hero-command-accent-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-command-copy-card {
+    max-width: 100%;
+  }
+
+  .hero-command-accent-card {
+    background: rgba(255, 255, 255, 0.86);
+  }
+
+  .footer-utility-row .grid {
+    grid-template-columns: 1fr;
+    justify-items: start;
   }
 }
 

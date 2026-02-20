@@ -615,11 +615,12 @@ export const CommandArrivalScene = ({ scene }) => {
   const foregroundY = useTransform(scrollYProgress, [0, 1], [16, -12])
   const rayY = useTransform(scrollYProgress, [0, 1], [0, -34])
   const particleY = useTransform(scrollYProgress, [0, 1], [16, -18])
+  const heroMediaSrc = Array.isArray(scene.media.ref) ? scene.media.ref[0] : scene.media.ref
 
   return (
-    <FreeSceneFrame scene={scene} pinBehavior="authority-prelude" layout="hero-command" className="scene-cinematic scene-command-arrival">
+    <FreeSceneFrame scene={scene} pinBehavior="authority-prelude" layout="hero-command" className="scene-cinematic scene-command-arrival scene-command-arrival-full">
       {({ reduced }) => (
-        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-hero">
+        <div ref={depthRef} className="scene-depth-stage scene-depth-stage-hero-full">
           <AmbientDepthField
             reduced={reduced}
             variant="hero"
@@ -629,9 +630,32 @@ export const CommandArrivalScene = ({ scene }) => {
             glowOpacity={0.58}
           />
 
-          <div className="relative z-[2] grid min-h-[clamp(620px,92vh,980px)] gap-5 lg:grid-cols-[1.04fr_0.96fr]">
+          <motion.video
+            className="hero-command-video"
+            src={heroMediaSrc}
+            preload="metadata"
+            muted={!audioCueArmed}
+            loop
+            playsInline
+            autoPlay
+            initial={reduced ? false : { opacity: 0.74, scale: 1.1 }}
+            style={reduced ? undefined : { y: backgroundY }}
+            animate={reduced ? undefined : { opacity: 1, scale: [1.02, 1.06, 1.02] }}
+            transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }}
+          />
+
+          <HeroAmbientCanvas />
+          <motion.div className="hero-volumetric-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.3, 0.44, 0.3] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8, ease: MASS_EASE, repeat: Infinity }} />
+          <motion.div className="hero-light-ray-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.18, 0.32, 0.18], x: [0, 20, 0] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.4, ease: AUTHORITY_EASE, repeat: Infinity }} />
+          <motion.div className="hero-particle-layer" style={reduced ? undefined : { y: particleY }} animate={reduced ? undefined : { opacity: [0.16, 0.24, 0.16] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.4, ease: RELEASE_EASE, repeat: Infinity }} />
+          <motion.div className="hero-vignette-layer" animate={reduced ? undefined : { opacity: [0.38, 0.46, 0.38] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }} />
+          <motion.div className="hero-dof-layer" animate={reduced ? undefined : { opacity: [0.22, 0.3, 0.22] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.1, ease: MASS_EASE, repeat: Infinity }} />
+          <div className="hero-command-soften-layer" />
+          <div className="hero-command-bottom-fade" />
+
+          <div className="hero-command-grid">
             <motion.div variants={sequence(0.04, MOTION_TOKEN_CONTRACT.stagger.line)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.28 }}>
-              <SceneCard className="relative h-full overflow-hidden p-7 md:p-10">
+              <SceneCard className="hero-command-copy-card relative overflow-hidden p-7 md:p-10">
                 <motion.p variants={revealLift(0.02, 10)} className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-ink-subtle)]">Executive Event Command</motion.p>
                 <motion.h1 variants={revealLift(0.06, 16)} className="mt-5 max-w-[16ch] font-serif text-[clamp(2.3rem,5.4vw,4.8rem)] leading-[0.98] tracking-[-0.03em] text-[var(--color-ink)]">
                   We command public moments where failure is visible and expensive.
@@ -640,14 +664,32 @@ export const CommandArrivalScene = ({ scene }) => {
                   Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.
                 </motion.p>
                 <motion.div variants={revealLift(0.17, 10)} className="mt-8 flex flex-wrap gap-3">
-                  <ScribbleButton title="Explore flagship event capability and portfolio" variant="primary" tone="light" size="md" to="/work" analyticsLabel="hero-signature-work">Explore Capabilities</ScribbleButton>
+                  <ScribbleButton title="Open flagship case reel and signature builds" variant="primary" tone="light" size="md" to="/work" analyticsLabel="hero-signature-work">See Signature Builds</ScribbleButton>
                   <ScribbleButton title="Open private project intake" variant="outline" tone="light" size="md" to="/contact" analyticsLabel="hero-private-brief">Request Proposal</ScribbleButton>
                 </motion.div>
                 <motion.p variants={revealLift(0.2, 8)} className="mt-3 text-xs text-[var(--color-ink-subtle)]">
                   Confidential intake channel. Response target: one business day.
                 </motion.p>
-                <motion.div variants={revealLift(0.23, 10)} className="mt-8 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">
-                  <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1">Optional Ambient Cue</span>
+              </SceneCard>
+            </motion.div>
+
+            <motion.aside variants={revealSide(0.08, 24)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }} className="hero-command-accent-stack">
+              <SceneCard className="hero-command-accent-card p-5">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Live Briefing</p>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-muted)]">Cross-disciplinary command line active across planning, technical production, and show control.</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {AUTHORITY_METRICS.slice(0, 3).map(metric => (
+                    <span key={metric.label} className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
+                      {metric.label}
+                    </span>
+                  ))}
+                </div>
+              </SceneCard>
+
+              <SceneCard className="hero-command-accent-card p-5">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Ambient Control</p>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-[10px] uppercase tracking-[0.13em] text-[var(--color-ink-subtle)]">Audio Cue</span>
                   <ScribbleButton
                     type="button"
                     onClick={() => setAudioCueArmed(value => !value)}
@@ -659,37 +701,9 @@ export const CommandArrivalScene = ({ scene }) => {
                   >
                     {audioCueArmed ? 'Audio Cue Active' : 'Activate Audio Cue'}
                   </ScribbleButton>
-                </motion.div>
-              </SceneCard>
-            </motion.div>
-
-            <motion.div variants={revealSide(0.08, 24)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.24 }}>
-              <SceneCard className="h-full p-3">
-                <div className="hero-media-shell relative min-h-[420px] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-                  <motion.video
-                    className="absolute inset-0 h-full w-full object-cover"
-                    src={Array.isArray(scene.media.ref) ? scene.media.ref[0] : scene.media.ref}
-                    preload="metadata"
-                    muted={!audioCueArmed}
-                    loop
-                    playsInline
-                    autoPlay
-                    initial={reduced ? false : { opacity: 0.76, scale: 1.14 }}
-                    style={{ scale: reduced ? 1.02 : 1.08 }}
-                    animate={reduced ? undefined : { opacity: 1, x: [0, -12, 0], y: [0, 9, 0], scale: [1.08, 1.105, 1.08] }}
-                    transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }}
-                  />
-                  <HeroAmbientCanvas />
-                  <motion.div className="hero-volumetric-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.28, 0.42, 0.28] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.8, ease: MASS_EASE, repeat: Infinity }} />
-                  <motion.div className="hero-light-ray-layer" style={reduced ? undefined : { y: rayY }} animate={reduced ? undefined : { opacity: [0.16, 0.3, 0.16], x: [0, 20, 0] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 3.4, ease: AUTHORITY_EASE, repeat: Infinity }} />
-                  <motion.div className="hero-particle-layer" style={reduced ? undefined : { y: particleY }} animate={reduced ? undefined : { opacity: [0.16, 0.24, 0.16] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.4, ease: RELEASE_EASE, repeat: Infinity }} />
-                  <motion.div className="hero-vignette-layer" animate={reduced ? undefined : { opacity: [0.38, 0.44, 0.38] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.6, ease: AUTHORITY_EASE, repeat: Infinity }} />
-                  <motion.div className="hero-dof-layer" animate={reduced ? undefined : { opacity: [0.22, 0.3, 0.22] }} transition={{ duration: MOTION_TOKEN_CONTRACT.durations.epic * 2.1, ease: MASS_EASE, repeat: Infinity }} />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,24,32,0.18)_0%,rgba(18,24,32,0.54)_100%)]" />
-                  <div className="absolute left-4 top-4 rounded-full border border-white/62 bg-white/76 px-3 py-1 text-[10px] uppercase tracking-[0.13em] text-[var(--color-ink)]">Command Floor Preview</div>
                 </div>
               </SceneCard>
-            </motion.div>
+            </motion.aside>
           </div>
         </div>
       )}
@@ -726,6 +740,11 @@ export const AuthorityLedgerScene = ({ scene }) => {
                       <p className="mt-2 font-serif text-[1.45rem] leading-none text-[var(--color-ink)]"><CountUpMetric value={metric.value} suffix={metric.suffix} reduced={reduced} /></p>
                     </motion.div>
                   ))}
+                </div>
+                <div className="mt-5">
+                  <ScribbleButton title="Open capability and delivery portfolio" variant="outline" tone="light" size="sm" to="/services" analyticsLabel="authority-ledger-capabilities">
+                    Explore Capabilities
+                  </ScribbleButton>
                 </div>
               </SceneCard>
             </motion.div>
@@ -1233,97 +1252,115 @@ export const ConversionChamberScene = ({ scene }) => (
 )
 
 // Global Footer: premium utility and contact closure.
-export const GlobalFooterScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="terminal-close" layout="global-footer" className="scene-cinematic scene-global-footer">
-    {({ reduced }) => (
-      <motion.div variants={sequence(0.05, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-4">
-        <SceneCard className="p-5 md:p-6">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Next Move</p>
-          <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.6rem,2.95vw,2.45rem)] leading-[1.08] text-[var(--color-ink)]">Precision-led production for moments where public failure is not an option.</h2>
-          <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">Regional reach across UAE, one accountable command structure, and execution discipline from scope to show close.</p>
-        </SceneCard>
+export const GlobalFooterScene = ({ scene }) => {
+  const currentYear = new Date().getFullYear()
 
-        {HAS_CLIENT_LOGOS ? (
+  return (
+    <FreeSceneFrame scene={scene} pinBehavior="terminal-close" layout="global-footer" className="scene-cinematic scene-global-footer">
+      {({ reduced }) => (
+        <motion.div variants={sequence(0.05, 0.08)} initial={reduced ? false : 'hidden'} whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-4">
           <SceneCard className="p-5 md:p-6">
-            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Logos</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              {CLIENT_PROOF_MARKS.map((mark, index) => (
-                <motion.article
-                  key={mark.id}
-                  initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, amount: 0.5 }}
-                  transition={{
-                    duration: MOTION_TOKEN_CONTRACT.durations.scene,
-                    ease: MASS_EASE,
-                    delay: reduced ? 0 : index * 0.05,
-                  }}
-                  whileHover={reduced ? undefined : { scale: 1.012 }}
-                  className="client-logo-panel rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4"
-                >
-                  <img src={mark.logo} alt={`${mark.name} logo`} loading="lazy" decoding="async" className="h-8 w-auto object-contain" />
-                </motion.article>
-              ))}
-            </div>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-ink-subtle)]">Next Move</p>
+            <h2 className="mt-3 max-w-[22ch] font-serif text-[clamp(1.6rem,2.95vw,2.45rem)] leading-[1.08] text-[var(--color-ink)]">Precision-led production for moments where public failure is not an option.</h2>
+            <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">Regional reach across UAE, one accountable command structure, and execution discipline from scope to show close.</p>
           </SceneCard>
-        ) : null}
 
-        <div className="grid gap-3 md:grid-cols-4">
-          <motion.div variants={revealLift(0.02, 10)}>
-            <SceneCard>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Company</p>
-              <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-                {FOOTER_COMPANY_LINKS.map(item => (
-                  <li key={item.to}>
-                    <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={item.to}>{item.label}</Link>
-                  </li>
+          {HAS_CLIENT_LOGOS ? (
+            <SceneCard className="p-5 md:p-6">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Logos</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                {CLIENT_PROOF_MARKS.map((mark, index) => (
+                  <motion.article
+                    key={mark.id}
+                    initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{
+                      duration: MOTION_TOKEN_CONTRACT.durations.scene,
+                      ease: MASS_EASE,
+                      delay: reduced ? 0 : index * 0.05,
+                    }}
+                    whileHover={reduced ? undefined : { scale: 1.012 }}
+                    className="client-logo-panel rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4"
+                  >
+                    <img src={mark.logo} alt={`${mark.name} logo`} loading="lazy" decoding="async" className="h-8 w-auto object-contain" />
+                  </motion.article>
                 ))}
-              </ul>
-            </SceneCard>
-          </motion.div>
-
-          <motion.div variants={revealLift(0.06, 10)}>
-            <SceneCard>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Services</p>
-              <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-                {services.slice(0, 4).map(service => (
-                  <li key={service.slug}>
-                    <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/services/${service.slug}`}>{service.title}</Link>
-                  </li>
-                ))}
-              </ul>
-            </SceneCard>
-          </motion.div>
-
-          <motion.div variants={revealLift(0.1, 10)}>
-            <SceneCard>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Case Work</p>
-              <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-                {caseStudies.map(study => (
-                  <li key={study.slug}>
-                    <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/work/${study.slug}`}>{study.title}</Link>
-                  </li>
-                ))}
-              </ul>
-            </SceneCard>
-          </motion.div>
-
-          <motion.div variants={revealLift(0.14, 10)}>
-            <SceneCard>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Direct Contact</p>
-              <div className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
-                <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="tel:+97142345678">+971 4 234 5678</a>
-                <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">hello@ghaimuae.com</a>
-                <p>Dubai Design District, UAE</p>
               </div>
             </SceneCard>
-          </motion.div>
-        </div>
+          ) : null}
 
-        <div className="pb-2">
-          <ScribbleButton title="Open contact and schedule executive consult" variant="primary" tone="light" size="md" analyticsLabel="footer-command-consult" to="/contact">Request Proposal</ScribbleButton>
-        </div>
-      </motion.div>
-    )}
-  </FreeSceneFrame>
-)
+          <div className="grid gap-3 md:grid-cols-4">
+            <motion.div variants={revealLift(0.02, 10)}>
+              <SceneCard>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Company</p>
+                <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+                  {FOOTER_COMPANY_LINKS.map(item => (
+                    <li key={item.to}>
+                      <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={item.to}>{item.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </SceneCard>
+            </motion.div>
+
+            <motion.div variants={revealLift(0.06, 10)}>
+              <SceneCard>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Services</p>
+                <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+                  {services.slice(0, 4).map(service => (
+                    <li key={service.slug}>
+                      <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/services/${service.slug}`}>{service.title}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </SceneCard>
+            </motion.div>
+
+            <motion.div variants={revealLift(0.1, 10)}>
+              <SceneCard>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Case Work</p>
+                <ul className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+                  {caseStudies.map(study => (
+                    <li key={study.slug}>
+                      <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to={`/work/${study.slug}`}>{study.title}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </SceneCard>
+            </motion.div>
+
+            <motion.div variants={revealLift(0.14, 10)}>
+              <SceneCard>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Direct Contact</p>
+                <div className="mt-3 space-y-2 text-sm text-[var(--color-ink-muted)]">
+                  <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="tel:+97142345678">+971 4 234 5678</a>
+                  <a className="footer-micro-link block transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">hello@ghaimuae.com</a>
+                  <p>Dubai Design District, UAE</p>
+                </div>
+              </SceneCard>
+            </motion.div>
+          </div>
+
+          <SceneCard className="footer-utility-row p-4 md:p-5">
+            <div className="grid gap-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+              <p className="text-xs text-[var(--color-ink-subtle)]">{currentYear} Ghaim UAE. All rights reserved.</p>
+              <div className="flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.11em] text-[var(--color-ink-subtle)]">
+                <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to="/privacy">Privacy</Link>
+                <Link className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" to="/terms">Terms</Link>
+                <a className="footer-micro-link transition-colors hover:text-[var(--color-ink)]" href="mailto:hello@ghaimuae.com">Support</a>
+              </div>
+              <ScribbleButton title="Open final proposal request flow" variant="micro" tone="light" size="sm" to="/contact" analyticsLabel="footer-utility-submit" showArrow={false}>
+                Submit Request
+              </ScribbleButton>
+            </div>
+          </SceneCard>
+
+          <div className="pb-2">
+            <ScribbleButton title="Open contact and schedule executive consult" variant="primary" tone="light" size="md" analyticsLabel="footer-command-consult" to="/contact">Request Proposal</ScribbleButton>
+          </div>
+        </motion.div>
+      )}
+    </FreeSceneFrame>
+  )
+}
