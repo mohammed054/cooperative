@@ -1,10 +1,11 @@
 import { MOTION_TOKEN_CONTRACT } from '../motion/motionTokenContract.js'
+import { assetUrl } from '../lib/assetUrl.js'
 
 /**
  * @typedef {'deep'|'dark'|'steel'|'warm'|'linen'} ToneKey
  * @typedef {'free'|'pinned'} SceneMode
  *
- * @typedef {Object} SceneMediaPlaceholder
+ * @typedef {Object} SceneMediaRef
  * @property {'video'|'image-sequence'|'media-collection'|'map-nodes'} type
  * @property {string} key
  * @property {string | string[]} ref
@@ -18,7 +19,7 @@ import { MOTION_TOKEN_CONTRACT } from '../motion/motionTokenContract.js'
  * @property {string} exitCue
  * @property {string | null} ctaSlot
  * @property {boolean} transitionReady
- * @property {SceneMediaPlaceholder} mediaPlaceholder
+ * @property {SceneMediaRef} media
  */
 
 export const TONE_STATE_MACHINE = Object.freeze({
@@ -51,7 +52,7 @@ export const SCENE_DEFINITION_SCHEMA = Object.freeze({
   exitCue: 'string',
   ctaSlot: 'string | null',
   transitionReady: 'boolean',
-  mediaPlaceholder: {
+  media: {
     type: "('video'|'image-sequence'|'media-collection'|'map-nodes')",
     key: 'string',
     ref: 'string | string[]',
@@ -67,7 +68,7 @@ export const SCENE_DEFINITION_TEMPLATE = Object.freeze({
   exitCue: 'scene-exit-cue',
   ctaSlot: null,
   transitionReady: false,
-  mediaPlaceholder: {
+  media: {
     type: 'video',
     key: 'media-key',
     ref: 'media-ref',
@@ -99,10 +100,10 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'hero-lock-release',
     ctaSlot: 'soft-primary',
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'video',
       key: 'hero-video',
-      ref: '/videos/background.mp4',
+      ref: assetUrl('videos/background.mp4'),
     },
   },
   // Free evidence ledger scan; dark tone, accelerated comprehension rhythm.
@@ -116,10 +117,10 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'ledger-handoff',
     ctaSlot: null,
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'media-collection',
       key: 'authority-ledger-media',
-      ref: ['authority-ledger-01', 'authority-ledger-02'],
+      ref: [assetUrl('images/event1.jpg'), assetUrl('images/full-production.png')],
     },
   },
   // Pinned horizontal reel progression; dark tone.
@@ -133,13 +134,13 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'reel-release-snap',
     ctaSlot: 'mid-journey',
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'image-sequence',
       key: 'project-reel-images',
       ref: [
-        'project-reel-01',
-        'project-reel-02',
-        'project-reel-03',
+        assetUrl('images/event1.jpg'),
+        assetUrl('images/event2.jpg'),
+        assetUrl('images/event3.jpg'),
       ],
     },
   },
@@ -154,10 +155,14 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'matrix-collapse',
     ctaSlot: null,
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'media-collection',
       key: 'capability-media',
-      ref: ['capability-01', 'capability-02', 'capability-03'],
+      ref: [
+        assetUrl('images/full-production.png'),
+        assetUrl('images/lighting-effects.png'),
+        assetUrl('images/av-setup.png'),
+      ],
     },
   },
   // Pinned operations sequence; steel tone with controlled friction depth.
@@ -171,10 +176,15 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'spine-release',
     ctaSlot: 'post-step-three',
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'media-collection',
       key: 'operations-spine-media',
-      ref: ['spine-01', 'spine-02', 'spine-03', 'spine-04'],
+      ref: [
+        assetUrl('images/process-bg.jpg'),
+        assetUrl('images/event-planning.png'),
+        assetUrl('images/event-planning-in-action.png'),
+        assetUrl('images/full-production.png'),
+      ],
     },
   },
   // Free narrative release handoff; warm tone reduces tension after pinned depth.
@@ -188,10 +198,10 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'bridge-soft-release',
     ctaSlot: null,
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'media-collection',
       key: 'narrative-bridge-media',
-      ref: ['bridge-ambient-01'],
+      ref: [assetUrl('images/country-bg.jpg')],
     },
   },
   // Free social proof theater; linen tone for trust readability.
@@ -205,13 +215,13 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'proof-logo-carry',
     ctaSlot: 'proof-reinforcement',
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'media-collection',
       key: 'testimonial-media',
       ref: [
-        'testimonial-media-01',
-        'testimonial-media-02',
-        'testimonial-media-03',
+        assetUrl('images/event1.jpg'),
+        assetUrl('images/event2.jpg'),
+        assetUrl('images/event3.jpg'),
       ],
     },
   },
@@ -226,10 +236,10 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'conversion-submit-release',
     ctaSlot: 'hard-conversion',
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'media-collection',
       key: 'conversion-media',
-      ref: ['conversion-panel-01'],
+      ref: [assetUrl('images/product-large.jpg')],
     },
   },
   // Free footer continuity scene; deep tone inheritance prevents white banding.
@@ -243,10 +253,10 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
     exitCue: 'footer-terminal',
     ctaSlot: 'utility',
     transitionReady: true,
-    mediaPlaceholder: {
+    media: {
       type: 'media-collection',
       key: 'footer-media',
-      ref: ['footer-brand-mark'],
+      ref: [assetUrl('images/logo.webp')],
     },
   },
 ])
@@ -319,6 +329,22 @@ export const validateHomepageFoundation = foundation => {
   if (!scenes.every(scene => typeof scene.transitionReady === 'boolean')) {
     issues.push("Every scene must declare a boolean 'transitionReady' flag.")
   }
+
+  scenes.forEach(scene => {
+    const media = scene.media
+    const hasValidMediaObject =
+      media &&
+      typeof media === 'object' &&
+      typeof media.type === 'string' &&
+      typeof media.key === 'string'
+    const hasValidMediaRef =
+      typeof media?.ref === 'string' ||
+      (Array.isArray(media?.ref) && media.ref.every(item => typeof item === 'string'))
+
+    if (!hasValidMediaObject || !hasValidMediaRef) {
+      issues.push(`Scene '${scene.id}' is missing a valid media reference contract.`)
+    }
+  })
 
   const pinnedIds = scenes.filter(scene => scene.mode === 'pinned').map(scene => scene.id)
   if (pinnedIds.length !== REQUIRED_PINNED_IDS.size) {

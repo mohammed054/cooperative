@@ -1348,14 +1348,6 @@
    Homepage Scene Container System
    ========================================================= */
 
-.flagship-home-skeleton {
-  background: var(--tone-deep);
-}
-
-.flagship-home-skeleton .flagship-scene-content {
-  padding-block: clamp(3rem, 8vw, 6rem);
-}
-
 .scene-friction-buffer {
   height: var(--scene-buffer-height, 10vh);
   min-height: 52px;
@@ -1378,249 +1370,8 @@
   gap: 1rem;
 }
 
-.scene-shell-meta {
-  border-radius: 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(9, 14, 22, 0.42);
-  padding: 0.75rem 0.9rem;
-}
-
-.flagship-scene-light .scene-shell-meta {
-  border-color: rgba(19, 27, 38, 0.22);
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.scene-shell-id {
-  margin: 0;
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 600;
-  opacity: 0.85;
-}
-
-.scene-shell-meta-grid {
-  margin: 0.55rem 0 0;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.55rem;
-}
-
-.scene-shell-meta-grid dt {
-  margin: 0;
-  font-size: 0.61rem;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  opacity: 0.62;
-}
-
-.scene-shell-meta-grid dd {
-  margin: 0.22rem 0 0;
-  font-size: 0.73rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: none;
-}
-
 .scene-shell-body {
   min-height: 0;
-}
-
-.scene-skeleton-grid {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.scene-skeleton-lane,
-.scene-skeleton-media,
-.scene-skeleton-map,
-.scene-skeleton-track,
-.scene-skeleton-spine {
-  border-radius: 1rem;
-  border: 1px dashed rgba(255, 255, 255, 0.26);
-  background: rgba(13, 19, 30, 0.52);
-}
-
-.flagship-scene-light .scene-skeleton-lane,
-.flagship-scene-light .scene-skeleton-media,
-.flagship-scene-light .scene-skeleton-map,
-.flagship-scene-light .scene-skeleton-track,
-.flagship-scene-light .scene-skeleton-spine {
-  border-color: rgba(19, 27, 38, 0.24);
-  background: rgba(255, 255, 255, 0.78);
-}
-
-.skeleton-hero-grid {
-  grid-template-columns: 1.08fr 0.92fr;
-  min-height: clamp(480px, 72vh, 760px);
-}
-
-.skeleton-hero-command-lane {
-  min-height: clamp(300px, 56vh, 640px);
-}
-
-.skeleton-hero-video {
-  min-height: clamp(300px, 56vh, 640px);
-}
-
-.skeleton-ledger-grid {
-  grid-template-columns: 1fr;
-}
-
-.skeleton-ledger-band {
-  min-height: clamp(90px, 12vh, 140px);
-}
-
-.skeleton-reel-grid {
-  min-height: clamp(380px, 66vh, 700px);
-}
-
-.scene-skeleton-track {
-  min-height: clamp(280px, 48vh, 500px);
-  padding: 0.85rem;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(220px, 24vw);
-  gap: 0.72rem;
-  overflow: hidden;
-}
-
-.skeleton-reel-frame {
-  min-height: 100%;
-}
-
-.skeleton-matrix-grid {
-  grid-template-columns: 1.2fr 0.8fr;
-  grid-template-rows: minmax(180px, 1fr) minmax(180px, 1fr);
-}
-
-.skeleton-matrix-tall {
-  grid-row: 1 / span 2;
-  min-height: clamp(380px, 58vh, 640px);
-}
-
-.skeleton-matrix-wide {
-  min-height: clamp(180px, 26vh, 320px);
-}
-
-.skeleton-spine-grid {
-  grid-template-columns: auto 1fr;
-  align-items: stretch;
-  min-height: clamp(420px, 70vh, 760px);
-}
-
-.scene-skeleton-spine {
-  width: 6px;
-  border-radius: 999px;
-}
-
-.skeleton-spine-step {
-  min-height: clamp(86px, 12vh, 132px);
-}
-
-.skeleton-bridge-grid {
-  place-items: center;
-  min-height: clamp(300px, 48vh, 500px);
-}
-
-.skeleton-bridge-line {
-  width: min(220px, 40vw);
-  min-height: 6px;
-  border-radius: 999px;
-}
-
-.skeleton-bridge-copy {
-  width: min(620px, 86vw);
-  min-height: clamp(120px, 18vh, 180px);
-}
-
-.skeleton-proof-grid {
-  grid-template-columns: 1.2fr 0.8fr;
-  grid-template-rows: repeat(2, minmax(140px, 1fr));
-  min-height: clamp(420px, 62vh, 680px);
-}
-
-.skeleton-proof-stage {
-  grid-row: 1 / span 2;
-  min-height: 100%;
-}
-
-.skeleton-proof-rail {
-  min-height: clamp(140px, 20vh, 240px);
-}
-
-.skeleton-network-grid {
-  grid-template-columns: 1.1fr 0.9fr;
-  grid-template-rows: repeat(3, minmax(120px, 1fr));
-  min-height: clamp(420px, 64vh, 720px);
-}
-
-.scene-skeleton-map {
-  position: relative;
-  grid-row: 1 / span 3;
-  min-height: 100%;
-}
-
-.scene-skeleton-node {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
-}
-
-.flagship-scene-light .scene-skeleton-node {
-  background: rgba(24, 31, 43, 0.84);
-  box-shadow: 0 0 0 3px rgba(24, 31, 43, 0.12);
-}
-
-.scene-skeleton-node:nth-child(1) {
-  left: 22%;
-  top: 26%;
-}
-
-.scene-skeleton-node:nth-child(2) {
-  left: 48%;
-  top: 34%;
-}
-
-.scene-skeleton-node:nth-child(3) {
-  left: 68%;
-  top: 46%;
-}
-
-.scene-skeleton-node:nth-child(4) {
-  left: 54%;
-  top: 64%;
-}
-
-.scene-skeleton-node:nth-child(5) {
-  left: 28%;
-  top: 74%;
-}
-
-.skeleton-network-metric {
-  min-height: clamp(120px, 16vh, 190px);
-}
-
-.skeleton-conversion-grid {
-  grid-template-columns: 1fr 1fr;
-  min-height: clamp(360px, 56vh, 620px);
-}
-
-.skeleton-conversion-brief,
-.skeleton-conversion-form {
-  min-height: 100%;
-}
-
-.skeleton-footer-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  min-height: clamp(220px, 36vh, 360px);
-}
-
-.skeleton-footer-column {
-  min-height: 100%;
 }
 
 @media (max-width: 1080px) {
@@ -1644,25 +1395,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .scene-shell-meta-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .skeleton-hero-grid,
-  .skeleton-proof-grid,
-  .skeleton-network-grid,
-  .skeleton-conversion-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .skeleton-proof-stage,
-  .scene-skeleton-map {
-    grid-row: auto;
-  }
-
-  .skeleton-footer-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 760px) {
@@ -1702,18 +1434,6 @@
     width: min(1200px, calc(100% - 1.4rem));
   }
 
-  .skeleton-spine-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .scene-skeleton-spine {
-    width: 100%;
-    min-height: 6px;
-  }
-
-  .skeleton-footer-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1730,8 +1450,7 @@
    ========================================================= */
 
 .flagship-home,
-.flagship-home-cinematic,
-.flagship-home-skeleton {
+.flagship-home-cinematic {
   --color-surface: #f6f7f9;
   --color-surface-2: #ffffff;
   --color-surface-3: #eef1f6;
@@ -1748,8 +1467,7 @@
   color: var(--color-ink);
 }
 
-.flagship-home-cinematic,
-.flagship-home-skeleton {
+.flagship-home-cinematic {
   position: relative;
   isolation: isolate;
 }
@@ -1830,7 +1548,7 @@
 }
 
 .flagship-home-cinematic::after,
-.flagship-home-skeleton::after {
+.flagship-home-cinematic::after {
   content: '';
   position: fixed;
   inset: 0;
@@ -1847,7 +1565,7 @@
 }
 
 .flagship-home-cinematic .flagship-scene,
-.flagship-home-skeleton .flagship-scene {
+.flagship-home-cinematic .flagship-scene {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -1855,7 +1573,7 @@
 }
 
 .flagship-home-cinematic .flagship-scene::before,
-.flagship-home-skeleton .flagship-scene::before {
+.flagship-home-cinematic .flagship-scene::before {
   content: '';
   position: absolute;
   inset: -12% -6%;
@@ -1870,7 +1588,7 @@
 }
 
 .flagship-home-cinematic .flagship-scene::after,
-.flagship-home-skeleton .flagship-scene::after {
+.flagship-home-cinematic .flagship-scene::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1882,7 +1600,7 @@
 }
 
 .flagship-home-cinematic .flagship-scene-content,
-.flagship-home-skeleton .flagship-scene-content {
+.flagship-home-cinematic .flagship-scene-content {
   position: relative;
   z-index: 2;
   padding-block: clamp(3.6rem, 9vw, 6.8rem);
@@ -1890,35 +1608,35 @@
 }
 
 .flagship-home-cinematic .flagship-scene-deep,
-.flagship-home-skeleton .flagship-scene-deep {
+.flagship-home-cinematic .flagship-scene-deep {
   --scene-mesh-a: rgba(120, 142, 170, 0.14);
   --scene-mesh-b: rgba(183, 196, 214, 0.2);
   --scene-bridge-fade: rgba(255, 255, 255, 0.24);
 }
 
 .flagship-home-cinematic .flagship-scene-dark,
-.flagship-home-skeleton .flagship-scene-dark {
+.flagship-home-cinematic .flagship-scene-dark {
   --scene-mesh-a: rgba(126, 146, 173, 0.14);
   --scene-mesh-b: rgba(192, 203, 219, 0.2);
   --scene-bridge-fade: rgba(255, 255, 255, 0.24);
 }
 
 .flagship-home-cinematic .flagship-scene-steel,
-.flagship-home-skeleton .flagship-scene-steel {
+.flagship-home-cinematic .flagship-scene-steel {
   --scene-mesh-a: rgba(145, 162, 186, 0.13);
   --scene-mesh-b: rgba(198, 208, 221, 0.2);
   --scene-bridge-fade: rgba(255, 255, 255, 0.24);
 }
 
 .flagship-home-cinematic .flagship-scene-warm,
-.flagship-home-skeleton .flagship-scene-warm {
+.flagship-home-cinematic .flagship-scene-warm {
   --scene-mesh-a: rgba(173, 157, 132, 0.15);
   --scene-mesh-b: rgba(211, 202, 187, 0.2);
   --scene-bridge-fade: rgba(255, 255, 255, 0.24);
 }
 
 .flagship-home-cinematic .flagship-scene-linen,
-.flagship-home-skeleton .flagship-scene-linen {
+.flagship-home-cinematic .flagship-scene-linen {
   --scene-mesh-a: rgba(138, 152, 176, 0.12);
   --scene-mesh-b: rgba(203, 213, 226, 0.2);
   --scene-bridge-fade: rgba(255, 255, 255, 0.24);
@@ -2488,42 +2206,9 @@
   }
 }
 
-.flagship-home-skeleton .scene-shell-meta {
-  border-color: var(--color-border);
-  background: var(--color-surface-2);
-  color: var(--color-ink);
-  box-shadow: 0 12px 26px rgba(28, 28, 28, 0.06);
-}
-
-.flagship-home-skeleton .scene-shell-meta-grid dt {
-  color: var(--color-ink-subtle);
-  opacity: 1;
-}
-
-.flagship-home-skeleton .scene-shell-meta-grid dd {
-  color: var(--color-ink);
-}
-
-.flagship-home-skeleton .scene-skeleton-lane,
-.flagship-home-skeleton .scene-skeleton-media,
-.flagship-home-skeleton .scene-skeleton-map,
-.flagship-home-skeleton .scene-skeleton-track,
-.flagship-home-skeleton .scene-skeleton-spine {
-  border-color: var(--color-border);
-  border-style: solid;
-  background: var(--color-surface-2);
-}
-
-.flagship-home-skeleton .scene-skeleton-node {
-  background: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .flagship-home-cinematic::after,
-  .flagship-home-cinematic .flagship-scene::before,
-  .flagship-home-skeleton::after,
-  .flagship-home-skeleton .flagship-scene::before {
+  .flagship-home-cinematic .flagship-scene::before {
     animation: none;
   }
 

@@ -17,6 +17,7 @@ import {
 import { MOTION_TOKEN_CONTRACT, parseBezier } from '../../motion/motionTokenContract.js'
 import { caseStudies, services, testimonials as testimonialData } from '../../data/siteData'
 import { assetUrl } from '../../lib/assetUrl'
+import { isLeadCaptureConfigured, submitLead } from '../../utils/leadCapture'
 
 const FREE = 'free'
 const PINNED = 'pinned'
@@ -101,17 +102,17 @@ const FOOTER_COMPANY_LINKS = [
   { to: '/faq', label: 'FAQ' },
 ]
 
-const CLIENT_LOGO_ASSET_BY_ORGANIZATION = Object.freeze({
-  // TODO(phase10-assets): Add approved client logo files when legal release is complete.
-})
+const CLIENT_LOGO_ASSET_BY_ORGANIZATION = Object.freeze({})
 
-const CLIENT_PROOF_MARKS = TESTIMONIALS.map(item => ({
-  id: `client-mark-${item.id}`,
-  name: item.organization,
-  role: item.role,
-  logo: CLIENT_LOGO_ASSET_BY_ORGANIZATION[item.organization] || null,
-}))
-const HAS_CLIENT_LOGOS = CLIENT_PROOF_MARKS.some(mark => Boolean(mark.logo))
+const CLIENT_PROOF_MARKS = TESTIMONIALS
+  .map(item => ({
+    id: `client-mark-${item.id}`,
+    name: item.organization,
+    role: item.role,
+    logo: CLIENT_LOGO_ASSET_BY_ORGANIZATION[item.organization] || null,
+  }))
+  .filter(mark => Boolean(mark.logo))
+const HAS_CLIENT_LOGOS = CLIENT_PROOF_MARKS.length > 0
 
 const parseMetricValue = raw => {
   const digits = String(raw || '').match(/\d+/g)
@@ -667,7 +668,7 @@ export const CommandArrivalScene = ({ scene }) => {
                 <div className="hero-media-shell relative min-h-[420px] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
                   <motion.video
                     className="absolute inset-0 h-full w-full object-cover"
-                    src={Array.isArray(scene.mediaPlaceholder.ref) ? scene.mediaPlaceholder.ref[0] : scene.mediaPlaceholder.ref}
+                    src={Array.isArray(scene.media.ref) ? scene.media.ref[0] : scene.media.ref}
                     preload="metadata"
                     muted={!audioCueArmed}
                     loop
@@ -1060,6 +1061,24 @@ const FloatingField = ({ id, label, children }) => (
   </label>
 )
 
+const HOMEPAGE_LEAD_FORM = 'homepage-command-brief'
+const STUB_API_DELAY_MS = 680
+
+const submitHomepageLead = async fields => {
+  if (isLeadCaptureConfigured()) {
+    await submitLead(fields, {
+      formName: HOMEPAGE_LEAD_FORM,
+      pagePath: window.location.pathname,
+      pageTitle: document.title,
+      sourceScene: 'conversion-chamber',
+    })
+    return { mode: 'live' }
+  }
+
+  await new Promise(resolve => window.setTimeout(resolve, STUB_API_DELAY_MS))
+  return { mode: 'stub' }
+}
+
 const ConversionChamberContent = ({ reduced }) => {
   const [status, setStatus] = useState('idle')
   const [feedbackMessage, setFeedbackMessage] = useState('')
@@ -1076,25 +1095,35 @@ const ConversionChamberContent = ({ reduced }) => {
     if (honeypotValue) return
 
     const name = String(formData.get('name') || '').trim()
+    const company = String(formData.get('company') || '').trim()
     const email = String(formData.get('email') || '').trim()
+    const budgetBand = String(formData.get('budget_band') || '').trim()
+    const eventType = String(formData.get('event_type') || '').trim()
 
-    if (!name || !email) {
+    if (!name || !company || !email || !budgetBand || !eventType) {
       setStatus('error')
-      setFeedbackMessage('Please provide your name and email before submitting.')
+      setFeedbackMessage('Please complete Name, Company, Budget Band, Event Type, and Email before submitting.')
       return
     }
 
     setStatus('submitting')
     setFeedbackMessage('')
 
-    await new Promise(resolve => window.setTimeout(resolve, 720))
-
-    // TODO(phase10-api): Replace local success simulation with backend submission when API endpoint is approved.
-    setStatus('success')
-    setFeedbackMessage(
-      'Request received. A senior producer will contact you within one business day.'
-    )
-    form.reset()
+    try {
+      await submitHomepageLead(Object.fromEntries(formData.entries()))
+      setStatus('success')
+      setFeedbackMessage(
+        'Request received. A senior producer will contact you within one business day.'
+      )
+      form.reset()
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Unable to submit request right now. Please retry in a moment.'
+      setStatus('error')
+      setFeedbackMessage(message)
+    }
   }
 
   return (
@@ -1131,7 +1160,7 @@ const ConversionChamberContent = ({ reduced }) => {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <FloatingField id="conversion-company" label="Company">
-            <input id="conversion-company" name="company" type="text" placeholder=" " autoComplete="organization" className="cinematic-field-input" />
+            <input id="conversion-company" name="company" type="text" placeholder=" " autoComplete="organization" required className="cinematic-field-input" />
           </FloatingField>
           <FloatingField id="conversion-phone" label="Phone">
             <input id="conversion-phone" name="phone" type="tel" placeholder=" " autoComplete="tel" className="cinematic-field-input" />
@@ -1196,7 +1225,7 @@ const ConversionChamberContent = ({ reduced }) => {
   )
 }
 
-// Conversion close: local-state intake simulation until backend endpoint is approved.
+// Conversion close: API-aware intake flow with stub fallback when no endpoint is configured.
 export const ConversionChamberScene = ({ scene }) => (
   <FreeSceneFrame scene={scene} pinBehavior="closing-ritual" layout="conversion-chamber" className="scene-cinematic scene-conversion-chamber">
     {({ reduced }) => <ConversionChamberContent reduced={reduced} />}
@@ -1214,11 +1243,11 @@ export const GlobalFooterScene = ({ scene }) => (
           <p className="mt-4 max-w-[62ch] text-sm text-[var(--color-ink-muted)]">Regional reach across UAE, one accountable command structure, and execution discipline from scope to show close.</p>
         </SceneCard>
 
-        <SceneCard className="p-5 md:p-6">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Logos</p>
-          {HAS_CLIENT_LOGOS ? (
+        {HAS_CLIENT_LOGOS ? (
+          <SceneCard className="p-5 md:p-6">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">Client Logos</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              {CLIENT_PROOF_MARKS.filter(mark => Boolean(mark.logo)).map((mark, index) => (
+              {CLIENT_PROOF_MARKS.map((mark, index) => (
                 <motion.article
                   key={mark.id}
                   initial={reduced ? false : { opacity: 0, y: 12, scale: 0.98 }}
@@ -1236,14 +1265,8 @@ export const GlobalFooterScene = ({ scene }) => (
                 </motion.article>
               ))}
             </div>
-          ) : (
-            <div className="mt-4 rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4">
-              <p className="text-sm text-[var(--color-ink-muted)]">
-                Client logo assets are pending legal release and will be added in the next publish cycle.
-              </p>
-            </div>
-          )}
-        </SceneCard>
+          </SceneCard>
+        ) : null}
 
         <div className="grid gap-3 md:grid-cols-4">
           <motion.div variants={revealLift(0.02, 10)}>

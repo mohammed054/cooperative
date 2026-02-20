@@ -17,7 +17,7 @@ import {
   OperationsSpineScene,
   ProofTheaterScene,
   SignatureReelScene,
-} from '../components/homepage/HomeSceneSkeletons'
+} from '../components/homepage/HomeScenes'
 
 const SCENE_COMPONENT_REGISTRY = Object.freeze({
   'command-arrival': CommandArrivalScene,
