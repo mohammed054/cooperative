@@ -670,71 +670,73 @@ export const CommandArrivalScene = ({ scene, nextSceneRef }) => {
         gsap.set(ctaNode, { opacity: 1 })
         gsap.set(nextSection, { y: window.innerHeight })
 
-        gsap
-          .timeline({
-            defaults: {
-              ease: 'power3.out',
-            },
-            scrollTrigger: {
-              trigger: heroSection,
-              start: 'top top',
-              end: '+=120%',
-              pin: true,
-              scrub: true,
-              anticipatePin: 1,
-            },
-          })
-          .to(
-            eyebrowNode,
-            {
-              opacity: 0,
-              y: -120,
-              duration: 0.6,
-            },
-            0
-          )
-          .to(
-            headlineNode,
-            {
-              opacity: 0,
-              y: -120,
-              duration: 0.6,
-            },
-            0
-          )
-          .to(
-            subtextNode,
-            {
-              opacity: 0,
-              duration: 0.6,
-            },
-            0
-          )
-          .to(
-            ctaNode,
-            {
-              opacity: 0,
-              duration: 0.6,
-            },
-            0
-          )
-          .to(
-            video,
-            {
-              scale: 1.08,
-              filter: 'brightness(0.7)',
-              duration: 0.6,
-            },
-            0
-          )
-          .to(
-            nextSection,
-            {
-              y: 0,
-              duration: 0.7,
-            },
-            0.3
-          )
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: heroSection,
+            start: 'top top',
+            end: '+=100%',
+            pin: true,
+            scrub: true,
+            anticipatePin: 1,
+          },
+        })
+
+        tl.to(
+          eyebrowNode,
+          {
+            opacity: 0,
+            y: -120,
+            duration: 0.4,
+            ease: 'power3.out',
+          },
+          0
+        )
+        tl.to(
+          headlineNode,
+          {
+            opacity: 0,
+            y: -120,
+            duration: 0.4,
+            ease: 'power3.out',
+          },
+          0
+        )
+        tl.to(
+          subtextNode,
+          {
+            opacity: 0,
+            duration: 0.4,
+            ease: 'power3.out',
+          },
+          0
+        )
+        tl.to(
+          ctaNode,
+          {
+            opacity: 0,
+            duration: 0.4,
+            ease: 'power3.out',
+          },
+          0
+        )
+        tl.to(
+          video,
+          {
+            scale: 1.08,
+            duration: 0.4,
+            ease: 'power3.out',
+          },
+          0
+        )
+        tl.to(
+          nextSection,
+          {
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+          },
+          0.3
+        )
       }, heroSection)
     })
 
