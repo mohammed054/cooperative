@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { useReducedMotion } from 'framer-motion'
 
@@ -21,14 +21,8 @@ const HeroAmbientCanvas = () => {
   const canvasRef = useRef(null)
   const shouldReduceMotion = useReducedMotion()
 
-  const canRender = useMemo(() => {
-    if (shouldReduceMotion) return false
-    if (typeof window === 'undefined') return false
-    return isWebGLAvailable()
-  }, [shouldReduceMotion])
-
   useEffect(() => {
-    if (!canRender || !canvasRef.current) {
+    if (shouldReduceMotion || !isWebGLAvailable() || !canvasRef.current) {
       return undefined
     }
 
@@ -117,6 +111,8 @@ const HeroAmbientCanvas = () => {
 
     window.addEventListener('resize', resize)
 
+    canvas.style.opacity = '0.38'
+
     return () => {
       window.removeEventListener('resize', resize)
       window.cancelAnimationFrame(animationFrameId)
@@ -134,16 +130,13 @@ const HeroAmbientCanvas = () => {
       renderer.dispose()
       renderer.forceContextLoss()
     }
-  }, [canRender])
-
-  if (!canRender) {
-    return null
-  }
+  }, [shouldReduceMotion])
 
   return (
     <canvas
       ref={canvasRef}
       className="flagship-ambient-canvas"
+      style={{ opacity: 0 }}
       aria-hidden="true"
     />
   )
