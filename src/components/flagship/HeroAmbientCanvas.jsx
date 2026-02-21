@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useReducedMotion } from 'framer-motion'
 
 const PARTICLE_COUNT = 360
 
 function isWebGLAvailable() {
+  if (typeof window === 'undefined') return false
   try {
     const testCanvas = document.createElement('canvas')
     return !!(
@@ -20,9 +21,19 @@ function isWebGLAvailable() {
 const HeroAmbientCanvas = () => {
   const canvasRef = useRef(null)
   const shouldReduceMotion = useReducedMotion()
+  const [canRender, setCanRender] = useState(false)
 
   useEffect(() => {
-    if (shouldReduceMotion || !isWebGLAvailable() || !canvasRef.current) {
+    const check = () => {
+      const available = !shouldReduceMotion && isWebGLAvailable()
+      setCanRender(available)
+    }
+    const id = requestAnimationFrame(check)
+    return () => cancelAnimationFrame(id)
+  }, [shouldReduceMotion])
+
+  useEffect(() => {
+    if (!canRender || !canvasRef.current) {
       return undefined
     }
 
@@ -111,8 +122,6 @@ const HeroAmbientCanvas = () => {
 
     window.addEventListener('resize', resize)
 
-    canvas.style.opacity = '0.38'
-
     return () => {
       window.removeEventListener('resize', resize)
       window.cancelAnimationFrame(animationFrameId)
@@ -130,13 +139,16 @@ const HeroAmbientCanvas = () => {
       renderer.dispose()
       renderer.forceContextLoss()
     }
-  }, [shouldReduceMotion])
+  }, [canRender])
+
+  if (!canRender) {
+    return null
+  }
 
   return (
     <canvas
       ref={canvasRef}
       className="flagship-ambient-canvas"
-      style={{ opacity: 0 }}
       aria-hidden="true"
     />
   )
