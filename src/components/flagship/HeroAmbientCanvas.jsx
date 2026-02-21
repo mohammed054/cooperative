@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useReducedMotion } from 'framer-motion'
 
@@ -20,12 +20,11 @@ function isWebGLAvailable() {
 const HeroAmbientCanvas = () => {
   const canvasRef = useRef(null)
   const shouldReduceMotion = useReducedMotion()
-  const [canRender, setCanRender] = useState(false)
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setCanRender(!shouldReduceMotion && isWebGLAvailable())
-    }
+  const canRender = useMemo(() => {
+    if (shouldReduceMotion) return false
+    if (typeof window === 'undefined') return false
+    return isWebGLAvailable()
   }, [shouldReduceMotion])
 
   useEffect(() => {
