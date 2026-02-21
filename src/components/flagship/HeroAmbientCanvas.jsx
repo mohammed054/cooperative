@@ -1,15 +1,35 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useReducedMotion } from 'framer-motion'
 
 const PARTICLE_COUNT = 360
 
+function isWebGLAvailable() {
+  try {
+    const testCanvas = document.createElement('canvas')
+    return !!(
+      window.WebGLRenderingContext &&
+      (testCanvas.getContext('webgl') ||
+        testCanvas.getContext('experimental-webgl'))
+    )
+  } catch {
+    return false
+  }
+}
+
 const HeroAmbientCanvas = () => {
   const canvasRef = useRef(null)
   const shouldReduceMotion = useReducedMotion()
+  const [canRender, setCanRender] = useState(false)
 
   useEffect(() => {
-    if (shouldReduceMotion || !canvasRef.current) {
+    if (typeof window !== 'undefined') {
+      setCanRender(!shouldReduceMotion && isWebGLAvailable())
+    }
+  }, [shouldReduceMotion])
+
+  useEffect(() => {
+    if (!canRender || !canvasRef.current) {
       return undefined
     }
 
@@ -115,7 +135,11 @@ const HeroAmbientCanvas = () => {
       renderer.dispose()
       renderer.forceContextLoss()
     }
-  }, [shouldReduceMotion])
+  }, [canRender])
+
+  if (!canRender) {
+    return null
+  }
 
   return (
     <canvas
