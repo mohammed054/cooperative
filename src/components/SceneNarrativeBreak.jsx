@@ -13,6 +13,12 @@ const NARRATIVE_LINE =
 const REVEAL_START = 0.17
 const REVEAL_END = 0.61
 
+/*
+ * PART 5 FIX: Removed inline backgroundColor from the sticky motion.div.
+ * Background ownership now belongs to the section's CSS class (flagship-scene-dark).
+ * The subtle animated tone shift (#161a22 → #0e1118) was cosmetic — static dark
+ * background achieves the same visual intent without inline style injection.
+ */
 const SceneNarrativeBreak = () => {
   const shouldReduceMotion = useReducedMotion()
   const sectionRef = useRef(null)
@@ -26,8 +32,6 @@ const SceneNarrativeBreak = () => {
     offset: ['start start', 'end end'],
   })
 
-  // Gradually cools the backdrop to move emotional tone deeper into the narrative arc.
-  const backgroundTone = useTransform(scrollYProgress, [0, 1], ['#161a22', '#0e1118'])
   // Raises the copy panel slightly to stage the reveal as a directed moment.
   const panelY = useTransform(scrollYProgress, [0.78, 1], ['0vh', '-11vh'])
   // Soft fade envelope keeps the copy readable through the reveal cycle.
@@ -54,9 +58,12 @@ const SceneNarrativeBreak = () => {
     <section
       ref={sectionRef}
       aria-label="Narrative break"
-      className="relative h-[300vh] overflow-clip"
+      /* PART 5 FIX: Background owned by flagship-scene-dark CSS class, not inline style */
+      className="flagship-scene-dark relative h-[300vh] overflow-clip"
     >
-      <motion.div style={{ backgroundColor: backgroundTone }} className="sticky top-0 h-screen">
+      {/* PART 4 FIX: Sticky container has no background, no transform on wrapper.
+          Background is inherited from the section's flagship-scene-dark class above. */}
+      <div className="sticky top-0 h-screen">
         <div className="cinematic-grain-overlay pointer-events-none absolute inset-0 opacity-[0.08]" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(66%_44%_at_50%_22%,rgba(255,255,255,0.1),rgba(255,255,255,0)_74%),radial-gradient(50%_38%_at_18%_70%,rgba(214,183,135,0.2),rgba(214,183,135,0)_76%)]" />
 
@@ -84,7 +91,7 @@ const SceneNarrativeBreak = () => {
             </p>
           </div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   )
 }

@@ -24,11 +24,11 @@ import { assetUrl } from '../lib/assetUrl.js'
 
 export const TONE_STATE_MACHINE = Object.freeze({
   tokens: Object.freeze({
-    deep: '#F6F7F9',
-    dark: '#FFFFFF',
-    steel: '#EEF1F6',
-    warm: '#F8F6F2',
-    linen: '#FFFFFF',
+    deep: '#0d1622',    // deep navy — darkest scene (hero, footer)
+    dark: '#111926',    // dark navy — authority, reel, conversion
+    steel: '#EEF1F6',   // cool light blue-gray — capabilities, operations
+    warm: '#F8F6F2',    // warm cream — narrative bridge
+    linen: '#FAF8F4',   // warm ivory — testimonials (distinct from steel)
   }),
   flow: Object.freeze([
     'deep',
@@ -267,6 +267,22 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
 ])
 
 export const HOMEPAGE_GRADIENT_BRIDGES = Object.freeze([
+  // ── NEW: hero deep → authority dark (both dark; subtle seam prevention) ──
+  {
+    id: 'bridge-hero-to-authority',
+    fromSceneId: 'command-arrival',
+    toSceneId: 'authority-ledger',
+    fromTone: 'deep',
+    toTone: 'dark',
+  },
+  // ── NEW: authority dark → signature-reel dark (same tone; removes micro-seam) ──
+  {
+    id: 'bridge-authority-to-reel',
+    fromSceneId: 'authority-ledger',
+    toSceneId: 'signature-reel',
+    fromTone: 'dark',
+    toTone: 'dark',
+  },
   {
     id: 'bridge-dark-to-steel',
     fromSceneId: 'signature-reel',
@@ -316,7 +332,7 @@ export const HOMEPAGE_FOUNDATION = Object.freeze({
 const VALID_MODES = new Set(['free', 'pinned'])
 const REQUIRED_PINNED_IDS = new Set(['signature-reel', 'operations-spine'])
 const EXPECTED_SCENE_COUNT = 9
-const MAX_BRIDGE_COUNT = 5
+const MAX_BRIDGE_COUNT = 7
 
 export const validateHomepageFoundation = foundation => {
   const issues = []

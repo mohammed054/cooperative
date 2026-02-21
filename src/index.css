@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600&display=swap');
+@import './cinematicPhase2.css';
 
 /* Font loading optimization */
 @font-face {
@@ -24,6 +25,7 @@
 :root {
   --font-heading: 'Fraunces', serif;
   --font-body: 'Manrope', system-ui, sans-serif;
+  /* --tone-deep is the neutral page background — light neutral, not pure white */
   --tone-deep: #f6f7f9;
   --space-1: 8px;
   --space-2: 16px;
@@ -114,19 +116,20 @@
 @layer base {
   html {
     overflow-x: hidden;
+    /* STABILIZATION: Light neutral background — no pure white, no dark flash */
     background-color: var(--tone-deep);
   }
 
   body {
     margin: 0;
     min-width: 320px;
+    /* STABILIZATION: body inherits the same light neutral — zero dark snapback */
     background-color: var(--tone-deep);
     color: var(--color-ink);
     font-family: var(--font-body);
     letter-spacing: -0.01em;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    /* overflow-x: hidden moved to html - putting it on body breaks sticky positioning */
   }
 
   :focus-visible {
@@ -150,6 +153,7 @@
 
   #root {
     min-height: 100%;
+    /* STABILIZATION: root is light, no dark override */
     background-color: var(--tone-deep);
   }
 }
@@ -215,7 +219,6 @@
 .cinematic-shell {
   position: relative;
   isolation: isolate;
-  /* overflow: hidden removed - it breaks sticky positioning in child sections */
 }
 
 .cinematic-grain-overlay {
@@ -285,9 +288,10 @@
   z-index: 1;
 }
 
+/* STABILIZATION: Removed negative margin overlap that caused 10-20px color seam artifacts */
 .cinematic-scene + .cinematic-scene {
-  margin-top: -14px;
-  padding-top: 14px;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .scene-rhythm-hero {
@@ -447,11 +451,6 @@
 }
 
 @media (min-width: 640px) {
-  .cinematic-scene + .cinematic-scene {
-    margin-top: -22px;
-    padding-top: 22px;
-  }
-
   .scene-rhythm-hero {
     padding-top: 1.4rem;
     padding-bottom: 2.9rem;
@@ -484,43 +483,6 @@
 
   .scene-bridge::before {
     height: 162px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .cinematic-scene + .cinematic-scene {
-    margin-top: -34px;
-    padding-top: 34px;
-  }
-
-  .scene-rhythm-hero {
-    padding-top: 1.8rem;
-    padding-bottom: 3.4rem;
-  }
-
-  .scene-rhythm-dense {
-    padding-top: 3.5rem;
-    padding-bottom: 4.2rem;
-  }
-
-  .scene-rhythm-medium {
-    padding-top: 4.6rem;
-    padding-bottom: 5.3rem;
-  }
-
-  .scene-rhythm-airy {
-    padding-top: 6rem;
-    padding-bottom: 6.7rem;
-  }
-
-  .scene-rhythm-anchor {
-    padding-top: 7rem;
-    padding-bottom: 7.8rem;
-  }
-
-  .scene-rhythm-quiet {
-    padding-top: 4rem;
-    padding-bottom: 5.4rem;
   }
 }
 
@@ -664,7 +626,6 @@
    Card Baseline
    ================================================ */
 
-  /* Keep cards restrained and avoid expensive shadows by default. */
   .card {
     box-shadow: none;
     border: 1px solid var(--color-border);
@@ -718,10 +679,17 @@
   }
 }
 
+/* STABILIZATION: flagship-home wrapper is TRANSPARENT — never imposes its own background.
+   Each section is the sole owner of its background color. */
 .flagship-home {
   position: relative;
   isolation: isolate;
-  background: var(--tone-deep);
+}
+
+.flagship-home-cinematic {
+  position: relative;
+  isolation: isolate;
+  /* STABILIZATION: No background here. Sections own their backgrounds. */
 }
 
 .flagship-shell {
@@ -742,6 +710,11 @@
   padding-block: clamp(2.8rem, 6vw, 5.5rem);
 }
 
+/* =========================================================
+   Scene Tone Backgrounds — section-owned, never inherited
+   Each tone sets its own background. No wrapper leaks.
+   ========================================================= */
+
 .flagship-scene-light {
   color: #161b24;
   background:
@@ -753,28 +726,65 @@
     linear-gradient(180deg, #f7f2ea 0%, #efe9df 100%);
 }
 
+/* STABILIZATION: dark/deep/steel/warm/linen are the true section backgrounds.
+   Inside flagship-home-cinematic these are overridden below to their intended tones. */
+
 .flagship-scene-dark {
-  color: #ffffff;
+  color: var(--color-ink);
   background:
     radial-gradient(
-      52% 42% at 16% 14%,
-      rgba(112, 130, 162, 0.18),
-      rgba(112, 130, 162, 0) 74%
+      46% 34% at 18% 8%,
+      rgba(134, 153, 181, 0.16),
+      rgba(134, 153, 181, 0) 74%
     ),
-    linear-gradient(180deg, #0d121c 0%, #111926 52%, #152033 100%);
+    linear-gradient(180deg, #ffffff 0%, #f8f9fb 50%, #f0f3f8 100%);
 }
 
 .flagship-scene-deep {
-  color: #ffffff;
+  color: var(--color-ink);
   background:
     radial-gradient(
-      48% 38% at 84% 8%,
-      rgba(237, 197, 145, 0.2),
-      rgba(237, 197, 145, 0) 74%
+      44% 34% at 86% 10%,
+      rgba(141, 161, 190, 0.16),
+      rgba(141, 161, 190, 0) 72%
     ),
-    linear-gradient(180deg, #0b1017 0%, #0d1622 54%, #101d2d 100%);
+    linear-gradient(180deg, #ffffff 0%, #f6f7f9 52%, #eef1f6 100%);
 }
 
+.flagship-scene-steel {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      42% 34% at 82% 12%,
+      rgba(139, 159, 185, 0.14),
+      rgba(139, 159, 185, 0) 74%
+    ),
+    linear-gradient(180deg, #fcfdff 0%, #f4f6fa 48%, #eef1f6 100%);
+}
+
+.flagship-scene-warm {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      40% 30% at 20% 10%,
+      rgba(180, 164, 145, 0.16),
+      rgba(180, 164, 145, 0) 74%
+    ),
+    linear-gradient(180deg, #ffffff 0%, #f9f8f5 48%, #f4f1eb 100%);
+}
+
+.flagship-scene-linen {
+  color: var(--color-ink);
+  background:
+    radial-gradient(
+      36% 30% at 80% 10%,
+      rgba(181, 148, 100, 0.13),
+      rgba(181, 148, 100, 0) 72%
+    ),
+    linear-gradient(180deg, #faf8f4 0%, #f5f1eb 48%, #ede8df 100%);
+}
+
+/* STABILIZATION: gradient bridges between sections */
 .flagship-gradient-bridge {
   position: relative;
   height: var(--bridge-height, 20vh);
@@ -1347,27 +1357,13 @@
    Homepage Scene Container System
    ========================================================= */
 
+/* STABILIZATION: scene-friction-buffer — transparent with no white gradients.
+   The original gradients created visible white bands between sections. */
 .scene-friction-buffer {
-  height: var(--scene-buffer-height, 3vh);
-  min-height: 12px;
+  height: var(--scene-buffer-height, 0);
+  min-height: 0;
   background: transparent;
   pointer-events: none;
-}
-
-.flagship-home-cinematic .scene-friction-buffer[data-buffer-position='pre'] {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(246, 247, 249, 0.42) 100%
-  );
-}
-
-.flagship-home-cinematic .scene-friction-buffer[data-buffer-position='post'] {
-  background: linear-gradient(
-    180deg,
-    rgba(246, 247, 249, 0.42) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
 }
 
 .scene-shell {
@@ -1452,6 +1448,8 @@
 
 /* =========================================================
    Flagship Cinematic Theme System
+   STABILIZATION: CSS variable overrides only — no background.
+   Dark/deep scenes set their own dark backgrounds below.
    ========================================================= */
 
 .flagship-home,
@@ -1468,218 +1466,112 @@
   --color-accent-strong: #0f0f0f;
   --color-accent-soft: rgba(26, 26, 26, 0.12);
   --color-border: rgba(28, 28, 28, 0.12);
-  background: var(--color-bg-main);
+  /* STABILIZATION: No background declaration here — wrapper is transparent */
   color: var(--color-ink);
 }
 
-.flagship-home-cinematic {
-  position: relative;
-  isolation: isolate;
-}
+/* ── Cinematic scene mesh animations — disabled for stabilization ── */
+/* STABILIZATION: Scene ::before and ::after pseudo-elements removed.
+   They caused:
+   - White bars via scene-bridge-fade gradient at top of light scenes
+   - Dark bottom-fade adding micro-seams between sections
+   - mesh drift animation running across all scenes simultaneously
+   - overflow:hidden clipping sections
+   All of these created the 10-20px color leaks described in the brief. */
 
-.flagship-scene-deep {
-  --color-ink: #1c1c1c;
-  --color-ink-muted: #5c6470;
-  --color-ink-subtle: #8892a0;
-  --color-surface: #f6f7f9;
-  --color-surface-2: #ffffff;
-  --color-surface-3: #eef1f6;
-  --color-border: rgba(28, 28, 28, 0.12);
-  --color-accent: #1a1a1a;
-  --color-accent-soft: rgba(26, 26, 26, 0.12);
-  background:
-    radial-gradient(
-      44% 34% at 86% 10%,
-      rgba(141, 161, 190, 0.16),
-      rgba(141, 161, 190, 0) 72%
-    ),
-    linear-gradient(180deg, #ffffff 0%, #f6f7f9 52%, #eef1f6 100%);
-}
-
-.flagship-scene-dark {
-  --color-ink: #1c1c1c;
-  --color-ink-muted: #5c6470;
-  --color-ink-subtle: #8892a0;
-  --color-surface: #f6f7f9;
-  --color-surface-2: #ffffff;
-  --color-surface-3: #eef1f6;
-  --color-border: rgba(28, 28, 28, 0.12);
-  --color-accent: #1a1a1a;
-  --color-accent-soft: rgba(26, 26, 26, 0.12);
-  background:
-    radial-gradient(
-      46% 34% at 18% 8%,
-      rgba(134, 153, 181, 0.16),
-      rgba(134, 153, 181, 0) 74%
-    ),
-    linear-gradient(180deg, #ffffff 0%, #f8f9fb 50%, #f0f3f8 100%);
-}
-
-.flagship-scene-steel {
-  --color-ink: #1c1c1c;
-  --color-ink-muted: #5c6470;
-  --color-ink-subtle: #8892a0;
-  --color-surface: #f6f7f9;
-  --color-surface-2: #ffffff;
-  --color-surface-3: #eef1f6;
-  --color-border: rgba(28, 28, 28, 0.12);
-  --color-accent: #1a1a1a;
-  --color-accent-soft: rgba(26, 26, 26, 0.12);
-  background:
-    radial-gradient(
-      42% 34% at 82% 12%,
-      rgba(139, 159, 185, 0.14),
-      rgba(139, 159, 185, 0) 74%
-    ),
-    linear-gradient(180deg, #fcfdff 0%, #f4f6fa 48%, #eef1f6 100%);
-}
-
-.flagship-scene-warm {
-  --color-ink: #1c1c1c;
-  --color-ink-muted: #5c6470;
-  --color-ink-subtle: #8892a0;
-  --color-surface: #f6f7f9;
-  --color-surface-2: #ffffff;
-  --color-surface-3: #eef1f6;
-  --color-border: rgba(28, 28, 28, 0.12);
-  --color-accent: #1a1a1a;
-  --color-accent-soft: rgba(26, 26, 26, 0.12);
-  background:
-    radial-gradient(
-      40% 30% at 20% 10%,
-      rgba(180, 164, 145, 0.16),
-      rgba(180, 164, 145, 0) 74%
-    ),
-    linear-gradient(180deg, #ffffff 0%, #f9f8f5 48%, #f4f1eb 100%);
-}
-
-.flagship-scene-linen {
-  --color-ink: #1c1c1c;
-  --color-ink-muted: #5c6470;
-  --color-ink-subtle: #8892a0;
-  --color-surface: #f6f7f9;
-  --color-surface-2: #ffffff;
-  --color-surface-3: #eef1f6;
-  --color-border: rgba(28, 28, 28, 0.12);
-  --color-accent: #1a1a1a;
-  --color-accent-soft: rgba(26, 26, 26, 0.12);
-  background:
-    radial-gradient(
-      36% 30% at 80% 10%,
-      rgba(134, 149, 172, 0.14),
-      rgba(134, 149, 172, 0) 72%
-    ),
-    linear-gradient(180deg, #ffffff 0%, #f6f7f9 48%, #eef1f6 100%);
-}
-
-.flagship-home-cinematic::after,
-.flagship-home-cinematic::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.045;
-  background-image:
-    radial-gradient(
-      circle at 22% 24%,
-      rgba(255, 255, 255, 0.6) 0.8px,
-      transparent 1px
-    ),
-    radial-gradient(
-      circle at 72% 60%,
-      rgba(20, 20, 20, 0.3) 0.7px,
-      transparent 1px
-    );
-  background-size:
-    4px 4px,
-    3px 3px;
-}
-
-.flagship-home-cinematic .flagship-scene,
 .flagship-home-cinematic .flagship-scene {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
-  transition: background 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  /* STABILIZATION: No overflow:hidden (caused hard background clips between sections) */
+  /* STABILIZATION: No background transition (caused color flash during scroll) */
 }
 
-.flagship-home-cinematic .flagship-scene::before,
-.flagship-home-cinematic .flagship-scene::before {
-  content: '';
-  position: absolute;
-  inset: -12% -6%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.46;
-  background:
-    radial-gradient(42% 32% at 14% 22%, var(--scene-mesh-a), transparent 76%),
-    radial-gradient(36% 26% at 84% 70%, var(--scene-mesh-b), transparent 78%);
-  transform: translate3d(0, 0, 0);
-  animation: cinematic-scene-drift 18s ease-in-out infinite;
-}
-
-.flagship-home-cinematic .flagship-scene::after,
-.flagship-home-cinematic .flagship-scene::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    linear-gradient(
-      180deg,
-      var(--scene-bridge-fade) 0%,
-      rgba(255, 255, 255, 0) 22%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0) 78%,
-      rgba(28, 28, 28, 0.05) 100%
-    );
-}
-
-.flagship-home-cinematic .flagship-scene-content,
+/* STABILIZATION: scene-content is transparent — background belongs to the section */
 .flagship-home-cinematic .flagship-scene-content {
   position: relative;
   z-index: 2;
-  padding-block: clamp(2.4rem, 5vw, 4.8rem);
+  padding-block: clamp(5.5rem, 10vw, 9rem);
   background: transparent;
 }
 
-.flagship-home-cinematic .flagship-scene-deep,
+/* ── Dark scene tone overrides inside flagship-home-cinematic ── */
+/* These restore the TRUE dark backgrounds that are intentional. */
+
 .flagship-home-cinematic .flagship-scene-deep {
-  --scene-mesh-a: rgba(120, 142, 170, 0.14);
-  --scene-mesh-b: rgba(183, 196, 214, 0.2);
-  --scene-bridge-fade: rgba(255, 255, 255, 0.24);
+  --color-ink: #eef2f7;
+  --color-ink-muted: rgba(210, 222, 238, 0.72);
+  --color-ink-subtle: rgba(185, 200, 220, 0.50);
+  --color-surface: rgba(255, 255, 255, 0.06);
+  --color-surface-2: rgba(255, 255, 255, 0.09);
+  --color-surface-3: rgba(255, 255, 255, 0.04);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-accent: rgba(220, 235, 255, 0.9);
+  --color-accent-soft: rgba(255, 255, 255, 0.08);
+  --lux-ink: #eef2f7;
+  --lux-ink-muted: rgba(220, 230, 245, 0.62);
+  --lux-ink-subtle: rgba(200, 215, 235, 0.42);
+  background:
+    radial-gradient(
+      48% 38% at 84% 8%,
+      rgba(181, 146, 79, 0.14),
+      rgba(181, 146, 79, 0) 74%
+    ),
+    linear-gradient(180deg, #0b1017 0%, #0d1622 52%, #101d2d 100%);
 }
 
-.flagship-home-cinematic .flagship-scene-dark,
 .flagship-home-cinematic .flagship-scene-dark {
-  --scene-mesh-a: rgba(126, 146, 173, 0.14);
-  --scene-mesh-b: rgba(192, 203, 219, 0.2);
-  --scene-bridge-fade: rgba(255, 255, 255, 0.24);
+  --color-ink: #eef2f7;
+  --color-ink-muted: rgba(210, 222, 238, 0.72);
+  --color-ink-subtle: rgba(185, 200, 220, 0.50);
+  --color-surface: rgba(255, 255, 255, 0.06);
+  --color-surface-2: rgba(255, 255, 255, 0.09);
+  --color-surface-3: rgba(255, 255, 255, 0.04);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-accent: rgba(220, 235, 255, 0.9);
+  --color-accent-soft: rgba(255, 255, 255, 0.08);
+  --lux-ink: #eef2f7;
+  --lux-ink-muted: rgba(220, 230, 245, 0.62);
+  --lux-ink-subtle: rgba(200, 215, 235, 0.42);
+  background:
+    radial-gradient(
+      46% 34% at 18% 8%,
+      rgba(80, 110, 165, 0.18),
+      rgba(80, 110, 165, 0) 74%
+    ),
+    linear-gradient(180deg, #111926 0%, #0e1620 52%, #0c1420 100%);
 }
 
-.flagship-home-cinematic .flagship-scene-steel,
+/* Light scene overrides: subtle mesh only, no background override needed */
 .flagship-home-cinematic .flagship-scene-steel {
   --scene-mesh-a: rgba(145, 162, 186, 0.13);
   --scene-mesh-b: rgba(198, 208, 221, 0.2);
-  --scene-bridge-fade: rgba(255, 255, 255, 0.24);
 }
 
-.flagship-home-cinematic .flagship-scene-warm,
 .flagship-home-cinematic .flagship-scene-warm {
   --scene-mesh-a: rgba(173, 157, 132, 0.15);
   --scene-mesh-b: rgba(211, 202, 187, 0.2);
-  --scene-bridge-fade: rgba(255, 255, 255, 0.24);
 }
 
-.flagship-home-cinematic .flagship-scene-linen,
 .flagship-home-cinematic .flagship-scene-linen {
   --scene-mesh-a: rgba(138, 152, 176, 0.12);
   --scene-mesh-b: rgba(203, 213, 226, 0.2);
-  --scene-bridge-fade: rgba(255, 255, 255, 0.24);
+}
+
+/* ── Light surface color context reset for use inside dark sections ── */
+.lux-light-surface {
+  --color-ink: #1c1c1c;
+  --color-ink-muted: #5c6470;
+  --color-ink-subtle: #8892a0;
+  --color-surface: #f6f7f9;
+  --color-surface-2: #ffffff;
+  --color-surface-3: #eef1f6;
+  --color-border: rgba(28, 28, 28, 0.12);
+  --color-accent: #1a1a1a;
+  --color-accent-soft: rgba(26, 26, 26, 0.12);
+  --lux-ink: #100f0d;
+  --lux-ink-muted: rgba(16, 15, 13, 0.52);
+  --lux-ink-subtle: rgba(16, 15, 13, 0.34);
+  color: var(--color-ink);
 }
 
 .cinematic-scene-card,
@@ -1864,69 +1756,12 @@
   will-change: opacity, transform;
 }
 
-.flagship-scene[data-transition-ready='false'] .scene-transition-shell {
-  /* Pending chapter-level transition choreography: keep subtle baseline fade/slide only. */
-  transform-origin: center top;
-}
-
-.scene-transition-hook {
-  position: relative;
-  height: 0;
-  pointer-events: none;
-  z-index: 4;
-}
-
-.scene-transition-hook::before {
-  content: '';
-  display: block;
-  height: clamp(48px, 6vw, 92px);
-  margin-top: calc(clamp(48px, 6vw, 92px) * -1);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(246, 247, 249, 0.92) 48%,
-    rgba(255, 255, 255, 0.98) 100%
-  );
-  opacity: 0.9;
-  transition:
-    opacity var(--cine-transition-dramatic),
-    filter var(--cine-transition-dramatic);
-}
-
-.scene-transition-hook[data-transition-ready='true']::before {
-  opacity: 1;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(246, 247, 249, 0.84) 42%,
-    rgba(255, 255, 255, 0.98) 100%
-  );
-}
-
-.scene-transition-hook[data-transition-ready='false']::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -1px;
-  width: min(180px, 34vw);
-  height: 1px;
-  transform: translateX(-50%);
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(136, 146, 160, 0.5) 0 6px,
-    rgba(136, 146, 160, 0) 6px 12px
-  );
-  opacity: 0.6;
-}
-
-.scene-transition-hook[data-transition-ready='false']::before {
-  animation: scene-transition-breathe 4.6s ease-in-out infinite;
-}
-
-/* Homepage: remove hanging transition bands between scenes. */
-.flagship-home-cinematic .scene-transition-hook::before,
-.flagship-home-cinematic .scene-transition-hook::after {
-  display: none;
+/* STABILIZATION: scene-transition-hook overlays removed — they created white gradient
+   bars between sections. The homepage explicitly disables them already; this makes
+   it apply globally so no other page layout accidentally inherits the white band. */
+.scene-transition-hook::before,
+.scene-transition-hook::after {
+  display: none !important;
   animation: none !important;
 }
 
@@ -2003,25 +1838,19 @@
 }
 
 .homepage-tone-bridge-linen-dark::before {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(247, 248, 251, 0.88) 52%,
-      rgba(243, 246, 250, 0.98) 100%
-    ),
-    radial-gradient(
-      64% 82% at 78% 18%,
-      rgba(148, 166, 192, 0.2),
-      rgba(148, 166, 192, 0) 74%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(250, 248, 244, 0) 0%,
+    rgba(17, 25, 38, 0.62) 58%,
+    rgba(14, 22, 32, 0.96) 100%
+  );
 }
 
 .homepage-tone-bridge-linen-dark::after {
   background: radial-gradient(
     68% 72% at 20% 44%,
-    rgba(152, 171, 198, 0.3),
-    rgba(152, 171, 198, 0) 72%
+    rgba(60, 90, 145, 0.14),
+    rgba(60, 90, 145, 0) 72%
   );
 }
 
@@ -2042,7 +1871,6 @@
   );
 }
 
-/* warm (beige) → linen (cool gray) */
 .homepage-tone-bridge-warm-linen::before {
   background:
     linear-gradient(
@@ -2066,27 +1894,51 @@
   );
 }
 
-/* dark (cool white) → deep (cool gray) */
 .homepage-tone-bridge-dark-deep::before {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(240, 243, 248, 0) 0%,
-      rgba(242, 244, 248, 0.82) 52%,
-      rgba(238, 241, 246, 0.98) 100%
-    ),
-    radial-gradient(
-      60% 78% at 78% 20%,
-      rgba(141, 161, 190, 0.18),
-      rgba(141, 161, 190, 0) 74%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(14, 22, 32, 0) 0%,
+    rgba(11, 16, 23, 0.88) 100%
+  );
 }
 
 .homepage-tone-bridge-dark-deep::after {
   background: radial-gradient(
-    66% 70% at 24% 44%,
-    rgba(152, 168, 196, 0.24),
-    rgba(152, 168, 196, 0) 72%
+    66% 70% at 50% 44%,
+    rgba(181, 146, 79, 0.08),
+    rgba(181, 146, 79, 0) 72%
+  );
+}
+
+.homepage-tone-bridge-deep-dark::before {
+  background: linear-gradient(
+    180deg,
+    rgba(11, 16, 23, 0) 0%,
+    rgba(14, 22, 32, 0.7) 100%
+  );
+}
+
+.homepage-tone-bridge-deep-dark::after {
+  background: radial-gradient(
+    60% 70% at 50% 44%,
+    rgba(60, 90, 145, 0.10),
+    rgba(60, 90, 145, 0) 72%
+  );
+}
+
+.homepage-tone-bridge-dark-dark::before {
+  background: linear-gradient(
+    180deg,
+    rgba(14, 22, 32, 0) 0%,
+    rgba(12, 18, 28, 0.45) 100%
+  );
+}
+
+.homepage-tone-bridge-dark-dark::after {
+  background: radial-gradient(
+    60% 70% at 50% 44%,
+    rgba(60, 90, 145, 0.07),
+    rgba(60, 90, 145, 0) 72%
   );
 }
 
@@ -2317,22 +2169,6 @@
   margin: 0;
 }
 
-.flagship-home-cinematic .scene-command-arrival-full.flagship-scene::after {
-  background: none;
-}
-
-/* Keep the homepage hero truly full-bleed without chapter overlap cutting into it. */
-.flagship-home-cinematic .scene-cinematic + .scene-cinematic {
-  margin-top: 0;
-  padding-top: 0;
-}
-
-/* Remove transition hook glow under the first hero so no light band appears at the fold. */
-.scene-transition-hook[data-scene-id='command-arrival']::before,
-.scene-transition-hook[data-scene-id='command-arrival']::after {
-  display: none;
-}
-
 .scene-depth-stage-hero-full {
   position: relative;
   width: 100%;
@@ -2347,15 +2183,11 @@
   z-index: 2;
 }
 
+/* STABILIZATION: hero-authority-transition-stage simplified.
+   Dark fallback matches hero video — prevents white flash before video loads */
 .hero-authority-transition-stage {
   isolation: isolate;
-  background:
-    radial-gradient(
-      46% 34% at 18% 8%,
-      rgba(134, 153, 181, 0.16),
-      rgba(134, 153, 181, 0) 74%
-    ),
-    linear-gradient(180deg, #ffffff 0%, #f8f9fb 50%, #f0f3f8 100%);
+  background: #0c1420;
 }
 
 .hero-authority-hero-stage {
@@ -2376,8 +2208,12 @@
   z-index: 0;
 }
 
+/* STABILIZATION: hero-command-overlay is z-index 20 with pointer-events: auto.
+   Buttons inside are always on top and clickable. */
 .hero-command-overlay {
   pointer-events: auto;
+  position: relative;
+  z-index: 20;
 }
 
 .hero-command-soften-layer {
@@ -2628,6 +2464,7 @@
   top: 0.42rem;
   transform: translateY(0);
   font-size: 0.52rem;
+  color: var(--color-ink);
 }
 
 .cinematic-field-input:focus {
@@ -2768,16 +2605,14 @@
   }
 }
 
-@keyframes cinematic-scene-drift {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(-1.8%, 1.2%, 0) scale(1.04);
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
+/* STABILIZATION: Remove CTA pointer-events block during embedded pin.
+   With pinning disabled, CTAs are always interactive. */
+.hero-authority-next-stage .authority-ledger-cta {
+  pointer-events: auto;
+}
+
+[data-pin-released='true'] .authority-ledger-cta {
+  pointer-events: auto;
 }
 
 @keyframes cinematic-bridge-drift {
@@ -2792,21 +2627,6 @@
   }
 }
 
-@keyframes scene-transition-breathe {
-  0% {
-    opacity: 0.84;
-    filter: saturate(0.94);
-  }
-  50% {
-    opacity: 1;
-    filter: saturate(1.02);
-  }
-  100% {
-    opacity: 0.84;
-    filter: saturate(0.94);
-  }
-}
-
 @keyframes cinematic-check-draw {
   to {
     stroke-dashoffset: 0;
@@ -2814,7 +2634,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .flagship-home-cinematic::after,
   .flagship-home-cinematic .flagship-scene::before {
     animation: none;
   }
@@ -2826,7 +2645,6 @@
   .hero-vignette-layer,
   .hero-dof-layer,
   .homepage-tone-bridge::after,
-  .scene-transition-hook[data-transition-ready='false']::before,
   .cinematic-success-mark path {
     animation: none !important;
     transform: none !important;
@@ -3276,28 +3094,6 @@
   }
 }
 
-/* Disable CTA while embedded inside the pinned GSAP transition */
-.hero-authority-next-stage .authority-ledger-cta {
-  pointer-events: none;
-}
-/*
-  FIX 6: Re-enable CTA using a data attribute set in CommandArrivalScene's
-  onLeave GSAP callback (transitionWrapper.dataset.pinReleased = 'true').
-
-  The previous rule used [style*='height: auto'] to detect when GSAP had
-  released the pin — this was extremely fragile because:
-  - It matched GSAP's specific inline style string output
-  - Any GSAP version update that writes 'height: initial' or adds whitespace
-    would silently break the re-enable
-  - Browsers that normalise inline styles would never match
-
-  The data attribute approach is explicit, readable, and stable across
-  library versions and browser style normalisation.
-*/
-[data-pin-released='true'] .authority-ledger-cta {
-  pointer-events: auto;
-}
-
 /* ==========================================================================
    LUXURY SYSTEM — Gold accent, scale expansion, editorial breathing room
    ========================================================================== */
@@ -3320,10 +3116,7 @@
   --lux-white-16:     rgba(250, 247, 242, 0.16);
 }
 
-/* More generous breathing room for all homepage scenes */
-.flagship-home-cinematic .flagship-scene-content {
-  padding-block: clamp(5.5rem, 10vw, 9rem);
-}
+/* ── lux-light-surface already defined above ── */
 
 /* ── Gold hairline ──────────────────────────────── */
 .lux-rule {
@@ -3585,6 +3378,8 @@
   border: none;
   cursor: pointer;
   transition: background 0.24s ease, transform 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .lux-cta-dark:hover {
@@ -3608,6 +3403,8 @@
   border: 1px solid rgba(16, 15, 13, 0.28);
   cursor: pointer;
   transition: border-color 0.24s ease, transform 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .lux-cta-dark-outline:hover {

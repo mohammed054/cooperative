@@ -114,6 +114,23 @@ const AnimatedRoutes = () => {
   )
 }
 
+// MobileCtaDock is hidden on these paths — no bottom padding needed there
+const DOCK_HIDDEN_PATHS = new Set(['/', '/contact', '/privacy', '/terms'])
+
+const MainPadding = ({ children }) => {
+  const location = useLocation()
+  const hasDock = !DOCK_HIDDEN_PATHS.has(location.pathname)
+  return (
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className={hasDock ? 'pb-24 md:pb-0' : ''}
+    >
+      {children}
+    </main>
+  )
+}
+
 const FooterGate = () => {
   const location = useLocation()
 
@@ -206,10 +223,9 @@ function App() {
             })
           }
         >
-          <main id="main-content" tabIndex={-1} className="pb-24 md:pb-0">
+          <MainPadding>
             <AnimatedRoutes />
-          </main>
-        </AppErrorBoundary>
+          </MainPadding>        </AppErrorBoundary>
         <FooterGate />
         <MobileCtaDock />
       </AnalyticsProvider>

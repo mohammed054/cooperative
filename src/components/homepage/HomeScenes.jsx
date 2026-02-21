@@ -1,7 +1,17 @@
 /**
- * HomeScenes.jsx
+ * HomeScenes.jsx — Phase 2 Cinematic Choreography
  *
- * Fixes applied:
+ * Phase 2 additions on top of Phase 1 fixes:
+ * - PHASE2-A: Hero subtitle gains blur-to-focus entrance (6px→0) for cinematic depth
+ * - PHASE2-B: Hero CTA div gets whileHover scale(1→1.04) with easeOutCubic
+ * - PHASE2-C: revealLift enhanced with optional scale 0.98→1 for section headers
+ * - PHASE2-D: NarrativeBridgeScene text uses blur-to-focus (6px→0) on whileInView
+ * - PHASE2-E: ProofTheaterScene adds scale 0.96→1 pop-in to testimonial container
+ * - PHASE2-F: GlobalFooterScene CTA buttons get pulse class + scale hover
+ * - PHASE2-G: SignatureReelContent header row animated with fade+scale entrance
+ * - PHASE2-H: CapabilityMatrixScene header enhanced with 0.98→1 scale
+ * - PHASE2-I: AmbientDepthField hero variant enhanced with warm tint glow
+
  * - FIX 1: Testimonial slide direction tracked via ref (prev/next) instead of
  *          index parity — direction is now correct for both forward and backward nav
  * - FIX 2: CARD_WIDTH measured at runtime via ResizeObserver instead of hardcoded
@@ -144,14 +154,47 @@ const AUTHORITY_METRICS = [
 const buildHeight = vh => `${vh}vh`
 const clampIndex = (value, max) => Math.max(0, Math.min(max, value))
 
+// PHASE2-C: revealLift now also scales 0.98→1 for cinematic entries
 const revealLift = (delay = 0, distance = 16) => ({
-  hidden: { opacity: 0, y: distance },
+  hidden: { opacity: 0, y: distance, scale: 0.98 },
   visible: {
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: {
       duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.08,
       ease: AUTHORITY_EASE,
+      delay,
+    },
+  },
+})
+
+// PHASE2-C: revealBlur — blur-to-focus entrance for narrative/bridge text
+const revealBlur = (delay = 0, blurPx = 6, distance = 24) => ({
+  hidden: { opacity: 0, y: distance, filter: `blur(${blurPx}px)`, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    scale: 1,
+    transition: {
+      duration: MOTION_TOKEN_CONTRACT.durations.cinematic,
+      ease: AUTHORITY_EASE,
+      delay,
+    },
+  },
+})
+
+// PHASE2-E: revealPop — scale pop-in for testimonials / cards
+const revealPop = (delay = 0) => ({
+  hidden: { opacity: 0, scale: 0.94, y: 18 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.12,
+      ease: RELEASE_EASE,
       delay,
     },
   },
@@ -496,6 +539,11 @@ const SignatureReelContent = () => {
   const hasNext = selectedIndex < PROJECTS.length - 1
   const backgroundY = useTransform(progress, v => reduced ? 0 : (0.5 - v) * 28)
 
+  // PHASE2-G: Cinematic header entrance driven by scroll progress
+  const headerOpacity = useTransform(progress, [0, 0.08], [0, 1])
+  const headerScale = useTransform(progress, [0, 0.1], [0.97, 1])
+  const headerY = useTransform(progress, [0, 0.1], [12, 0])
+
   useEffect(() => () => { if (scrollFrameRef.current) window.cancelAnimationFrame(scrollFrameRef.current) }, [])
 
   const selectProject = index => {
@@ -531,18 +579,23 @@ const SignatureReelContent = () => {
   return (
     <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%' }}>
       {/* ── Header row ── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        borderBottom: '1px solid rgba(16,15,13,0.1)',
-        paddingBottom: '1.4rem',
-      }}>
+      <motion.div
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          borderBottom: '1px solid rgba(16,15,13,0.1)',
+          paddingBottom: '1.4rem',
+          opacity: headerOpacity,
+          scale: headerScale,
+          y: headerY,
+        }}
+      >
         <p className="lux-eyebrow-muted">Featured Engagements</p>
         <p style={{ fontFamily: 'var(--font-heading)', fontSize: '0.88rem', color: 'var(--lux-ink-subtle)', letterSpacing: '0.04em' }}>
           <span style={{ color: 'var(--lux-gold)' }}>{String(selectedIndex + 1).padStart(2, '0')}</span>
           {' / '}
           {String(PROJECTS.length).padStart(2, '0')}
         </p>
-      </div>
+      </motion.div>
 
       {/* ── Body ── */}
       <div style={{ display: 'grid', minHeight: 0, padding: 'clamp(2.2rem, 4.5vh, 3.8rem) 0' }}
@@ -710,16 +763,24 @@ const SignatureReelContent = () => {
 }
 
 
+/**
+ * CommandArrivalScene — STABILIZATION MODE
+ *
+ * The complex GSAP scroll-pinned transition between hero and authority-ledger
+ * is temporarily disabled. Both sections render as natural stacked flow.
+ *
+ * Original behaviour (restored in choreography pass):
+ * - Hero pins at top while authority ledger slides in over 300vh scroll track
+ * - Text fades out, next section fades in scrubbed to scroll position
+ *
+ * Current behaviour:
+ * - Hero section renders full-height with video background and CTA
+ * - Authority ledger renders immediately below as a normal free section
+ * - All buttons are clickable — no z-index or pointer-events conflicts
+ * - No background flashing, no dark snap-back
+ */
 export const CommandArrivalScene = ({ scene, nextScene }) => {
-  const transitionWrapperRef = useRef(null)
-  const heroRef = useRef(null)
-  const nextRef = useRef(null)
-  const depthRef = useRef(null)
   const videoRef = useRef(null)
-  const eyebrowRef = useRef(null)
-  const headlineRef = useRef(null)
-  const subtextRef = useRef(null)
-  const ctaRef = useRef(null)
   const reducedMotion = useReducedMotion()
   const mediaRef = scene?.videoSrc || scene?.media?.ref
   const heroMediaSrc = Array.isArray(mediaRef) ? mediaRef[0] : mediaRef
@@ -731,377 +792,110 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
     'Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.'
   const ctaText = scene?.ctaText || 'See Signature Builds'
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger)
-
-    const transitionWrapper = transitionWrapperRef.current
-    const heroSection = heroRef.current
-    const nextSection = nextRef.current
-    const video = videoRef.current
-    const eyebrowNode = eyebrowRef.current
-    const headlineNode = headlineRef.current
-    const subtextNode = subtextRef.current
-    const ctaNode = ctaRef.current
-
-    if (
-      !transitionWrapper ||
-      !heroSection ||
-      !nextSection ||
-      !video ||
-      !eyebrowNode ||
-      !headlineNode ||
-      !subtextNode ||
-      !ctaNode
-    ) {
-      return undefined
-    }
-
-    const ledgerHeadingNode = nextSection.querySelector(
-      '.authority-ledger-heading'
-    )
-    const ledgerSubcopyNode = nextSection.querySelector(
-      '.authority-ledger-subcopy'
-    )
-    const ledgerCtaNode = nextSection.querySelector('.authority-ledger-cta')
-    const ledgerCardNodes = Array.from(
-      nextSection.querySelectorAll('.authority-ledger-card')
-    )
-    const ledgerTextNodes = [ledgerHeadingNode, ledgerSubcopyNode].filter(
-      Boolean
-    )
-
-    // Use ScrollTrigger.matchMedia() for responsive pinning.
-    // - Mobile (< 768px): Disables pinning, shows static hero without scroll transitions
-    // - Desktop (>= 768px): Enables full scroll-driven animation with pinning
-    const context = gsap.context(() => {
-      // NOTE: All position/layout gsap.set calls are inside matchMedia blocks
-      // so mobile and desktop get correct values. Only safe neutral values here.
-      gsap.set(video, { scale: 1, transformOrigin: 'center center' })
-      gsap.set(eyebrowNode, { opacity: 1, y: 0 })
-      gsap.set(headlineNode, { opacity: 1, y: 0 })
-      gsap.set(subtextNode, { opacity: 1 })
-      gsap.set(ctaNode, { opacity: 1 })
-
-      ScrollTrigger.matchMedia({
-        // ── Mobile: disable pinning, show sections stacked as normal flow ───────
-        [`(max-width: ${MOBILE_BREAKPOINT - 1}px)`]: function mobileSetup() {
-          // On mobile: undo the absolute positioning set outside matchMedia so
-          // both hero and authority ledger render as stacked flow elements.
-          gsap.set(transitionWrapper, {
-            position: 'relative',
-            height: 'auto',
-            overflow: 'visible',
-          })
-          gsap.set(heroSection, {
-            position: 'relative',
-            top: 'auto',
-            left: 'auto',
-            width: '100%',
-            height: '100svh',
-            opacity: 1,
-          })
-          gsap.set(nextSection, {
-            position: 'relative',
-            top: 'auto',
-            left: 'auto',
-            width: '100%',
-            height: 'auto',
-            y: '0%',
-            opacity: 1,
-            overflow: 'visible',
-          })
-          gsap.set(ledgerTextNodes, { opacity: 1, y: 0 })
-          gsap.set(ledgerCardNodes, { opacity: 1, y: 0 })
-          if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 1, y: 0 })
-
-          return () => {
-            gsap.set(
-              [transitionWrapper, heroSection, nextSection, ...ledgerTextNodes, ...ledgerCardNodes],
-              { clearProps: 'all' }
-            )
-            if (ledgerCtaNode) gsap.set(ledgerCtaNode, { clearProps: 'all' })
-          }
-        },
-
-        // ── Desktop: enable pinning and scroll-driven animations ─────────────────
-        [`(min-width: ${MOBILE_BREAKPOINT}px)`]: function desktopSetup() {
-          // Desktop: set up the overlapping stack animation
-          gsap.set(transitionWrapper, {
-            position: 'relative',
-            height: '100vh',
-            overflow: 'hidden',
-            zIndex: 10,
-          })
-          gsap.set(heroSection, {
-            position: 'absolute',
-            top: 0, left: 0,
-            width: '100%', height: '100%',
-            opacity: 1, zIndex: 3,
-          })
-          gsap.set(nextSection, {
-            position: 'absolute',
-            top: 0, left: 0,
-            width: '100%', height: '100%',
-            y: '50%', opacity: 0, zIndex: 2, overflow: 'hidden',
-          })
-          gsap.set(ledgerTextNodes, { opacity: 0, y: 36 })
-          gsap.set(ledgerCardNodes, { opacity: 0, y: 56 })
-          if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 0, y: 42 })
-
-          const timeline = gsap.timeline({
-            scrollTrigger: {
-              trigger: transitionWrapper,
-              start: 'top top',
-              end: reducedMotion ? '+=180%' : '+=300%',
-              pin: true,
-              // FIX 7: Changed from scrub: true (instant) to scrub: 0.5 so the
-              // animation has a slight lag that smooths out the discrete jumps
-              // produced by mouse-wheel scroll steps. With scrub: true, each
-              // rAF-batched ScrollTrigger.update() caused a visible snap; 0.5
-              // gives a natural easing feel that matches trackpad behaviour.
-              scrub: 0.5,
-              anticipatePin: 1,
-              invalidateOnRefresh: true,
-
-              onLeave: () => {
-                gsap.set(transitionWrapper, {
-                  height: 'auto',
-                  overflow: 'visible',
-                  zIndex: 'auto',
-                })
-                gsap.set(nextSection, {
-                  position: 'relative',
-                  top: 'auto',
-                  left: 'auto',
-                  width: '100%',
-                  height: 'auto',
-                  y: '0%',
-                  opacity: 1,
-                  overflow: 'visible',
-                })
-                gsap.set(heroSection, { opacity: 0, pointerEvents: 'none' })
-                gsap.set(ledgerTextNodes, { opacity: 1, y: 0 })
-                gsap.set(ledgerCardNodes, { opacity: 1, y: 0 })
-                if (ledgerCtaNode) gsap.set(ledgerCtaNode, { opacity: 1, y: 0 })
-
-                // FIX 6: Toggle a data attribute to re-enable CTA pointer-events
-                if (transitionWrapper) {
-                  transitionWrapper.dataset.pinReleased = 'true'
-                }
-              },
-
-              onEnterBack: () => {
-                gsap.set(transitionWrapper, {
-                  height: '100vh',
-                  overflow: 'hidden',
-                  zIndex: 10,
-                })
-                gsap.set(heroSection, {
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  pointerEvents: 'auto',
-                  zIndex: 3,
-                })
-                gsap.set(nextSection, {
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  overflow: 'hidden',
-                  zIndex: 2,
-                })
-
-                // FIX 6: Remove the data attribute to restore CTA disable state
-                if (transitionWrapper) {
-                  delete transitionWrapper.dataset.pinReleased
-                }
-              },
-            },
-          })
-
-          timeline
-            .to(
-              [eyebrowNode, headlineNode],
-              { opacity: 0, y: -120, duration: 1.35, ease: 'power3.out' },
-              0
-            )
-            .to(
-              [subtextNode, ctaNode],
-              { opacity: 0, y: -60, duration: 1.35, ease: 'power3.out' },
-              0.08
-            )
-            .to(video, { scale: 1.08, duration: 3, ease: 'none' }, 0)
-            .to(
-              nextSection,
-              { y: '0%', opacity: 1, duration: 1.6, ease: 'power3.out' },
-              1.5
-            )
-            .to(
-              heroSection,
-              { opacity: 0, duration: 1.6, ease: 'power3.out' },
-              1.5
-            )
-
-          if (ledgerTextNodes.length) {
-            timeline.to(
-              ledgerTextNodes,
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.78,
-                stagger: 0.1,
-                ease: 'power2.out',
-              },
-              1.72
-            )
-          }
-
-          if (ledgerCardNodes.length) {
-            timeline.to(
-              ledgerCardNodes,
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.92,
-                stagger: 0.1,
-                ease: 'power2.out',
-              },
-              1.92
-            )
-          }
-
-          if (ledgerCtaNode) {
-            timeline.to(
-              ledgerCtaNode,
-              { opacity: 1, y: 0, duration: 0.76, ease: 'power2.out' },
-              2.18
-            )
-          }
-        },
-      })
-    }, transitionWrapper)
-
-    // FIX 4: ctx.revert() is the only cleanup needed.
-    return () => {
-      context.revert()
-    }
-  }, [reducedMotion])
-
   return (
-    <div
-      ref={transitionWrapperRef}
-      className="hero-authority-transition-stage"
-      style={{
-        position: 'relative',
-        height: '100vh',
-        overflow: 'hidden',
-        isolation: 'isolate',
-        zIndex: 1,
-      }}
-    >
+    <>
+      {/* ── Hero Section ── */}
       <section
-        ref={heroRef}
         id={scene.id}
-        className="hero-authority-hero-stage"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-        }}
+        data-scene-id={scene.id}
+        className="scene-depth-stage-hero-full flagship-scene-deep"
+        style={{ position: 'relative', isolation: 'isolate' }}
       >
-        <div
-          ref={depthRef}
-          className="scene-depth-stage scene-depth-stage-hero-full relative overflow-hidden"
-        >
-          <AmbientDepthField
-            reduced
-            variant="hero"
-            backgroundY={0}
-            midY={0}
-            foregroundY={0}
-            glowOpacity={0.58}
+        <AmbientDepthField
+          reduced={reducedMotion}
+          variant="hero"
+          backgroundY={0}
+          midY={0}
+          foregroundY={0}
+          glowOpacity={0.58}
+        />
+
+        {/* Video background */}
+        <div className="absolute inset-0 z-0">
+          <video
+            ref={videoRef}
+            className="hero-command-video h-full w-full object-cover"
+            src={heroMediaSrc}
+            preload="metadata"
+            muted
+            loop
+            playsInline
+            autoPlay
           />
+        </div>
 
-          <div className="absolute inset-0 z-0">
-            <video
-              ref={videoRef}
-              className="hero-command-video h-full w-full object-cover"
-              src={heroMediaSrc}
-              preload="metadata"
-              muted
-              loop
-              playsInline
-              autoPlay
-            />
-          </div>
+        <HeroAmbientCanvas />
+        <div className="hero-volumetric-layer" />
+        <div className="hero-particle-layer" />
+        <div className="hero-vignette-layer" />
+        <div className="hero-dof-layer" />
+        <div className="hero-command-soften-layer" />
+        {/* PHASE2-I: Warm palette tint lens-flare overlay */}
+        <div className="hero-lens-warmtint" aria-hidden="true" />
+        <div className="hero-parallax-shimmer" aria-hidden="true" />
 
-          <HeroAmbientCanvas />
-          <div className="hero-volumetric-layer" />
-          <div className="hero-particle-layer" />
-          <div className="hero-vignette-layer" />
-          <div className="hero-dof-layer" />
-          <div className="hero-command-soften-layer" />
-
-          <div className="hero-command-overlay absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
-            <div className="hero-command-copy w-[90%] sm:w-[82%] lg:w-[40%] max-w-none">
-              <div className="inline-flex max-w-full flex-col p-1">
-                <p
-                  ref={eyebrowRef}
-                  className="text-xs uppercase tracking-[0.18em] text-white/80"
+        {/* PART 3 FIX: Removed pointerEvents:none from outer overlay.
+            Decorative layers (video, canvas, vignette) each use pointer-events:none
+            via CSS class. This container must be fully interactive. */}
+        <div
+          className="absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14"
+        >
+          <div
+            className="w-[90%] sm:w-[82%] lg:w-[40%] max-w-none"
+          >
+            <div className="inline-flex max-w-full flex-col p-1">
+              <motion.p
+                initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: AUTHORITY_EASE, delay: 0.1 }}
+                className="text-xs uppercase tracking-[0.18em] text-white/80"
+              >
+                Executive Event Command
+              </motion.p>
+              <motion.h1
+                initial={reducedMotion ? false : { opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease: AUTHORITY_EASE, delay: 0.22 }}
+                className="mt-4 max-w-[16ch] font-serif text-[clamp(1.9rem,7.8vw,5.4rem)] leading-[0.98] tracking-[-0.03em] text-white"
+              >
+                {headline}
+              </motion.h1>
+              <motion.p
+                initial={reducedMotion ? false : { opacity: 0, y: 16, filter: 'blur(5px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 0.95, ease: AUTHORITY_EASE, delay: 0.38 }}
+                className="mt-5 max-w-[38ch] text-[clamp(0.98rem,2.15vw,1.45rem)] leading-relaxed text-white/90"
+              >
+                {subtitle}
+              </motion.p>
+              <motion.div
+                initial={reducedMotion ? false : { opacity: 0, y: 12, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                whileHover={reducedMotion ? undefined : { scale: 1.04, y: -2 }}
+                whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+                transition={{ duration: 0.7, ease: AUTHORITY_EASE, delay: 0.52 }}
+                className="mt-8"
+                style={{ position: 'relative', zIndex: 30, display: 'inline-block' }}
+              >
+                <ScribbleButton
+                  title="Open flagship case reel and signature builds"
+                  variant="primary"
+                  tone="light"
+                  size="md"
+                  to="/work"
+                  analyticsLabel="hero-signature-work"
                 >
-                  Executive Event Command
-                </p>
-                <h1
-                  ref={headlineRef}
-                  className="mt-4 max-w-[16ch] font-serif text-[clamp(1.9rem,7.8vw,5.4rem)] leading-[0.98] tracking-[-0.03em] text-white"
-                >
-                  {headline}
-                </h1>
-                <p
-                  ref={subtextRef}
-                  className="mt-5 max-w-[38ch] text-[clamp(0.98rem,2.15vw,1.45rem)] leading-relaxed text-white/90"
-                >
-                  {subtitle}
-                </p>
-                <div ref={ctaRef} className="mt-8">
-                  <ScribbleButton
-                    title="Open flagship case reel and signature builds"
-                    variant="primary"
-                    tone="light"
-                    size="md"
-                    to="/work"
-                    analyticsLabel="hero-signature-work"
-                  >
-                    {ctaText}
-                  </ScribbleButton>
-                </div>
-              </div>
+                  {ctaText}
+                </ScribbleButton>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      <section
-        ref={nextRef}
-        id={nextScene?.id || 'authority-ledger'}
-        className="hero-authority-next-stage"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        {nextScene ? <AuthorityLedgerScene scene={nextScene} embedded /> : null}
-      </section>
-    </div>
+      {/* ── Authority Ledger — rendered as normal free section directly below hero ── */}
+      {nextScene ? <AuthorityLedgerScene scene={nextScene} /> : null}
+    </>
   )
 }
 
@@ -1253,7 +1047,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
         viewport={{ once: true, amount: 0.15 }}
       >
         {/* ── Section header ── */}
-        <motion.div variants={revealLift(0, 16)} className="mb-14 lg:mb-20">
+        <motion.div variants={revealBlur(0, 4, 18)} className="mb-14 lg:mb-20">
           <p className="lux-eyebrow-muted mb-5">Capabilities</p>
           <div className="lux-rule mb-7" />
           <h2 className="lux-display text-[var(--color-ink)]" style={{ maxWidth: '16ch' }}>
@@ -1355,7 +1149,9 @@ export const CapabilityMatrixScene = ({ scene }) => (
 export const NarrativeBridgeScene = ({ scene }) => {
   const depthRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: depthRef, offset: ['start end', 'end start'] })
-  const textY = useTransform(scrollYProgress, [0, 1], [18, -18])
+  // PHASE2-D: Deeper parallax — text moves faster than scene background for cinematic depth
+  const textY = useTransform(scrollYProgress, [0, 1], [22, -22])
+  const bgY = useTransform(scrollYProgress, [0, 1], [10, -10])
 
   return (
     <FreeSceneFrame
@@ -1365,10 +1161,16 @@ export const NarrativeBridgeScene = ({ scene }) => {
       className="scene-cinematic scene-narrative-bridge"
     >
       {({ reduced }) => (
-        <div
-          ref={depthRef}
-          style={{
-            display: 'flex',
+        <>
+          {/* PHASE2-D: Warm glow for narrative bridge atmosphere */}
+          <div className="cine-scene-glow cine-scene-glow-warm" aria-hidden="true" />
+          <motion.div
+            ref={depthRef}
+            style={reduced ? undefined : { y: bgY, position: 'relative', zIndex: 1 }}
+          >
+          <div
+            style={{
+              display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1377,8 +1179,8 @@ export const NarrativeBridgeScene = ({ scene }) => {
           }}
         >
           <motion.div
-            initial={reduced ? false : { opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={reduced ? false : { opacity: 0, y: 28, filter: 'blur(6px)', scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
             viewport={{ once: true, amount: 0.35 }}
             transition={{ duration: 1.1, ease: AUTHORITY_EASE }}
             style={reduced ? undefined : { y: textY }}
@@ -1422,7 +1224,9 @@ export const NarrativeBridgeScene = ({ scene }) => {
             {/* Gold bottom rule */}
             <div className="lux-rule" style={{ margin: '2.6rem auto 0' }} />
           </motion.div>
-        </div>
+          </div>
+          </motion.div>
+        </>
       )}
     </FreeSceneFrame>
   )
@@ -1607,26 +1411,32 @@ export const ProofTheaterScene = ({ scene }) => (
     className="scene-cinematic scene-proof-theater"
   >
     {({ reduced }) => (
-      <motion.div
-        variants={sequence(0.02, 0.1)}
-        initial={reduced ? false : 'hidden'}
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-      >
-        {/* ── Header ── */}
-        <motion.div variants={revealLift(0, 14)}>
-          <p className="lux-eyebrow-muted" style={{ marginBottom: '1.4rem' }}>Client Outcomes</p>
-          <div className="lux-rule" style={{ marginBottom: '1.8rem' }} />
-          <h2 className="lux-title" style={{ color: 'var(--color-ink)', maxWidth: '22ch' }}>
-            Verified outcomes, named stakeholders, accountable delivery.
-          </h2>
-        </motion.div>
+      <>
+        {/* PHASE2-E: Grain + warm glow for linen tone atmosphere */}
+        <div className="cine-grain-overlay" aria-hidden="true" />
+        <div className="cine-scene-glow cine-scene-glow-warm" aria-hidden="true" />
+        <motion.div
+          variants={sequence(0.02, 0.1)}
+          initial={reduced ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          style={{ position: 'relative', zIndex: 1 }}
+        >
+          {/* ── Header ── */}
+          <motion.div variants={revealLift(0, 14)}>
+            <p className="lux-eyebrow-muted" style={{ marginBottom: '1.4rem' }}>Client Outcomes</p>
+            <div className="lux-rule" style={{ marginBottom: '1.8rem' }} />
+            <h2 className="lux-title" style={{ color: 'var(--color-ink)', maxWidth: '22ch' }}>
+              Verified outcomes, named stakeholders, accountable delivery.
+            </h2>
+          </motion.div>
 
-        {/* ── Testimonials ── */}
-        <motion.div variants={revealLift(0.12, 16)}>
-          <ProofTheaterSplit reduced={reduced} />
+          {/* ── Testimonials ── */}
+          <motion.div variants={revealPop(0.12)}>
+            <ProofTheaterSplit reduced={reduced} />
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </>
     )}
   </FreeSceneFrame>
 )
@@ -2046,19 +1856,25 @@ export const GlobalFooterScene = ({ scene }) => (
     className="scene-cinematic scene-global-footer"
   >
     {({ reduced }) => (
-      <motion.div
-        variants={sequence(0.04, 0.1)}
-        initial={reduced ? false : 'hidden'}
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          padding: 'clamp(2rem, 5vh, 4rem) 0',
-        }}
-      >
+      <>
+        {/* PHASE2-F: Subtle film grain + glow for cinematic footer atmosphere */}
+        <div className="cine-grain-overlay" aria-hidden="true" />
+        <div className="cine-scene-glow cine-scene-glow-warm" aria-hidden="true" />
+        <motion.div
+          variants={sequence(0.04, 0.1)}
+          initial={reduced ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            padding: 'clamp(2rem, 5vh, 4rem) 0',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
         <motion.div variants={revealLift(0, 18)}>
           <div className="lux-rule" style={{ margin: '0 auto 2.2rem' }} />
           <p className="lux-eyebrow-muted" style={{ marginBottom: '2rem' }}>Next Move</p>
@@ -2097,7 +1913,7 @@ export const GlobalFooterScene = ({ scene }) => (
           variants={revealLift(0.14, 14)}
           style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center', marginBottom: '3rem' }}
         >
-          <Link to="/contact" className="lux-cta-dark">
+          <Link to="/contact" className="lux-cta-dark cine-cta-pulse">
             Request Proposal
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
               <path d="M2 5.5h7M6.5 3L9 5.5 6.5 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
@@ -2123,7 +1939,7 @@ export const GlobalFooterScene = ({ scene }) => (
           <div className="lux-rule" style={{ margin: '2rem auto 0' }} />
         </motion.div>
       </motion.div>
+      </>
     )}
   </FreeSceneFrame>
 )
-

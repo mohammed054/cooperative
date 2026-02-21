@@ -1,86 +1,39 @@
-import React, { useLayoutEffect, useRef } from 'react'
-import { motion, useReducedMotion, useMotionValue } from 'framer-motion'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { MOBILE_BREAKPOINT } from '../../lib/constants'
-import {
-  MOTION_TOKEN_CONTRACT,
-  parseBezier,
-} from '../../motion/motionTokenContract.js'
+/**
+ * ScrollLockedSection — STABILIZATION MODE
+ *
+ * Scroll-lock (GSAP pin) is temporarily disabled.
+ * Sections render as natural flow with a static progress value.
+ * Choreography will be restored in a later pass.
+ *
+ * Changes from original:
+ * - No GSAP ScrollTrigger pinning
+ * - No sticky positioning
+ * - Progress is static at 0 (content renders in initial state)
+ * - reduced is false so framer-motion scroll animations still work
+ * - Sections scroll naturally, meeting the 100vh min-height requirement
+ */
+
+import React from 'react'
+import { useMotionValue } from 'framer-motion'
 import { ProgressProvider } from './ProgressContext.jsx'
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
-}
-
 const joinClasses = (...classes) => classes.filter(Boolean).join(' ')
-const AUTHORITY_EASE = parseBezier(MOTION_TOKEN_CONTRACT.easing.authority)
 
 const ScrollLockedSection = ({
   id,
   children,
   className = '',
   tone = 'dark',
-  height = '240vh',
+  height = '100vh',
   theme = 'light',
   transitionReady = false,
 }) => {
-  const sectionRef = useRef(null)
-  const lockRef = useRef(null)
+  // Static progress — scroll lock disabled for stabilization
   const progress = useMotionValue(0)
-  const shouldReduceMotion = useReducedMotion()
-
-  useLayoutEffect(() => {
-    if (shouldReduceMotion || !sectionRef.current || !lockRef.current) {
-      return undefined
-    }
-
-    const sectionEl = sectionRef.current
-    const lockEl = lockRef.current
-
-    const context = gsap.context(() => {
-      ScrollTrigger.matchMedia({
-        [`(max-width: ${MOBILE_BREAKPOINT - 1}px)`]: function mobileSetup() {
-          progress.set(1)
-          gsap.set(lockEl, { opacity: 1 })
-        },
-
-        [`(min-width: ${MOBILE_BREAKPOINT}px)`]: function desktopSetup() {
-          ScrollTrigger.create({
-            trigger: sectionEl,
-            start: 'top top',
-            end: 'bottom bottom',
-            pin: lockEl,
-            pinSpacing: false,
-            scrub: MOTION_TOKEN_CONTRACT.scroll.inertia + 0.12,
-            anticipatePin: 1,
-            fastScrollEnd: true,
-            invalidateOnRefresh: true,
-            onRefresh: self => {
-              const nextProgress = Math.min(1, Math.max(0, self.progress))
-              progress.set(nextProgress)
-            },
-            onUpdate: self => {
-              const nextProgress = Math.min(1, Math.max(0, self.progress))
-              const velocity = Math.abs(self.getVelocity())
-              const momentumGain = Math.min(0.26, velocity / 4600)
-              const previous = progress.get()
-              const blend = 0.2 + momentumGain
-              progress.set(previous + (nextProgress - previous) * blend)
-            },
-          })
-        },
-      })
-    }, sectionEl)
-
-    return () => {
-      context.revert()
-    }
-  }, [shouldReduceMotion, progress])
 
   const content =
     typeof children === 'function'
-      ? children(progress, shouldReduceMotion)
+      ? children(progress, false)
       : children
 
   return (
@@ -89,30 +42,19 @@ const ScrollLockedSection = ({
       data-scene-id={id}
       data-theme={theme}
       data-transition-ready={String(Boolean(transitionReady))}
-      ref={sectionRef}
       className={joinClasses(
         'flagship-scene',
-        'flagship-scene-locked',
         `flagship-scene-${tone}`,
         className
       )}
-      style={{ '--scene-min-height': height }}
+      style={{ '--scene-min-height': '100vh', minHeight: '100vh' }}
     >
-      <motion.div
-        ref={lockRef}
-        className="flagship-lock-inner scene-transition-shell"
-        initial={shouldReduceMotion ? false : { opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.15 }}
-        transition={{
-          duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.06,
-          ease: AUTHORITY_EASE,
-        }}
-      >
-        <ProgressProvider progress={progress} reduced={shouldReduceMotion}>
+      {/* No sticky wrapper — sections scroll naturally in stabilization mode */}
+      <div className="flagship-scene-content scene-transition-shell">
+        <ProgressProvider progress={progress} reduced={false}>
           {content}
         </ProgressProvider>
-      </motion.div>
+      </div>
     </section>
   )
 }

@@ -1,0 +1,263 @@
+/* ============================================================
+   CINEMATIC PHASE 2 — Light-First, Color-Graded, Animated
+   All dark scenes are intentional (hero, authority, reel, conversion).
+   Light scenes use palette gradients only. No global dark injection.
+   ============================================================ */
+
+/* ── Scene Gradient Backgrounds (light palette tones) ── */
+
+/* Steel / Capability: cool blue-gray wash */
+.scene-cinematic.scene-capability-matrix {
+  background:
+    radial-gradient(62% 48% at 80% 18%, rgba(145, 162, 186, 0.18) 0%, transparent 70%),
+    linear-gradient(180deg, #eef1f6 0%, #e8edf4 44%, #eaecf1 100%);
+}
+
+/* Warm / Narrative Bridge: warm cream atmosphere */
+.scene-cinematic.scene-narrative-bridge {
+  background:
+    radial-gradient(54% 40% at 20% 22%, rgba(211, 202, 187, 0.26) 0%, transparent 68%),
+    radial-gradient(38% 44% at 82% 72%, rgba(181, 146, 79, 0.09) 0%, transparent 64%),
+    linear-gradient(180deg, #faf7f2 0%, #f5f0e8 50%, #f0ebe1 100%);
+}
+
+/* Linen / Proof Theater: warm ivory with subtle gold tint */
+.scene-cinematic.scene-proof-theater {
+  background:
+    radial-gradient(48% 38% at 74% 14%, rgba(181, 146, 79, 0.08) 0%, transparent 62%),
+    radial-gradient(42% 52% at 14% 80%, rgba(203, 213, 226, 0.14) 0%, transparent 60%),
+    linear-gradient(180deg, #faf8f4 0%, #f7f3ec 52%, #f3ede3 100%);
+}
+
+/* Footer: deep tone — intentional dark, keep as-is */
+/* Conversion: dark tone — intentional dark, keep as-is */
+
+/* ── Cinematic Gradient Mesh for Steel/Capability scene scroll shift ── */
+.scene-capability-matrix .flagship-scene-content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(58% 32% at 50% 0%, rgba(198, 208, 221, 0.22) 0%, transparent 60%);
+  opacity: 0;
+  animation: cine-mesh-breathe 8s ease-in-out infinite alternate;
+}
+
+@keyframes cine-mesh-breathe {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Soft Vignette — Hero lens-flare warm tint ── */
+.hero-lens-warmtint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    radial-gradient(ellipse 55% 42% at 15% 90%, rgba(181, 146, 79, 0.11) 0%, transparent 68%),
+    radial-gradient(ellipse 38% 28% at 88% 5%, rgba(255, 240, 210, 0.12) 0%, transparent 60%);
+}
+
+/* ── Film Grain Overlay ── */
+.cine-grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+}
+
+/* Slightly more visible grain on dark scenes */
+.flagship-scene-dark .cine-grain-overlay,
+.flagship-scene-deep .cine-grain-overlay {
+  opacity: 0.048;
+  mix-blend-mode: screen;
+}
+
+/* ── Subtle Glow Radials for scene sections ── */
+.cine-scene-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cine-scene-glow-warm {
+  background: radial-gradient(ellipse 48% 30% at 50% 50%, rgba(181, 146, 79, 0.06) 0%, transparent 70%);
+}
+
+.cine-scene-glow-cool {
+  background: radial-gradient(ellipse 44% 28% at 50% 50%, rgba(145, 162, 186, 0.08) 0%, transparent 70%);
+}
+
+/* ── CTA Button Cinematic Hover & Spotlight ── */
+.lux-cta-dark,
+.lux-cta-dark-outline,
+.scribble-button {
+  transition:
+    transform 0.32s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.32s cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 0.24s ease;
+}
+
+.lux-cta-dark:hover,
+.lux-cta-dark-outline:hover {
+  transform: scale(1.04) translateY(-1px);
+}
+
+.lux-cta-dark:active,
+.lux-cta-dark-outline:active {
+  transform: scale(0.98) translateY(0);
+}
+
+/* ── Cinematic Pulse for final CTA ── */
+@keyframes cine-pulse-spotlight {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(181, 146, 79, 0); }
+  50%       { box-shadow: 0 0 0 6px rgba(181, 146, 79, 0.12); }
+}
+
+.cine-cta-pulse {
+  animation: cine-pulse-spotlight 3.2s ease-in-out infinite;
+}
+
+/* ── Parallax depth layers ── */
+.cine-parallax-bg {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.cine-parallax-mid {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* ── Scene entrance transition helpers ── */
+.cine-scene-enter {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.cine-scene-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1), transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ── Narrative Bridge: blur-to-focus glow backdrop ── */
+.scene-narrative-bridge .flagship-scene-content {
+  position: relative;
+}
+
+.scene-narrative-bridge .flagship-scene-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(248, 246, 242, 0.6) 0%, transparent 70%);
+  z-index: 0;
+}
+
+/* ── Proof Theater: card pop shadows ── */
+.scene-proof-theater .cinematic-scene-card {
+  box-shadow: 0 8px 32px rgba(16, 15, 13, 0.08);
+  transition: box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.scene-proof-theater .cinematic-scene-card:hover {
+  box-shadow: 0 16px 48px rgba(16, 15, 13, 0.14);
+}
+
+/* ── Section eyebrow micro-reveal line ── */
+@keyframes cine-rule-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.cine-rule-animated {
+  transform-origin: left center;
+  animation: cine-rule-grow 0.8s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+/* ── Tone bridge enhanced gradient blending ── */
+.homepage-tone-bridge {
+  position: relative;
+  pointer-events: none;
+}
+
+/* ── Operations Spine: enhanced card rotation styling ── */
+.osv2-card-entering {
+  transform-origin: center bottom;
+}
+
+/* ── Ambient depth field enhanced light variants ── */
+.scene-ambient-warm .scene-ambient-back {
+  background:
+    radial-gradient(ellipse 54% 36% at 62% 46%, rgba(211, 198, 172, 0.26) 0%, transparent 66%),
+    radial-gradient(ellipse 32% 24% at 22% 68%, rgba(181, 146, 79, 0.12) 0%, transparent 54%);
+}
+
+.scene-ambient-matrix .scene-ambient-mid {
+  background:
+    radial-gradient(ellipse 48% 32% at 38% 28%, rgba(145, 162, 186, 0.2) 0%, transparent 62%),
+    radial-gradient(ellipse 28% 20% at 74% 72%, rgba(198, 208, 221, 0.14) 0%, transparent 50%);
+}
+
+/* ── Signature Reel pinned scene: light-safe ink fix ── */
+/* The reel uses dark tone, which is intentional */
+
+/* ── Scroll-linked parallax shimmer for hero ── */
+.hero-parallax-shimmer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 36%,
+    rgba(255, 248, 232, 0.04) 50%,
+    transparent 64%
+  );
+  background-size: 200% 100%;
+  animation: cine-shimmer 6s ease-in-out infinite;
+}
+
+@keyframes cine-shimmer {
+  0%, 100% { background-position: 200% 0; }
+  50%       { background-position: -200% 0; }
+}
+
+/* ── Focus ring refinement ── */
+.scribble-button:focus-visible,
+.lux-cta-dark:focus-visible,
+.lux-cta-dark-outline:focus-visible {
+  outline: 2px solid var(--lux-gold, rgba(181, 146, 79, 0.8));
+  outline-offset: 3px;
+}
+
+/* ── Reduce motion: disable all cine animations ── */
+@media (prefers-reduced-motion: reduce) {
+  .cine-grain-overlay,
+  .hero-parallax-shimmer,
+  .hero-lens-warmtint,
+  .cine-scene-glow,
+  .cine-cta-pulse {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  .cine-rule-animated {
+    animation: none !important;
+    transform: scaleX(1) !important;
+  }
+
+  .lux-cta-dark,
+  .lux-cta-dark-outline {
+    transition: none !important;
+  }
+}

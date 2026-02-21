@@ -31,8 +31,10 @@ const Footer = () => {
   return (
     <footer
       id="site-footer"
+      /* PART 5 FIX: Removed inline background:'#09090b'. Background now controlled
+         by flagship-scene-deep CSS class. Border and position kept as style props. */
+      className="flagship-scene-deep"
       style={{
-        background: '#09090b',
         borderTop: '1px solid rgba(255,255,255,0.06)',
         position: 'relative',
       }}

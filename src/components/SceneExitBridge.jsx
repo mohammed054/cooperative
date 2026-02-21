@@ -2,6 +2,11 @@ import React, { useRef } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import ScribbleButton from './ScribbleButton'
 
+/*
+ * PART 5 FIX: Removed hardcoded bg-[#0f1116] Tailwind utility.
+ * Background now owned by flagship-scene-deep CSS class which maps to the
+ * darkest tone in the tone system. No inline background or Tailwind bg-[#...].
+ */
 const SceneExitBridge = () => {
   const shouldReduceMotion = useReducedMotion()
   const sectionRef = useRef(null)
@@ -22,7 +27,8 @@ const SceneExitBridge = () => {
     <section
       ref={sectionRef}
       aria-label="Cinematic exit"
-      className="relative overflow-hidden bg-[#0f1116]"
+      /* PART 5 FIX: Use tone class instead of hardcoded Tailwind bg-[#0f1116] */
+      className="flagship-scene-deep relative overflow-hidden"
     >
       <motion.div
         style={shouldReduceMotion ? undefined : { opacity: glowOpacity }}

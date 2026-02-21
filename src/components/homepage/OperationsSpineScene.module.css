@@ -3,26 +3,36 @@
    Dark. Precise. Mechanical. No noise.
 ───────────────────────────────────────────────────── */
 
-.osv2Outer { position: relative; }
-
-.osv2Sticky {
+/*
+  PART 1 FIX: osv2Outer owns the scroll height that creates the sticky scroll track.
+  GSAP no longer injects a spacer — the height is set here via CSS custom property
+  so the sticky container below can remain pinned while the user scrolls through it.
+  Formula: (PHASES * VH_PER_PHASE + entry_exit_buffer) = (4 * 0.9 + 1.2) = 4.8
+*/
+.osv2Outer {
   position: relative;
+  /* 480vh = scroll track height — keeps the sticky panel live for 4.8 viewports */
+  height: 480vh;
+  /* No background — section is transparent, background lives on sticky panel */
+}
+
+/*
+  PART 1 FIX: CSS sticky replaces GSAP pin.
+  No GSAP spacer injected, no layout reflow, no bleed.
+  Background lives here, not on the outer div or any parent.
+*/
+.osv2Sticky {
+  position: sticky;
+  top: 0;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   overflow: hidden;
   isolation: isolate;
+  /* PART 5: Background ownership — dark tone defined here, nowhere else */
   background: #0e1117;
-}
-
-/* GSAP pin spacer: force transparent */
-.osv2Outer > .pin-spacer {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  min-height: 0 !important;
 }
 
 /* Subtle grid texture overlay */
@@ -422,13 +432,22 @@
 /* Sentinel */
 .osv2Sentinel { height: 0; overflow: hidden; pointer-events: none; }
 
-/* Mobile override */
+/* Mobile overrides */
 @media (max-width: 768px) {
+  /* Mobile: no scroll track needed — section scrolls naturally */
+  .osv2Outer { height: auto; }
+  .osv2Sticky {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 100dvh;
+    align-items: flex-start;
+    padding-top: clamp(5.2rem, 12vh, 7rem);
+  }
   .osv2Card { opacity: 1 !important; transform: none !important; }
   .osv2CardDetail { max-height: 14rem !important; opacity: 1 !important; }
   .osv2Left { opacity: 1 !important; transform: none !important; }
   .osv2Cta { opacity: 1 !important; transform: none !important; }
-  .osv2Sticky { align-items: flex-start; padding-top: clamp(5.2rem, 12vh, 7rem); }
   .osv2RailFill { transform: translateX(-50%) scaleY(1) !important; }
   .osv2ProgFill { transform: scaleX(1) !important; }
 }

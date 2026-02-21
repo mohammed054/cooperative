@@ -43,11 +43,11 @@ const PHASES = [
 ]
 
 const VH_PER_PHASE = 0.9
+// Total scroll height multiplier: phases * vhPerPhase + entry/exit buffer
+const SCROLL_MULTIPLIER = PHASES.length * VH_PER_PHASE + 1.2
 const pad = n => String(n).padStart(2, '0')
 
-// Left column: even-index phases (0, 2)
 const LEFT_PHASES = PHASES.filter((_, i) => i % 2 === 0)
-// Right column: odd-index phases (1, 3)
 const RIGHT_PHASES = PHASES.filter((_, i) => i % 2 === 1)
 
 const PhaseCard = React.memo(
@@ -102,8 +102,9 @@ export const OperationsSpineScene = ({ scene }) => {
   const ctaRef = useRef(null)
   const railFillRef = useRef(null)
   const progBarRef = useRef(null)
-  // cardRefs ordered by phase index: [phase0, phase1, phase2, phase3]
   const cardRefs = useRef([])
+  // Guard against double-init in React StrictMode
+  const gsapInitRef = useRef(false)
 
   const [activeIdx, setActiveIdx] = useState(0)
   const activeIdxRef = useRef(0)
@@ -117,6 +118,10 @@ export const OperationsSpineScene = ({ scene }) => {
   )
 
   useLayoutEffect(() => {
+    // Guard: prevent double initialization from StrictMode double-invoke
+    if (gsapInitRef.current) return undefined
+    gsapInitRef.current = true
+
     gsap.registerPlugin(ScrollTrigger)
 
     const outer = outerRef.current
@@ -151,29 +156,32 @@ export const OperationsSpineScene = ({ scene }) => {
         },
 
         [`(min-width: ${MOBILE_BREAKPOINT}px)`]: function desktopSetup() {
-          gsap.set(outer, { position: 'relative', zIndex: 2 })
+          // GSAP only sets z-index on the outer container — no position/transform control
+          gsap.set(outer, { zIndex: 2 })
           gsap.set(header, { opacity: 0, y: 36 })
           if (cta) gsap.set(cta, { opacity: 0, y: 20 })
           if (railFill)
             gsap.set(railFill, { scaleY: 0, transformOrigin: 'top center' })
           if (progBar)
             gsap.set(progBar, { scaleX: 0, transformOrigin: 'left center' })
-          gsap.set(cards, { opacity: 0, y: 52 })
+          // PHASE2: Cards start with slight rotation + y offset for natural reveal
+          gsap.set(cards, { opacity: 0, y: 52, rotation: -1.8, transformOrigin: 'center bottom' })
 
           const cardBudget = 0.76
           const cardStart = 0.1
           const stepSize = cardBudget / PHASES.length
 
+          // PART 1 FIX: No pin/pinSpacing — CSS sticky handles positioning.
+          // GSAP only drives opacity/scale/progress animations via scrub.
           const tl = gsap.timeline({
             scrollTrigger: {
               trigger: outer,
               start: 'top top',
               end: () =>
-                `+=${window.innerHeight * (PHASES.length * VH_PER_PHASE + 1.2)}`,
-              pin: sticky,
-              pinSpacing: true,
+                `+=${window.innerHeight * SCROLL_MULTIPLIER}`,
+              // No pin: sticky — CSS position:sticky on .osv2Sticky handles this
+              // No pinSpacing — no spacer div injected
               scrub: 1.5,
-              anticipatePin: 1,
               invalidateOnRefresh: true,
 
               onUpdate(self) {
@@ -194,14 +202,6 @@ export const OperationsSpineScene = ({ scene }) => {
 
               onEnterBack() {
                 gsap.set(outer, { zIndex: 2 })
-              },
-
-              onRefresh(self) {
-                if (self.spacer) {
-                  self.spacer.style.cssText +=
-                    ';background:transparent!important;background-color:transparent!important;background-image:none!important;'
-                  self.spacer.style.minHeight = ''
-                }
               },
             },
           })
@@ -226,7 +226,7 @@ export const OperationsSpineScene = ({ scene }) => {
             const at = cardStart + i * stepSize
             tl.to(
               card,
-              { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' },
+              { opacity: 1, y: 0, rotation: 0, duration: 0.32, ease: 'power2.out' },
               at
             )
           })
@@ -283,6 +283,9 @@ export const OperationsSpineScene = ({ scene }) => {
             },
           })
 
+          // One-time refresh after mount so trigger positions are accurate
+          ScrollTrigger.refresh()
+
           return () => {
             sentinelTrigger.kill()
             if (sentinelTween) sentinelTween.kill()
@@ -292,6 +295,7 @@ export const OperationsSpineScene = ({ scene }) => {
     }, outer)
 
     return () => {
+      gsapInitRef.current = false
       ctx.revert()
     }
   }, [reducedMotion])
@@ -308,6 +312,7 @@ export const OperationsSpineScene = ({ scene }) => {
       className={styles.osv2Outer}
       aria-label="Delivery Framework - scroll to advance through phases"
     >
+      {/* CSS sticky container — GSAP never touches position/transform of this element */}
       <div ref={stickyRef} className={styles.osv2Sticky}>
         <div className={styles.osv2Grain} aria-hidden="true">
           <span className={styles.osv2GrainBack} />
