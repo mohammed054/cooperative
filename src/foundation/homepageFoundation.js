@@ -282,11 +282,25 @@ export const HOMEPAGE_GRADIENT_BRIDGES = Object.freeze([
     toTone: 'warm',
   },
   {
+    id: 'bridge-warm-to-linen',
+    fromSceneId: 'narrative-bridge',
+    toSceneId: 'proof-theater',
+    fromTone: 'warm',
+    toTone: 'linen',
+  },
+  {
     id: 'bridge-linen-to-dark',
     fromSceneId: 'proof-theater',
     toSceneId: 'conversion-chamber',
     fromTone: 'linen',
     toTone: 'dark',
+  },
+  {
+    id: 'bridge-dark-to-deep',
+    fromSceneId: 'conversion-chamber',
+    toSceneId: 'global-footer',
+    fromTone: 'dark',
+    toTone: 'deep',
   },
 ])
 
@@ -302,7 +316,7 @@ export const HOMEPAGE_FOUNDATION = Object.freeze({
 const VALID_MODES = new Set(['free', 'pinned'])
 const REQUIRED_PINNED_IDS = new Set(['signature-reel', 'operations-spine'])
 const EXPECTED_SCENE_COUNT = 9
-const MAX_BRIDGE_COUNT = 3
+const MAX_BRIDGE_COUNT = 5
 
 export const validateHomepageFoundation = foundation => {
   const issues = []

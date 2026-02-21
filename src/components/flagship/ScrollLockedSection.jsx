@@ -103,7 +103,7 @@ const ScrollLockedSection = ({
         className="flagship-lock-inner scene-transition-shell"
         initial={shouldReduceMotion ? false : { opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.15 }}
         transition={{
           duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.06,
           ease: AUTHORITY_EASE,

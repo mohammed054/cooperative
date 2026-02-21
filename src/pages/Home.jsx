@@ -39,7 +39,9 @@ const BRIDGE_BY_FROM_SCENE = new Map(
 const BRIDGE_CLASS_BY_TONE_FLOW = Object.freeze({
   'dark->steel': 'homepage-tone-bridge-dark-steel',
   'steel->warm': 'homepage-tone-bridge-steel-warm',
+  'warm->linen': 'homepage-tone-bridge-warm-linen',
   'linen->dark': 'homepage-tone-bridge-linen-dark',
+  'dark->deep': 'homepage-tone-bridge-dark-deep',
 })
 
 const getBridgeClassName = bridge => {

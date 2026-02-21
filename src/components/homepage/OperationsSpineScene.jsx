@@ -45,8 +45,10 @@ const PHASES = [
 const VH_PER_PHASE = 0.9
 const pad = n => String(n).padStart(2, '0')
 
-// NOTE: MOBILE_BREAKPOINT is imported from ../../lib/constants.js for
-// consistent responsive behavior across all pinned sections.
+// Left column: even-index phases (0, 2)
+const LEFT_PHASES = PHASES.filter((_, i) => i % 2 === 0)
+// Right column: odd-index phases (1, 3)
+const RIGHT_PHASES = PHASES.filter((_, i) => i % 2 === 1)
 
 const PhaseCard = React.memo(
   React.forwardRef(({ phase, isActive }, ref) => (
@@ -100,6 +102,7 @@ export const OperationsSpineScene = ({ scene }) => {
   const ctaRef = useRef(null)
   const railFillRef = useRef(null)
   const progBarRef = useRef(null)
+  // cardRefs ordered by phase index: [phase0, phase1, phase2, phase3]
   const cardRefs = useRef([])
 
   const [activeIdx, setActiveIdx] = useState(0)
@@ -126,15 +129,8 @@ export const OperationsSpineScene = ({ scene }) => {
 
     if (!outer || !sticky || !header || !cards.length) return undefined
 
-    // FIX: Use ScrollTrigger.matchMedia() for responsive pinning.
-    // This properly handles breakpoint changes by cleaning up and reinitializing
-    // ScrollTriggers when the viewport crosses mobile/desktop breakpoints.
-    // - Mobile (< 768px): Disables pinning, shows static layout
-    // - Desktop (>= 768px): Enables full scroll-driven animations with pinning
-
     const ctx = gsap.context(() => {
       ScrollTrigger.matchMedia({
-        // ── Mobile: disable pinning, show static layout ───────────────────
         [`(max-width: ${MOBILE_BREAKPOINT - 1}px)`]: function mobileSetup() {
           gsap.set(header, { opacity: 1, y: 0 })
           gsap.set(cards, { opacity: 1, y: 0 })
@@ -145,7 +141,6 @@ export const OperationsSpineScene = ({ scene }) => {
           activeIdxRef.current = finalIdx
           setActiveIdx(finalIdx)
 
-          // Return cleanup for mobile context
           return () => {
             gsap.set(header, { clearProps: 'all' })
             gsap.set(cards, { clearProps: 'all' })
@@ -155,9 +150,7 @@ export const OperationsSpineScene = ({ scene }) => {
           }
         },
 
-        // ── Desktop: enable pinning and scroll-driven animations ───────────
         [`(min-width: ${MOBILE_BREAKPOINT}px)`]: function desktopSetup() {
-          // ── Initial states ────────────────────────────────────────────────
           gsap.set(outer, { position: 'relative', zIndex: 2 })
           gsap.set(header, { opacity: 0, y: 36 })
           if (cta) gsap.set(cta, { opacity: 0, y: 20 })
@@ -204,7 +197,6 @@ export const OperationsSpineScene = ({ scene }) => {
               },
 
               onRefresh(self) {
-                // Force the GSAP pin spacer fully transparent on every refresh.
                 if (self.spacer) {
                   self.spacer.style.cssText +=
                     ';background:transparent!important;background-color:transparent!important;background-image:none!important;'
@@ -214,18 +206,15 @@ export const OperationsSpineScene = ({ scene }) => {
             },
           })
 
-          // Header enters
           tl.to(
             header,
             { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' },
             0
           )
 
-          // Rail grows
           if (railFill)
             tl.to(railFill, { scaleY: 1, duration: 0.86, ease: 'none' }, 0.06)
 
-          // Progress bar grows
           if (progBar)
             tl.to(
               progBar,
@@ -233,7 +222,6 @@ export const OperationsSpineScene = ({ scene }) => {
               0.06
             )
 
-          // Cards stagger in sequentially
           cards.forEach((card, i) => {
             const at = cardStart + i * stepSize
             tl.to(
@@ -243,7 +231,6 @@ export const OperationsSpineScene = ({ scene }) => {
             )
           })
 
-          // CTA enters near end
           if (cta)
             tl.to(
               cta,
@@ -261,7 +248,6 @@ export const OperationsSpineScene = ({ scene }) => {
             1
           )
 
-          // ── Sentinel: prime the next scene's entry animation ─────────────
           let sentinelTween = null
           const sentinelTrigger = ScrollTrigger.create({
             trigger: sentinelRef.current,
@@ -318,7 +304,7 @@ export const OperationsSpineScene = ({ scene }) => {
       ref={outerRef}
       id={scene?.id || 'operations-spine'}
       data-scene-id={scene?.id}
-      data-theme="light"
+      data-theme="dark"
       className={styles.osv2Outer}
       aria-label="Delivery Framework - scroll to advance through phases"
     >
@@ -329,7 +315,7 @@ export const OperationsSpineScene = ({ scene }) => {
         </div>
 
         <div className={styles.osv2Content}>
-          {/* ── Left: copy + progress ────────────────────────────────── */}
+          {/* ── Left: copy + progress ── */}
           <div ref={headerRef} className={styles.osv2Left}>
             <p className={styles.osv2Eyebrow}>Delivery Framework</p>
 
@@ -394,8 +380,24 @@ export const OperationsSpineScene = ({ scene }) => {
             </div>
           </div>
 
-          {/* ── Right: rail + cards ──────────────────────────────────── */}
+          {/* ── Right: center rail + alternating cards ── */}
           <div className={styles.osv2Right}>
+            {/* Left column: phases 01, 03 */}
+            <div className={styles.osv2LeftCards} role="list" aria-label="Delivery phases — left column">
+              {LEFT_PHASES.map((phase, relIdx) => {
+                const i = relIdx * 2
+                return (
+                  <PhaseCard
+                    key={phase.id}
+                    ref={setCardRef(i)}
+                    phase={phase}
+                    isActive={i === displayIdx}
+                  />
+                )
+              })}
+            </div>
+
+            {/* Center rail */}
             <div className={styles.osv2Rail} aria-hidden="true">
               <div className={styles.osv2RailTrack} />
               <div
@@ -417,25 +419,24 @@ export const OperationsSpineScene = ({ scene }) => {
               </div>
             </div>
 
-            <div
-              className={styles.osv2Cards}
-              role="list"
-              aria-label="Delivery phases"
-            >
-              {PHASES.map((phase, i) => (
-                <PhaseCard
-                  key={phase.id}
-                  ref={setCardRef(i)}
-                  phase={phase}
-                  isActive={i === displayIdx}
-                />
-              ))}
+            {/* Right column: phases 02, 04 */}
+            <div className={styles.osv2RightCards} role="list" aria-label="Delivery phases — right column">
+              {RIGHT_PHASES.map((phase, relIdx) => {
+                const i = relIdx * 2 + 1
+                return (
+                  <PhaseCard
+                    key={phase.id}
+                    ref={setCardRef(i)}
+                    phase={phase}
+                    isActive={i === displayIdx}
+                  />
+                )
+              })}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sentinel: tells the next scene to animate in on approach */}
       <div
         ref={sentinelRef}
         className={styles.osv2Sentinel}

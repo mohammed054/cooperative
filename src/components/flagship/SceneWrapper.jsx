@@ -34,7 +34,7 @@ const SceneWrapper = ({
         className="flagship-scene-content scene-transition-shell"
         initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.24 }}
+        viewport={{ once: true, amount: 0.18 }}
         transition={{
           duration: MOTION_TOKEN_CONTRACT.durations.scene + 0.08,
           ease: AUTHORITY_EASE,
