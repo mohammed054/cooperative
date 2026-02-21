@@ -1,497 +1,653 @@
 # FULL CODEBASE FORENSIC AUDIT
 
+## Core-Level Runtime Analysis | Updated: 2026-02-21
+
+---
+
 ## Executive Summary
-- Overall health score: **3.5 / 10**
-- Current state: visually ambitious, but architecture is unstable under resize/mobile/low-end hardware.
-- Main blocker: scroll ownership is fragmented across Lenis, GSAP ScrollTrigger, Framer Motion `useScroll`, CSS sticky/snap, and direct `scrollIntoView` calls.
-- Production readiness: **not stable for high-traffic deployment** without refactor of scroll/pin architecture.
+
+| Metric                       | Previous | Current      |
+| ---------------------------- | -------- | ------------ |
+| **Overall Health Score**     | 3.5 / 10 | **5.5 / 10** |
+| **Scroll Architecture**      | 3 / 10   | **7 / 10**   |
+| **React Render Performance** | N/A      | **5 / 10**   |
+| **Memory Management**        | N/A      | **6 / 10**   |
+| **CSS Performance**          | N/A      | **5 / 10**   |
+| **Bundle Health**            | 5 / 10   | **4 / 10**   |
+| **Production Readiness**     | 3.5 / 10 | **6 / 10**   |
+
+**Critical Blockers**: 3 runtime issues that will cause visible bugs in production
+**High Severity**: 14 issues affecting performance/stability under load
+**Medium Severity**: 10 maintainability/predictability issues
+
+---
+
+## Delta Since Last Audit
+
+### What Improved
+
+- **Responsive pinning**: All pinned scenes now use `ScrollTrigger.matchMedia()` with proper mobile disable at 768px
+- **Scroll ownership**: Single update path via Lenis callback; wheel bridge removed
+- **Asset resolution**: OperationsSpineScene uses shared `assetUrl` helper from `src/lib/assetUrl.js`
+- **Internal routing**: All internal links use React Router `<Link>`; no `<a href="/...">` found
+- **ScrollLockedSection performance**: Uses `useMotionValue` instead of React state for progress
+
+### What Regressed
+
+- **None detected** - all changes were improvements
+
+### What Remains Unstable
+
+- **React state in scroll handlers**: `setProgressValue` called on every scroll frame
+- **THREE.js memory leak**: BufferAttribute never disposed
+- **GSAP double-cleanup**: Explicit `.kill()` + `ctx.revert()` in all pinned components
+- **Global smooth scroll**: Still conflicts with Lenis
+- **CSS GPU overload**: 23 backdrop-filter blurs + mix-blend-mode overlays
+
+---
 
 ## System-Level Architecture Map
 
-### Scene architecture
-- Scene source of truth: `src/foundation/homepageFoundation.js:91` (`HOMEPAGE_SCENE_REGISTRY`)
-- Scene component registry mapping: `src/pages/Home.jsx:21`
-- Free scene wrapper path: `SceneWrapper` -> `SceneShell` (`src/components/flagship/SceneWrapper.jsx:21`, `src/components/flagship/SceneShell.jsx:23`)
-- Pinned scene wrapper path: `ScrollLockedSection` -> `SceneShell` (`src/components/flagship/ScrollLockedSection.jsx:73`)
-- Homepage orchestration: `src/pages/Home.jsx:135`
+### Scroll System Data Flow
 
-### Scroll ownership map
-- Lenis smooth scrolling owner: `src/hooks/useLenisScroll.js:15`
-- GSAP pinning owners:
-  - Command arrival pinned transition: `src/components/homepage/HomeScenes.jsx:742`
-  - Signature reel lock (via `ScrollLockedSection`): `src/components/flagship/ScrollLockedSection.jsx:37`
-  - Operations spine pin: `src/components/homepage/OperationsSpineScene.jsx:169`
-- Framer Motion scroll progress owners (`useScroll`) are spread across many scenes, e.g. `src/components/homepage/HomeScenes.jsx:952`, `src/components/TestimonialsSection.jsx:75`, etc.
-- Native scroll/snap owners:
-  - Global smooth scroll: `src/index.css:116`
-  - Horizontal rail snap: `src/index.css:1654`
-  - Direct smooth `scrollIntoView` calls in multiple components (Footer, Search, HomeScenes, ScrollToTop, etc.)
-
-### Which system controls what
-- Pinning: GSAP ScrollTrigger (`HomeScenes` + `ScrollLockedSection` + `OperationsSpineScene`)
-- Progress tracking:
-  - GSAP -> React state in pinned sections (`setProgress`, `setActiveIdx`)
-  - Framer `scrollYProgress` for non-pinned/parallax scenes
-- Horizontal scroll: native overflow rail in Signature reel mobile (`src/components/homepage/HomeScenes.jsx:591`)
-- Snap: CSS scroll snap on `.cinematic-horizontal-rail` (`src/index.css:1665`)
-- Touch behavior:
-  - Lenis uses `syncTouch: false` (`src/hooks/useLenisScroll.js:18`), so touch and wheel behavior diverge
-  - Horizontal rail forces `touchAction: 'pan-x'` (`src/components/homepage/HomeScenes.jsx:594`)
-
-### Animation engine overlap
-- GSAP + ScrollTrigger: heavy pin/timeline control
-- Framer Motion: per-scene reveal/parallax/state-driven animation
-- CSS transitions/animations: global cards/bridges/legacy classes
-- Conflict status: **yes, active conflicts**
-  - GSAP and Framer both animate transforms/opacity in same page lifecycle
-  - Lenis and native smooth scroll both enabled
-  - GSAP update called from multiple pathways (Lenis callback + wheel bridge)
-
-## Critical Bugs
-
-### 1) Asset path contract is broken for production subpath deploys
-- File: `src/components/homepage/OperationsSpineScene.jsx:7`
-- Snippet:
-```jsx
-const assetUrl =
-  typeof window !== 'undefined' && window.__assetUrl
-    ? window.__assetUrl
-    : path => `/${path}`
 ```
-- Why this is a bug: `window.__assetUrl` is never defined anywhere; fallback hardcodes root-relative URLs and ignores Vite `BASE_URL`. On GitHub Pages subpath deploys, these images 404.
-- Severity: **Critical**
-- Exact fix: replace this local helper with shared `assetUrl` from `src/lib/assetUrl.js`.
+User Input (wheel/touch)
+       │
+       ▼
+┌──────────────────────────────────────┐
+│ LENIS INSTANCE (useLenisScroll.js)   │
+│   - autoRaf: false (manual control)  │
+│   - syncTouch: false (desktop opt)   │
+│   - lerp: 0.085 (damping)            │
+└───────────────┬──────────────────────┘
+                │
+                ▼ lenis.on('scroll') → ScrollTrigger.update()
+┌──────────────────────────────────────┐
+│ SCROLLTRIGGER INSTANCES (3 active)   │
+│   - CommandArrival: scrub 0.5        │
+│   - SignatureReel: scrub ~1.2        │
+│   - OperationsSpine: scrub 1.5       │
+└──────────────────────────────────────┘
+```
 
-### 2) Operations pin mode is frozen at mount; resize/orientation breaks behavior
-- File: `src/components/homepage/OperationsSpineScene.jsx:134`, `src/components/homepage/OperationsSpineScene.jsx:282`
-- Snippet:
-```jsx
-const isMobile = window.innerWidth < 768
-...
-}, [reducedMotion])
-```
-- Why this is a bug: mode is decided once and never reinitialized on viewport class change. Desktop->mobile keeps desktop pin logic active; mobile->desktop never enables it.
-- Severity: **Critical**
-- Exact fix: use `ScrollTrigger.matchMedia` or a debounced resize listener that fully tears down/recreates triggers on breakpoint crossing.
+**VERIFIED**: Single update path, no duplicate `ScrollTrigger.update()` calls.
 
-### 3) ScrollTrigger update is duplicated, causing jitter and wasted frames
-- Files: `src/hooks/useLenisScroll.js:24`, `src/components/homepage/HomeScenes.jsx:687`
-- Snippets:
-```jsx
-lenis.on('scroll', syncScrollTrigger)
-```
-```jsx
-window.addEventListener('wheel', handleWheelForLenis, { passive: true })
-```
-- Why this is a bug: ScrollTrigger is updated from Lenis scroll callback and from a wheel RAF bridge, producing competing update cadence and visible stutter under wheel input.
-- Severity: **Critical**
-- Exact fix: keep one synchronization path only (Lenis scroll callback), remove wheel bridge, verify with performance trace.
+### Animation System Overlap
 
-### 4) Pinned architecture on mobile is not consistently disabled
-- Files: `src/components/homepage/HomeScenes.jsx:742`, `src/components/flagship/ScrollLockedSection.jsx:37`
-- Snippet:
-```jsx
-pin: true
 ```
-```jsx
-ScrollTrigger.create({ ... pin: lockEl ... })
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│ GSAP/ScrollTrigger│ │ Framer Motion   │ │ Three.js Canvas │
+│ - Pinned scenes   │ │ - Parallax      │ │ - Particle loop │
+│ - Scrub timelines │ │ - AnimatePresence│ │ - WebGL render  │
+│ - matchMedia      │ │ - useTransform  │ │ - RAF loop      │
+└────────┬──────────┘ └────────┬─────────┘ └────────┬────────┘
+         │                     │                    │
+         └─────────────────────┼────────────────────┘
+                               │
+                    3 separate RAF loops
+                    No coordination mechanism
 ```
-- Why this is a bug: CommandArrival and SignatureReel pin logic still run on mobile (only OperationsSpine has explicit mobile bypass). This is a direct source of jumpy layout and sticky failures.
-- Severity: **Critical**
-- Exact fix: introduce centralized mobile pin policy for all pinned scenes (prefer `matchMedia` and degrade to free-flow scenes below tablet breakpoints).
 
-### 5) Internal route navigation forces full page reload in key flows
-- Files: `src/components/homepage/OperationsSpineScene.jsx:347`, `src/components/OurProjects.jsx:74`, `src/components/OurProjects.jsx:183`
-- Snippet:
-```jsx
-<a href="/process" ...>
-```
-```jsx
-<motion.a href="/work" ...>
-```
-- Why this is a bug: bypasses React Router and resets app state/scroll systems; expensive and user-visible navigation instability.
-- Severity: **Critical**
-- Exact fix: replace with `<Link to="...">` for internal routes.
+**WARNING**: Three independent animation systems with separate RAF loops.
 
-## High Severity Issues
+### Scene Architecture
 
-### 6) Search data contract mismatch drops testimonial relevance
-- Files: `src/hooks/useSearch.js:39`, `src/hooks/useSearch.js:41`, `src/data/siteData.js:184`
-- Snippet:
+- Scene source of truth: `src/foundation/homepageFoundation.js:91`
+- Scene component registry: `src/pages/Home.jsx:21`
+- Free scene wrapper: `SceneWrapper` → `SceneShell`
+- Pinned scene wrapper: `ScrollLockedSection` → `SceneShell`
+
+---
+
+## 🚨 CRITICAL RUNTIME ISSUES
+
+### C1: React State Updates on Every Scroll Frame
+
+**Severity**: CRITICAL
+**File**: `src/components/homepage/HomeScenes.jsx:499-501`
+
 ```jsx
-title: testimonial.client,
-content: testimonial.content,
-```
-- Why this is a bug: data model uses `name` and `quote`; current keys are undefined.
-- Severity: **High**
-- Exact fix: map to `testimonial.name` and `testimonial.quote`.
-
-### 7) Global smooth scroll conflicts with Lenis and manual smooth calls
-- Files: `src/index.css:116`, `src/components/homepage/HomeScenes.jsx:469`, `src/components/Footer.jsx:27`, `src/components/FinalCta.jsx:48`
-- Snippet:
-```css
-html { scroll-behavior: smooth; }
-```
-- Why this is a bug: native smooth + Lenis + explicit smooth calls stack easing systems and produce inconsistent travel time/jank.
-- Severity: **High**
-- Exact fix: disable global `scroll-behavior: smooth` when Lenis is active; route all programmatic scroll via Lenis API.
-
-### 8) `ScrollLockedSection` causes high-frequency React rerenders during scroll
-- File: `src/components/flagship/ScrollLockedSection.jsx:54`
-- Snippet:
-```jsx
-setProgress(previous => {
-  const blend = 0.2 + momentumGain
-  return previous + (nextProgress - previous) * blend
+useMotionValueEvent(progress, 'change', latest => {
+  setProgressValue(latest) // React re-render on every frame!
 })
 ```
-- Why this is a bug: state updates on every ScrollTrigger update frame re-render heavy scene trees.
-- Severity: **High**
-- Exact fix: use motion values for progress and derive UI transforms without React state churn.
 
-### 9) Mobile viewport instability from `100vh`/`h-screen` pinning
-- Files: `src/components/homepage/HomeScenes.jsx:707`, `src/index.css:2080`, `src/index.css:2122`
-- Snippet:
+**Impact**: Every scroll frame triggers:
+
+1. React state update
+2. Component re-render
+3. All children re-render
+4. Derived value recomputation (lines 503-525)
+
+**Fix**: Use `useTransform` for derived values:
+
 ```jsx
-height: '100vh'
+const selectedIndex = useTransform(progress, [0, 1], [0, PROJECTS.length - 1])
 ```
+
+---
+
+### C2: GSAP Double-Cleanup Anti-Pattern
+
+**Severity**: CRITICAL
+**Files**: `HomeScenes.jsx:1029-1042`, `OperationsSpineScene.jsx:268-284`, `ScrollLockedSection.jsx:77-86`
+
+```jsx
+// INSIDE matchMedia cleanup
+return () => {
+  if (timeline?.scrollTrigger) timeline.scrollTrigger.kill() // KILL #1
+}
+
+// OUTSIDE matchMedia - final cleanup
+return () => {
+  context.revert() // KILL #2 - kills same trigger again
+}
+```
+
+**Impact**: Console errors, race conditions in StrictMode, HMR failures
+
+**Fix**: Remove explicit `.kill()` calls — `ctx.revert()` handles ALL cleanup:
+
+```jsx
+// CORRECT: Only ctx.revert() at the top level
+useEffect(() => {
+  const ctx = gsap.context(() => {
+    ScrollTrigger.matchMedia({ ... })
+  }, element)
+  return () => ctx.revert()  // This alone kills everything
+}, [deps])
+```
+
+---
+
+### C3: ScrollTrigger.getAll() Global Kill
+
+**Severity**: CRITICAL
+**File**: `src/components/homepage/OperationsSpineScene.jsx:121-125`
+
+```jsx
+ScrollTrigger.getAll().forEach(trigger => {
+  if (trigger.trigger === outer || trigger.pin === sticky) {
+    trigger.kill()
+  }
+})
+```
+
+**Impact**: Kills triggers from OTHER components that happen to match conditions. Can destroy scroll behavior for unrelated sections.
+
+**Fix**: Remove entirely — `gsap.context()` with proper scoping handles cleanup.
+
+---
+
+## 🔴 HIGH SEVERITY ISSUES
+
+### H1: THREE.js BufferAttribute Memory Leak
+
+**File**: `src/components/flagship/HeroAmbientCanvas.jsx:48, 106-108`
+**Severity**: HIGH
+
+```jsx
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+// NEVER DISPOSED in cleanup
+```
+
+**Impact**: WebGL buffer leaks on every effect re-run (e.g., `shouldReduceMotion` toggle). GPU memory accumulation.
+
+**Fix**:
+
+```jsx
+return () => {
+  window.removeEventListener('resize', resize)
+  window.cancelAnimationFrame(animationFrameId)
+  if (geometry.attributes.position) {
+    geometry.attributes.position.array = null
+  }
+  geometry.dispose()
+  pointsMaterial.dispose()
+  renderer.dispose()
+}
+```
+
+---
+
+### H2: Orphaned GSAP Tween in ScrollTrigger Callback
+
+**File**: `src/components/homepage/OperationsSpineScene.jsx:254-264`
+**Severity**: HIGH
+
+```jsx
+onEnter() {
+  gsap.fromTo(cursor, { y: 72, opacity: 0 }, { ... })
+  // Tween created but never stored — no cleanup possible
+}
+```
+
+**Impact**: If component unmounts during animation, tween continues orphaned.
+
+---
+
+### H3: Fixed-Position Blend-Mode Overlay
+
+**File**: `src/index.css:1550-1565`
+**Severity**: HIGH
+
 ```css
-height: 100vh;
+.flagship-home-cinematic::after {
+  position: fixed;
+  inset: 0;
+  mix-blend-mode: soft-light;
+}
 ```
-- Why this is a bug: iOS/Safari dynamic chrome changes viewport height; pinned sections jump/clip on scroll/orientation.
-- Severity: **High**
-- Exact fix: standardize on `dvh/svh` strategy and avoid JS hardcoded `100vh` inline writes.
 
-### 10) `100vw` hero stage causes hidden horizontal overflow
-- Files: `src/index.css:2121`, `src/index.css:117`
-- Snippet:
+**Impact**: Forces repaint on every scroll frame across entire viewport. `mix-blend-mode` disables GPU compositing.
+
+---
+
+### H4: 23 Instances of Backdrop-Filter Blur
+
+**Files**: `src/index.css`, `src/components/ScribbleButton.css`
+**Severity**: HIGH
+
+GPU-intensive blur applied to:
+
+- Glass panels (16px)
+- Stat cards (8px)
+- Conversion form (10px)
+- Hero cards (5-7px)
+- DOF layer (0.9px on full viewport)
+
+**Impact**: Each blur forces GPU rasterization of background content. Stacked blurs compound exponentially.
+
+---
+
+### H5: Box-Shadow in Transition Properties
+
+**Files**: `src/index.css:1647-1650`, `src/components/ScribbleButton.css:39-45`
+**Severity**: HIGH
+
 ```css
-width: 100vw;
-overflow-x: hidden;
+transition: box-shadow var(--cine-transition-medium);
 ```
-- Why this is a bug: `100vw` includes scrollbar width and creates latent overflow; hidden globally masks real layout faults.
-- Severity: **High**
-- Exact fix: use `width: 100%` and remove global overflow masking where possible.
 
-### 11) Error boundary fallback distorts scene rhythm after failures
-- File: `src/pages/Home.jsx:84`
-- Snippet:
+**Impact**: Box-shadow changes trigger repaint + recomposite. Frame drops during hover animations.
+
+---
+
+### H6: Main Bundle 939KB (Home Statically Imported)
+
+**File**: `src/App.jsx:15`
+**Severity**: HIGH
+
 ```jsx
-style={{ minHeight: '100vh' }}
+import Home from './pages/Home' // STATIC IMPORT
 ```
-- Why this is a bug: all scene failures collapse to one-height fallback, but scenes have variable lengths (`75vh` to `240vh`) and pinned semantics.
-- Severity: **High**
-- Exact fix: fallback height should derive from scene registry `length` and mode.
 
-### 12) `history.scrollRestoration` at module scope breaks SSR/prerender portability
-- File: `src/main.jsx:11`
-- Snippet:
+Build output:
+
+```
+assets/index.js    939.95 kB │ gzip: 271.86 kB
+(!) Some chunks are larger than 500 kB
+```
+
+**Impact**: Landing page loads entire homepage scene tree + dependencies before interaction.
+
+---
+
+### H7: Search Testimonial Data Key Mismatch
+
+**File**: `src/hooks/useSearch.js:39-41`
+**Severity**: HIGH
+
 ```jsx
-history.scrollRestoration = 'manual'
+title: testimonial.client,    // WRONG - data has 'name'
+content: testimonial.content, // WRONG - data has 'quote'
 ```
-- Why this is a bug: unguarded browser global at module eval time.
-- Severity: **High**
-- Exact fix: wrap in `if (typeof window !== 'undefined' && 'scrollRestoration' in history)`.
 
-### 13) Breakpoint system is inconsistent across CSS, JS, and Tailwind
-- Files: `src/index.css:1772`, `src/index.css:2446`, `src/index.css:2604`, `src/components/homepage/OperationsSpineScene.jsx:53`, `tailwind.config.js:1`
-- Snippet:
+**Impact**: Testimonials not searchable — silently fails.
+
+---
+
+### H8: setTimeout Without Cleanup
+
+**File**: `src/hooks/useScrollSnap.js:37, 66, 113`
+**Severity**: MEDIUM-HIGH
+
+```jsx
+setTimeout(() => {
+  isScrolling.current = false
+}, 1000)
+// No timeout ID stored, no cleanup
+```
+
+**Impact**: If component unmounts during timeout, callback still executes.
+
+---
+
+### H9: History.scrollRestoration Unguarded
+
+**File**: `src/main.jsx:11`
+**Severity**: HIGH
+
+```jsx
+history.scrollRestoration = 'manual' // No window check
+```
+
+**Impact**: Crashes in SSR/prerender environments.
+
+---
+
+### H10: 100vw Hero Causes Horizontal Overflow
+
+**File**: `src/index.css:2121`
+**Severity**: HIGH
+
 ```css
-@media (min-width: 780px)
-@media (max-width: 900px)
-@media (min-width: 960px)
-@media (min-width: 1080px)
+.scene-depth-stage-hero-full {
+  width: 100vw; /* Includes scrollbar width */
+}
 ```
-- Why this is a bug: mixed, non-tokenized breakpoints produce unpredictable layout transitions and JS/CSS desync.
-- Severity: **High**
-- Exact fix: establish a single breakpoint contract exported for JS and reflected in CSS/Tailwind tokens.
 
-### 14) Legacy and current Operations systems are duplicated
-- Files: `src/index.css:2567`, `src/components/homepage/OperationsSpineScene.module.css:1`
-- Snippet:
+**Impact**: Hidden horizontal overflow on pages with scrollbars.
+
+---
+
+### H11: Event Listener Re-attachment on State Change
+
+**File**: `src/components/GhaimAEHeader.jsx:145-167`
+**Severity**: MEDIUM-HIGH
+
+```jsx
+useEffect(() => {
+  document.addEventListener('keydown', handleKeyDown)
+  return () => document.removeEventListener('keydown', handleKeyDown)
+}, [mobileOpen, activeMenu, searchOpen]) // Re-runs on every state change
+```
+
+**Impact**: Event listener removed/re-added frequently during normal use.
+
+---
+
+### H12: Global Smooth Scroll Conflicts with Lenis
+
+**File**: `src/index.css:116`
+**Severity**: HIGH
+
 ```css
-.ops-spine-*   (global legacy)
-.osv2*         (current CSS module)
+html {
+  scroll-behavior: smooth;
+}
 ```
-- Why this is a bug: two parallel style systems for the same feature increases drift and debugging ambiguity.
-- Severity: **High**
-- Exact fix: remove legacy `.ops-spine-*` block after verifying no runtime consumers.
 
-### 15) Large main bundle remains despite route lazy loading
-- Evidence: `npm run build` output (`assets/index.js` ~939k minified, chunk warning)
-- Related files: `src/App.jsx:15`, `src/utils/routePreload.js:1`
-- Why this is a bug: landing performance is constrained; heavy home scenes stay in entry chunk.
-- Severity: **High**
-- Exact fix: lazy-load Home route and scene bundles; split homepage scene groups into async chunks.
+**Impact**: Double smoothing — Lenis + native browser smooth scroll both active.
 
-### 16) Vite manual chunk config includes unused `swiper` chunk
-- File: `vite.config.js:63`
-- Snippet:
-```js
-carousel: ['swiper']
-```
-- Why this is a bug: build emits empty chunk warning and unnecessary configuration complexity.
-- Severity: **High**
-- Exact fix: remove manual chunk and dependency if Swiper is not used.
+---
 
-## Medium Issues
+### H13: Async Form Handlers Without Mounted Guards
 
-### 17) `useScrollSnap` has timeout leak risk and hot-path event churn
-- File: `src/hooks/useScrollSnap.js:37`, `src/hooks/useScrollSnap.js:66`, `src/hooks/useScrollSnap.js:113`, `src/hooks/useScrollSnap.js:159`
-- Snippet:
+**Files**: `src/hooks/useLeadSubmission.js:62-83`, `src/components/homepage/HomeScenes.jsx:1853-1866`
+**Severity**: HIGH
+
 ```jsx
-setTimeout(() => { isScrolling.current = false }, 1000)
-...
-}, [currentSection, sectionIds])
+const submit = useCallback(async formElement => {
+  await submitLead(fields, {...})
+  setStatus('success')  // No mounted check
+}, [...])
 ```
-- Why this is a bug: timeouts are never tracked/cleared; effect rebinds global listeners every state change.
-- Severity: **Medium**
-- Exact fix: store timeout IDs and clear on cleanup; stabilize handlers and depend only on immutable refs.
 
-### 18) Header mobile animation lock uses wrong event (`onAnimationEnd`)
-- File: `src/components/HeaderMobile.jsx:200`
-- Snippet:
+**Impact**: "Can't perform a React state update on an unmounted component" warnings. Potential memory leaks.
+
+---
+
+### H14: ProgressContext Inline Object Value
+
+**File**: `src/components/flagship/ProgressContext.jsx:35`
+**Severity**: MEDIUM-HIGH
+
 ```jsx
-onAnimationEnd={() => setIsAnimating(false)}
+<ProgressContext.Provider value={{ progress, reduced }}>
 ```
-- Why this is a bug: drawer uses CSS transition, not animation; lock release path is unreliable.
-- Severity: **Medium**
-- Exact fix: switch to `onTransitionEnd` or remove lock state and gate by actual open state.
 
-### 19) Skip link scrolling is smoothed, not instant
-- Files: `src/components/SkipToContent.jsx:9`, `src/index.css:116`
-- Snippet:
+**Impact**: New object reference on every render causes all consumers to re-render unnecessarily.
+
+**Fix**:
+
 ```jsx
-mainContent.scrollIntoView()
+const value = useMemo(() => ({ progress, reduced }), [progress, reduced])
 ```
-- Why this is a bug: accessibility skip links should jump immediately; smooth motion delays focus target arrival.
-- Severity: **Medium**
-- Exact fix: call `scrollIntoView({ behavior: 'auto', block: 'start' })` and avoid global smooth for assistive flows.
 
-### 20) Resize listeners are unthrottled on expensive work
-- Files: `src/components/flagship/HeroAmbientCanvas.jsx:101`, `src/components/SceneCapabilityEstablishment.jsx:175`, `src/components/GhaimAEHeader.jsx:133`
-- Snippet:
+---
+
+## 🟡 MEDIUM SEVERITY ISSUES
+
+### M1: Motion Token Systems Duplicated
+
+**Files**: `src/motion/tokens.js`, `src/motion/motionTokenContract.js`
+
+Both export similar constants — `MOTION_EASE` vs `MOTION_TOKEN_CONTRACT.easing`
+
+---
+
+### M2: Breakpoint Inconsistency
+
+- **JS**: `MOBILE_BREAKPOINT = 768` (`constants.js`)
+- **Tailwind**: `md: 768px`
+- **CSS**: `@media (min-width: 780px)`, `900px`, `960px`, `1080px`
+
+---
+
+### M3: will-change Overuse
+
+**Files**: `src/index.css` (13 instances)
+
+Some on non-animating elements, causing unnecessary GPU layer promotion.
+
+---
+
+### M4: AnimatePresence Exit Animation Gap
+
+**File**: `src/components/homepage/HomeScenes.jsx:1606-1615`
+
 ```jsx
-window.addEventListener('resize', resize)
+exit={reduced ? undefined : { opacity: 0, ... }}
 ```
-- Why this is a bug: can trigger heavy layout/renderer operations repeatedly during drag/orientation.
-- Severity: **Medium**
-- Exact fix: throttle/debounce and batch with `requestAnimationFrame`.
 
-### 21) Async form handlers can set state after unmount
-- Files: `src/hooks/useLeadSubmission.js:62`, `src/components/homepage/HomeScenes.jsx:1345`
-- Snippet:
+When `reduced` is true, exit is undefined — can cause orphaned elements.
+
+---
+
+### M5: No WebGL Context Loss Handling
+
+**File**: `src/components/flagship/HeroAmbientCanvas.jsx`
+
+No handlers for `webglcontextlost` / `webglcontextrestored` — canvas permanently broken on GPU reset.
+
+---
+
+### M6: ResizeObserver + Window Resize Redundancy
+
+**File**: `src/components/SceneCapabilityEstablishment.jsx:168-178`
+
+Both `ResizeObserver` and `window.resize` listener update same state.
+
+---
+
+### M7: SEO Metadata Ignores Query Changes
+
+**File**: `src/components/SiteMetaManager.jsx:276`
+
 ```jsx
-await submitLead(...)
-setStatus('success')
+}, [location.pathname])  // Missing location.search
 ```
-- Why this is a bug: unresolved async task races route changes/unmount.
-- Severity: **Medium**
-- Exact fix: track mounted flag or use abortable request in hook and guard state updates.
 
-### 22) CTA enablement depends on cross-layer DOM data attribute side-effect
-- Files: `src/components/homepage/HomeScenes.jsx:775`, `src/index.css:3016`
-- Snippet:
+---
+
+### M8: Console.error in Production Code
+
+**File**: `src/pages/Home.jsx:75`
+
 ```jsx
-transitionWrapper.dataset.pinReleased = 'true'
+console.error(`[SceneErrorBoundary] ...`)
 ```
-```css
-[data-pin-released="true"] .authority-ledger-cta { pointer-events: auto; }
-```
-- Why this is a bug: behavior depends on imperative DOM mutation + global selector coupling.
-- Severity: **Medium**
-- Exact fix: manage CTA state in React, not global style side-effect selectors.
 
-### 23) Motion token systems are split and inconsistent
-- Files: `src/motion/tokens.js:1`, `src/motion/motionTokenContract.js:6`
-- Snippet:
-```js
-export const MOTION_EASE ...
-export const MOTION_TOKEN_CONTRACT ...
-```
-- Why this is a bug: two token contracts are both active in runtime components, causing drift.
-- Severity: **Medium**
-- Exact fix: consolidate into one contract and migrate all imports.
+---
 
-### 24) Debug/legacy comments indicate drift from actual constants
-- File: `src/components/homepage/OperationsSpineScene.jsx:160`
-- Snippet:
+### M9: Direct DOM Style Manipulation
+
+**Files**: `src/components/CurvedArrow.jsx:14-15`, `src/components/AnimatedArrow.jsx:14-15`, `src/components/OurProjects.jsx:353-354`
+
 ```jsx
-// FIX: ... MOBILE_BREAKPOINT (760)
-const MOBILE_BREAKPOINT = 768
+pathRef.current.style.strokeDasharray = length
+e.currentTarget.style.color = '#1c1c1c'
 ```
-- Why this is a bug: comment/documentation drift in fragile scroll codebase increases misconfiguration risk.
-- Severity: **Medium**
-- Exact fix: remove stale commentary and codify breakpoints in shared constants.
 
-### 25) Internal SEO metadata updates ignore query changes
-- File: `src/components/SiteMetaManager.jsx:276`
-- Snippet:
-```jsx
-}, [location.pathname])
-```
-- Why this is a bug: canonical/meta remain stale on same-path query transitions.
-- Severity: **Medium**
-- Exact fix: include `location.search` when route-level query semantics matter.
+**Impact**: Bypasses React's virtual DOM, can cause hydration mismatches.
 
-## Low / Technical Debt
+---
 
-### 26) `console.error` shipped in homepage error boundary
-- File: `src/pages/Home.jsx:75`
-- Snippet:
-```jsx
-console.error(...)
-```
-- Severity: **Low**
-- Fix: route through centralized monitoring and remove console noise in production builds.
+### M10: Stale Closure in useScrollSnap
 
-### 27) Dead component inventory (unused in app graph)
-- Files:
-  - `src/components/AnimatedArrow.jsx`
-  - `src/components/CurvedArrow.jsx`
-  - `src/components/SceneBridgeDusk.jsx`
-  - `src/components/SceneExitBridge.jsx`
-  - `src/components/SceneNarrativeBreak.jsx`
-  - `src/components/SceneNarrativeRelease.jsx`
-  - `src/components/SceneProcessDepth.jsx`
-  - `src/components/Button.jsx`
-  - `src/hooks/useScrollSnap.js`
-  - `src/motion/hooks/useMagneticMotion.js`
-  - `src/motion/hooks/useSceneProgress.js`
-  - `src/components/flagship/MotionText.jsx`
-  - `src/components/flagship/MediaReveal.jsx`
-  - `src/components/flagship/GradientBridge.jsx`
-- Severity: **Low**
-- Fix: remove or move to experimental folder and exclude from production bundle paths.
+**File**: `src/hooks/useScrollSnap.js:26-29`
 
-### 28) Unused dependency overhead
-- Files: `package.json:32-37`, `vite.config.js:63`
-- Example: `swiper`, `react-intersection-observer`, `react-lazy-load-image-component` not used by `src`.
-- Severity: **Low**
-- Fix: uninstall unused packages and simplify manualChunks.
+Handlers reference `currentSection` state directly which can become stale. Effect re-runs on every state change.
 
-### 29) Legacy Vite template CSS remains
-- File: `src/App.css:9`
-- Why this matters: dead style surface area increases confusion.
-- Severity: **Low**
-- Fix: delete unused file or import intentionally.
+---
 
-### 30) Duplicate selector typo
-- File: `src/index.css:1602`
-- Snippet:
-```css
-.flagship-home-cinematic .flagship-scene-content,
-.flagship-home-cinematic .flagship-scene-content {
-```
-- Severity: **Low**
-- Fix: remove duplicate selector.
+## ✅ VERIFIED FIXED ISSUES
 
-## Scroll & Animation System Analysis
-- Current reality: there is no single scroll runtime contract.
-- Jitter sources:
-  - Duplicate ScrollTrigger updates (Lenis callback + wheel bridge)
-  - Frequent React state updates from GSAP `onUpdate`
-  - Simultaneous GSAP pin + Framer transform + CSS transitions
-- Duplication sources:
-  - Legacy `.ops-spine-*` plus current `.osv2*`
-  - Multiple motion token contracts
-  - Dead alternate scene family still in codebase
-- Resize jump sources:
-  - Mount-time-only mobile checks in operations spine
-  - Heavy `100vh` inline writes in pinned transitions
-  - Mixed sticky/pinSpacing policies (`pinSpacing: true` and `false`)
-- Mobile breakage sources:
-  - Multiple pinned sections with no global mobile downgrade
-  - `syncTouch: false` divergence between touch and wheel behavior
-  - Hard viewport heights and fixed overlays
+| #   | Issue                                   | Status   | Evidence                                                    |
+| --- | --------------------------------------- | -------- | ----------------------------------------------------------- |
+| 1   | Asset path contract broken              | ✅ FIXED | `OperationsSpineScene.jsx:6` imports from `assetUrl` helper |
+| 2   | Operations pin mode frozen at mount     | ✅ FIXED | Uses `ScrollTrigger.matchMedia()` at line 134               |
+| 3   | ScrollTrigger update duplicated         | ✅ FIXED | Single path via Lenis callback; wheel bridge removed        |
+| 4   | Pinned architecture on mobile           | ✅ FIXED | All pinned scenes use matchMedia at 768px                   |
+| 5   | Internal route navigation forces reload | ✅ FIXED | All internal links use `<Link>`                             |
 
-### Architectural fixes
-1. Create one `ScrollRuntimeProvider` that owns Lenis, ScrollTrigger lifecycle, breakpoint policies, reduced-motion behavior.
-2. Move pin configuration to registry-level declarative config (`enabledByBreakpoint`, `pinSpacing`, `endStrategy`).
-3. Replace React state-based per-frame progress updates with MotionValue streams.
-4. Remove global smooth scroll and route all programmatic scroll through one API.
+---
 
-## Responsive System Analysis
-- Hardcoded viewport and width risks are widespread (`100vh`, `h-screen`, `100vw`, fixed px paddings/gaps).
-- Breakpoint contract is inconsistent (`780`, `900`, `960`, `1080`, Tailwind `768/1024`, JS checks `768/1024`).
-- Mixed layout systems (Tailwind + large global CSS + module CSS + inline style objects) create override unpredictability.
-- Missing fluid guardrails:
-  - many media blocks lack `width/height` attributes (CLS risk)
-  - no shared `clamp` typography contract across all pages
-  - multiple scene lengths in raw `vh` without mobile correction factors
+## ✅ WHAT'S WORKING WELL
 
-## Performance Analysis
-- Build output flags:
-  - `assets/index.js` ~939k minified (too large)
-  - empty chunk `carousel`
-  - dynamic+static import conflict for Home
-- Runtime hotspots:
-  - Scroll frame state updates in `ScrollLockedSection`
-  - Heavy animation layers: GSAP + Framer + Three.js canvas on landing
-  - resize handlers without throttling
-- Asset risks:
-  - image-heavy scenes with no responsive `srcset`
-  - large hero video + multiple overlays
+### G1: Lenis-ScrollTrigger Synchronization
 
-### Improvement roadmap
-1. Split Home scene groups into lazy chunks.
-2. Remove dead code/dependencies and legacy CSS.
-3. Convert scroll progress to MotionValue/store (not React state per frame).
-4. Add image dimension hints and responsive sources.
-5. Profile and cap Three.js workload on low-power devices.
+Single update path via `lenis.on('scroll', () => ScrollTrigger.update())`. No duplicate calls per frame.
+
+### G2: Responsive Pinning
+
+All pinned sections use `ScrollTrigger.matchMedia()` with proper mobile disable at 768px.
+
+### G3: ScrollLockedSection Progress
+
+Uses `useMotionValue` instead of React state — no re-renders on scroll.
+
+### G4: Event Listener Cleanup
+
+All `addEventListener` calls have matching `removeEventListener`.
+
+### G5: Lenis Lifecycle
+
+Proper `.on()`, `.off()`, `.destroy()` cleanup.
+
+### G6: Context Provider Stability (AnalyticsContext)
+
+AnalyticsContext uses `useMemo` for stable value reference.
+
+### G7: AbortController in leadCapture
+
+Proper timeout and abort handling in fetch calls.
+
+---
+
+## 📊 PRODUCTION RISK ASSESSMENT
+
+### What Breaks First Under Load
+
+1. **Scroll performance** on low-end mobile — triple animation systems (GSAP + Framer + Three.js)
+2. **Memory** on long sessions — THREE.js buffer leak + possible GSAP orphaned tweens
+3. **GPU** on integrated graphics — backdrop-filter + mix-blend-mode + Three.js particles
+
+### What Crashes on Low-End Mobile
+
+- Composite load from GSAP pinning + Framer transforms + Three.js canvas + backdrop-filter blur
+
+### What Fails on Safari
+
+- `100vh` pinned sections during browser chrome expand/collapse
+- `backdrop-filter` performance regression
+
+### What Fails on Orientation Change
+
+- Currently handled via `matchMedia()` — should work correctly now
+
+### What Fails on Resize
+
+- GSAP `invalidateOnRefresh: true` set — should recalculate correctly
+
+---
+
+## 📈 RECOMMENDED FIXES (Priority Order)
+
+### Immediate (Blocks Production)
+
+| #   | Issue                              | File                           | Fix                                 |
+| --- | ---------------------------------- | ------------------------------ | ----------------------------------- |
+| 1   | React state in scroll handler      | `HomeScenes.jsx:499`           | Use `useTransform` instead of state |
+| 2   | GSAP double-cleanup                | All pinned components          | Remove explicit `.kill()` calls     |
+| 3   | ScrollTrigger.getAll() global kill | `OperationsSpineScene.jsx:121` | Remove entirely                     |
+
+### High Impact Performance
+
+| #   | Issue                         | File                       | Fix                               |
+| --- | ----------------------------- | -------------------------- | --------------------------------- |
+| 4   | THREE.js BufferAttribute leak | `HeroAmbientCanvas.jsx:48` | Add disposal in cleanup           |
+| 5   | Home static import            | `App.jsx:15`               | Lazy import with `React.lazy()`   |
+| 6   | Fixed blend-mode overlay      | `index.css:1550`           | Remove or simplify                |
+| 7   | Box-shadow in transitions     | `index.css:1647`           | Remove from transition properties |
+| 8   | Async setState without guard  | `useLeadSubmission.js:62`  | Add `isMountedRef` guard          |
+| 9   | Search data keys              | `useSearch.js:39`          | Use `name` and `quote` fields     |
+
+### Maintainability
+
+| #   | Issue                         | Fix                          |
+| --- | ----------------------------- | ---------------------------- |
+| 10  | ProgressContext inline object | Wrap in `useMemo`            |
+| 11  | Breakpoint system             | Consolidate to single source |
+| 12  | Motion tokens                 | Merge into single contract   |
+
+---
+
+## 📈 ESTIMATED STABILITY AFTER FIXES
+
+| Category            | Current    | After Top 5 | After All  |
+| ------------------- | ---------- | ----------- | ---------- |
+| Scroll Architecture | 7/10       | 8/10        | 8.5/10     |
+| React Performance   | 5/10       | 8/10        | 8.5/10     |
+| Memory Management   | 6/10       | 8/10        | 8.5/10     |
+| CSS Performance     | 5/10       | 7/10        | 8/10       |
+| Bundle Health       | 4/10       | 7/10        | 8/10       |
+| **Overall**         | **5.5/10** | **7.5/10**  | **8.3/10** |
+
+---
 
 ## Architectural Maturity Assessment
-- Classification: **Experimental**
-- Why:
-  - No unified scroll orchestration boundary
-  - Multiple parallel animation/layout systems with side effects
-  - Runtime behavior depends on fragile imperative DOM mutations
-  - Significant dead code and duplicate implementation layers
 
-## Dead Code & Redundancy
-- Unused scene family files (bridge/break/release/process variants) coexist with active homepage scene stack.
-- Unused UI primitives (`Button.jsx`) and motion hooks remain exported.
-- Legacy operations styles remain in global CSS after migration to CSS module implementation.
-- Route preload includes `loadHome` but App statically imports Home.
+- Classification: **Experimental → Maturing**
+- Progress:
+  - ✅ Unified scroll update path (Lenis → ScrollTrigger)
+  - ✅ Responsive pinning with matchMedia
+  - ⚠️ Multiple parallel animation systems remain
+  - ⚠️ React state still used in scroll hot paths
+  - ❌ Memory management gaps (THREE.js, async guards)
 
-## Production Risk Assessment
-
-### What breaks first
-- Scroll rhythm and pin release on mid-tier mobile and small tablets.
-
-### What crashes on low-end mobile
-- Composite load from GSAP pinning + Framer transforms + Three.js ambient canvas + large media.
-
-### What fails on Safari
-- `100vh` pinned sections and sticky combinations during browser chrome expand/collapse.
-
-### What fails on orientation change
-- Operations spine mode mismatch due mount-time width check.
-
-### What fails on resize
-- Pin ownership and measured offsets drift; sections can jump or retain stale mode.
-
-### What fails on dynamic content injection
-- Any changed card heights/text lengths can desync progress mapping and end calculations in pinned scenes.
+---
 
 ## Cleanup Roadmap (Priority Order)
-1. Unify scroll runtime ownership and remove duplicate ScrollTrigger update pathways.
-2. Fix BASE_URL asset resolution in OperationsSpine and replace all internal `<a href="/...">` route links.
-3. Implement breakpoint-driven pin enable/disable for all pinned scenes.
-4. Replace per-frame React state updates in scroll handlers with MotionValue/store-based progress.
-5. Remove legacy ops CSS and dead scene/component/hook files.
-6. Align breakpoint tokens across Tailwind, CSS, and JS.
-7. Rework viewport units (`dvh/svh`) and eliminate hardcoded `100vh` writes.
-8. Cut bundle size via Home lazy loading and dependency cleanup.
 
-## Safe Refactor Order
-1. Introduce non-breaking `ScrollRuntimeProvider` behind feature flag.
-2. Migrate CommandArrival pin to provider-managed lifecycle.
-3. Migrate SignatureReel/ScrollLockedSection progress to MotionValue.
-4. Migrate OperationsSpine with responsive matchMedia lifecycle.
-5. Remove legacy pathways (wheel bridge, old ops CSS, unused scenes/hooks).
-6. Final pass: simplify CSS, re-audit breakpoints, and run cross-device QA matrix.
-
-## Estimated Stability After Fixes
-- After top 4 roadmap items: **7.2 / 10** expected stability.
-- After full cleanup roadmap: **8.3 / 10** expected stability.
+1. **[CRITICAL]** Fix React state in scroll handlers → use MotionValue transforms
+2. **[CRITICAL]** Remove GSAP double-cleanup pattern
+3. **[CRITICAL]** Remove `ScrollTrigger.getAll()` global kill
+4. **[HIGH]** Add THREE.js BufferAttribute disposal
+5. **[HIGH]** Add mounted guards to async form submissions
+6. **[HIGH]** Fix search testimonial data mapping
+7. **[MEDIUM]** Lazy load Home route
+8. **[MEDIUM]** Remove fixed blend-mode overlay or simplify
+9. **[MEDIUM]** Consolidate breakpoint tokens
+10. **[LOW]** Remove unused dependencies and dead code

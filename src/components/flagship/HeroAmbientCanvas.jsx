@@ -31,7 +31,6 @@ const HeroAmbientCanvas = () => {
 
     const geometry = new THREE.BufferGeometry()
     const positions = new Float32Array(PARTICLE_COUNT * 3)
-    const sizes = new Float32Array(PARTICLE_COUNT)
 
     for (let index = 0; index < PARTICLE_COUNT; index += 1) {
       const stride = index * 3
@@ -42,7 +41,6 @@ const HeroAmbientCanvas = () => {
       positions[stride] = Math.cos(angle) * radius
       positions[stride + 1] = spread
       positions[stride + 2] = Math.sin(angle) * radius * 0.8
-      sizes[index] = 0.015 + Math.random() * 0.04
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
@@ -103,9 +101,19 @@ const HeroAmbientCanvas = () => {
     return () => {
       window.removeEventListener('resize', resize)
       window.cancelAnimationFrame(animationFrameId)
+
+      geometry.deleteAttribute('position')
       geometry.dispose()
       pointsMaterial.dispose()
+
+      pointsGroup.remove(points)
+      scene.remove(pointsGroup)
+      scene.remove(ambient)
+      scene.remove(keyLight)
+      scene.remove(fillLight)
+
       renderer.dispose()
+      renderer.forceContextLoss()
     }
   }, [shouldReduceMotion])
 

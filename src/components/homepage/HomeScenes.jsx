@@ -478,7 +478,8 @@ const SignatureReelContent = () => {
   const [cardWidth, setCardWidth] = useState(252)
   const scrollFrameRef = useRef(0)
   const [manualIndex, setManualIndex] = useState(null)
-  const [progressValue, setProgressValue] = useState(0)
+  const [scrollIndex, setScrollIndex] = useState(0)
+  const prevScrollIndexRef = useRef(0)
 
   useEffect(() => {
     const card = firstCardRef.current
@@ -497,13 +498,18 @@ const SignatureReelContent = () => {
   }, [])
 
   useMotionValueEvent(progress, 'change', latest => {
-    setProgressValue(latest)
+    const newIndex = clampIndex(
+      Math.floor(latest * PROJECTS.length),
+      PROJECTS.length - 1
+    )
+    if (newIndex !== prevScrollIndexRef.current) {
+      prevScrollIndexRef.current = newIndex
+      setScrollIndex(newIndex)
+      setManualIndex(null)
+    }
   })
 
-  const indexFromScroll = clampIndex(
-    Math.floor(progressValue * PROJECTS.length),
-    PROJECTS.length - 1
-  )
+  const indexFromScroll = scrollIndex
 
   const manualIndexInRange =
     typeof manualIndex === 'number' &&
@@ -513,16 +519,24 @@ const SignatureReelContent = () => {
   const hasPrev = selectedIndex > 0
   const hasNext = selectedIndex < PROJECTS.length - 1
 
-  const tension = reduced
-    ? 0
-    : Math.max(0, 1 - Math.abs(progressValue - 0.55) / 0.55)
-  const apertureInset = reduced ? 0 : 8 + tension * 26
+  const tension = useTransform(progress, v =>
+    reduced ? 0 : Math.max(0, 1 - Math.abs(v - 0.55) / 0.55)
+  )
+  const apertureInset = useTransform(tension, t => (reduced ? 0 : 8 + t * 26))
+  const apertureClipPath = useTransform(
+    apertureInset,
+    inset => `inset(0 ${inset}% 0 ${inset}% round 24px)`
+  )
 
   const conveyorOffset = reduced ? 0 : -selectedIndex * (cardWidth + CARD_GAP)
 
-  const backgroundY = reduced ? 0 : (0.5 - progressValue) * 40
-  const midY = reduced ? 0 : (0.5 - progressValue) * 22
-  const foregroundY = reduced ? 0 : (0.5 - progressValue) * 14
+  const backgroundY = useTransform(progress, v =>
+    reduced ? 0 : (0.5 - v) * 40
+  )
+  const midY = useTransform(progress, v => (reduced ? 0 : (0.5 - v) * 22))
+  const foregroundY = useTransform(progress, v =>
+    reduced ? 0 : (0.5 - v) * 14
+  )
 
   useEffect(
     () => () => {
@@ -654,7 +668,6 @@ const SignatureReelContent = () => {
                 : {
                     opacity: 1,
                     x: [0, -22, 0],
-                    y: [backgroundY, backgroundY + 8, backgroundY],
                     scale: [1.1, 1.12, 1.1],
                   }
             }
@@ -670,7 +683,7 @@ const SignatureReelContent = () => {
             className="command-aperture-beam pointer-events-none absolute inset-0 z-[1]"
             style={{
               y: midY,
-              clipPath: `inset(0 ${apertureInset}% 0 ${apertureInset}% round 24px)`,
+              clipPath: apertureClipPath,
             }}
           />
 
@@ -1023,14 +1036,6 @@ export const CommandArrivalScene = ({ scene, nextScene }) => {
               { opacity: 1, y: 0, duration: 0.76, ease: 'power2.out' },
               2.18
             )
-          }
-
-          // Return cleanup for desktop context
-          return () => {
-            if (timeline?.scrollTrigger) timeline.scrollTrigger.kill()
-            gsap.set(ledgerTextNodes, { clearProps: 'all' })
-            gsap.set(ledgerCardNodes, { clearProps: 'all' })
-            if (ledgerCtaNode) gsap.set(ledgerCtaNode, { clearProps: 'all' })
           }
         },
       })

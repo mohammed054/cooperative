@@ -70,7 +70,9 @@ const PhaseCard = React.memo(
             decoding="async"
             className={styles.osv2CardImg}
           />
-          {isActive ? <span className={styles.osv2CardShimmer} aria-hidden="true" /> : null}
+          {isActive ? (
+            <span className={styles.osv2CardShimmer} aria-hidden="true" />
+          ) : null}
         </div>
 
         <div className={styles.osv2CardText}>
@@ -80,7 +82,11 @@ const PhaseCard = React.memo(
         </div>
       </div>
 
-      <span className={styles.osv2CardDot} aria-hidden="true" style={{ opacity: isActive ? 1 : 0 }} />
+      <span
+        className={styles.osv2CardDot}
+        aria-hidden="true"
+        style={{ opacity: isActive ? 1 : 0 }}
+      />
     </article>
   ))
 )
@@ -100,9 +106,12 @@ export const OperationsSpineScene = ({ scene }) => {
   const activeIdxRef = useRef(0)
   const reducedMotion = useReducedMotion()
 
-  const setCardRef = useCallback(i => node => {
-    cardRefs.current[i] = node
-  }, [])
+  const setCardRef = useCallback(
+    i => node => {
+      cardRefs.current[i] = node
+    },
+    []
+  )
 
   useLayoutEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -116,13 +125,6 @@ export const OperationsSpineScene = ({ scene }) => {
     const cards = cardRefs.current.filter(Boolean)
 
     if (!outer || !sticky || !header || !cards.length) return undefined
-
-    // Dev StrictMode/HMR hardening: remove stale triggers tied to this instance
-    ScrollTrigger.getAll().forEach(trigger => {
-      if (trigger.trigger === outer || trigger.pin === sticky) {
-        trigger.kill()
-      }
-    })
 
     // FIX: Use ScrollTrigger.matchMedia() for responsive pinning.
     // This properly handles breakpoint changes by cleaning up and reinitializing
@@ -159,8 +161,10 @@ export const OperationsSpineScene = ({ scene }) => {
           gsap.set(outer, { position: 'relative', zIndex: 2 })
           gsap.set(header, { opacity: 0, y: 36 })
           if (cta) gsap.set(cta, { opacity: 0, y: 20 })
-          if (railFill) gsap.set(railFill, { scaleY: 0, transformOrigin: 'top center' })
-          if (progBar) gsap.set(progBar, { scaleX: 0, transformOrigin: 'left center' })
+          if (railFill)
+            gsap.set(railFill, { scaleY: 0, transformOrigin: 'top center' })
+          if (progBar)
+            gsap.set(progBar, { scaleX: 0, transformOrigin: 'left center' })
           gsap.set(cards, { opacity: 0, y: 52 })
 
           const cardBudget = 0.76
@@ -171,7 +175,8 @@ export const OperationsSpineScene = ({ scene }) => {
             scrollTrigger: {
               trigger: outer,
               start: 'top top',
-              end: () => `+=${window.innerHeight * (PHASES.length * VH_PER_PHASE + 1.2)}`,
+              end: () =>
+                `+=${window.innerHeight * (PHASES.length * VH_PER_PHASE + 1.2)}`,
               pin: sticky,
               pinSpacing: true,
               scrub: 1.5,
@@ -180,7 +185,10 @@ export const OperationsSpineScene = ({ scene }) => {
 
               onUpdate(self) {
                 const cp = Math.max(0, (self.progress - cardStart) / cardBudget)
-                const next = Math.min(PHASES.length - 1, Math.floor(cp * PHASES.length))
+                const next = Math.min(
+                  PHASES.length - 1,
+                  Math.floor(cp * PHASES.length)
+                )
                 if (next !== activeIdxRef.current) {
                   activeIdxRef.current = next
                   setActiveIdx(next)
@@ -207,28 +215,51 @@ export const OperationsSpineScene = ({ scene }) => {
           })
 
           // Header enters
-          tl.to(header, { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' }, 0)
+          tl.to(
+            header,
+            { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' },
+            0
+          )
 
           // Rail grows
-          if (railFill) tl.to(railFill, { scaleY: 1, duration: 0.86, ease: 'none' }, 0.06)
+          if (railFill)
+            tl.to(railFill, { scaleY: 1, duration: 0.86, ease: 'none' }, 0.06)
 
           // Progress bar grows
-          if (progBar) tl.to(progBar, { scaleX: 1, duration: 0.86, ease: 'power1.inOut' }, 0.06)
+          if (progBar)
+            tl.to(
+              progBar,
+              { scaleX: 1, duration: 0.86, ease: 'power1.inOut' },
+              0.06
+            )
 
           // Cards stagger in sequentially
           cards.forEach((card, i) => {
             const at = cardStart + i * stepSize
-            tl.to(card, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }, at)
+            tl.to(
+              card,
+              { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' },
+              at
+            )
           })
 
           // CTA enters near end
-          if (cta) tl.to(cta, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' }, 0.88)
+          if (cta)
+            tl.to(
+              cta,
+              { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' },
+              0.88
+            )
 
-          tl.call(() => {
-            gsap.set(header, { clearProps: 'willChange' })
-            gsap.set(cards, { clearProps: 'willChange' })
-            if (cta) gsap.set(cta, { clearProps: 'willChange' })
-          }, [], 1)
+          tl.call(
+            () => {
+              gsap.set(header, { clearProps: 'willChange' })
+              gsap.set(cards, { clearProps: 'willChange' })
+              if (cta) gsap.set(cta, { clearProps: 'willChange' })
+            },
+            [],
+            1
+          )
 
           // ── Sentinel: prime the next scene's entry animation ─────────────
           const sentinelTrigger = ScrollTrigger.create({
@@ -264,17 +295,6 @@ export const OperationsSpineScene = ({ scene }) => {
               )
             },
           })
-
-          // Return cleanup for desktop context
-          return () => {
-            if (sentinelTrigger) sentinelTrigger.kill()
-            if (tl?.scrollTrigger) tl.scrollTrigger.kill()
-            gsap.set(header, { clearProps: 'all' })
-            gsap.set(cards, { clearProps: 'all' })
-            if (cta) gsap.set(cta, { clearProps: 'all' })
-            if (railFill) gsap.set(railFill, { clearProps: 'all' })
-            if (progBar) gsap.set(progBar, { clearProps: 'all' })
-          }
         },
       })
     }, outer)
@@ -316,7 +336,8 @@ export const OperationsSpineScene = ({ scene }) => {
             </h2>
 
             <p className={styles.osv2Body}>
-              Each phase locks before the next advances. Scroll through the command sequence.
+              Each phase locks before the next advances. Scroll through the
+              command sequence.
             </p>
 
             <div className={styles.osv2ProgWrap}>
@@ -333,15 +354,21 @@ export const OperationsSpineScene = ({ scene }) => {
                   className={styles.osv2ProgFill}
                   style={
                     reducedMotion
-                      ? { transform: `scaleX(${(displayIdx + 1) / PHASES.length})` }
+                      ? {
+                          transform: `scaleX(${(displayIdx + 1) / PHASES.length})`,
+                        }
                       : undefined
                   }
                 />
               </div>
 
               <p className={styles.osv2ProgLabel} aria-live="polite">
-                <span className={styles.osv2ProgLabelCurrent}>{pad(displayIdx + 1)}</span>
-                <span className={styles.osv2ProgLabelSep} aria-hidden="true">/</span>
+                <span className={styles.osv2ProgLabelCurrent}>
+                  {pad(displayIdx + 1)}
+                </span>
+                <span className={styles.osv2ProgLabelSep} aria-hidden="true">
+                  /
+                </span>
                 <span>{pad(PHASES.length)}</span>
               </p>
             </div>
@@ -354,7 +381,9 @@ export const OperationsSpineScene = ({ scene }) => {
                 aria-label="View full delivery process"
               >
                 View Full Process
-                <span className={styles.osv2CtaArrow} aria-hidden="true">→</span>
+                <span className={styles.osv2CtaArrow} aria-hidden="true">
+                  →
+                </span>
               </Link>
             </div>
           </div>
@@ -366,7 +395,11 @@ export const OperationsSpineScene = ({ scene }) => {
               <div
                 ref={railFillRef}
                 className={styles.osv2RailFill}
-                style={reducedMotion ? { transform: 'translateX(-50%) scaleY(1)' } : undefined}
+                style={
+                  reducedMotion
+                    ? { transform: 'translateX(-50%) scaleY(1)' }
+                    : undefined
+                }
               />
               <div className={styles.osv2RailDots}>
                 {PHASES.map((_, i) => (
@@ -378,7 +411,11 @@ export const OperationsSpineScene = ({ scene }) => {
               </div>
             </div>
 
-            <div className={styles.osv2Cards} role="list" aria-label="Delivery phases">
+            <div
+              className={styles.osv2Cards}
+              role="list"
+              aria-label="Delivery phases"
+            >
               {PHASES.map((phase, i) => (
                 <PhaseCard
                   key={phase.id}

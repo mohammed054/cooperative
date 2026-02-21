@@ -43,14 +43,10 @@ const ScrollLockedSection = ({
         [`(max-width: ${MOBILE_BREAKPOINT - 1}px)`]: function mobileSetup() {
           progress.set(1)
           gsap.set(lockEl, { opacity: 1 })
-
-          return () => {
-            gsap.set(lockEl, { clearProps: 'all' })
-          }
         },
 
         [`(min-width: ${MOBILE_BREAKPOINT}px)`]: function desktopSetup() {
-          const trigger = ScrollTrigger.create({
+          ScrollTrigger.create({
             trigger: sectionEl,
             start: 'top top',
             end: 'bottom bottom',
@@ -73,10 +69,6 @@ const ScrollLockedSection = ({
               progress.set(previous + (nextProgress - previous) * blend)
             },
           })
-
-          return () => {
-            if (trigger) trigger.kill()
-          }
         },
       })
     }, sectionEl)
