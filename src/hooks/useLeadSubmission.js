@@ -1,4 +1,11 @@
-import { useCallback, useContext, useMemo, useState } from 'react'
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { AnalyticsContext } from '../context/AnalyticsContextCore'
 import {
   isLeadCaptureConfigured,
@@ -16,6 +23,13 @@ export const useLeadSubmission = ({
   const analytics = useContext(AnalyticsContext)
   const [status, setStatus] = useState('idle')
   const [feedbackMessage, setFeedbackMessage] = useState('')
+  const isMounted = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
 
   const resetFeedback = useCallback(() => {
     setStatus('idle')
@@ -66,20 +80,24 @@ export const useLeadSubmission = ({
           pageTitle: document.title,
         })
 
-        setStatus('success')
-        setFeedbackMessage(successMessage)
-        formElement.reset()
-        analytics?.trackFormSubmission?.(formName, true)
+        if (isMounted.current) {
+          setStatus('success')
+          setFeedbackMessage(successMessage)
+          formElement.reset()
+          analytics?.trackFormSubmission?.(formName, true)
+        }
       } catch (error) {
         const errorMessage =
           error instanceof Error
             ? error.message
             : 'Unable to submit right now. Please try again.'
 
-        setStatus('error')
-        setFeedbackMessage(errorMessage)
-        analytics?.trackFormSubmission?.(formName, false)
-        analytics?.trackError?.('LeadSubmission', errorMessage, formName)
+        if (isMounted.current) {
+          setStatus('error')
+          setFeedbackMessage(errorMessage)
+          analytics?.trackFormSubmission?.(formName, false)
+          analytics?.trackError?.('LeadSubmission', errorMessage, formName)
+        }
       }
     },
     [analytics, formName, successMessage]

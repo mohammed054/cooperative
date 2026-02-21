@@ -262,6 +262,7 @@ export const OperationsSpineScene = ({ scene }) => {
           )
 
           // ── Sentinel: prime the next scene's entry animation ─────────────
+          let sentinelTween = null
           const sentinelTrigger = ScrollTrigger.create({
             trigger: sentinelRef.current,
             start: 'top 92%',
@@ -282,7 +283,7 @@ export const OperationsSpineScene = ({ scene }) => {
               const rect = cursor.getBoundingClientRect()
               if (rect.top < window.innerHeight * 0.95) return
 
-              gsap.fromTo(
+              sentinelTween = gsap.fromTo(
                 cursor,
                 { y: 72, opacity: 0 },
                 {
@@ -295,6 +296,11 @@ export const OperationsSpineScene = ({ scene }) => {
               )
             },
           })
+
+          return () => {
+            sentinelTrigger.kill()
+            if (sentinelTween) sentinelTween.kill()
+          }
         },
       })
     }, outer)

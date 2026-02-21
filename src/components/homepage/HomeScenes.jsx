@@ -1828,6 +1828,13 @@ const ConversionChamberContent = ({ reduced }) => {
   const isSubmitting = status === 'submitting'
   const isSuccess = status === 'success'
   const isError = status === 'error'
+  const isMounted = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
 
   const handleSubmit = async event => {
     event.preventDefault()
@@ -1857,18 +1864,22 @@ const ConversionChamberContent = ({ reduced }) => {
 
     try {
       await submitHomepageLead(Object.fromEntries(formData.entries()))
-      setStatus('success')
-      setFeedbackMessage(
-        'Request received. A senior producer will contact you within one business day.'
-      )
-      form.reset()
+      if (isMounted.current) {
+        setStatus('success')
+        setFeedbackMessage(
+          'Request received. A senior producer will contact you within one business day.'
+        )
+        form.reset()
+      }
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : 'Unable to submit request right now. Please retry in a moment.'
-      setStatus('error')
-      setFeedbackMessage(message)
+      if (isMounted.current) {
+        setStatus('error')
+        setFeedbackMessage(message)
+      }
     }
   }
 
