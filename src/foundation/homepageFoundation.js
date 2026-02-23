@@ -32,7 +32,7 @@ export const TONE_STATE_MACHINE = Object.freeze({
   }),
   flow: Object.freeze([
     'deep',
-    'dark',
+    'steel',
     'dark',
     'steel',
     'steel',
@@ -115,7 +115,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   // Pin status: free
   {
     id: 'authority-ledger',
-    tone: 'dark',
+    tone: 'steel',
     length: 100,
     mode: 'free',
     entryCue: 'ledger-evidence-rise',
@@ -273,14 +273,14 @@ export const HOMEPAGE_GRADIENT_BRIDGES = Object.freeze([
     fromSceneId: 'command-arrival',
     toSceneId: 'authority-ledger',
     fromTone: 'deep',
-    toTone: 'dark',
+    toTone: 'steel',
   },
   // ── NEW: authority dark → signature-reel dark (same tone; removes micro-seam) ──
   {
     id: 'bridge-authority-to-reel',
     fromSceneId: 'authority-ledger',
     toSceneId: 'signature-reel',
-    fromTone: 'dark',
+    fromTone: 'steel',
     toTone: 'dark',
   },
   {

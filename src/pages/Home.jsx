@@ -38,8 +38,10 @@ const BRIDGE_BY_FROM_SCENE = new Map(
 
 const BRIDGE_CLASS_BY_TONE_FLOW = Object.freeze({
   'deep->dark': 'homepage-tone-bridge-deep-dark',
+  'deep->steel': 'homepage-tone-bridge-deep-steel',
   'dark->dark': 'homepage-tone-bridge-dark-dark',
   'dark->steel': 'homepage-tone-bridge-dark-steel',
+  'steel->dark': 'homepage-tone-bridge-steel-dark',
   'steel->warm': 'homepage-tone-bridge-steel-warm',
   'warm->linen': 'homepage-tone-bridge-warm-linen',
   'linen->dark': 'homepage-tone-bridge-linen-dark',
@@ -138,7 +140,7 @@ const Home = () => {
 
   return (
     <div className="flagship-home flagship-home-cinematic">
-      {/* CommandArrival + AuthorityLedger are tightly coupled via GSAP transition */}
+      {/* CommandArrival renders AuthorityLedger inline — they share one scroll context */}
       <SceneErrorBoundary sceneId="command-arrival+authority-ledger">
         {commandScene && authorityScene ? (
           <CommandArrivalScene scene={commandScene} nextScene={authorityScene} />

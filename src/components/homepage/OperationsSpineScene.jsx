@@ -137,16 +137,34 @@ export const OperationsSpineScene = ({ scene }) => {
     const ctx = gsap.context(() => {
       ScrollTrigger.matchMedia({
         [`(max-width: ${MOBILE_BREAKPOINT - 1}px)`]: function mobileSetup() {
-          gsap.set(header, { opacity: 1, y: 0 })
-          gsap.set(cards, { opacity: 1, y: 0 })
-          if (cta) gsap.set(cta, { opacity: 1, y: 0 })
+          // Mobile: animate header and cards in with IntersectionObserver via CSS class
+          // GSAP animates them in staggered when outer enters viewport
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: outer,
+              start: 'top 85%',
+              once: true,
+            },
+          })
+          gsap.set(header, { opacity: 0, y: 28 })
+          gsap.set(cards, { opacity: 0, y: 40 })
+          if (cta) gsap.set(cta, { opacity: 0, y: 20 })
           if (railFill) gsap.set(railFill, { scaleY: 1 })
           if (progBar) gsap.set(progBar, { scaleX: 1 })
+
+          tl.to(header, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0)
+          cards.forEach((card, i) => {
+            tl.to(card, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0.1 + i * 0.1)
+          })
+          if (cta) tl.to(cta, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 0.5)
+
+          // Show all phases on mobile
           const finalIdx = PHASES.length - 1
           activeIdxRef.current = finalIdx
           setActiveIdx(finalIdx)
 
           return () => {
+            tl.kill()
             gsap.set(header, { clearProps: 'all' })
             gsap.set(cards, { clearProps: 'all' })
             if (cta) gsap.set(cta, { clearProps: 'all' })
@@ -164,8 +182,8 @@ export const OperationsSpineScene = ({ scene }) => {
             gsap.set(railFill, { scaleY: 0, transformOrigin: 'top center' })
           if (progBar)
             gsap.set(progBar, { scaleX: 0, transformOrigin: 'left center' })
-          // PHASE2: Cards start with slight rotation + y offset for natural reveal
-          gsap.set(cards, { opacity: 0, y: 52, rotation: -1.8, transformOrigin: 'center bottom' })
+          // Cinematic card entrance: x 80→0, rotateY 4→0, blur 8→0 (spec)
+          gsap.set(cards, { opacity: 0, x: 80, rotateY: 4, filter: 'blur(8px)', transformOrigin: 'center center', transformPerspective: 900 })
 
           const cardBudget = 0.76
           const cardStart = 0.1
@@ -226,7 +244,7 @@ export const OperationsSpineScene = ({ scene }) => {
             const at = cardStart + i * stepSize
             tl.to(
               card,
-              { opacity: 1, y: 0, rotation: 0, duration: 0.32, ease: 'power2.out' },
+              { opacity: 1, x: 0, rotateY: 0, filter: 'blur(0px)', duration: 0.38, ease: 'power2.out' },
               at
             )
           })

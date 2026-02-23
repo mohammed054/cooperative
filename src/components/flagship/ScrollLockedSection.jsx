@@ -1,20 +1,27 @@
 /**
- * ScrollLockedSection — STABILIZATION MODE
+ * ScrollLockedSection — CINEMATIC ENGINE RESTORED
  *
- * Scroll-lock (GSAP pin) is temporarily disabled.
- * Sections render as natural flow with a static progress value.
- * Choreography will be restored in a later pass.
+ * Architecture: scroll spacer outer div + CSS sticky inner pin + live Framer Motion progress.
  *
- * Changes from original:
- * - No GSAP ScrollTrigger pinning
- * - No sticky positioning
- * - Progress is static at 0 (content renders in initial state)
- * - reduced is false so framer-motion scroll animations still work
- * - Sections scroll naturally, meeting the 100vh min-height requirement
+ * Outer div (ref = containerRef):
+ *   height = scene.length  e.g. "220vh" for signature-reel
+ *   class  = flagship-scene-locked  →  CSS: position: relative
+ *   Creates the scroll duration. useScroll tracks this element.
+ *
+ * Inner div (flagship-lock-inner):
+ *   CSS: position: sticky; top: 0; min-height: 100svh
+ *   Pins the visible viewport while the outer spacer scrolls past.
+ *
+ * scrollYProgress — live MotionValue (0 → 1):
+ *   0 = outer div top reaches viewport top   (scene fully entered, pin begins)
+ *   1 = outer div bottom reaches viewport bottom  (pin releases, next scene takes over)
+ *
+ * Children receive: (progress: MotionValue<number>, reduced: boolean)
+ * All internal scroll-linked animations derive from this single authoritative value.
  */
 
-import React from 'react'
-import { useMotionValue } from 'framer-motion'
+import React, { useRef } from 'react'
+import { useScroll, useReducedMotion } from 'framer-motion'
 import { ProgressProvider } from './ProgressContext.jsx'
 
 const joinClasses = (...classes) => classes.filter(Boolean).join(' ')
@@ -28,34 +35,61 @@ const ScrollLockedSection = ({
   theme = 'light',
   transitionReady = false,
 }) => {
-  // Static progress — scroll lock disabled for stabilization
-  const progress = useMotionValue(0)
+  // containerRef wraps the full scroll spacer (height = scene.length in vh).
+  // useScroll measures: spacer-top-at-viewport-top → 0, spacer-bottom-at-viewport-bottom → 1
+  const containerRef = useRef(null)
+  const prefersReduced = useReducedMotion() ?? false
 
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  })
+
+  // scrollYProgress is a live MotionValue — updates continuously on every scroll frame.
   const content =
     typeof children === 'function'
-      ? children(progress, false)
+      ? children(scrollYProgress, prefersReduced)
       : children
 
   return (
-    <section
-      id={id}
-      data-scene-id={id}
-      data-theme={theme}
-      data-transition-ready={String(Boolean(transitionReady))}
-      className={joinClasses(
-        'flagship-scene',
-        `flagship-scene-${tone}`,
-        className
-      )}
-      style={{ '--scene-min-height': '100vh', minHeight: '100vh' }}
+    // Scroll spacer: reserves the full scroll distance for this scene (e.g. 220vh)
+    <div
+      ref={containerRef}
+      style={{ height }}
+      className="flagship-scene-locked"
     >
-      {/* No sticky wrapper — sections scroll naturally in stabilization mode */}
-      <div className="flagship-scene-content scene-transition-shell">
-        <ProgressProvider progress={progress} reduced={false}>
-          {content}
-        </ProgressProvider>
+      {/* Sticky pin: stays at viewport top while user scrolls through the spacer above */}
+      <div
+        className="flagship-lock-inner"
+        style={{ padding: 0, alignItems: 'stretch' }}
+      >
+        <section
+          id={id}
+          data-scene-id={id}
+          data-theme={theme}
+          data-transition-ready={String(Boolean(transitionReady))}
+          className={joinClasses(
+            'flagship-scene',
+            `flagship-scene-${tone}`,
+            className,
+          )}
+          style={{
+            height: '100svh',
+            '--scene-min-height': '100svh',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            className="flagship-scene-content scene-transition-shell"
+            style={{ minHeight: '100svh' }}
+          >
+            <ProgressProvider progress={scrollYProgress} reduced={prefersReduced}>
+              {content}
+            </ProgressProvider>
+          </div>
+        </section>
       </div>
-    </section>
+    </div>
   )
 }
 
