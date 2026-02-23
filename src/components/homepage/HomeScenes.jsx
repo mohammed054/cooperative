@@ -1,16 +1,26 @@
 /**
- * HomeScenes.jsx — MOBILE-FIRST MOTION REBUILD
+ * HomeScenes.jsx — NATIVE SCROLL ARCHITECTURE
  *
- * All animations use direct whileInView on each element.
- * No parent-child variant propagation (unreliable on mobile).
- * viewport={{ once: true, amount: 0.1 }} — works at all breakpoints.
- * Ease: cubic-bezier(.22,.61,.36,1) throughout.
+ * SCENE MAP:
+ *   01  CommandArrivalScene      — Hero, fullscreen video, individual scroll-linked text fade
+ *   02  AuthorityLedgerScene     — Performance Record, staggered count-up metrics
+ *   03  SignatureReelScene       — Featured Engagements, manual navigation
+ *   04  CapabilityMatrixScene    — Capabilities, 3 cards, sequential reveal
+ *   05  OperationsSpineScene     — Delivery Framework (external GSAP component)
+ *   06  NarrativeBridgeScene     — Outcome Transition, pure breathing bridge
+ *   07  ProofTheaterScene        — Client Outcomes, testimonial contrast reveal
+ *   08  ConversionChamberScene   — Request Proposal, elevation reveal
+ *   09  GlobalFooterScene        — Final Close
  *
- * Section 2 (AuthorityLedgerScene) — now uses tone:'steel' (light).
- * All sections animate. No section is dark unless explicitly coded.
+ * GLOBAL MOTION RULES:
+ *   — Fade (primary)
+ *   — Slight translateY (secondary, max 40px)
+ *   — Slight contrast shift (highlight)
+ *   — Sequential stagger (authority feel)
+ *   NEVER: scale bounce, big rotations, aggressive parallax, snap
  */
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import {
   AnimatePresence,
   motion,
@@ -18,16 +28,12 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
-  useMotionValueEvent,
 } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import ScribbleButton from '../ScribbleButton'
 import {
   HeroAmbientCanvas,
-  SceneShell,
   SceneWrapper,
-  ScrollLockedSection,
-  useProgress,
 } from '../flagship'
 import {
   caseStudies,
@@ -38,89 +44,92 @@ import { assetUrl } from '../../lib/assetUrl'
 import { isLeadCaptureConfigured, submitLead } from '../../utils/leadCapture'
 
 // ---------------------------------------------------------------------------
-// MOTION CONSTANTS — mobile-first
+// MOTION CONSTANTS
 // ---------------------------------------------------------------------------
 
 const EASE = [0.22, 0.61, 0.36, 1]
 const DUR = { fast: 0.6, base: 0.8, slow: 1.0, cinematic: 1.1 }
-const VP = { once: true, amount: 0.1 } // low threshold — fires early on mobile
+const VP = { once: true, amount: 0.1 }
 const VP_CARD = { once: true, amount: 0.05 }
 
-/** Standard entrance: opacity 0→1, y 40→0, blur 6→0 */
-const enterFrom = (delay = 0, distance = 40) => ({
-  initial: { opacity: 0, y: distance, filter: 'blur(6px)' },
+/** Standard entrance: opacity 0→1, y 12→0 (light touch per brief) */
+const enterFrom = (delay = 0, distance = 12) => ({
+  initial: { opacity: 0, y: distance, filter: 'blur(4px)' },
   whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' },
   viewport: VP,
   transition: { duration: DUR.base, ease: EASE, delay },
 })
 
-/** Card variant (staggered): y 60→0, scale 0.97→1, blur 6→0 */
+/** Card variant: y 10→0, no blur (brief: no gimmicks) */
 const cardEnter = (delay = 0) => ({
-  initial: { opacity: 0, y: 60, scale: 0.97, filter: 'blur(6px)' },
-  whileInView: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' },
+  initial: { opacity: 0, y: 10 },
+  whileInView: { opacity: 1, y: 0 },
   viewport: VP_CARD,
   transition: { duration: DUR.base, ease: EASE, delay },
 })
 
-/** Narrative text: scale 1.02→1, y 20→0 */
+/** Narrative text: pure fade, slight scale correction */
 const narrativeEnter = {
-  initial: { opacity: 0, y: 20, scale: 1.02 },
-  whileInView: { opacity: 1, y: 0, scale: 1 },
+  initial: { opacity: 0, y: 8 },
+  whileInView: { opacity: 1, y: 0 },
   viewport: VP,
   transition: { duration: DUR.cinematic, ease: EASE },
 }
-
-/** Testimonial: y 40→0, scale 0.95→1 */
-const testimonialEnter = (delay = 0) => ({
-  initial: { opacity: 0, y: 40, scale: 0.95 },
-  whileInView: { opacity: 1, y: 0, scale: 1 },
-  viewport: VP,
-  transition: { duration: DUR.fast, ease: EASE, delay },
-})
 
 // ---------------------------------------------------------------------------
 // DATA
 // ---------------------------------------------------------------------------
 
-const FREE = 'free'
-const PINNED = 'pinned'
-const clampIndex = (v, max) => Math.max(0, Math.min(max, v))
-
 const PROJECTS = caseStudies.slice(0, 3).map((project, i) => ({
   id: `case-${String(i + 1).padStart(2, '0')}`,
-  title: project.title,
-  subtitle: project.summary,
+  title:     project.title,
+  subtitle:  project.summary,
   challenge: project.challenge,
-  outcome: project.results?.[0] || 'Delivered without timeline drift.',
-  image: project.image,
-  location: project.location,
-  slug: project.slug,
+  outcome:   project.results?.[0] || 'Delivered without timeline drift.',
+  image:     project.image,
+  location:  project.location,
+  slug:      project.slug,
 }))
 
-const CAPABILITY_MODULES = services.slice(0, 3).map((service, i) => ({
-  id: service.slug,
-  title: service.title,
-  summary: service.summary,
-  standards: service.standards?.slice(0, 2) || [],
-  image:
-    [
-      assetUrl('images/full-production.png'),
-      assetUrl('images/lighting-effects.png'),
-      assetUrl('images/av-setup.png'),
-    ][i] || assetUrl('images/full-production.png'),
-}))
+// Scene 04 capability cards — exactly three
+const CAPABILITY_CARDS = [
+  {
+    id:      'event-production',
+    num:     '01',
+    title:   'Event Production',
+    summary: services[0]?.summary || 'Full-spectrum live event production from concept to show close.',
+    tags:    services[0]?.standards?.slice(0, 3) || ['Narrative Direction', 'Floor Authority', 'Risk Protocols'],
+    image:   assetUrl('images/full-production.png'),
+  },
+  {
+    id:      'technical-production',
+    num:     '02',
+    title:   'Technical Production',
+    summary: services[1]?.summary || 'AV, lighting, and systems integration at broadcast-grade precision.',
+    tags:    services[1]?.standards?.slice(0, 3) || ['Systems Integration', 'Broadcast AV', 'Redundancy'],
+    image:   assetUrl('images/lighting-effects.png'),
+  },
+  {
+    id:      'staging-scenic',
+    num:     '03',
+    title:   'Staging & Scenic',
+    summary: services[2]?.summary || 'Custom staging, scenic architecture, and spatial design for executive environments.',
+    tags:    services[2]?.standards?.slice(0, 3) || ['Scenic Build', 'Spatial Design', 'Custom Fabrication'],
+    image:   assetUrl('images/av-setup.png'),
+  },
+]
 
 const TESTIMONIALS = testimonialData
   .filter(t => t?.name && t?.quote)
   .slice(0, 3)
   .map((t, i) => ({
-    id: t.id || `testimonial-${String(i + 1).padStart(2, '0')}`,
-    name: t.name,
-    role: t.role,
+    id:           t.id || `testimonial-${String(i + 1).padStart(2, '0')}`,
+    name:         t.name,
+    role:         t.role,
     organization: t.company,
-    quote: t.quote,
-    context: t.project,
-    image: caseStudies[i]?.image || PROJECTS[i % PROJECTS.length]?.image,
+    quote:        t.quote,
+    context:      t.project,
+    image:        caseStudies[i]?.image || PROJECTS[i % PROJECTS.length]?.image,
   }))
 
 const parseMetricValue = raw => {
@@ -129,7 +138,7 @@ const parseMetricValue = raw => {
 }
 
 const AUTHORITY_METRICS = [
-  { label: 'Events Delivered', value: caseStudies.length, suffix: '' },
+  { label: 'Events Delivered',    value: caseStudies.length, suffix: '' },
   {
     label: 'Guests Managed',
     value: caseStudies.reduce((sum, s) => {
@@ -155,17 +164,18 @@ const buildHeight = vh => `${vh}vh`
 // SHARED HELPERS
 // ---------------------------------------------------------------------------
 
+/** Count-up metric — starts at 0, counts to value when in view */
 const CountUpMetric = ({ value, suffix = '', reduced }) => {
-  const ref = useRef(null)
+  const ref     = useRef(null)
   const [display, setDisplay] = useState(0)
   const isInView = useInView(ref, { once: true, amount: 0.1 })
 
   useEffect(() => {
     if (!isInView || reduced) return undefined
-    const dur = 920
+    const dur   = 920
     const start = performance.now()
-    let fid = 0
-    const tick = now => {
+    let fid     = 0
+    const tick  = now => {
       const p = Math.min(1, (now - start) / dur)
       setDisplay(Math.round(value * (1 - (1 - p) ** 3)))
       if (p < 1) fid = requestAnimationFrame(tick)
@@ -191,26 +201,16 @@ const SceneCard = ({ children, className = '', ...rest }) => (
   </div>
 )
 
-const SceneTransitionHook = ({ scene, position = 'post' }) => (
-  <div
-    aria-hidden="true"
-    className={`scene-transition-hook scene-transition-hook-${position}`}
-    data-scene-id={scene.id}
-    data-theme="light"
-    data-transition-ready={String(Boolean(scene.transitionReady))}
-  />
-)
-
-// AmbientDepthField — gated by useInView so GPU isn't wasted off-screen
+// Ambient depth layers (GPU-composited: opacity + transform only)
 const AmbientDepthField = ({
   reduced,
-  variant = 'core',
+  variant   = 'core',
   backgroundY = 0,
-  midY = 0,
+  midY      = 0,
   foregroundY = 0,
   glowOpacity = 0.5,
 }) => {
-  const ref = useRef(null)
+  const ref    = useRef(null)
   const inView = useInView(ref, { amount: 0.1 })
   return (
     <div ref={ref} aria-hidden="true" className={`scene-ambient-field scene-ambient-${variant}`}>
@@ -219,7 +219,7 @@ const AmbientDepthField = ({
         style={reduced ? undefined : { y: backgroundY }}
         animate={reduced || !inView ? undefined : {
           opacity: [glowOpacity * 0.84, glowOpacity, glowOpacity * 0.8],
-          scale: [1, 1.035, 1],
+          scale:   [1, 1.035, 1],
         }}
         transition={{ duration: 7.8, ease: EASE, repeat: Infinity }}
       />
@@ -240,111 +240,274 @@ const AmbientDepthField = ({
 }
 
 // ---------------------------------------------------------------------------
-// FRAME WRAPPERS
+// SCENE 01 — COMMAND ARRIVAL (HERO)
+// Scroll behavior: headline fades first, subheadline second, CTA last.
+// Background video stays steady.
 // ---------------------------------------------------------------------------
 
-const FreeSceneFrame = ({ scene, pinBehavior, layout, className = '', children }) => {
-  const reduced = useReducedMotion()
-  const frameRef = useRef(null)
+export const CommandArrivalScene = ({ scene, nextScene }) => {
+  const reduced    = useReducedMotion()
+  const sectionRef = useRef(null)
 
-  // Single useScroll per scene — tracks this scene's position in the master scroll.
-  // offset ['start end', 'end start']: progress=0 when scene top hits viewport bottom,
-  // progress=1 when scene bottom hits viewport top.
-  const { scrollYProgress } = useScroll({
-    target: frameRef,
-    offset: ['start end', 'end start'],
-  })
+  const mediaRef = scene?.videoSrc || scene?.media?.ref
+  const heroSrc  = Array.isArray(mediaRef) ? mediaRef[0] : mediaRef
+  const headline = scene?.headline || 'We command public moments where failure is visible and expensive.'
+  const subtitle  = scene?.subtitle || 'Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.'
+  const ctaText  = scene?.ctaText  || 'See Signature Builds'
 
-  // Cinematic enter: fade up from 0 opacity + subtle scale lift
-  // Cinematic exit: very gentle opacity pull (not full black — avoids gap between scenes)
-  const opacity = useTransform(scrollYProgress, [0, 0.07, 0.88, 1], [0, 1, 1, 0.82])
-  const scale   = useTransform(scrollYProgress, [0, 0.07, 0.9, 1],  [0.978, 1, 1, 1.009])
-  const yShift  = useTransform(scrollYProgress, [0, 0.10],          [28, 0])
+  // Scroll progress: start start → end start (hero exiting upward)
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
 
-  const content = typeof children === 'function' ? children({ reduced }) : children
+  // BRIEF: headline fades first, subheadline second, CTA last. Video steady.
+  const headlineOpacity  = useTransform(scrollYProgress, [0.28, 0.52], [1, 0])
+  const headlineY        = useTransform(scrollYProgress, [0.28, 0.52], [0, -12])
+  const subtitleOpacity  = useTransform(scrollYProgress, [0.38, 0.60], [1, 0])
+  const subtitleY        = useTransform(scrollYProgress, [0.38, 0.60], [0, -8])
+  const ctaOpacity       = useTransform(scrollYProgress, [0.48, 0.70], [1, 0])
+  const ctaY             = useTransform(scrollYProgress, [0.48, 0.70], [0, -6])
+  const eyebrowOpacity   = useTransform(scrollYProgress, [0.22, 0.46], [1, 0])
+
+  // Headline lines
+  const rawLines = headline.split(/\.\s+|[\n]/g).filter(Boolean)
+  const lines    = rawLines.length > 1
+    ? rawLines.map((l, i) => i < rawLines.length - 1 ? l + '.' : l)
+    : [headline]
+
   return (
     <>
-      {/* motion.div owns the cinematic enter/exit — SceneWrapper content is unaffected */}
-      <motion.div
-        ref={frameRef}
-        style={reduced ? undefined : { opacity, scale, y: yShift }}
+      <motion.section
+        ref={sectionRef}
+        id={scene.id}
+        data-scene-id={scene.id}
+        className="scene-depth-stage-hero-full flagship-scene-deep"
+        style={{ position: 'relative', minHeight: '100vh' }}
+        initial={reduced ? false : { opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease: EASE }}
       >
-        <SceneWrapper
-          id={scene.id}
-          tone={scene.tone}
-          theme="light"
-          transitionReady={scene.transitionReady}
-          minHeight={buildHeight(scene.length)}
-          className={className}
-        >
-          <SceneShell scene={scene} scrollMode={FREE} pinBehavior={pinBehavior} layout={layout}>
-            {content}
-          </SceneShell>
-        </SceneWrapper>
-      </motion.div>
-      <SceneTransitionHook scene={scene} position="post" />
+        <AmbientDepthField reduced={reduced} variant="hero" glowOpacity={0.58} />
+
+        {/* Video — stays steady during scroll (no opacity link) */}
+        <div className="absolute inset-0 z-0">
+          <video
+            className="hero-command-video h-full w-full object-cover"
+            src={heroSrc}
+            preload="metadata"
+            muted loop playsInline autoPlay
+          />
+        </div>
+
+        <HeroAmbientCanvas />
+        <div className="hero-volumetric-layer" />
+        <div className="hero-particle-layer" />
+        <div className="hero-vignette-layer" />
+        <div className="hero-dof-layer" />
+        <div className="hero-command-soften-layer" />
+
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
+            background: 'radial-gradient(ellipse 60% 50% at 20% 80%, rgba(181,146,79,0.05) 0%, transparent 70%)',
+          }}
+        />
+        <div className="hero-lens-warmtint" aria-hidden="true" />
+        <div className="hero-parallax-shimmer" aria-hidden="true" />
+
+        {/* Content — individually scroll-linked */}
+        <div className="absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
+          <div className="w-[90%] sm:w-[82%] lg:w-[40%] max-w-none">
+            <div className="inline-flex max-w-full flex-col p-1">
+
+              {/* Eyebrow */}
+              <motion.p
+                style={reduced ? undefined : { opacity: eyebrowOpacity }}
+                initial={reduced ? false : { opacity: 0, y: 30, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: DUR.base, ease: EASE, delay: 0.1 }}
+                className="text-xs uppercase tracking-[0.18em] text-white/80"
+              >
+                Executive Event Command
+              </motion.p>
+
+              {/* Headline — scroll-linked fade-out, line by line entrance */}
+              <motion.div
+                style={reduced ? undefined : { opacity: headlineOpacity, y: headlineY }}
+              >
+                <h1 className="mt-4 max-w-[16ch] font-serif text-[clamp(1.9rem,7.8vw,5.4rem)] leading-[0.98] tracking-[-0.03em] text-white">
+                  {lines.map((line, i) => (
+                    <motion.span
+                      key={i}
+                      style={{ display: 'block' }}
+                      initial={reduced ? false : { opacity: 0, y: 30, filter: 'blur(8px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      transition={{ duration: DUR.base, ease: EASE, delay: 0.22 + i * 0.12 }}
+                    >
+                      {line}
+                    </motion.span>
+                  ))}
+                </h1>
+              </motion.div>
+
+              {/* Subtitle — fades second */}
+              <motion.div
+                style={reduced ? undefined : { opacity: subtitleOpacity, y: subtitleY }}
+              >
+                <motion.p
+                  initial={reduced ? false : { opacity: 0, y: 30, filter: 'blur(8px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  transition={{ duration: DUR.base, ease: EASE, delay: 0.22 + lines.length * 0.12 + 0.08 }}
+                  className="mt-5 max-w-[38ch] text-[clamp(0.98rem,2.15vw,1.45rem)] leading-relaxed text-white/90"
+                >
+                  {subtitle}
+                </motion.p>
+              </motion.div>
+
+              {/* CTA — fades last */}
+              <motion.div
+                style={reduced ? undefined : { opacity: ctaOpacity, y: ctaY }}
+              >
+                <motion.div
+                  initial={reduced ? false : { opacity: 0, y: 40, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  whileHover={reduced ? undefined : { scale: 1.02 }}
+                  whileTap={reduced ? undefined : { scale: 0.98 }}
+                  transition={{ duration: DUR.base, ease: EASE, delay: 0.22 + lines.length * 0.12 + 0.22 }}
+                  className="mt-8"
+                  style={{ position: 'relative', zIndex: 30, display: 'inline-block' }}
+                >
+                  <ScribbleButton
+                    title="Open flagship case reel and signature builds"
+                    variant="primary"
+                    tone="light"
+                    size="md"
+                    to="/work"
+                    analyticsLabel="hero-signature-work"
+                  >
+                    {ctaText}
+                  </ScribbleButton>
+                </motion.div>
+              </motion.div>
+
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {nextScene ? <AuthorityLedgerScene scene={nextScene} /> : null}
     </>
   )
 }
 
-const PinnedSceneFrame = ({ scene, pinBehavior, layout, className = '', children }) => (
-  <>
-    {/* ScrollLockedSection provides: scroll spacer (height=scene.length) + sticky pin + live progress */}
-    <ScrollLockedSection
+// ---------------------------------------------------------------------------
+// SCENE 02 — AUTHORITY LEDGER (Performance Record)
+// Staggered metric reveal: Events Delivered → Guests Managed → Cue Volume → Verified Testimonials
+// ---------------------------------------------------------------------------
+
+export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
+  const depthRef = useRef(null)
+  const reduced  = useReducedMotion()
+  const { scrollYProgress } = useScroll({ target: depthRef, offset: ['start end', 'end start'] })
+
+  const backgroundY  = embedded ? 0 : useTransform(scrollYProgress, [0, 1], [30, -20])
+  const midY         = embedded ? 0 : useTransform(scrollYProgress, [0, 1], [18, -14])
+  const foregroundY  = embedded ? 0 : useTransform(scrollYProgress, [0, 1], [8, -8])
+
+  const heading = scene?.headline || 'Outcome authority before visual theater.'
+  const body    = scene?.subtitle || 'Executive productions stay trusted when timing, technical certainty, and delivery control are visible before the spotlight turns on.'
+
+  const ledgerBody = r => (
+    <div
+      ref={depthRef}
+      className="authority-ledger scene-depth-stage scene-depth-stage-ledger"
+      style={{ background: 'transparent' }}
+    >
+      <AmbientDepthField reduced={r} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.32} />
+
+      <div className="authority-ledger-shell relative z-[2]">
+        {/* Header */}
+        <motion.header
+          {...(embedded || r ? {} : enterFrom(0, 20))}
+          className="authority-ledger-intro"
+        >
+          <p className="authority-ledger-eyebrow text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Performance Record</p>
+          <h2 className="authority-ledger-heading mt-4 font-serif leading-[1.02] text-[var(--color-ink)]">{heading}</h2>
+          <p className="authority-ledger-subcopy mt-4 text-[var(--color-ink-muted)]">{body}</p>
+        </motion.header>
+
+        {/* Metrics — staggered reveal, clip from bottom, then count up */}
+        <div className="authority-ledger-metrics-grid">
+          {AUTHORITY_METRICS.map((metric, i) => (
+            <motion.div
+              key={metric.label}
+              {...(embedded || r ? {} : {
+                initial:     { opacity: 0, clipPath: 'inset(0 0 100% 0 round 18px)' },
+                whileInView: { opacity: 1, clipPath: 'inset(0 0 0% 0 round 18px)' },
+                viewport:    VP,
+                transition:  { duration: DUR.base, ease: EASE, delay: i * 0.12 },
+              })}
+            >
+              <SceneCard className="authority-ledger-card authority-ledger-metric p-4 md:p-5">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{metric.label}</p>
+                <p className="authority-ledger-metric-value mt-3 font-serif leading-none text-[var(--color-ink)]">
+                  <CountUpMetric value={metric.value} suffix={metric.suffix} reduced={r} />
+                </p>
+              </SceneCard>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <motion.div
+          {...(embedded || r ? {} : enterFrom(0.24, 14))}
+          className="authority-ledger-cta"
+        >
+          <ScribbleButton
+            title="Open capability and delivery portfolio"
+            variant="outline"
+            tone="dark"
+            size="md"
+            to="/services"
+            analyticsLabel="authority-ledger-capabilities"
+          >
+            Explore Capabilities
+          </ScribbleButton>
+        </motion.div>
+      </div>
+    </div>
+  )
+
+  if (embedded) return ledgerBody(reduced)
+
+  return (
+    <SceneWrapper
       id={scene.id}
       tone={scene.tone}
       theme="light"
       transitionReady={scene.transitionReady}
-      height={buildHeight(scene.length)}
-      className={className}
+      minHeight={buildHeight(scene.length)}
+      className="scene-cinematic scene-authority-ledger"
     >
-      {(progress, reduced) => (
-        <SceneShell scene={scene} scrollMode={PINNED} pinBehavior={pinBehavior} layout={layout}>
-          {typeof children === 'function' ? children({ progress, reduced }) : children}
-        </SceneShell>
-      )}
-    </ScrollLockedSection>
-    <SceneTransitionHook scene={scene} position="post" />
-  </>
-)
+      {ledgerBody(reduced)}
+    </SceneWrapper>
+  )
+}
 
 // ---------------------------------------------------------------------------
-// SIGNATURE REEL CONTENT
+// SCENE 03 — SIGNATURE REEL CONTENT (manual navigation)
 // ---------------------------------------------------------------------------
 
 const SignatureReelContent = () => {
-  const { progress, reduced } = useProgress()
-  const mobileTrackRef = useRef(null)
-  const scrollFrameRef = useRef(0)
-  const [manualIndex, setManualIndex] = useState(null)
-  const [scrollIndex, setScrollIndex] = useState(0)
-  const prevRef = useRef(0)
-
-  useMotionValueEvent(progress, 'change', latest => {
-    const next = clampIndex(Math.floor(latest * PROJECTS.length), PROJECTS.length - 1)
-    if (next !== prevRef.current) {
-      prevRef.current = next
-      setScrollIndex(next)
-      setManualIndex(null)
-    }
-  })
-
-  const manualOk = typeof manualIndex === 'number' && Math.abs(scrollIndex - manualIndex) <= 1
-  const selectedIndex = manualOk ? manualIndex : scrollIndex
+  const reduced = useReducedMotion()
+  const mobileTrackRef  = useRef(null)
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const selected = PROJECTS[selectedIndex]
-  const hasPrev = selectedIndex > 0
-  const hasNext = selectedIndex < PROJECTS.length - 1
-
-  const backgroundY = useTransform(progress, v => reduced ? 0 : (0.5 - v) * 24 * 0.95)
-  const headerOpacity = useTransform(progress, [0, 0.1], [0, 1])
-  const headerY = useTransform(progress, [0, 0.12], [60, 0])
-  const headerScale = useTransform(progress, [0, 0.12], [0.97, 1])
-
-  useEffect(() => () => { if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current) }, [])
+  const hasPrev  = selectedIndex > 0
+  const hasNext  = selectedIndex < PROJECTS.length - 1
 
   const selectProject = index => {
-    const c = clampIndex(index, PROJECTS.length - 1)
-    setManualIndex(c)
+    const c = Math.max(0, Math.min(PROJECTS.length - 1, index))
+    setSelectedIndex(c)
     if (!mobileTrackRef.current) return
     const t = mobileTrackRef.current.querySelector(`[data-project-index="${c}"]`)
     if (t) t.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
@@ -358,15 +521,14 @@ const SignatureReelContent = () => {
     let ci = 0, cd = Infinity
     items.forEach(n => {
       const idx = Number(n.getAttribute('data-project-index'))
-      const d = Math.abs(n.getBoundingClientRect().left - cr.left)
+      const d   = Math.abs(n.getBoundingClientRect().left - cr.left)
       if (d < cd) { cd = d; ci = idx }
     })
-    if (isFinite(ci) && ci !== manualIndex) setManualIndex(clampIndex(ci, PROJECTS.length - 1))
+    if (isFinite(ci)) setSelectedIndex(Math.max(0, Math.min(PROJECTS.length - 1, ci)))
   }
 
   const onMobileScroll = () => {
-    if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current)
-    scrollFrameRef.current = requestAnimationFrame(() => { scrollFrameRef.current = 0; syncMobile() })
+    requestAnimationFrame(syncMobile)
   }
 
   const STBTN = {
@@ -378,15 +540,17 @@ const SignatureReelContent = () => {
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%' }}>
-      {/* Header — card rise (scroll-linked) */}
+    <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr auto', height: '100%', padding: 'clamp(2rem, 4vh, 3.5rem) 0' }}>
+      {/* Header */}
       <motion.div
+        initial={reduced ? false : { opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={VP}
+        transition={{ duration: DUR.base, ease: EASE }}
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           borderBottom: '1px solid rgba(16,15,13,0.1)', paddingBottom: '1.4rem',
-          opacity: headerOpacity, y: headerY, scale: headerScale,
-        }}
-      >
+        }}>
         <p className="lux-eyebrow-muted">Featured Engagements</p>
         <p style={{ fontFamily: 'var(--font-heading)', fontSize: '0.88rem', color: 'var(--lux-ink-subtle)', letterSpacing: '0.04em' }}>
           <span style={{ color: 'var(--lux-gold)' }}>{String(selectedIndex + 1).padStart(2, '0')}</span>
@@ -421,14 +585,14 @@ const SignatureReelContent = () => {
           </div>
         </div>
 
-        {/* Image — desktop, parallax 0.95 */}
-        <div className="hidden md:block" style={{ position: 'relative', overflow: 'hidden', minHeight: '320px' }}>
+        {/* Desktop image */}
+        <div className="hidden md:block" style={{ position: 'relative', minHeight: '320px' }}>
           <AnimatePresence mode="wait">
             <motion.img
               key={selected.id}
               src={selected.image}
               alt={selected.title}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', y: backgroundY }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
               initial={reduced ? false : { opacity: 0, scale: 1.04 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={reduced ? undefined : { opacity: 0 }}
@@ -451,7 +615,7 @@ const SignatureReelContent = () => {
               <div
                 key={`mob-${p.id}`}
                 data-project-index={i}
-                style={{ position: 'relative', minWidth: '78vw', scrollSnapAlign: 'start', overflow: 'hidden', aspectRatio: '4/3', cursor: 'pointer', flexShrink: 0 }}
+                style={{ position: 'relative', minWidth: '78vw', scrollSnapAlign: 'start', aspectRatio: '4/3', cursor: 'pointer', flexShrink: 0 }}
                 onClick={() => selectProject(i)}
                 role="button" tabIndex={0}
               >
@@ -508,378 +672,323 @@ const SignatureReelContent = () => {
   )
 }
 
-// ---------------------------------------------------------------------------
-// COMMAND ARRIVAL — HERO
-// ---------------------------------------------------------------------------
-
-export const CommandArrivalScene = ({ scene, nextScene }) => {
-  const reduced = useReducedMotion()
-  const sectionRef = useRef(null)
-
-  const mediaRef = scene?.videoSrc || scene?.media?.ref
-  const heroSrc = Array.isArray(mediaRef) ? mediaRef[0] : mediaRef
-  const headline = scene?.headline || 'We command public moments where failure is visible and expensive.'
-  const subtitle = scene?.subtitle || 'Ghaim unifies narrative direction, technical systems, and floor authority for executive events that cannot miss timing, clarity, or impact.'
-  const ctaText = scene?.ctaText || 'See Signature Builds'
-
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
-  const heroExitOpacity = useTransform(scrollYProgress, [0.55, 1], [1, 0.85])
-
-  // Headline: split into display lines
-  const rawLines = headline.split(/\.\s+|[\n]/g).filter(Boolean)
-  const lines = rawLines.length > 1
-    ? rawLines.map((l, i) => i < rawLines.length - 1 ? l + '.' : l)
-    : [headline]
-
-  return (
-    <>
-      <motion.section
-        ref={sectionRef}
-        id={scene.id}
-        data-scene-id={scene.id}
-        className="scene-depth-stage-hero-full flagship-scene-deep"
-        style={{ position: 'relative', isolation: 'isolate', opacity: reduced ? 1 : heroExitOpacity }}
-        // Entire section entrance: opacity 0→1, y 30→0, 0.9s
-        initial={reduced ? false : { opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: EASE }}
-      >
-        <AmbientDepthField reduced={reduced} variant="hero" glowOpacity={0.58} />
-
-        <div className="absolute inset-0 z-0">
-          <video
-            className="hero-command-video h-full w-full object-cover"
-            src={heroSrc}
-            preload="metadata"
-            muted loop playsInline autoPlay
-          />
-        </div>
-
-        <HeroAmbientCanvas />
-        <div className="hero-volumetric-layer" />
-        <div className="hero-particle-layer" />
-        <div className="hero-vignette-layer" />
-        <div className="hero-dof-layer" />
-        <div className="hero-command-soften-layer" />
-
-        {/* Radial accent overlay — 5% opacity */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
-            background: 'radial-gradient(ellipse 60% 50% at 20% 80%, rgba(181,146,79,0.05) 0%, transparent 70%)',
-          }}
-        />
-        <div className="hero-lens-warmtint" aria-hidden="true" />
-        <div className="hero-parallax-shimmer" aria-hidden="true" />
-
-        {/* Content — interactive, fully clickable */}
-        <div className="absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6 md:px-10 lg:px-14">
-          <div className="w-[90%] sm:w-[82%] lg:w-[40%] max-w-none">
-            <div className="inline-flex max-w-full flex-col p-1">
-
-              {/* Eyebrow — delay 0.1s */}
-              <motion.p
-                initial={reduced ? false : { opacity: 0, y: 30, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                transition={{ duration: DUR.base, ease: EASE, delay: 0.1 }}
-                className="text-xs uppercase tracking-[0.18em] text-white/80"
-              >
-                Executive Event Command
-              </motion.p>
-
-              {/* Headline — line-by-line, stagger 0.12s */}
-              <h1 className="mt-4 max-w-[16ch] font-serif text-[clamp(1.9rem,7.8vw,5.4rem)] leading-[0.98] tracking-[-0.03em] text-white">
-                {lines.map((line, i) => (
-                  <motion.span
-                    key={i}
-                    style={{ display: 'block' }}
-                    initial={reduced ? false : { opacity: 0, y: 30, filter: 'blur(8px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{ duration: DUR.base, ease: EASE, delay: 0.22 + i * 0.12 }}
-                  >
-                    {line}
-                  </motion.span>
-                ))}
-              </h1>
-
-              {/* Subtitle — blur to focus */}
-              <motion.p
-                initial={reduced ? false : { opacity: 0, y: 30, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                transition={{ duration: DUR.base, ease: EASE, delay: 0.22 + lines.length * 0.12 + 0.08 }}
-                className="mt-5 max-w-[38ch] text-[clamp(0.98rem,2.15vw,1.45rem)] leading-relaxed text-white/90"
-              >
-                {subtitle}
-              </motion.p>
-
-              {/* CTA — y 40→0, scale 0.96→1 */}
-              <motion.div
-                initial={reduced ? false : { opacity: 0, y: 40, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={reduced ? undefined : { scale: 1.02 }}
-                whileTap={reduced ? undefined : { scale: 0.98 }}
-                transition={{ duration: DUR.base, ease: EASE, delay: 0.22 + lines.length * 0.12 + 0.22 }}
-                className="mt-8"
-                style={{ position: 'relative', zIndex: 30, display: 'inline-block' }}
-              >
-                <ScribbleButton
-                  title="Open flagship case reel and signature builds"
-                  variant="primary"
-                  tone="light"
-                  size="md"
-                  to="/work"
-                  analyticsLabel="hero-signature-work"
-                >
-                  {ctaText}
-                </ScribbleButton>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Authority Ledger fades in simultaneously as hero exits */}
-      {nextScene ? <AuthorityLedgerScene scene={nextScene} /> : null}
-    </>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// AUTHORITY LEDGER — SECTION 2 (LIGHT — tone:steel)
-// ---------------------------------------------------------------------------
-
-export const AuthorityLedgerScene = ({ scene, embedded = false }) => {
-  const depthRef = useRef(null)
-  const reduced = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: depthRef, offset: ['start end', 'end start'] })
-
-  const backgroundY = embedded ? 0 : useTransform(scrollYProgress, [0, 1], [30, -20])
-  const midY = embedded ? 0 : useTransform(scrollYProgress, [0, 1], [18, -14])
-  const foregroundY = embedded ? 0 : useTransform(scrollYProgress, [0, 1], [8, -8])
-
-  const heading = scene?.headline || 'Outcome authority before visual theater.'
-  const body = scene?.subtitle || 'Executive productions stay trusted when timing, technical certainty, and delivery control are visible before the spotlight turns on.'
-
-  const ledgerBody = r => (
-    <div
-      ref={depthRef}
-      className="authority-ledger scene-depth-stage scene-depth-stage-ledger"
-      // Explicit light background — prevents any inherited dark tone
-      style={{ background: 'transparent' }}
-    >
-      <AmbientDepthField reduced={r} variant="ledger" backgroundY={backgroundY} midY={midY} foregroundY={foregroundY} glowOpacity={0.32} />
-
-      <div className="authority-ledger-shell relative z-[2]">
-        {/* Heading — direct whileInView (mobile-first) */}
-        <motion.header
-          {...(embedded || r ? {} : enterFrom(0, 20))}
-          className="authority-ledger-intro"
-        >
-          <p className="authority-ledger-eyebrow text-[11px] uppercase tracking-[0.17em] text-[var(--color-ink-subtle)]">Performance Record</p>
-          <h2 className="authority-ledger-heading mt-4 font-serif leading-[1.02] text-[var(--color-ink)]">{heading}</h2>
-          <p className="authority-ledger-subcopy mt-4 text-[var(--color-ink-muted)]">{body}</p>
-        </motion.header>
-
-        {/* Metrics — stagger 0.12s */}
-        <div className="authority-ledger-metrics-grid">
-          {AUTHORITY_METRICS.map((metric, i) => (
-            <motion.div
-              key={metric.label}
-              {...(embedded || r ? {} : {
-                initial: { opacity: 0, clipPath: 'inset(0 0 100% 0 round 18px)' },
-                whileInView: { opacity: 1, clipPath: 'inset(0 0 0% 0 round 18px)' },
-                viewport: VP,
-                transition: { duration: DUR.base, ease: EASE, delay: i * 0.12 },
-              })}
-            >
-              <SceneCard className="authority-ledger-card authority-ledger-metric p-4 md:p-5">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-subtle)]">{metric.label}</p>
-                <p className="authority-ledger-metric-value mt-3 font-serif leading-none text-[var(--color-ink)]">
-                  <CountUpMetric value={metric.value} suffix={metric.suffix} reduced={r} />
-                </p>
-              </SceneCard>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <motion.div
-          {...(embedded || r ? {} : enterFrom(0.24, 14))}
-          className="authority-ledger-cta"
-        >
-          <ScribbleButton
-            title="Open capability and delivery portfolio"
-            variant="outline"
-            tone="dark"
-            size="md"
-            to="/services"
-            analyticsLabel="authority-ledger-capabilities"
-          >
-            Explore Capabilities
-          </ScribbleButton>
-        </motion.div>
-      </div>
-    </div>
-  )
-
-  if (embedded) return ledgerBody(reduced)
-
-  return (
-    <FreeSceneFrame scene={scene} pinBehavior="evidence-ramp" layout="authority-ledger" className="scene-cinematic scene-authority-ledger">
-      {({ reduced: r }) => ledgerBody(r)}
-    </FreeSceneFrame>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// SIGNATURE REEL — pinned
-// ---------------------------------------------------------------------------
-
 export const SignatureReelScene = ({ scene }) => (
-  <PinnedSceneFrame scene={scene} pinBehavior="command-aperture-lock" layout="command-aperture" className="scene-cinematic scene-signature-reel">
+  <SceneWrapper
+    id={scene.id}
+    tone={scene.tone}
+    theme="light"
+    transitionReady={scene.transitionReady}
+    minHeight="100vh"
+    className="scene-cinematic scene-signature-reel"
+  >
     <SignatureReelContent />
-  </PinnedSceneFrame>
+  </SceneWrapper>
 )
 
 // ---------------------------------------------------------------------------
-// CAPABILITY MATRIX
+// SCENE 04 — CAPABILITY CARD (sub-component)
 // ---------------------------------------------------------------------------
 
-export const CapabilityMatrixScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="matrix-reveal" layout="capability-matrix" className="scene-cinematic scene-capability-matrix">
-    {({ reduced }) => (
-      <div>
-        {/* Header — direct whileInView */}
-        <motion.div {...(reduced ? {} : cardEnter(0))} className="mb-14 lg:mb-20">
-          <p className="lux-eyebrow-muted mb-5">Capabilities</p>
-          <div className="lux-rule mb-7" />
-          <h2 className="lux-display text-[var(--color-ink)]" style={{ maxWidth: '16ch' }}>
-            Technical depth,<br />creative precision,<br />operational control.
-          </h2>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-1rem' }}>
-            <Link to="/services" className="lux-cta-dark-outline">
-              All Services
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M6.5 3L9 5.5 6.5 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </Link>
-          </div>
-        </motion.div>
+/**
+ * CapabilityCard — highlight when centered/active.
+ * Active state: border intensifies (gold), background shifts, title contrast peaks.
+ */
+const CapabilityCard = React.forwardRef(({ card, isActive, reduced }, ref) => {
+  const s = {
+    root: {
+      position: 'relative',
+      border: isActive
+        ? '1px solid rgba(181,146,79,0.72)'
+        : '1px solid rgba(16,15,13,0.1)',
+      background: isActive
+        ? 'linear-gradient(160deg, rgba(250,247,242,1) 0%, rgba(245,239,228,1) 100%)'
+        : 'rgba(250,248,245,0.88)',
+      boxShadow: isActive
+        ? '0 24px 56px rgba(8,12,20,0.14), 0 0 0 1px rgba(181,146,79,0.12) inset'
+        : '0 8px 24px rgba(8,12,20,0.06)',
+      transition: reduced ? 'none' : 'border-color 0.48s ease, background 0.48s ease, box-shadow 0.48s ease, opacity 0.36s ease',
+      opacity:    isActive ? 1 : 0.58,
+      padding:    'clamp(1.8rem, 3.5vw, 2.8rem)',
+      display:    'flex',
+      flexDirection: 'column',
+      gap:        '1.6rem',
+      cursor:     'default',
+    },
+    num: {
+      fontFamily:    'var(--font-heading)',
+      fontSize:      '0.75rem',
+      letterSpacing: '0.28em',
+      fontWeight:    400,
+      color:         isActive ? 'rgba(181,146,79,0.9)' : 'rgba(16,15,13,0.28)',
+      transition:    reduced ? 'none' : 'color 0.36s ease',
+    },
+    rule: {
+      width:      isActive ? '2.4rem' : '1.2rem',
+      height:     '1px',
+      background: isActive ? 'rgba(181,146,79,0.6)' : 'rgba(16,15,13,0.15)',
+      transition: reduced ? 'none' : 'width 0.48s ease, background 0.36s ease',
+    },
+    title: {
+      fontFamily:    'var(--font-heading)',
+      fontSize:      'clamp(1.5rem, 2.4vw, 2.2rem)',
+      lineHeight:    1.06,
+      letterSpacing: '-0.035em',
+      fontWeight:    500,
+      color:         isActive ? 'var(--color-ink)' : 'rgba(16,15,13,0.52)',
+      transition:    reduced ? 'none' : 'color 0.36s ease',
+    },
+    summary: {
+      fontSize:   'clamp(0.86rem, 1.1vw, 0.98rem)',
+      lineHeight: 1.72,
+      color:      isActive ? 'var(--lux-ink-muted)' : 'rgba(16,15,13,0.35)',
+      maxWidth:   '32ch',
+      transition: reduced ? 'none' : 'color 0.36s ease',
+    },
+    tags: {
+      display:   'flex',
+      flexWrap:  'wrap',
+      gap:       '0.5rem 1.4rem',
+      marginTop: 'auto',
+    },
+    tag: {
+      fontSize:      '8.5px',
+      fontWeight:    600,
+      letterSpacing: '0.22em',
+      textTransform: 'uppercase',
+      color:         isActive ? 'var(--lux-gold)' : 'rgba(16,15,13,0.3)',
+      transition:    reduced ? 'none' : 'color 0.36s ease',
+    },
+    imgWrapper: {
+      position:     'absolute',
+      bottom:       0,
+      right:        0,
+      width:        '88px',
+      height:       '88px',
+      opacity:      isActive ? 0.18 : 0.06,
+      transition:   reduced ? 'none' : 'opacity 0.48s ease',
+      pointerEvents:'none',
+    },
+  }
 
-        {/* Capability rows — stagger 0.12s */}
-        {CAPABILITY_MODULES.map((module, i) => (
+  return (
+    <div ref={ref} style={s.root} aria-current={isActive ? 'true' : undefined}>
+      <span style={s.num} aria-hidden="true">{card.num}</span>
+      <div style={s.rule} aria-hidden="true" />
+      <h3 style={s.title}>{card.title}</h3>
+      <p style={s.summary}>{card.summary}</p>
+      <div style={s.tags}>
+        {card.tags.map(tag => (
+          <span key={tag} style={s.tag}>{tag}</span>
+        ))}
+      </div>
+      {/* Subtle background image — decorative only */}
+      <div style={s.imgWrapper} aria-hidden="true">
+        <img
+          src={card.image}
+          alt=""
+          style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(1)' }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+  )
+})
+CapabilityCard.displayName = 'CapabilityCard'
+
+// ---------------------------------------------------------------------------
+// SCENE 04 — CAPABILITY MATRIX
+// Three cards: Event Production / Technical Production / Staging & Scenic
+// Sequential stagger reveal with all cards active.
+// ---------------------------------------------------------------------------
+
+const CapabilityMatrixContent = () => {
+  const reduced = useReducedMotion()
+
+  return (
+    <div style={{ display: 'grid', gap: 'clamp(2rem, 4vh, 3.5rem)', padding: 'clamp(2rem, 4vh, 3.5rem) 0' }}>
+      {/* Header */}
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={VP}
+        transition={{ duration: DUR.base, ease: EASE }}
+      >
+        <p className="lux-eyebrow-muted">Capabilities</p>
+        <div className="lux-rule" style={{ marginTop: '1.2rem', marginBottom: '1.4rem' }} />
+        <h2 className="lux-display text-[var(--color-ink)]" style={{ maxWidth: '18ch' }}>
+          Technical depth,<br />creative precision,<br />operational control.
+        </h2>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-1rem' }}>
+          <Link to="/services" className="lux-cta-dark-outline">
+            All Services
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M6.5 3L9 5.5 6.5 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </Link>
+        </div>
+      </motion.div>
+
+      {/* Three cards — desktop: 3-column, mobile: stacked */}
+      <div
+        style={{
+          display: 'grid',
+          gap: '1rem',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          alignItems: 'stretch',
+        }}
+        className="capability-cards-grid"
+      >
+        {CAPABILITY_CARDS.map((card, i) => (
           <motion.div
-            key={module.id}
-            {...(reduced ? {} : cardEnter(i * 0.12))}
-            className="lux-capability-row group"
+            key={card.id}
+            initial={reduced ? false : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VP}
+            transition={{ duration: DUR.base, ease: EASE, delay: i * 0.1 }}
           >
-            <p className="lux-capability-num">{String(i + 1).padStart(2, '0')}</p>
-            <div style={{ display: 'grid', gap: '0.55rem', paddingBottom: '0.5rem' }}>
-              <h3 className="lux-section-head text-[var(--color-ink)]" style={{ letterSpacing: '-0.03em' }}>{module.title}</h3>
-              <p style={{ fontSize: 'clamp(0.88rem, 1.1vw, 1rem)', lineHeight: 1.72, color: 'var(--lux-ink-muted)', maxWidth: '54ch' }}>{module.summary}</p>
-              {module.standards?.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0 2rem', marginTop: '0.5rem' }}>
-                  {module.standards.map(s => (
-                    <span key={s} style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--lux-ink-subtle)' }}>{s}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="hidden lg:block" style={{ width: '140px', flexShrink: 0, overflow: 'hidden' }}>
-              <img
-                src={module.image} alt={module.title} loading="lazy" decoding="async"
-                style={{ width: '100%', aspectRatio: '3/2', objectFit: 'cover', filter: 'grayscale(0.22)', transition: 'filter 0.5s ease, transform 0.6s cubic-bezier(0.22,0.61,0.36,1)' }}
-                className="group-hover:scale-105 group-hover:grayscale-0"
-              />
-            </div>
+            <CapabilityCard
+              card={card}
+              isActive
+              reduced={reduced}
+            />
           </motion.div>
         ))}
+      </div>
 
-        <div className="lux-rule-full mt-0" style={{ borderColor: 'rgba(16,15,13,0.1)' }} />
-        <motion.div {...(reduced ? {} : enterFrom(0.1, 12))} className="mt-8 lg:hidden">
+      {/* Mobile: show all with staggered entrance */}
+      <div className="capability-cards-mobile">
+        {CAPABILITY_CARDS.map((card, i) => (
+          <motion.div
+            key={`m-${card.id}`}
+            {...(reduced ? {} : cardEnter(i * 0.12))}
+          >
+            <CapabilityCard card={card} isActive reduced={reduced} />
+          </motion.div>
+        ))}
+        <motion.div {...(reduced ? {} : enterFrom(0.2, 10))}>
           <Link to="/services" className="lux-cta-dark-outline">
             All Services
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M6.5 3L9 5.5 6.5 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </Link>
         </motion.div>
       </div>
-    )}
-  </FreeSceneFrame>
+
+    </div>
+  )
+}
+
+export const CapabilityMatrixScene = ({ scene }) => (
+  <SceneWrapper
+    id={scene.id}
+    tone={scene.tone}
+    theme="light"
+    transitionReady={scene.transitionReady}
+    minHeight="100vh"
+    className="scene-cinematic scene-capability-matrix"
+  >
+    <CapabilityMatrixContent />
+  </SceneWrapper>
 )
 
 // ---------------------------------------------------------------------------
-// NARRATIVE BRIDGE
+// SCENE 06 — NARRATIVE BRIDGE (Outcome Transition)
+// BRIEF: Short. Breathing. Bridge section.
+// Text fades in. Holds. Fades out as user scrolls. No heavy animation. Just space.
 // ---------------------------------------------------------------------------
 
 export const NarrativeBridgeScene = ({ scene }) => {
-  const depthRef = useRef(null)
-  const reduced = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: depthRef, offset: ['start end', 'end start'] })
-  // Parallax rate 0.8 — slower than scroll (slow-motion feel)
-  const textY = useTransform(scrollYProgress, [0, 1], [18 * 0.8, -18 * 0.8])
-  const bgY = useTransform(scrollYProgress, [0, 1], [10 * 0.8, -10 * 0.8])
+  const reduced   = useReducedMotion()
 
   return (
-    <FreeSceneFrame scene={scene} pinBehavior="calm-release" layout="narrative-bridge" className="scene-cinematic scene-narrative-bridge">
-      {({ reduced: r }) => (
-        <>
-          {/* Accent tint overlay — 3% opacity */}
-          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(181,146,79,0.03) 0%, transparent 70%)' }} />
-          <div className="cine-scene-glow cine-scene-glow-warm" aria-hidden="true" />
-          <motion.div ref={depthRef} style={r ? undefined : { y: bgY, position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'clamp(3rem, 8vh, 6rem) 0' }}>
-              {/* Scale 1.02→1 + opacity, parallax text */}
-              <motion.div
-                {...(r ? {} : narrativeEnter)}
-                style={r ? undefined : { y: textY }}
-              >
-                <div className="lux-rule" style={{ margin: '0 auto 2.4rem' }} />
-                <p className="lux-eyebrow-light" style={{ marginBottom: '2rem', color: 'rgba(181,146,79,0.7)' }}>Outcome Transition</p>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.6rem, 5.5vw, 5.2rem)', lineHeight: 1.04, letterSpacing: '-0.04em', fontWeight: 500, maxWidth: '18ch', margin: '0 auto', color: 'var(--color-ink)' }}>
-                  Precision is only credible when proof carries the weight.
-                </h2>
-                <p style={{ marginTop: '2.2rem', maxWidth: '44ch', marginInline: 'auto', fontSize: 'clamp(0.92rem, 1.2vw, 1.05rem)', lineHeight: 1.74, color: 'var(--lux-ink-muted)' }}>
-                  The next chapter shifts from directional language to verified outcomes, named stakeholders, and delivery context.
-                </p>
-                <div className="lux-rule" style={{ margin: '2.6rem auto 0' }} />
-              </motion.div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </FreeSceneFrame>
+    <SceneWrapper
+      id={scene.id}
+      tone={scene.tone}
+      theme="light"
+      transitionReady={scene.transitionReady}
+      minHeight={buildHeight(scene.length)}
+      className="scene-cinematic scene-narrative-bridge"
+    >
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(181,146,79,0.03) 0%, transparent 70%)' }} />
+
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={VP}
+        transition={{ duration: DUR.cinematic, ease: EASE }}
+      >
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', textAlign: 'center',
+          padding: 'clamp(3.5rem, 9vh, 7rem) 0',
+        }}>
+          <div className="lux-rule" style={{ margin: '0 auto 2.4rem' }} />
+
+          <p className="lux-eyebrow-light" style={{ marginBottom: '2rem', color: 'rgba(181,146,79,0.7)' }}>
+            Outcome Transition
+          </p>
+
+          <h2 style={{
+            fontFamily:    'var(--font-heading)',
+            fontSize:      'clamp(2.6rem, 5.5vw, 5.2rem)',
+            lineHeight:    1.04,
+            letterSpacing: '-0.04em',
+            fontWeight:    500,
+            maxWidth:      '18ch',
+            margin:        '0 auto',
+            color:         'var(--color-ink)',
+          }}>
+            Precision is only credible when proof carries the weight.
+          </h2>
+
+          <p style={{
+            marginTop:    '2.2rem',
+            maxWidth:     '44ch',
+            marginInline: 'auto',
+            fontSize:     'clamp(0.92rem, 1.2vw, 1.05rem)',
+            lineHeight:   1.74,
+            color:        'var(--lux-ink-muted)',
+          }}>
+            The next chapter shifts from directional language to verified outcomes, named stakeholders, and delivery context.
+          </p>
+
+          <div className="lux-rule" style={{ margin: '2.6rem auto 0' }} />
+        </div>
+      </motion.div>
+    </SceneWrapper>
   )
 }
 
 // ---------------------------------------------------------------------------
-// PROOF THEATER — Testimonials
+// SCENE 07 — PROOF THEATER (Client Outcomes)
+// Quote fades in. Name fades after. Context fades last.
+// When centered: text contrast increases slightly.
 // ---------------------------------------------------------------------------
 
 const ProofTheaterSplit = ({ reduced }) => {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [entryDir, setEntryDir] = useState(1)
-  const touchStartX = useRef(null)
-  const touchDelta = useRef(0)
-  const safe = clampIndex(activeIndex, Math.max(TESTIMONIALS.length - 1, 0))
+  const [entryDir,    setEntryDir]    = useState(1)
+  const touchStartX  = useRef(null)
+  const touchDelta   = useRef(0)
+  const safe   = Math.max(0, Math.min(activeIndex, Math.max(TESTIMONIALS.length - 1, 0)))
   const active = TESTIMONIALS[safe]
   const hasPrev = safe > 0
   const hasNext = safe < TESTIMONIALS.length - 1
 
-  const goPrev = () => { setEntryDir(-1); setActiveIndex(i => clampIndex(i - 1, TESTIMONIALS.length - 1)) }
-  const goNext = () => { setEntryDir(1); setActiveIndex(i => clampIndex(i + 1, TESTIMONIALS.length - 1)) }
+  const goPrev = () => { setEntryDir(-1); setActiveIndex(i => Math.max(0, i - 1)) }
+  const goNext = () => { setEntryDir(1);  setActiveIndex(i => Math.min(TESTIMONIALS.length - 1, i + 1)) }
 
   const onTouchStart = e => { touchStartX.current = e.touches[0]?.clientX ?? null; touchDelta.current = 0 }
-  const onTouchMove = e => { if (touchStartX.current === null) return; touchDelta.current = (e.touches[0]?.clientX ?? touchStartX.current) - touchStartX.current }
-  const onTouchEnd = () => {
+  const onTouchMove  = e => { if (touchStartX.current === null) return; touchDelta.current = (e.touches[0]?.clientX ?? touchStartX.current) - touchStartX.current }
+  const onTouchEnd   = () => {
     if (touchStartX.current === null) return
     if (touchDelta.current <= -46) goNext()
-    if (touchDelta.current >= 46) goPrev()
+    if (touchDelta.current >= 46)  goPrev()
     touchStartX.current = null; touchDelta.current = 0
   }
 
   if (!active) return null
 
   const NAVBTN = (disabled) => ({
-    width: '44px', height: '44px', // larger touch target
+    width: '44px', height: '44px',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     background: 'none', border: '1px solid rgba(16,15,13,0.14)',
     cursor: disabled ? 'not-allowed' : 'pointer',
@@ -902,15 +1011,55 @@ const ProofTheaterSplit = ({ reduced }) => {
           <div style={{ display: 'grid', gap: 'clamp(2.4rem, 5vw, 5rem)', alignItems: 'start' }} className="md:grid-cols-[1fr_200px] lg:grid-cols-[1fr_240px]">
             <div>
               <div style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(5rem, 8vw, 9rem)', lineHeight: 0.8, color: 'var(--lux-gold)', opacity: 0.28, marginBottom: '-1.4rem', userSelect: 'none', letterSpacing: '-0.04em' }} aria-hidden="true">"</div>
-              <blockquote className="lux-blockquote" style={{ color: 'var(--color-ink)', marginBottom: '2rem' }}>{active.quote}</blockquote>
+
+              {/* Quote — primary */}
+              <motion.blockquote
+                className="lux-blockquote"
+                initial={reduced ? false : { opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={VP}
+                transition={{ duration: DUR.cinematic, ease: EASE, delay: 0 }}
+                style={{ color: 'var(--color-ink)', marginBottom: '2rem' }}
+              >
+                {active.quote}
+              </motion.blockquote>
+
               <footer>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--lux-ink)', marginBottom: '0.25rem' }}>{active.name}</p>
-                <p style={{ fontSize: '11px', color: 'var(--lux-ink-muted)', letterSpacing: '0.02em' }}>{active.role}{active.organization ? ` · ${active.organization}` : ''}</p>
-                {active.context && <p style={{ fontSize: '8.5px', fontWeight: 600, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--lux-gold)', marginTop: '0.7rem', opacity: 0.8 }}>{active.context}</p>}
+                {/* Name — fades after */}
+                <motion.p
+                  initial={reduced ? false : { opacity: 0, y: 6 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={VP}
+                  transition={{ duration: DUR.base, ease: EASE, delay: 0.14 }}
+                  style={{ fontSize: '13px', fontWeight: 600, color: 'var(--lux-ink)', marginBottom: '0.25rem' }}
+                >
+                  {active.name}
+                </motion.p>
+                <motion.p
+                  initial={reduced ? false : { opacity: 0, y: 4 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={VP}
+                  transition={{ duration: DUR.base, ease: EASE, delay: 0.20 }}
+                  style={{ fontSize: '11px', color: 'var(--lux-ink-muted)', letterSpacing: '0.02em' }}
+                >
+                  {active.role}{active.organization ? ` · ${active.organization}` : ''}
+                </motion.p>
+                {/* Context — fades last */}
+                {active.context && (
+                  <motion.p
+                    initial={reduced ? false : { opacity: 0, y: 4 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={VP}
+                    transition={{ duration: DUR.base, ease: EASE, delay: 0.28 }}
+                    style={{ fontSize: '8.5px', fontWeight: 600, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--lux-gold)', marginTop: '0.7rem', opacity: 0.8 }}
+                  >
+                    {active.context}
+                  </motion.p>
+                )}
               </footer>
             </div>
             {active.image && (
-              <div style={{ overflow: 'hidden', display: 'none' }} className="md:block">
+              <div style={{ display: 'none' }} className="md:block">
                 <img src={active.image} alt={active.name} loading="lazy" decoding="async" style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', filter: 'grayscale(0.15)' }} />
               </div>
             )}
@@ -919,16 +1068,6 @@ const ProofTheaterSplit = ({ reduced }) => {
       </AnimatePresence>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2.8rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(16,15,13,0.1)' }}>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          {TESTIMONIALS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setEntryDir(i > safe ? 1 : -1); setActiveIndex(i) }}
-              aria-label={`Testimonial ${i + 1}`}
-              style={{ position: 'relative', width: i === safe ? '1.8rem' : '0.5rem', height: '4px', background: i === safe ? 'var(--lux-gold)' : 'rgba(16,15,13,0.18)', border: 'none', padding: 0, cursor: 'pointer', transition: 'all 0.3s ease', WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
-            />
-          ))}
-        </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button onClick={goPrev} disabled={!hasPrev} style={NAVBTN(!hasPrev)}
             onMouseEnter={e => { if (hasPrev) e.currentTarget.style.borderColor = 'var(--lux-gold)' }}
@@ -943,38 +1082,56 @@ const ProofTheaterSplit = ({ reduced }) => {
             <svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          {TESTIMONIALS.map((_, i) => (
+            <button key={i} onClick={() => { setEntryDir(i > safe ? 1 : -1); setActiveIndex(i) }} aria-label={`Testimonial ${i + 1}`}
+              style={{ position: 'relative', width: i === safe ? '1.8rem' : '0.5rem', height: '4px', background: i === safe ? 'var(--lux-gold)' : 'rgba(16,15,13,0.18)', border: 'none', padding: 0, cursor: 'pointer', transition: 'all 0.3s ease', WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   )
 }
 
-export const ProofTheaterScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="proof-consolidation" layout="proof-theater" className="scene-cinematic scene-proof-theater">
-    {({ reduced }) => (
-      <>
-        <div className="cine-grain-overlay" aria-hidden="true" />
-        <div className="cine-scene-glow cine-scene-glow-warm" aria-hidden="true" />
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          {/* Header — direct whileInView */}
-          <motion.div {...(reduced ? {} : enterFrom(0, 14))}>
-            <p className="lux-eyebrow-muted" style={{ marginBottom: '1.4rem' }}>Client Outcomes</p>
-            <div className="lux-rule" style={{ marginBottom: '1.8rem' }} />
-            <h2 className="lux-title" style={{ color: 'var(--color-ink)', maxWidth: '22ch' }}>
-              Verified outcomes, named stakeholders, accountable delivery.
-            </h2>
-          </motion.div>
-          {/* Testimonials — y 40→0, scale 0.95→1, stagger 0.1s */}
-          <motion.div {...(reduced ? {} : testimonialEnter(0.1))}>
-            <ProofTheaterSplit reduced={reduced} />
-          </motion.div>
-        </div>
-      </>
-    )}
-  </FreeSceneFrame>
-)
+export const ProofTheaterScene = ({ scene }) => {
+  const reduced = useReducedMotion()
+
+  return (
+    <SceneWrapper
+      id={scene.id}
+      tone={scene.tone}
+      theme="light"
+      transitionReady={scene.transitionReady}
+      minHeight={buildHeight(scene.length)}
+      className="scene-cinematic scene-proof-theater"
+    >
+      <div className="cine-grain-overlay" aria-hidden="true" />
+      <div className="cine-scene-glow cine-scene-glow-warm" aria-hidden="true" />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <motion.div {...(reduced ? {} : enterFrom(0, 14))}>
+          <p className="lux-eyebrow-muted" style={{ marginBottom: '1.4rem' }}>Client Outcomes</p>
+          <div className="lux-rule" style={{ marginBottom: '1.8rem' }} />
+          <h2 className="lux-title" style={{ color: 'var(--color-ink)', maxWidth: '22ch' }}>
+            Verified outcomes, named stakeholders, accountable delivery.
+          </h2>
+        </motion.div>
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VP}
+          transition={{ duration: DUR.base, ease: EASE, delay: 0.1 }}
+        >
+          <ProofTheaterSplit reduced={reduced} />
+        </motion.div>
+      </div>
+    </SceneWrapper>
+  )
+}
 
 // ---------------------------------------------------------------------------
-// CONVERSION CHAMBER
+// SCENE 08 — CONVERSION CHAMBER (Request Proposal)
+// Elevation reveal: form rises slightly, shadow intensifies. No gimmicks.
 // ---------------------------------------------------------------------------
 
 const FloatingField = ({ id, label, children }) => (
@@ -985,7 +1142,7 @@ const FloatingField = ({ id, label, children }) => (
 )
 
 const HOMEPAGE_LEAD_FORM = 'homepage-command-brief'
-const STUB_DELAY = 680
+const STUB_DELAY         = 680
 
 const submitHomepageLead = async fields => {
   if (isLeadCaptureConfigured()) {
@@ -997,19 +1154,19 @@ const submitHomepageLead = async fields => {
 }
 
 const ConversionChamberContent = ({ reduced }) => {
-  const [status, setStatus] = useState('idle')
-  const [msg, setMsg] = useState('')
+  const [status,  setStatus]  = useState('idle')
+  const [msg,     setMsg]     = useState('')
   const submitting = status === 'submitting'
-  const success = status === 'success'
-  const error = status === 'error'
-  const mounted = useRef(true)
+  const success    = status === 'success'
+  const error      = status === 'error'
+  const mounted    = useRef(true)
 
   useEffect(() => () => { mounted.current = false }, [])
 
   const handleSubmit = async e => {
     e.preventDefault()
     const form = e.currentTarget
-    const fd = new FormData(form)
+    const fd   = new FormData(form)
     if (String(fd.get('website') || '').trim()) return
 
     const required = ['name', 'company', 'email', 'budget_band', 'event_type', 'scope']
@@ -1038,10 +1195,15 @@ const ConversionChamberContent = ({ reduced }) => {
         </div>
       </SceneCard>
 
-      <form
+      {/* Form — elevation effect when centered */}
+      <motion.form
         onSubmit={handleSubmit}
         className="cinematic-conversion-form grid gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5"
         aria-busy={submitting}
+        initial={reduced ? false : { opacity: 0, y: 12, boxShadow: '0 8px 24px rgba(8,12,20,0.06)' }}
+        whileInView={{ opacity: 1, y: 0, boxShadow: '0 32px 72px rgba(8,12,20,0.18)' }}
+        viewport={VP}
+        transition={{ duration: DUR.slow, ease: EASE }}
       >
         <input type="hidden" name="source_scene" value="conversion-chamber" />
         <input type="hidden" name="source_path" value="/" />
@@ -1110,16 +1272,25 @@ const ConversionChamberContent = ({ reduced }) => {
         <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-ink-subtle)]">
           {error ? 'Submission issue. Please retry or call direct.' : success ? 'Command queue confirmed.' : 'Private brief channel secured.'}
         </p>
-      </form>
+      </motion.form>
     </div>
   )
 }
 
-export const ConversionChamberScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="closing-ritual" layout="conversion-chamber" className="scene-cinematic scene-conversion-chamber">
-    {({ reduced }) => (
-      <div style={{ display: 'grid', overflow: 'hidden' }} className="md:grid-cols-[0.44fr_0.56fr]">
-        {/* Left: intentionally dark — isolated, no leakage outside */}
+export const ConversionChamberScene = ({ scene }) => {
+  const reduced = useReducedMotion()
+
+  return (
+    <SceneWrapper
+      id={scene.id}
+      tone={scene.tone}
+      theme="light"
+      transitionReady={scene.transitionReady}
+      minHeight={buildHeight(scene.length)}
+      className="scene-cinematic scene-conversion-chamber"
+    >
+      <div style={{ display: 'grid' }} className="md:grid-cols-[0.44fr_0.56fr]">
+        {/* Left: dark editorial — isolated */}
         <div style={{ background: 'var(--lux-dark)', padding: 'clamp(2.4rem, 5vw, 4rem) clamp(1.6rem, 3.5vw, 3rem)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '3rem' }}>
           <div>
             <p className="lux-eyebrow-light" style={{ marginBottom: '1.8rem' }}>Request Proposal</p>
@@ -1154,74 +1325,80 @@ export const ConversionChamberScene = ({ scene }) => (
           <ConversionChamberContent reduced={reduced} />
         </div>
       </div>
-    )}
-  </FreeSceneFrame>
-)
+    </SceneWrapper>
+  )
+}
 
 // ---------------------------------------------------------------------------
-// GLOBAL FOOTER — Final CTA
+// SCENE 09 — GLOBAL FOOTER (Final Close)
+// Feels like closing a production brief. Text fades. CTA holds strong.
 // ---------------------------------------------------------------------------
 
-export const GlobalFooterScene = ({ scene }) => (
-  <FreeSceneFrame scene={scene} pinBehavior="terminal-close" layout="global-footer" className="scene-cinematic scene-global-footer">
-    {({ reduced }) => (
-      <>
-        <div className="cine-grain-overlay" aria-hidden="true" />
-        <div className="cine-scene-glow cine-scene-glow-warm" aria-hidden="true" />
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: 'clamp(2rem, 5vh, 4rem) 0', position: 'relative', zIndex: 1 }}>
+export const GlobalFooterScene = ({ scene }) => {
+  const reduced = useReducedMotion()
 
-          {/* Section fades in over 1.1s */}
-          <motion.div {...(reduced ? {} : enterFrom(0, 18))}>
-            <div className="lux-rule" style={{ margin: '0 auto 2.2rem' }} />
-            <p className="lux-eyebrow-muted" style={{ marginBottom: '2rem' }}>Next Move</p>
-          </motion.div>
+  return (
+    <SceneWrapper
+      id={scene.id}
+      tone={scene.tone}
+      theme="light"
+      transitionReady={scene.transitionReady}
+      minHeight={buildHeight(scene.length)}
+      className="scene-cinematic scene-global-footer"
+    >
+      <div className="cine-grain-overlay" aria-hidden="true" />
+      <div className="cine-scene-glow cine-scene-glow-warm" aria-hidden="true" />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: 'clamp(2rem, 5vh, 4rem) 0', position: 'relative', zIndex: 1 }}>
 
-          <motion.h2
-            {...(reduced ? {} : enterFrom(0.06, 20))}
-            style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.8rem, 6vw, 6rem)', lineHeight: 0.97, letterSpacing: '-0.045em', fontWeight: 500, color: 'var(--color-ink)', maxWidth: '16ch', marginBottom: '2rem' }}
-          >
-            Precision-led production for moments that cannot miss.
-          </motion.h2>
+        <motion.div {...(reduced ? {} : enterFrom(0, 18))}>
+          <div className="lux-rule" style={{ margin: '0 auto 2.2rem' }} />
+          <p className="lux-eyebrow-muted" style={{ marginBottom: '2rem' }}>Next Move</p>
+        </motion.div>
 
-          <motion.p
-            {...(reduced ? {} : enterFrom(0.1, 16))}
-            style={{ fontSize: 'clamp(0.9rem, 1.2vw, 1.05rem)', lineHeight: 1.74, color: 'var(--lux-ink-muted)', maxWidth: '48ch', marginBottom: '3rem' }}
-          >
-            Regional reach across UAE — one accountable command structure and execution discipline from scope to show close.
-          </motion.p>
+        <motion.h2
+          {...(reduced ? {} : enterFrom(0.06, 20))}
+          style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.8rem, 6vw, 6rem)', lineHeight: 0.97, letterSpacing: '-0.045em', fontWeight: 500, color: 'var(--color-ink)', maxWidth: '16ch', marginBottom: '2rem' }}
+        >
+          Precision-led production for moments that cannot miss.
+        </motion.h2>
 
+        <motion.p
+          {...(reduced ? {} : enterFrom(0.1, 16))}
+          style={{ fontSize: 'clamp(0.9rem, 1.2vw, 1.05rem)', lineHeight: 1.74, color: 'var(--lux-ink-muted)', maxWidth: '48ch', marginBottom: '3rem' }}
+        >
+          Regional reach across UAE — one accountable command structure and execution discipline from scope to show close.
+        </motion.p>
+
+        <motion.div
+          {...(reduced ? {} : enterFrom(0.14, 14))}
+          style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center', marginBottom: '3rem' }}
+        >
           <motion.div
-            {...(reduced ? {} : enterFrom(0.14, 14))}
-            style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center', marginBottom: '3rem' }}
+            animate={reduced ? undefined : {
+              scale: [1, 1.015, 1],
+              transition: { duration: 0.9, ease: EASE, repeat: Infinity, repeatDelay: 3.1 },
+            }}
+            style={{ display: 'inline-flex' }}
           >
-            {/* Primary CTA — pulse every 4s: scale 1→1.015→1 */}
-            <motion.div
-              animate={reduced ? undefined : {
-                scale: [1, 1.015, 1],
-                transition: { duration: 0.9, ease: EASE, repeat: Infinity, repeatDelay: 3.1 },
-              }}
-              style={{ display: 'inline-flex' }}
-            >
-              <Link to="/contact" className="lux-cta-dark">
-                Request Proposal
-                <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M6.5 3L9 5.5 6.5 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </Link>
-            </motion.div>
-            <Link to="/work" className="lux-cta-dark-outline">View Our Work</Link>
+            <Link to="/contact" className="lux-cta-dark">
+              Request Proposal
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M6.5 3L9 5.5 6.5 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </Link>
           </motion.div>
+          <Link to="/work" className="lux-cta-dark-outline">View Our Work</Link>
+        </motion.div>
 
-          <motion.p
-            {...(reduced ? {} : enterFrom(0.18, 10))}
-            style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.36em', textTransform: 'uppercase', color: 'var(--lux-ink-subtle)' }}
-          >
-            Dubai · Abu Dhabi · GCC
-          </motion.p>
+        <motion.p
+          {...(reduced ? {} : enterFrom(0.18, 10))}
+          style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.36em', textTransform: 'uppercase', color: 'var(--lux-ink-subtle)' }}
+        >
+          Dubai · Abu Dhabi · GCC
+        </motion.p>
 
-          <motion.div {...(reduced ? {} : enterFrom(0.2, 8))}>
-            <div className="lux-rule" style={{ margin: '2rem auto 0' }} />
-          </motion.div>
-        </div>
-      </>
-    )}
-  </FreeSceneFrame>
-)
+        <motion.div {...(reduced ? {} : enterFrom(0.2, 8))}>
+          <div className="lux-rule" style={{ margin: '2rem auto 0' }} />
+        </motion.div>
+      </div>
+    </SceneWrapper>
+  )
+}

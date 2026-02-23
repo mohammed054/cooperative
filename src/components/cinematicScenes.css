@@ -1,0 +1,406 @@
+/* ==========================================================================
+   GHAIM UAE — CINEMATIC SCENE CSS
+   Companion to HomeScenes.jsx rebuild.
+   Light-first. GPU-only motion (transform + opacity + filter:blur).
+   No dark global inheritance. No color leaks between sections.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   SCENE BACKGROUNDS — light palette tones only
+   --------------------------------------------------------------------------- */
+
+.scene-cinematic.scene-capability-matrix {
+  background:
+    radial-gradient(62% 48% at 80% 18%, rgba(145, 162, 186, 0.18) 0%, transparent 70%),
+    linear-gradient(180deg, #eef1f6 0%, #e8edf4 44%, #eaecf1 100%);
+}
+
+.scene-cinematic.scene-narrative-bridge {
+  background:
+    radial-gradient(54% 40% at 20% 22%, rgba(211, 202, 187, 0.26) 0%, transparent 68%),
+    radial-gradient(38% 44% at 82% 72%, rgba(181, 146, 79, 0.09) 0%, transparent 64%),
+    linear-gradient(180deg, #faf7f2 0%, #f5f0e8 50%, #f0ebe1 100%);
+}
+
+.scene-cinematic.scene-proof-theater {
+  background:
+    radial-gradient(48% 38% at 74% 14%, rgba(181, 146, 79, 0.08) 0%, transparent 62%),
+    radial-gradient(42% 52% at 14% 80%, rgba(203, 213, 226, 0.14) 0%, transparent 60%),
+    linear-gradient(180deg, #faf8f4 0%, #f7f3ec 52%, #f3ede3 100%);
+}
+
+.scene-cinematic.scene-global-footer {
+  background:
+    radial-gradient(50% 36% at 50% 0%, rgba(181, 146, 79, 0.07) 0%, transparent 60%),
+    linear-gradient(180deg, #faf8f4 0%, #f5f1e8 100%);
+}
+
+.scene-cinematic.scene-conversion-chamber {
+  background: var(--color-surface, #f6f7f9);
+}
+
+/* ---------------------------------------------------------------------------
+   SCENE 04 — CAPABILITY CARDS
+   Desktop: 3-column grid with scroll-linked highlight.
+   Mobile: stacked single-column, all active style, staggered entrance.
+   --------------------------------------------------------------------------- */
+
+/* Desktop grid (handled inline via style prop) */
+.capability-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+/* Hide mobile stack on desktop */
+.capability-cards-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* Hide pinned desktop grid on mobile */
+  .capability-cards-grid {
+    display: none !important;
+  }
+
+  /* Show stacked mobile version */
+  .capability-cards-mobile {
+    display: grid;
+    gap: 1rem;
+  }
+}
+
+/* Breathing gradient mesh — Capability scene */
+.scene-capability-matrix .flagship-scene-content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(58% 32% at 50% 0%, rgba(198, 208, 221, 0.22) 0%, transparent 60%);
+  opacity: 0;
+  animation: cine-mesh-breathe 8s ease-in-out infinite alternate;
+}
+
+@keyframes cine-mesh-breathe {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+   FILM GRAIN OVERLAY — 2% on light, 4.8% on dark
+   --------------------------------------------------------------------------- */
+
+.cine-grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.022;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+}
+
+.flagship-scene-dark .cine-grain-overlay,
+.flagship-scene-deep .cine-grain-overlay {
+  opacity: 0.048;
+  mix-blend-mode: screen;
+}
+
+/* ---------------------------------------------------------------------------
+   SCENE GLOW RADIALS
+   --------------------------------------------------------------------------- */
+
+.cine-scene-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cine-scene-glow-warm {
+  background:
+    radial-gradient(ellipse 44% 28% at 72% 82%, rgba(181, 146, 79, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 32% 22% at 14% 12%, rgba(203, 213, 226, 0.08) 0%, transparent 52%);
+}
+
+.cine-scene-glow-cool {
+  background:
+    radial-gradient(ellipse 40% 26% at 26% 74%, rgba(113, 155, 208, 0.06) 0%, transparent 56%),
+    radial-gradient(ellipse 30% 20% at 78% 14%, rgba(181, 146, 79, 0.04) 0%, transparent 48%);
+}
+
+/* ---------------------------------------------------------------------------
+   AUTHORITY LEDGER (Scene 02) — structural
+   --------------------------------------------------------------------------- */
+
+.authority-ledger {
+  position: relative;
+  isolation: isolate;
+}
+
+.authority-ledger-shell {
+  display: grid;
+  gap: clamp(2.8rem, 5vh, 4.5rem);
+}
+
+.authority-ledger-intro {
+  max-width: 52ch;
+}
+
+.authority-ledger-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  letter-spacing: -0.04em;
+  color: var(--color-ink);
+}
+
+.authority-ledger-subcopy {
+  font-size: clamp(0.92rem, 1.2vw, 1.05rem);
+  line-height: 1.74;
+  max-width: 44ch;
+}
+
+.authority-ledger-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 1rem;
+}
+
+.authority-ledger-metric-value {
+  font-size: clamp(2.8rem, 5vw, 4.4rem);
+  letter-spacing: -0.04em;
+}
+
+.authority-ledger-card {
+  transition: box-shadow 0.4s ease;
+}
+
+.authority-ledger-card:hover {
+  box-shadow: 0 28px 56px rgba(8, 12, 20, 0.14);
+}
+
+/* ---------------------------------------------------------------------------
+   SCENE TRANSITION HOOKS — invisible spacers
+   --------------------------------------------------------------------------- */
+
+.scene-transition-hook {
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   FORM FIELDS — Floating label inputs
+   --------------------------------------------------------------------------- */
+
+.cinematic-field {
+  position: relative;
+  display: block;
+}
+
+.cinematic-field-input {
+  width: 100%;
+  padding: 1.1rem 1rem 0.5rem;
+  border: 1px solid var(--color-border, rgba(16, 15, 13, 0.12));
+  border-radius: 0.75rem;
+  background: var(--color-surface, #faf8f5);
+  font-size: 0.92rem;
+  color: var(--color-ink);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.cinematic-field-input:focus {
+  border-color: rgba(181, 146, 79, 0.6);
+  box-shadow: 0 0 0 3px rgba(181, 146, 79, 0.08);
+}
+
+.cinematic-field-label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.875rem;
+  color: var(--color-ink-subtle, rgba(16, 15, 13, 0.44));
+  pointer-events: none;
+  transition: top 0.18s ease, font-size 0.18s ease, transform 0.18s ease, color 0.18s ease;
+}
+
+.cinematic-field-input:focus ~ .cinematic-field-label,
+.cinematic-field-input:not(:placeholder-shown) ~ .cinematic-field-label {
+  top: 0.55rem;
+  transform: none;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: rgba(181, 146, 79, 0.8);
+}
+
+.cinematic-select-input {
+  padding-right: 2.2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='rgba(16,15,13,0.4)' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+}
+
+.cinematic-success-mark svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cinematic-success-mark path {
+  stroke: rgba(122, 218, 165, 0.9);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------------------------------------------------------------------------
+   LUX DESIGN TOKENS (shared across scenes)
+   --------------------------------------------------------------------------- */
+
+.lux-eyebrow-muted {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--lux-ink-subtle, rgba(16, 15, 13, 0.42));
+}
+
+.lux-eyebrow-light {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(181, 146, 79, 0.72);
+}
+
+.lux-rule {
+  width: 2rem;
+  height: 1px;
+  background: rgba(16, 15, 13, 0.14);
+}
+
+.lux-rule-full {
+  width: 100%;
+  height: 1px;
+  background: rgba(16, 15, 13, 0.08);
+  border: none;
+  margin: 0;
+}
+
+.lux-display {
+  font-family: var(--font-heading);
+  font-size: clamp(2.4rem, 4.5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+
+.lux-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+
+.lux-section-head {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+
+.lux-blockquote {
+  font-family: var(--font-heading);
+  font-size: clamp(1.3rem, 2.2vw, 2rem);
+  line-height: 1.36;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lux-cta-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.78rem 1.4rem;
+  background: var(--lux-dark, #0a0907);
+  color: rgba(250, 247, 242, 0.92);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease;
+}
+
+.lux-cta-dark:hover {
+  background: rgba(10, 9, 7, 0.84);
+}
+
+.lux-cta-dark-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.78rem 1.4rem;
+  background: transparent;
+  color: var(--lux-ink, rgba(16, 15, 13, 0.88));
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid rgba(16, 15, 13, 0.22);
+  transition: border-color 0.22s ease, color 0.22s ease;
+}
+
+.lux-cta-dark-outline:hover {
+  border-color: rgba(181, 146, 79, 0.6);
+  color: var(--lux-gold, rgba(181, 146, 79, 0.9));
+}
+
+/* ---------------------------------------------------------------------------
+   NARRATIVE BRIDGE (Scene 06) — breathing container
+   Ensure adequate min-height so "hold" phase is felt
+   --------------------------------------------------------------------------- */
+
+.scene-cinematic.scene-narrative-bridge .flagship-scene-content {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------------------------------------------------------------------------
+   PROOF THEATER (Scene 07) — testimonial
+   --------------------------------------------------------------------------- */
+
+.scene-proof-theater .lux-blockquote {
+  quotes: none;
+}
+
+/* ---------------------------------------------------------------------------
+   REDUCE MOTION — honor prefers-reduced-motion
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cine-grain-overlay,
+  .hero-parallax-shimmer,
+  .hero-lens-warmtint,
+  .scene-ambient-layer,
+  .cine-mesh-breathe {
+    animation: none !important;
+    transition: none !important;
+  }
+}

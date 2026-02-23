@@ -5,7 +5,7 @@ import {
   HOMEPAGE_FOUNDATION_ASSERTION, // FIX: import pre-computed assertion instead of re-running validation
 } from '../foundation/homepageFoundation'
 import { useAnalyticsContext } from '../hooks/useAnalyticsContext'
-import useLenisScroll from '../hooks/useLenisScroll'
+// import useLenisScroll from '../hooks/useLenisScroll'
 import {
   AuthorityLedgerScene,
   CapabilityMatrixScene,
@@ -105,7 +105,7 @@ const Home = () => {
     scene => scene.id !== 'command-arrival' && scene.id !== 'authority-ledger'
   )
 
-  useLenisScroll()
+  // useLenisScroll()
 
   useEffect(() => {
     if (typeof window === 'undefined' || !analytics?.trackEvent) return

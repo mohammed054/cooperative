@@ -115,7 +115,13 @@
 
 @layer base {
   html {
-    overflow-x: hidden;
+    /* SCROLL ARCHITECTURE: Use clip, NOT hidden.
+       overflow-x: hidden creates a scroll container on html/body which silently
+       kills ALL position:sticky descendants across the entire page.
+       overflow-x: clip clips visually without creating a new scroll container. */
+    overflow-x: clip;
+    /* height: auto ensures the browser viewport — not html — is the scroll root. */
+    height: auto;
     /* STABILIZATION: Light neutral background — no pure white, no dark flash */
     background-color: var(--tone-deep);
   }
@@ -123,6 +129,11 @@
   body {
     margin: 0;
     min-width: 320px;
+    /* SCROLL ARCHITECTURE: height: auto keeps body as a flow container, not a
+       scroll container. overflow-x: clip prevents horizontal bleed without
+       the sticky-breaking side-effect of overflow-x: hidden. */
+    height: auto;
+    overflow-x: clip;
     /* STABILIZATION: body inherits the same light neutral — zero dark snapback */
     background-color: var(--tone-deep);
     color: var(--color-ink);
@@ -1063,17 +1074,21 @@
   color: rgba(255, 255, 255, 0.72);
 }
 
-.flagship-scene-locked {
+.panel {
   position: relative;
 }
 
-.flagship-lock-inner {
+.sticky {
   position: sticky;
   top: 0;
-  min-height: 100svh;
+  height: 100svh;
   display: flex;
-  align-items: center;
-  padding-block: clamp(2.2rem, 5vh, 4rem);
+  flex-direction: column;
+}
+
+.sticky > * {
+  flex: 1;
+  min-height: 0;
 }
 
 .flagship-lock-layout,
@@ -1419,7 +1434,7 @@
     grid-template-columns: 1fr;
   }
 
-  .flagship-lock-inner {
+  .sticky {
     align-items: start;
     padding-top: 5.8rem;
   }
@@ -1500,7 +1515,7 @@
 .flagship-home-cinematic .flagship-scene-deep {
   --color-ink: #eef2f7;
   --color-ink-muted: rgba(210, 222, 238, 0.72);
-  --color-ink-subtle: rgba(185, 200, 220, 0.50);
+  --color-ink-subtle: rgba(185, 200, 220, 0.5);
   --color-surface: rgba(255, 255, 255, 0.06);
   --color-surface-2: rgba(255, 255, 255, 0.09);
   --color-surface-3: rgba(255, 255, 255, 0.04);
@@ -1522,7 +1537,7 @@
 .flagship-home-cinematic .flagship-scene-dark {
   --color-ink: #eef2f7;
   --color-ink-muted: rgba(210, 222, 238, 0.72);
-  --color-ink-subtle: rgba(185, 200, 220, 0.50);
+  --color-ink-subtle: rgba(185, 200, 220, 0.5);
   --color-surface: rgba(255, 255, 255, 0.06);
   --color-surface-2: rgba(255, 255, 255, 0.09);
   --color-surface-3: rgba(255, 255, 255, 0.04);
@@ -1921,7 +1936,7 @@
 .homepage-tone-bridge-deep-dark::after {
   background: radial-gradient(
     60% 70% at 50% 44%,
-    rgba(60, 90, 145, 0.10),
+    rgba(60, 90, 145, 0.1),
     rgba(60, 90, 145, 0) 72%
   );
 }
@@ -1944,13 +1959,12 @@
 
 /* steel → dark: light steel fades into dark section */
 .homepage-tone-bridge-steel-dark::before {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(238, 243, 249, 0) 0%,
-      rgba(18, 24, 36, 0.56) 56%,
-      rgba(13, 18, 28, 0.92) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(238, 243, 249, 0) 0%,
+    rgba(18, 24, 36, 0.56) 56%,
+    rgba(13, 18, 28, 0.92) 100%
+  );
 }
 
 .homepage-tone-bridge-steel-dark::after {
@@ -1963,13 +1977,12 @@
 
 /* deep → steel: deep dark fades up into light steel */
 .homepage-tone-bridge-deep-steel::before {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(244, 247, 252, 0.82) 52%,
-      rgba(238, 243, 249, 0.97) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(244, 247, 252, 0.82) 52%,
+    rgba(238, 243, 249, 0.97) 100%
+  );
 }
 
 .homepage-tone-bridge-deep-steel::after {
@@ -2210,10 +2223,19 @@
 .scene-depth-stage-hero-full {
   position: relative;
   width: 100%;
-  height: 100vh;
-  min-height: 100vh;
+  /* SCROLL ARCHITECTURE: 200vh gives ['start start','end start'] a real 100vh
+     scroll range. The sticky inner layer pins the visual at 100vh.
+     At 100vh the scroll range is collapsed and progress never moves. */
+  height: 200vh;
+  min-height: 200vh;
   isolation: isolate;
-  overflow: hidden;
+  /* overflow: hidden removed — breaks sticky descendants and clips scroll tracking */
+}
+
+.scene-depth-stage-hero-inner {
+  position: sticky;
+  top: 0;
+  height: 100svh;
 }
 
 .scene-depth-stage-hero-full .scene-ambient-field {
@@ -3137,21 +3159,21 @@
    ========================================================================== */
 
 :root {
-  --lux-gold:         #b5924f;
-  --lux-gold-light:   #d4ae78;
-  --lux-gold-soft:    rgba(181, 146, 79, 0.2);
-  --lux-gold-line:    rgba(181, 146, 79, 0.36);
-  --lux-ink:          #100f0d;
-  --lux-ink-muted:    rgba(16, 15, 13, 0.52);
-  --lux-ink-subtle:   rgba(16, 15, 13, 0.34);
-  --lux-surface:      #faf7f2;
-  --lux-dark:         #0a0907;
-  --lux-dark-2:       #100e0b;
-  --lux-dark-3:       #161310;
-  --lux-white-88:     rgba(250, 247, 242, 0.88);
-  --lux-white-56:     rgba(250, 247, 242, 0.56);
-  --lux-white-32:     rgba(250, 247, 242, 0.32);
-  --lux-white-16:     rgba(250, 247, 242, 0.16);
+  --lux-gold: #b5924f;
+  --lux-gold-light: #d4ae78;
+  --lux-gold-soft: rgba(181, 146, 79, 0.2);
+  --lux-gold-line: rgba(181, 146, 79, 0.36);
+  --lux-ink: #100f0d;
+  --lux-ink-muted: rgba(16, 15, 13, 0.52);
+  --lux-ink-subtle: rgba(16, 15, 13, 0.34);
+  --lux-surface: #faf7f2;
+  --lux-dark: #0a0907;
+  --lux-dark-2: #100e0b;
+  --lux-dark-3: #161310;
+  --lux-white-88: rgba(250, 247, 242, 0.88);
+  --lux-white-56: rgba(250, 247, 242, 0.56);
+  --lux-white-32: rgba(250, 247, 242, 0.32);
+  --lux-white-16: rgba(250, 247, 242, 0.16);
 }
 
 /* ── lux-light-surface already defined above ── */
@@ -3367,7 +3389,9 @@
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: background 0.24s ease, transform 0.2s ease;
+  transition:
+    background 0.24s ease,
+    transform 0.2s ease;
 }
 
 .lux-cta-primary:hover {
@@ -3390,7 +3414,10 @@
   text-decoration: none;
   border: 1px solid var(--lux-gold-line);
   cursor: pointer;
-  transition: border-color 0.24s ease, color 0.24s ease, transform 0.2s ease;
+  transition:
+    border-color 0.24s ease,
+    color 0.24s ease,
+    transform 0.2s ease;
 }
 
 .lux-cta-secondary:hover {
@@ -3415,7 +3442,9 @@
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: background 0.24s ease, transform 0.2s ease;
+  transition:
+    background 0.24s ease,
+    transform 0.2s ease;
   position: relative;
   z-index: 1;
 }
@@ -3440,7 +3469,9 @@
   text-decoration: none;
   border: 1px solid rgba(16, 15, 13, 0.28);
   cursor: pointer;
-  transition: border-color 0.24s ease, transform 0.2s ease;
+  transition:
+    border-color 0.24s ease,
+    transform 0.2s ease;
   position: relative;
   z-index: 1;
 }

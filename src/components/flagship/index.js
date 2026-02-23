@@ -5,6 +5,7 @@ export { default as MotionText } from './MotionText'
 export { default as GradientBridge } from './GradientBridge'
 export { default as MediaReveal } from './MediaReveal'
 export { default as HeroAmbientCanvas } from './HeroAmbientCanvas'
+export { FreeSceneFrame, PinnedSceneFrame } from './SceneFrames'
 export {
   ProgressProvider,
   useProgress,
