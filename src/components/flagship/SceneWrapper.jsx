@@ -7,15 +7,24 @@ const SceneWrapper = ({
   children,
   className = '',
   minHeight = '100vh',
+  sticky = false,
   tone = 'light',
   theme = 'light',
   transitionReady = false,
+  sceneIndex = 0,
+  sceneCount = 1,
   style,
 }) => {
+  const isFirstScene = sceneIndex === 0
+  const isLastScene = sceneIndex === Math.max(0, sceneCount - 1)
+
   return (
     <section
       id={id}
       data-scene-id={id}
+      data-sticky={sticky ? 'true' : 'false'}
+      data-scene-first={isFirstScene ? 'true' : 'false'}
+      data-scene-last={isLastScene ? 'true' : 'false'}
       data-theme={theme}
       data-transition-ready={String(Boolean(transitionReady))}
       className={joinClasses(
@@ -25,10 +34,13 @@ const SceneWrapper = ({
       )}
       style={{ '--scene-min-height': minHeight, ...style }}
     >
-      {/* No wrapper animation — scenes animate their own content via variants.
-          A wrapping opacity-0 fade compounds with scene-level stagger chains
-          and creates triple-layer invisible states during scroll-in. */}
-      <div className="flagship-scene-content scene-transition-shell">
+      <div className="scene-fade-overlay" data-scene-fade-overlay aria-hidden="true" />
+      <div
+        className={joinClasses(
+          'flagship-scene-content scene-transition-shell',
+          sticky ? 'scene-sticky-stage' : ''
+        )}
+      >
         {children}
       </div>
     </section>
@@ -36,3 +48,4 @@ const SceneWrapper = ({
 }
 
 export default SceneWrapper
+

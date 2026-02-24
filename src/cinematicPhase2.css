@@ -389,7 +389,7 @@
 /* Ensure body is the scroll root — no interference */
 html,
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Scene wrapper min-height fallback via custom property */

@@ -434,12 +434,11 @@
 
 /* Mobile overrides */
 @media (max-width: 768px) {
-  /* Mobile: no scroll track needed — section scrolls naturally */
-  .osv2Outer { height: auto; }
+  .osv2Outer { height: var(--osv2-outer-height, 240vh); }
   .osv2Sticky {
-    position: relative;
-    top: auto;
-    height: auto;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
     min-height: 100dvh;
     align-items: flex-start;
     padding-top: clamp(5.2rem, 12vh, 7rem);

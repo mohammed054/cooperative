@@ -721,6 +721,19 @@
   padding-block: clamp(2.8rem, 6vw, 5.5rem);
 }
 
+.flagship-scene[data-sticky='true'] {
+  height: var(--scene-min-height, 140vh);
+  min-height: var(--scene-min-height, 140vh);
+}
+
+.flagship-scene[data-sticky='true'] .scene-sticky-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
 /* Homepage cinematic scenes own their internal spacing to avoid wrapper air gaps. */
 .flagship-home-cinematic .scene-cinematic .flagship-scene-content {
   padding-block: 0;
@@ -1511,8 +1524,24 @@
 .flagship-home-cinematic .flagship-scene-content {
   position: relative;
   z-index: 2;
-  padding-block: clamp(5.5rem, 10vw, 9rem);
+  padding-block: 0;
+  align-items: stretch;
   background: transparent;
+}
+
+.scene-fade-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 10, 14, 0.88) 0%,
+      rgba(8, 10, 14, 0.62) 46%,
+      rgba(8, 10, 14, 0.9) 100%
+    );
 }
 
 /* ── Dark scene tone overrides inside flagship-home-cinematic ── */

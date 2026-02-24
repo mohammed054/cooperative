@@ -167,7 +167,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'command-arrival',
     tone: 'deep',
-    length: 100,
+    length: 165,
     mode: 'free',
     entryCue: 'hero-pre-roll',
     exitCue: 'hero-lock-release',
@@ -189,7 +189,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'authority-ledger',
     tone: 'steel',
-    length: 85,
+    length: 160,
     mode: 'free',
     entryCue: 'ledger-evidence-rise',
     exitCue: 'ledger-handoff',
@@ -206,7 +206,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'signature-reel',
     tone: 'dark',
-    length: 220,
+    length: 240,
     mode: 'pinned',
     entryCue: 'reel-pre-pin-buffer',
     exitCue: 'reel-release-snap',
@@ -227,7 +227,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'capability-matrix',
     tone: 'steel',
-    length: 100,
+    length: 165,
     mode: 'free',
     entryCue: 'matrix-lateral-reveal',
     exitCue: 'matrix-collapse',
@@ -248,7 +248,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'operations-spine',
     tone: 'steel',
-    length: 240,
+    length: 260,
     mode: 'pinned',
     entryCue: 'spine-pre-pin-buffer',
     exitCue: 'spine-release',
@@ -270,7 +270,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'narrative-bridge',
     tone: 'warm',
-    length: 75,
+    length: 145,
     mode: 'free',
     entryCue: 'bridge-decompress',
     exitCue: 'bridge-soft-release',
@@ -287,7 +287,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'proof-theater',
     tone: 'linen',
-    length: 120,
+    length: 170,
     mode: 'free',
     entryCue: 'proof-stage-open',
     exitCue: 'proof-logo-carry',
@@ -308,7 +308,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'conversion-chamber',
     tone: 'dark',
-    length: 120,
+    length: 175,
     mode: 'free',
     entryCue: 'conversion-panel-arm',
     exitCue: 'conversion-submit-release',
@@ -325,7 +325,7 @@ export const HOMEPAGE_SCENE_REGISTRY = Object.freeze([
   {
     id: 'global-footer',
     tone: 'deep',
-    length: 70,
+    length: 140,
     mode: 'free',
     entryCue: 'footer-tone-carry',
     exitCue: 'footer-terminal',

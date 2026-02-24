@@ -54,11 +54,22 @@ export default function Home() {
   }, [])
 
   return (
-    <main id="main-content" aria-label="Ghaim UAE Homepage">
-      {HOMEPAGE_SCENE_REGISTRY.map(scene => {
+    <main
+      id="main-content"
+      aria-label="Ghaim UAE Homepage"
+      className="flagship-home-cinematic"
+    >
+      {HOMEPAGE_SCENE_REGISTRY.map((scene, sceneIndex) => {
         const Scene = SCENE_MAP[scene.id]
         if (!Scene) return null
-        return <Scene key={scene.id} scene={scene} />
+        return (
+          <Scene
+            key={scene.id}
+            scene={scene}
+            sceneIndex={sceneIndex}
+            sceneCount={HOMEPAGE_SCENE_REGISTRY.length}
+          />
+        )
       })}
     </main>
   )

@@ -315,6 +315,29 @@ export const OperationsSpineScene = ({ scene }) => {
     }
   }, [reducedMotion, scene?.length])
 
+  useLayoutEffect(() => {
+    const outer = outerRef.current
+    const sticky = stickyRef.current
+    if (!outer || !sticky || reducedMotion) return undefined
+
+    const ctx = gsap.context(() => {
+      gsap.set(sticky, { autoAlpha: 0 })
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: outer,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.05,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      tl.to(sticky, { autoAlpha: 1, ease: 'none', duration: 0.24 }, 0.08)
+    }, outer)
+
+    return () => ctx.revert()
+  }, [reducedMotion, scene?.length])
+
   const displayIdx = reducedMotion ? PHASES.length - 1 : activeIdx
   const progressPercent = Math.round(((displayIdx + 1) / PHASES.length) * 100)
 

@@ -191,15 +191,19 @@ const CTA = {
   },
 }
 
-const useFreeSceneReveal = (
+const useStickySceneLifecycle = (
   rootRef,
   {
-    start = 'top 82%',
-    sectionY = 18,
-    itemY = 14,
     itemSelector = '[data-reveal-item]',
-    stagger = 0.15,
-    duration = 0.52,
+    itemEnterY = 12,
+    revealAt = 0.12,
+    revealDoneAt = 0.56,
+    sceneFadeInAt = 0.02,
+    sceneFadeInDoneAt = 0.14,
+    sceneFadeOutAt = 0.82,
+    sceneFadeOutDoneAt = 0.98,
+    skipSceneEntryFade = false,
+    skipSceneExitFade = false,
   } = {}
 ) => {
   useLayoutEffect(() => {
@@ -211,93 +215,90 @@ const useFreeSceneReveal = (
       '(prefers-reduced-motion: reduce)'
     ).matches
     if (prefersReduced) {
+      const section = root.closest('[data-scene-id]') || root
+      const overlay = section.querySelector('[data-scene-fade-overlay]')
+      if (overlay) gsap.set(overlay, { autoAlpha: 0 })
       gsap.set(root, { clearProps: 'all' })
       gsap.set(root.querySelectorAll(itemSelector), { clearProps: 'all' })
       return undefined
     }
 
+    const section = root.closest('[data-scene-id]') || root
+
     const ctx = gsap.context(() => {
+      const overlay = section.querySelector('[data-scene-fade-overlay]')
       const items = root.querySelectorAll(itemSelector)
+      const isFirstScene = section.getAttribute('data-scene-first') === 'true'
+      const isLastScene = section.getAttribute('data-scene-last') === 'true'
+
+      if (overlay) {
+        gsap.set(overlay, { autoAlpha: isFirstScene ? 0 : 1 })
+      }
+      if (items.length) gsap.set(items, { autoAlpha: 0, y: itemEnterY })
+
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: root,
-          start,
-          toggleActions: 'play none none reverse',
-          onLeave: () => {
-            gsap.to(root, {
-              autoAlpha: 0.92,
-              y: -8,
-              duration: 0.28,
-              ease: 'power2.out',
-              overwrite: 'auto',
-            })
-          },
-          onEnterBack: () => {
-            gsap.to(root, {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.28,
-              ease: 'power2.out',
-              overwrite: 'auto',
-            })
-          },
+          trigger: section,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.05,
+          invalidateOnRefresh: true,
         },
       })
 
-      // Cinematic dissolve into and out of each free-scroll scene.
-      gsap.fromTo(
-        root,
-        { autoAlpha: 0.9 },
-        {
-          autoAlpha: 1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: root,
-            start: 'top 92%',
-            end: 'top 58%',
-            scrub: 1.1,
+      if (overlay && !(skipSceneEntryFade || isFirstScene)) {
+        tl.to(
+          overlay,
+          {
+            autoAlpha: 0,
+            ease: 'none',
+            duration: Math.max(0.08, sceneFadeInDoneAt - sceneFadeInAt),
           },
-        }
-      )
-
-      gsap.to(root, {
-        autoAlpha: 0.92,
-        y: -6,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: root,
-          start: 'bottom 34%',
-          end: 'bottom top',
-          scrub: 1.1,
-        },
-      })
-
-      gsap.set(root, { autoAlpha: 0, y: sectionY })
-      tl.to(root, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.72,
-        ease: 'power3.out',
-      })
+          sceneFadeInAt
+        )
+      }
 
       if (items.length) {
-        gsap.set(items, { autoAlpha: 0, y: itemY })
         tl.to(
           items,
           {
             autoAlpha: 1,
             y: 0,
-            duration,
-            ease: 'power3.out',
-            stagger,
+            ease: 'none',
+            duration: Math.max(0.12, revealDoneAt - revealAt),
+            stagger: 0.06,
           },
-          0.08
+          revealAt
+        )
+      }
+
+      if (overlay && !(skipSceneExitFade || isLastScene)) {
+        tl.to(
+          overlay,
+          {
+            autoAlpha: 1,
+            ease: 'none',
+            duration: Math.max(0.08, sceneFadeOutDoneAt - sceneFadeOutAt),
+          },
+          sceneFadeOutAt
         )
       }
     }, root)
 
     return () => ctx.revert()
-  }, [duration, itemSelector, itemY, rootRef, sectionY, stagger, start])
+  }, [
+    itemEnterY,
+    itemSelector,
+    revealAt,
+    revealDoneAt,
+    sceneFadeInAt,
+    sceneFadeInDoneAt,
+    sceneFadeOutAt,
+    sceneFadeOutDoneAt,
+    skipSceneEntryFade,
+    skipSceneExitFade,
+    rootRef,
+  ])
 }
 
 // ─── SHARED PRIMITIVES ────────────────────────────────────────────────────────
@@ -416,6 +417,7 @@ const CheckCircle = () => (
 
 export const CommandArrivalScene = ({ scene }) => {
   const rootRef = useRef(null)
+  const stageRef = useRef(null)
   const videoRef = useRef(null)
   const heroVideo = (() => {
     const src = scene?.videoSrc || scene?.media?.ref
@@ -439,6 +441,7 @@ export const CommandArrivalScene = ({ scene }) => {
   useLayoutEffect(() => {
     const root = rootRef.current
     if (!root) return undefined
+    gsap.registerPlugin(ScrollTrigger)
     const prefersReduced = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches
@@ -447,30 +450,16 @@ export const CommandArrivalScene = ({ scene }) => {
     const ctx = gsap.context(() => {
       const heroContent = root.querySelector('[data-hero-content]')
       const heroFadeBridge = root.querySelector('[data-hero-fade-bridge]')
-      const tl = gsap.timeline()
-      tl.fromTo(
-        root.querySelector('[data-hero-eyebrow]'),
-        { autoAlpha: 0, y: 10 },
-        { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.2 }
+      const heroSceneFade = root.querySelector('[data-hero-scene-fade]')
+      const stage = stageRef.current
+      const heroItems = root.querySelectorAll(
+        '[data-hero-eyebrow], [data-hero-headline], [data-hero-subtitle], [data-hero-cta]'
       )
-        .fromTo(
-          root.querySelector('[data-hero-headline]'),
-          { autoAlpha: 0, y: 12, scale: 0.98 },
-          { autoAlpha: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out' },
-          '-=0.32'
-        )
-        .fromTo(
-          root.querySelector('[data-hero-subtitle]'),
-          { autoAlpha: 0, y: 8 },
-          { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' },
-          '-=0.24'
-        )
-        .fromTo(
-          root.querySelector('[data-hero-cta]'),
-          { autoAlpha: 0, y: 5 },
-          { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' },
-          '-=0.2'
-        )
+
+      if (stage) gsap.set(stage, { autoAlpha: 1 })
+      if (heroSceneFade) gsap.set(heroSceneFade, { autoAlpha: 0 })
+      if (heroContent) gsap.set(heroContent, { autoAlpha: 0, y: 22 })
+      if (heroItems.length) gsap.set(heroItems, { autoAlpha: 0, y: 12 })
 
       if (videoRef.current) {
         gsap.fromTo(
@@ -481,17 +470,27 @@ export const CommandArrivalScene = ({ scene }) => {
       }
 
       if (heroContent) {
-        gsap.to(heroContent, {
-          autoAlpha: 0,
-          y: -34,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: root,
-            start: 'top top',
-            end: 'bottom 34%',
-            scrub: 1.2,
-          },
+        const introTl = gsap.timeline()
+        introTl.to(heroContent, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.2,
+          ease: 'power3.out',
         })
+        if (heroItems.length) {
+          introTl.to(
+            heroItems,
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.6,
+              stagger: 0.12,
+              ease: 'power3.out',
+            },
+            0.45
+          )
+        }
       }
 
       if (videoRef.current) {
@@ -501,7 +500,7 @@ export const CommandArrivalScene = ({ scene }) => {
           scrollTrigger: {
             trigger: root,
             start: 'top top',
-            end: 'bottom top',
+            end: 'bottom bottom',
             scrub: 1.2,
           },
         })
@@ -516,12 +515,25 @@ export const CommandArrivalScene = ({ scene }) => {
             ease: 'none',
             scrollTrigger: {
               trigger: root,
-              start: 'top 32%',
-              end: 'bottom top',
+              start: 'top 36%',
+              end: 'bottom bottom',
               scrub: 1.1,
             },
           }
         )
+      }
+
+      if (heroSceneFade) {
+        const fadeTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: root,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: 1.05,
+            invalidateOnRefresh: true,
+          },
+        })
+        fadeTl.to(heroSceneFade, { autoAlpha: 1, ease: 'none', duration: 0.16 }, 0.82)
       }
     }, root)
 
@@ -535,13 +547,22 @@ export const CommandArrivalScene = ({ scene }) => {
       data-scene-id="command-arrival"
       style={{
         position: 'relative',
-        minHeight: sceneVh(scene, 100),
-        height: sceneVh(scene, 100),
-        overflow: 'hidden',
+        minHeight: sceneVh(scene, 160),
+        height: sceneVh(scene, 160),
+        overflow: 'clip',
         isolation: 'isolate',
         zIndex: 10,
       }}
     >
+      <div
+        ref={stageRef}
+        style={{
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          overflow: 'hidden',
+        }}
+      >
       {/* ── BACKGROUND VIDEO / FALLBACK ── */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         {heroVideo ? (
@@ -740,6 +761,19 @@ export const CommandArrivalScene = ({ scene }) => {
             'linear-gradient(to bottom, transparent, rgba(8,10,14,0.75))',
         }}
       />
+      <div
+        aria-hidden="true"
+        data-hero-scene-fade
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 60,
+          pointerEvents: 'none',
+          background:
+            'linear-gradient(180deg, rgba(6,8,12,0.02) 0%, rgba(6,8,12,0.84) 100%)',
+        }}
+      />
+      </div>
     </section>
   )
 }
@@ -754,14 +788,11 @@ export const CommandArrivalScene = ({ scene }) => {
 // Section now reads as deliberate, not padded-out.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const AuthorityLedgerScene = ({ scene }) => {
+export const AuthorityLedgerScene = ({ scene, sceneIndex, sceneCount }) => {
   const rootRef = useRef(null)
-  useFreeSceneReveal(rootRef, {
-    start: 'top 80%',
+  useStickySceneLifecycle(rootRef, {
     itemSelector: '[data-metric-block], [data-authority-cta]',
-    itemY: 10,
-    stagger: 0.15,
-    duration: 0.35,
+    itemEnterY: 10,
   })
 
   useLayoutEffect(() => {
@@ -806,7 +837,10 @@ export const AuthorityLedgerScene = ({ scene }) => {
       tone={scene?.tone || 'steel'}
       theme="light"
       transitionReady={scene?.transitionReady}
+      sceneIndex={sceneIndex}
+      sceneCount={sceneCount}
       minHeight={sceneVh(scene, 85)}
+      sticky
       className="scene-cinematic scene-authority-ledger"
     >
       <div
@@ -931,8 +965,14 @@ export const AuthorityLedgerScene = ({ scene }) => {
 export const SignatureReelScene = ({ scene }) => {
   const [activeIdx, setActiveIdx] = useState(0)
   const outerRef = useRef(null)
+  const stageRef = useRef(null)
   const trackRef = useRef(null)
   const scrollBoundsRef = useRef({ start: 0, end: 0 })
+  useStickySceneLifecycle(stageRef, {
+    itemSelector: '[data-reel-panel], [data-reel-ui]',
+    rootEnterY: 0,
+    itemEnterY: 0,
+  })
 
   useLayoutEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -990,6 +1030,7 @@ export const SignatureReelScene = ({ scene }) => {
       }}
     >
       <div
+        ref={stageRef}
         style={{
           position: 'sticky',
           top: 0,
@@ -1062,6 +1103,7 @@ export const SignatureReelScene = ({ scene }) => {
 
         {/* Header bar */}
         <div
+          data-reel-ui
           style={{
             position: 'absolute',
             top: 0,
@@ -1097,6 +1139,7 @@ export const SignatureReelScene = ({ scene }) => {
 
         {/* Floating text — left, bottom anchored */}
         <div
+          data-reel-ui
           style={{
             position: 'absolute',
             bottom: 'clamp(4rem, 9vh, 7rem)',
@@ -1173,6 +1216,7 @@ export const SignatureReelScene = ({ scene }) => {
 
         {/* Navigation — bottom right */}
         <div
+          data-reel-ui
           style={{
             position: 'absolute',
             bottom: 'clamp(4rem, 9vh, 7rem)',
@@ -1249,6 +1293,7 @@ export const SignatureReelScene = ({ scene }) => {
 
         {/* Progress line */}
         <div
+          data-reel-ui
           style={{
             position: 'absolute',
             bottom: 0,
@@ -1287,15 +1332,12 @@ export const SignatureReelScene = ({ scene }) => {
 //   - Reducing numeric ghost size slightly (8vw → 6vw) to not echo §2's overscale
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const CapabilityMatrixScene = ({ scene }) => {
+export const CapabilityMatrixScene = ({ scene, sceneIndex, sceneCount }) => {
   const rootRef = useRef(null)
-  useFreeSceneReveal(rootRef, {
-    start: 'top 75%',
+  useStickySceneLifecycle(rootRef, {
     itemSelector:
       '[data-capability-head], [data-capability-cta], [data-capability-block]',
-    itemY: 10,
-    stagger: 0.15,
-    duration: 0.35,
+    itemEnterY: 10,
   })
 
   return (
@@ -1304,7 +1346,10 @@ export const CapabilityMatrixScene = ({ scene }) => {
       tone="dark"
       theme="dark"
       transitionReady={scene?.transitionReady}
+      sceneIndex={sceneIndex}
+      sceneCount={sceneCount}
       minHeight={sceneVh(scene, 100)}
+      sticky
       className="scene-cinematic scene-capability-matrix"
     >
     <div
@@ -1488,14 +1533,14 @@ export const CapabilityMatrixScene = ({ scene }) => {
 // No ambiguous partial centering.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const NarrativeBridgeScene = ({ scene }) => {
+export const NarrativeBridgeScene = ({ scene, sceneIndex, sceneCount }) => {
   const rootRef = useRef(null)
-  useFreeSceneReveal(rootRef, {
-    start: 'top 80%',
-    itemSelector: '[data-bridge-copy]',
-    itemY: 8,
-    stagger: 0.15,
-    duration: 0.5,
+  const bridgeWords = 'Precision is only credible when proof carries the weight.'.split(' ')
+  useStickySceneLifecycle(rootRef, {
+    itemSelector: '[data-bridge-word]',
+    itemEnterY: 8,
+    revealAt: 0.16,
+    revealDoneAt: 0.66,
   })
 
   return (
@@ -1504,7 +1549,10 @@ export const NarrativeBridgeScene = ({ scene }) => {
       tone={scene?.tone || 'warm'}
       theme="light"
       transitionReady={scene?.transitionReady}
+      sceneIndex={sceneIndex}
+      sceneCount={sceneCount}
       minHeight={sceneVh(scene, 75)}
+      sticky
       className="scene-cinematic scene-narrative-bridge"
     >
     {/*
@@ -1527,7 +1575,6 @@ export const NarrativeBridgeScene = ({ scene }) => {
       }}
     >
       <h2
-        data-bridge-copy
         style={{
           margin: '0 auto',
           fontFamily: T.fontHead,
@@ -1540,7 +1587,15 @@ export const NarrativeBridgeScene = ({ scene }) => {
           maxWidth: '22ch',
         }}
       >
-        Precision is only credible when proof carries the weight.
+        {bridgeWords.map((word, idx) => (
+          <span
+            key={`${word}-${idx}`}
+            data-bridge-word
+            style={{ display: 'inline-block', marginRight: '0.28em' }}
+          >
+            {word}
+          </span>
+        ))}
       </h2>
     </div>
     </SceneWrapper>
@@ -1854,14 +1909,11 @@ const TestimonialCarousel = () => {
   )
 }
 
-export const ProofTheaterScene = ({ scene }) => {
+export const ProofTheaterScene = ({ scene, sceneIndex, sceneCount }) => {
   const rootRef = useRef(null)
-  useFreeSceneReveal(rootRef, {
-    start: 'top 75%',
+  useStickySceneLifecycle(rootRef, {
     itemSelector: '[data-proof-header], [data-proof-carousel]',
-    itemY: 10,
-    stagger: 0.15,
-    duration: 0.35,
+    itemEnterY: 10,
   })
 
   return (
@@ -1870,7 +1922,10 @@ export const ProofTheaterScene = ({ scene }) => {
       tone="dark"
       theme="dark"
       transitionReady={scene?.transitionReady}
+      sceneIndex={sceneIndex}
+      sceneCount={sceneCount}
       minHeight={sceneVh(scene, 120)}
+      sticky
       className="scene-cinematic scene-proof-theater"
       style={{ background: T.dark }}
     >
@@ -2366,15 +2421,12 @@ const ConversionForm = () => {
   )
 }
 
-export const ConversionChamberScene = ({ scene }) => {
+export const ConversionChamberScene = ({ scene, sceneIndex, sceneCount }) => {
   const rootRef = useRef(null)
-  useFreeSceneReveal(rootRef, {
-    start: 'top 80%',
+  useStickySceneLifecycle(rootRef, {
     itemSelector:
       '[data-conversion-left], [data-conversion-right], [data-conversion-right] label, [data-conversion-right] input, [data-conversion-right] select, [data-conversion-right] textarea, [data-conversion-right] button',
-    itemY: 8,
-    stagger: 0.1,
-    duration: 0.35,
+    itemEnterY: 8,
   })
 
   return (
@@ -2391,7 +2443,10 @@ export const ConversionChamberScene = ({ scene }) => {
     tone="linen"
     theme="light"
     transitionReady={scene?.transitionReady}
+    sceneIndex={sceneIndex}
+    sceneCount={sceneCount}
     minHeight={sceneVh(scene, 120)}
+    sticky
     className="scene-cinematic scene-conversion-chamber"
     style={{ padding: 0, overflow: 'hidden' }}
   >
@@ -2588,14 +2643,11 @@ export const ConversionChamberScene = ({ scene }) => {
 //   - z-index on content wrapper confirmed at zIndex:1 above grain/glow layers.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const GlobalFooterScene = ({ scene }) => {
+export const GlobalFooterScene = ({ scene, sceneIndex, sceneCount }) => {
   const rootRef = useRef(null)
-  useFreeSceneReveal(rootRef, {
-    start: 'top 85%',
+  useStickySceneLifecycle(rootRef, {
     itemSelector: '[data-footer-reveal]',
-    itemY: 8,
-    stagger: 0.2,
-    duration: 0.35,
+    itemEnterY: 8,
   })
 
   return (
@@ -2604,7 +2656,10 @@ export const GlobalFooterScene = ({ scene }) => {
       tone="linen"
       theme="light"
       transitionReady={scene?.transitionReady}
+      sceneIndex={sceneIndex}
+      sceneCount={sceneCount}
       minHeight={sceneVh(scene, 70)}
+      sticky
       className="scene-cinematic scene-global-footer"
     >
     <div style={{ position: 'relative', width: '100%' }}>
