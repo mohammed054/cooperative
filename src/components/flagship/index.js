@@ -1,15 +1,2 @@
 export { default as SceneWrapper } from './SceneWrapper'
-export { default as SceneShell } from './SceneShell'
-export { default as ScrollLockedSection } from './ScrollLockedSection'
-export { default as MotionText } from './MotionText'
-export { default as GradientBridge } from './GradientBridge'
-export { default as MediaReveal } from './MediaReveal'
 export { default as HeroAmbientCanvas } from './HeroAmbientCanvas'
-export { FreeSceneFrame, PinnedSceneFrame } from './SceneFrames'
-export {
-  ProgressProvider,
-  useProgress,
-  useProgressValue,
-  useProgressTransform,
-  useProgressEvent,
-} from './ProgressContext'
