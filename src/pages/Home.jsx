@@ -53,6 +53,47 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    const root = document.querySelector('.flagship-home-cinematic')
+    if (!root) return undefined
+
+    const toneToColor = {
+      deep: '#0d1622',
+      dark: '#111926',
+      steel: '#eef1f6',
+      warm: '#f8f6f2',
+      linen: '#faf8f4',
+    }
+
+    const triggers = HOMEPAGE_SCENE_REGISTRY.map(scene =>
+      ScrollTrigger.create({
+        trigger: `[data-scene-id="${scene.id}"]`,
+        start: 'top center',
+        end: 'bottom center',
+        onEnter: () => {
+          gsap.to(root, {
+            '--home-scene-bg': toneToColor[scene.tone] || '#faf8f4',
+            duration: 0.8,
+            ease: 'power2.out',
+            overwrite: 'auto',
+          })
+        },
+        onEnterBack: () => {
+          gsap.to(root, {
+            '--home-scene-bg': toneToColor[scene.tone] || '#faf8f4',
+            duration: 0.8,
+            ease: 'power2.out',
+            overwrite: 'auto',
+          })
+        },
+      })
+    )
+
+    return () => {
+      triggers.forEach(trigger => trigger.kill())
+    }
+  }, [])
+
   return (
     <main
       id="main-content"

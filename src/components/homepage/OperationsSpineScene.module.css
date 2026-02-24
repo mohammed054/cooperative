@@ -31,6 +31,7 @@
   align-items: center;
   overflow: hidden;
   isolation: isolate;
+  z-index: 2;
   /* PART 5: Background ownership — dark tone defined here, nowhere else */
   background: #0e1117;
 }
@@ -465,3 +466,4 @@
   .osv2RailFill { transform: translateX(-50%) scaleY(1) !important; }
   .osv2ProgFill { transform: scaleX(1) !important; }
 }
+

@@ -22,6 +22,7 @@ const SceneWrapper = ({
     <section
       id={id}
       data-scene-id={id}
+      data-scene-tone={tone}
       data-sticky={sticky ? 'true' : 'false'}
       data-scene-first={isFirstScene ? 'true' : 'false'}
       data-scene-last={isLastScene ? 'true' : 'false'}
@@ -35,6 +36,7 @@ const SceneWrapper = ({
       style={{ '--scene-min-height': minHeight, ...style }}
     >
       <div className="scene-fade-overlay" data-scene-fade-overlay aria-hidden="true" />
+      <div className="scene-edge-fade" aria-hidden="true" />
       <div
         className={joinClasses(
           'flagship-scene-content scene-transition-shell',
@@ -48,4 +50,3 @@ const SceneWrapper = ({
 }
 
 export default SceneWrapper
-

@@ -91,7 +91,7 @@ const PhaseCard = React.memo(
 )
 PhaseCard.displayName = 'PhaseCard'
 
-export const OperationsSpineScene = ({ scene }) => {
+export const OperationsSpineScene = ({ scene, sceneIndex = 0, sceneCount = 1 }) => {
   const outerRef = useRef(null)
   const stickyRef = useRef(null)
   const sentinelRef = useRef(null)
@@ -338,6 +338,40 @@ export const OperationsSpineScene = ({ scene }) => {
     return () => ctx.revert()
   }, [reducedMotion, scene?.length])
 
+  useLayoutEffect(() => {
+    if (reducedMotion) return undefined
+    const outer = outerRef.current
+    if (!outer) return undefined
+
+    const overlay = outer.querySelector('[data-scene-fade-overlay]')
+    if (!overlay) return undefined
+
+    const isFirstScene = sceneIndex === 0
+    const isLastScene = sceneIndex === Math.max(0, sceneCount - 1)
+
+    const ctx = gsap.context(() => {
+      gsap.set(overlay, { autoAlpha: isFirstScene ? 0 : 1 })
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: outer,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.05,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      if (!isFirstScene) {
+        tl.to(overlay, { autoAlpha: 0, ease: 'none', duration: 0.14 }, 0.04)
+      }
+      if (!isLastScene) {
+        tl.to(overlay, { autoAlpha: 1, ease: 'none', duration: 0.16 }, 0.84)
+      }
+    }, outer)
+
+    return () => ctx.revert()
+  }, [reducedMotion, sceneIndex, sceneCount])
+
   const displayIdx = reducedMotion ? PHASES.length - 1 : activeIdx
   const progressPercent = Math.round(((displayIdx + 1) / PHASES.length) * 100)
 
@@ -346,12 +380,17 @@ export const OperationsSpineScene = ({ scene }) => {
       ref={outerRef}
       id={scene?.id || 'operations-spine'}
       data-scene-id={scene?.id}
+      data-scene-tone={scene?.tone || 'steel'}
+      data-scene-first={sceneIndex === 0 ? 'true' : 'false'}
+      data-scene-last={sceneIndex === Math.max(0, sceneCount - 1) ? 'true' : 'false'}
       data-theme="dark"
       className={styles.osv2Outer}
       style={{ '--osv2-outer-height': `${scene?.length || 240}vh` }}
       aria-label="Delivery Framework - scroll to advance through phases"
     >
       {/* CSS sticky container — GSAP never touches position/transform of this element */}
+      <div className="scene-fade-overlay" data-scene-fade-overlay aria-hidden="true" />
+      <div className="scene-edge-fade" aria-hidden="true" />
       <div ref={stickyRef} className={styles.osv2Sticky}>
         <div className={styles.osv2Grain} aria-hidden="true">
           <span className={styles.osv2GrainBack} />

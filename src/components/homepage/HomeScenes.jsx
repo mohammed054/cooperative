@@ -415,7 +415,7 @@ const CheckCircle = () => (
 // Headline reads immediately on entry. Heavy space is preserved below, not above.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const CommandArrivalScene = ({ scene }) => {
+export const CommandArrivalScene = ({ scene, sceneIndex = 0, sceneCount = 1 }) => {
   const rootRef = useRef(null)
   const stageRef = useRef(null)
   const videoRef = useRef(null)
@@ -545,6 +545,9 @@ export const CommandArrivalScene = ({ scene }) => {
       ref={rootRef}
       id={scene?.id || 'command-arrival'}
       data-scene-id="command-arrival"
+      data-scene-tone={scene?.tone || 'deep'}
+      data-scene-first={sceneIndex === 0 ? 'true' : 'false'}
+      data-scene-last={sceneIndex === Math.max(0, sceneCount - 1) ? 'true' : 'false'}
       style={{
         position: 'relative',
         minHeight: sceneVh(scene, 160),
@@ -561,6 +564,7 @@ export const CommandArrivalScene = ({ scene }) => {
           top: 0,
           height: '100vh',
           overflow: 'hidden',
+          zIndex: 2,
         }}
       >
       {/* ── BACKGROUND VIDEO / FALLBACK ── */}
@@ -962,7 +966,7 @@ export const AuthorityLedgerScene = ({ scene, sceneIndex, sceneCount }) => {
 // No structural changes required. Unchanged from previous pass.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const SignatureReelScene = ({ scene }) => {
+export const SignatureReelScene = ({ scene, sceneIndex = 0, sceneCount = 1 }) => {
   const [activeIdx, setActiveIdx] = useState(0)
   const outerRef = useRef(null)
   const stageRef = useRef(null)
@@ -970,7 +974,6 @@ export const SignatureReelScene = ({ scene }) => {
   const scrollBoundsRef = useRef({ start: 0, end: 0 })
   useStickySceneLifecycle(stageRef, {
     itemSelector: '[data-reel-panel], [data-reel-ui]',
-    rootEnterY: 0,
     itemEnterY: 0,
   })
 
@@ -1023,12 +1026,17 @@ export const SignatureReelScene = ({ scene }) => {
       ref={outerRef}
       id={scene?.id || 'signature-reel'}
       data-scene-id="signature-reel"
+      data-scene-tone={scene?.tone || 'dark'}
+      data-scene-first={sceneIndex === 0 ? 'true' : 'false'}
+      data-scene-last={sceneIndex === Math.max(0, sceneCount - 1) ? 'true' : 'false'}
       style={{
         height: sceneVh(scene, 220),
         position: 'relative',
         zIndex: 20,
       }}
     >
+      <div className="scene-fade-overlay" data-scene-fade-overlay aria-hidden="true" />
+      <div className="scene-edge-fade" aria-hidden="true" />
       <div
         ref={stageRef}
         style={{
@@ -1036,6 +1044,7 @@ export const SignatureReelScene = ({ scene }) => {
           top: 0,
           height: '100vh',
           overflow: 'hidden',
+          zIndex: 2,
           background: T.dark,
         }}
       >
@@ -2793,3 +2802,4 @@ export const GlobalFooterScene = ({ scene, sceneIndex, sceneCount }) => {
     </SceneWrapper>
   )
 }
+
