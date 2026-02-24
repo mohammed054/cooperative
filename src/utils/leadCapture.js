@@ -1,106 +1,68 @@
-const REQUEST_TIMEOUT_MS = 12000
+/**
+ * leadCapture — stub implementation.
+ * Replace with real integration (e.g. HubSpot, Salesforce, custom API).
+ */
 
-const getEnvValue = key => {
-  const rawValue = import.meta.env?.[key]
-  return typeof rawValue === 'string' ? rawValue.trim() : ''
-}
+/**
+ * Normalize lead fields from form data
+ * @param {Record<string, unknown>} data - Raw form data
+ * @returns {Record<string, unknown>} Normalized lead fields
+ */
+export const normalizeLeadFields = (data = {}) => {
+  const normalized = {}
 
-export const getLeadWebhookUrl = () => getEnvValue('VITE_LEAD_WEBHOOK_URL')
-
-export const getLeadWebhookKey = () => getEnvValue('VITE_LEAD_WEBHOOK_KEY')
-
-export const isLeadCaptureConfigured = () => Boolean(getLeadWebhookUrl())
-
-const normalizeFieldValue = value => {
-  if (typeof value === 'string') return value.trim()
-  if (value == null) return ''
-  return String(value).trim()
-}
-
-export const normalizeLeadFields = fields => {
-  if (!fields || typeof fields !== 'object') return {}
-
-  return Object.entries(fields).reduce((acc, [key, value]) => {
-    const normalizedKey = String(key || '').trim()
-    if (!normalizedKey) return acc
-
-    const normalizedValue = normalizeFieldValue(value)
-    if (!normalizedValue) return acc
-
-    acc[normalizedKey] = normalizedValue
-    return acc
-  }, {})
-}
-
-export const buildLeadPayload = (fields, metadata = {}) => {
-  const normalizedFields = normalizeLeadFields(fields)
-
-  return {
-    ...normalizedFields,
-    _meta: {
-      submittedAt: new Date().toISOString(),
-      ...metadata,
-    },
-  }
-}
-
-const parseErrorMessage = async response => {
-  try {
-    const json = await response.json()
-    if (typeof json?.error === 'string') return json.error
-    if (typeof json?.message === 'string') return json.message
-  } catch {
-    // Ignore JSON parsing failures and fall back to plain text.
+  // Map common field variations to standard names
+  const fieldMappings = {
+    name: ['name', 'fullName', 'full_name', 'clientName', 'client_name'],
+    email: ['email', 'emailAddress', 'email_address'],
+    phone: ['phone', 'phoneNumber', 'phone_number', 'tel', 'telephone'],
+    company: ['company', 'companyName', 'company_name', 'organization'],
+    message: ['message', 'comments', 'notes', 'description', 'inquiry'],
+    service: ['service', 'serviceType', 'service_type', 'interest'],
+    budget: ['budget', 'budgetRange', 'budget_range'],
+    eventDate: ['eventDate', 'event_date', 'date', 'eventDate'],
+    eventLocation: ['eventLocation', 'event_location', 'location', 'venue'],
   }
 
-  try {
-    const text = await response.text()
-    if (text) return text
-  } catch {
-    // Ignore text parsing failures and use fallback.
+  for (const [standardField, aliases] of Object.entries(fieldMappings)) {
+    for (const alias of aliases) {
+      if (data[alias] !== undefined && data[alias] !== '') {
+        normalized[standardField] = data[alias]
+        break
+      }
+    }
   }
 
-  return `Lead request failed with status ${response.status}`
+  // Copy any remaining fields that weren't mapped
+  for (const [key, value] of Object.entries(data)) {
+    if (!normalized[key] && value !== undefined && value !== '') {
+      normalized[key] = value
+    }
+  }
+
+  return normalized
 }
 
-export const submitLead = async (fields, metadata = {}, options = {}) => {
-  const endpoint = (options.endpoint || getLeadWebhookUrl()).trim()
-  const apiKey = (options.apiKey || getLeadWebhookKey()).trim()
+export const isLeadCaptureConfigured = () => {
+  return Boolean(
+    typeof import.meta !== 'undefined' &&
+    import.meta.env?.VITE_LEAD_CAPTURE_ENDPOINT
+  )
+}
 
+export const submitLead = async (fields, meta = {}) => {
+  const endpoint = import.meta?.env?.VITE_LEAD_CAPTURE_ENDPOINT
   if (!endpoint) {
-    throw new Error('Lead webhook is not configured.')
+    // Stub: simulate network delay
+    await new Promise(r => setTimeout(r, 680))
+    console.info('[leadCapture] Stub submission:', { fields, meta })
+    return { ok: true, mode: 'stub' }
   }
-
-  const payload = buildLeadPayload(fields, metadata)
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
-
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ...(apiKey ? { 'x-api-key': apiKey } : {}),
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    })
-
-    if (!response.ok) {
-      throw new Error(await parseErrorMessage(response))
-    }
-
-    return { ok: true }
-  } catch (error) {
-    if (error?.name === 'AbortError') {
-      throw new Error('Submission timed out. Please try again.')
-    }
-
-    throw error instanceof Error
-      ? error
-      : new Error('Lead submission failed. Please try again.')
-  } finally {
-    clearTimeout(timeoutId)
-  }
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...fields, ...meta }),
+  })
+  if (!res.ok) throw new Error(`Lead capture failed: ${res.status}`)
+  return { ok: true, mode: 'live' }
 }

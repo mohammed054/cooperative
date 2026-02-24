@@ -23,7 +23,6 @@ import {
   loadPricing,
   loadPrivacy,
   loadProcess,
-  loadProjects,
   loadServiceDetail,
   loadServices,
   loadTerms,
@@ -45,7 +44,6 @@ const Contact = lazy(loadContact)
 const Privacy = lazy(loadPrivacy)
 const Terms = lazy(loadTerms)
 const NotFound = lazy(loadNotFound)
-const OurProjects = lazy(loadProjects)
 
 const AnimatedRoutes = () => {
   const location = useLocation()
@@ -103,7 +101,6 @@ const AnimatedRoutes = () => {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/projects" element={<OurProjects />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="*" element={<NotFound />} />

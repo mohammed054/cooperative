@@ -331,3 +331,54 @@
     transform: none !important;
   }
 }
+
+/* ===========================================================================
+   CINEMATIC SCROLL ARCHITECTURE — GSAP supplement
+   Scene 03: Signature Reel pinned horizontal supplemental styles.
+   =========================================================================== */
+
+/* Signature reel scene — dark, no inner overflow issues */
+#signature-reel {
+  /* Outer: 220vh in JS via inline style */
+  position: relative;
+}
+
+/* Ensure body is the scroll root — no interference */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Scene wrapper min-height fallback via custom property */
+.flagship-scene {
+  min-height: var(--scene-min-height, 100vh);
+}
+
+/* Reduced motion: skip all GSAP-driven transform animations */
+@media (prefers-reduced-motion: reduce) {
+  .scene-ambient-layer,
+  .hero-parallax-shimmer,
+  [data-gsap-reveal],
+  [data-metric-card],
+  [data-headline-line],
+  [data-capability-card],
+  [data-bridge-reveal],
+  [data-proof-header],
+  [data-footer-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+  }
+}
+
+/* Authority ledger CTA spacing */
+.authority-ledger-cta {
+  display: flex;
+}
+
+/* Signature reel horizontal track — GPU layer */
+[data-reel-panel] {
+  will-change: opacity;
+  transform: translateZ(0);
+}
