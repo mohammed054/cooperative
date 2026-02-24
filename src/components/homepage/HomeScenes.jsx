@@ -151,6 +151,8 @@ const T = {
   gold: '#b5924f',
   goldMuted: 'rgba(181,146,79,0.68)',
   goldFaint: 'rgba(181,146,79,0.22)',
+  accent: 'var(--color-accent, #1a1a1a)',
+  accentSoft: 'var(--color-accent-soft, rgba(26,26,26,0.12))',
   ink: '#100f0d',
   inkMuted: 'rgba(16,15,13,0.52)',
   inkSubtle: 'rgba(16,15,13,0.32)',
@@ -189,6 +191,115 @@ const CTA = {
   },
 }
 
+const useFreeSceneReveal = (
+  rootRef,
+  {
+    start = 'top 82%',
+    sectionY = 18,
+    itemY = 14,
+    itemSelector = '[data-reveal-item]',
+    stagger = 0.15,
+    duration = 0.52,
+  } = {}
+) => {
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    if (!root) return undefined
+    gsap.registerPlugin(ScrollTrigger)
+
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    if (prefersReduced) {
+      gsap.set(root, { clearProps: 'all' })
+      gsap.set(root.querySelectorAll(itemSelector), { clearProps: 'all' })
+      return undefined
+    }
+
+    const ctx = gsap.context(() => {
+      const items = root.querySelectorAll(itemSelector)
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start,
+          toggleActions: 'play none none reverse',
+          onLeave: () => {
+            gsap.to(root, {
+              autoAlpha: 0.92,
+              y: -8,
+              duration: 0.28,
+              ease: 'power2.out',
+              overwrite: 'auto',
+            })
+          },
+          onEnterBack: () => {
+            gsap.to(root, {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.28,
+              ease: 'power2.out',
+              overwrite: 'auto',
+            })
+          },
+        },
+      })
+
+      // Cinematic dissolve into and out of each free-scroll scene.
+      gsap.fromTo(
+        root,
+        { autoAlpha: 0.9 },
+        {
+          autoAlpha: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: root,
+            start: 'top 92%',
+            end: 'top 58%',
+            scrub: 1.1,
+          },
+        }
+      )
+
+      gsap.to(root, {
+        autoAlpha: 0.92,
+        y: -6,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: root,
+          start: 'bottom 34%',
+          end: 'bottom top',
+          scrub: 1.1,
+        },
+      })
+
+      gsap.set(root, { autoAlpha: 0, y: sectionY })
+      tl.to(root, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.72,
+        ease: 'power3.out',
+      })
+
+      if (items.length) {
+        gsap.set(items, { autoAlpha: 0, y: itemY })
+        tl.to(
+          items,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration,
+            ease: 'power3.out',
+            stagger,
+          },
+          0.08
+        )
+      }
+    }, root)
+
+    return () => ctx.revert()
+  }, [duration, itemSelector, itemY, rootRef, sectionY, stagger, start])
+}
+
 // ─── SHARED PRIMITIVES ────────────────────────────────────────────────────────
 
 const LuxRule = ({ style = {} }) => (
@@ -198,7 +309,7 @@ const LuxRule = ({ style = {} }) => (
       display: 'block',
       width: '2rem',
       height: '1px',
-      background: T.gold,
+      background: 'var(--color-accent, #1a1a1a)',
       opacity: 0.55,
       ...style,
     }}
@@ -280,13 +391,13 @@ const CheckCircle = () => (
       cx="7"
       cy="7"
       r="6"
-      stroke={T.gold}
+      stroke="var(--color-accent, #1a1a1a)"
       strokeWidth="0.8"
       strokeOpacity="0.4"
     />
     <path
       d="M4.5 7l2 2 3-3"
-      stroke={T.gold}
+      stroke="var(--color-accent, #1a1a1a)"
       strokeWidth="1.2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -304,6 +415,8 @@ const CheckCircle = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const CommandArrivalScene = ({ scene }) => {
+  const rootRef = useRef(null)
+  const videoRef = useRef(null)
   const heroVideo = (() => {
     const src = scene?.videoSrc || scene?.media?.ref
     return Array.isArray(src) ? src[0] : src
@@ -323,8 +436,101 @@ export const CommandArrivalScene = ({ scene }) => {
       ? rawLines.map((l, i) => (i < rawLines.length - 1 ? l + '.' : l))
       : [headline]
 
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    if (!root) return undefined
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    if (prefersReduced) return undefined
+
+    const ctx = gsap.context(() => {
+      const heroContent = root.querySelector('[data-hero-content]')
+      const heroFadeBridge = root.querySelector('[data-hero-fade-bridge]')
+      const tl = gsap.timeline()
+      tl.fromTo(
+        root.querySelector('[data-hero-eyebrow]'),
+        { autoAlpha: 0, y: 10 },
+        { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.2 }
+      )
+        .fromTo(
+          root.querySelector('[data-hero-headline]'),
+          { autoAlpha: 0, y: 12, scale: 0.98 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out' },
+          '-=0.32'
+        )
+        .fromTo(
+          root.querySelector('[data-hero-subtitle]'),
+          { autoAlpha: 0, y: 8 },
+          { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+          '-=0.24'
+        )
+        .fromTo(
+          root.querySelector('[data-hero-cta]'),
+          { autoAlpha: 0, y: 5 },
+          { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+          '-=0.2'
+        )
+
+      if (videoRef.current) {
+        gsap.fromTo(
+          videoRef.current,
+          { scale: 1.02 },
+          { scale: 1, duration: 20, ease: 'none' }
+        )
+      }
+
+      if (heroContent) {
+        gsap.to(heroContent, {
+          autoAlpha: 0,
+          y: -34,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: root,
+            start: 'top top',
+            end: 'bottom 34%',
+            scrub: 1.2,
+          },
+        })
+      }
+
+      if (videoRef.current) {
+        gsap.to(videoRef.current, {
+          scale: 1.06,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: root,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.2,
+          },
+        })
+      }
+
+      if (heroFadeBridge) {
+        gsap.fromTo(
+          heroFadeBridge,
+          { autoAlpha: 0.2 },
+          {
+            autoAlpha: 1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: root,
+              start: 'top 32%',
+              end: 'bottom top',
+              scrub: 1.1,
+            },
+          }
+        )
+      }
+    }, root)
+
+    return () => ctx.revert()
+  }, [])
+
   return (
     <section
+      ref={rootRef}
       id={scene?.id || 'command-arrival'}
       data-scene-id="command-arrival"
       style={{
@@ -340,6 +546,7 @@ export const CommandArrivalScene = ({ scene }) => {
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         {heroVideo ? (
           <video
+            ref={videoRef}
             src={heroVideo}
             preload="metadata"
             muted
@@ -431,6 +638,7 @@ export const CommandArrivalScene = ({ scene }) => {
         reads in the upper-third of the viewport — present and anchored immediately.
       */}
       <div
+        data-hero-content
         style={{
           position: 'absolute',
           inset: 0,
@@ -519,6 +727,7 @@ export const CommandArrivalScene = ({ scene }) => {
       {/* Bottom fade */}
       <div
         aria-hidden="true"
+        data-hero-fade-bridge
         style={{
           position: 'absolute',
           bottom: 0,
@@ -546,6 +755,51 @@ export const CommandArrivalScene = ({ scene }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const AuthorityLedgerScene = ({ scene }) => {
+  const rootRef = useRef(null)
+  useFreeSceneReveal(rootRef, {
+    start: 'top 80%',
+    itemSelector: '[data-metric-block], [data-authority-cta]',
+    itemY: 10,
+    stagger: 0.15,
+    duration: 0.35,
+  })
+
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    if (!root) return undefined
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    if (prefersReduced) return undefined
+
+    const trigger = ScrollTrigger.create({
+      trigger: root,
+      start: 'top 80%',
+      toggleActions: 'play none none reverse',
+      onEnter: () => {
+        root.querySelectorAll('[data-metric-value]').forEach(node => {
+          const target = Number(node.getAttribute('data-metric-value') || 0)
+          const state = { value: 0 }
+          gsap.to(state, {
+            value: target,
+            duration: 0.6,
+            ease: 'power2.out',
+            onUpdate: () => {
+              node.textContent = Math.round(state.value).toLocaleString()
+            },
+          })
+        })
+      },
+      onLeaveBack: () => {
+        root.querySelectorAll('[data-metric-value]').forEach(node => {
+          node.textContent = '0'
+        })
+      },
+    })
+
+    return () => trigger.kill()
+  }, [])
+
   return (
     <SceneWrapper
       id={scene?.id || 'authority-ledger'}
@@ -556,6 +810,7 @@ export const AuthorityLedgerScene = ({ scene }) => {
       className="scene-cinematic scene-authority-ledger"
     >
       <div
+        ref={rootRef}
         style={{
           width: 'min(1320px, 100%)',
           marginInline: 'auto',
@@ -597,7 +852,7 @@ export const AuthorityLedgerScene = ({ scene }) => {
                     color: T.ink,
                   }}
                 >
-                  {metric.value.toLocaleString()}
+                  <span data-metric-value={metric.value}>0</span>
                   <span
                     style={{
                       fontSize: 'clamp(2rem, 4vw, 4rem)',
@@ -649,7 +904,10 @@ export const AuthorityLedgerScene = ({ scene }) => {
         </div>
 
         {/* CTA */}
-        <div style={{ marginTop: 'clamp(2rem, 4vh, 3.5rem)' }}>
+        <div
+          data-authority-cta
+          style={{ marginTop: 'clamp(2rem, 4vh, 3.5rem)' }}
+        >
           <ScribbleButton
             to="/services"
             variant="outline"
@@ -829,7 +1087,7 @@ export const SignatureReelScene = ({ scene }) => {
               letterSpacing: '0.08em',
             }}
           >
-            <span style={{ color: T.gold }}>
+            <span style={{ color: 'var(--color-accent, rgba(220,235,255,0.9))' }}>
               {String(activeIdx + 1).padStart(2, '0')}
             </span>
             {' / '}
@@ -856,7 +1114,7 @@ export const SignatureReelScene = ({ scene }) => {
               transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
             >
               <Eyebrow
-                color={T.gold}
+                color="var(--color-accent, rgba(220,235,255,0.9))"
                 style={{
                   marginBottom: '1.2rem',
                   letterSpacing: '0.42em',
@@ -898,13 +1156,16 @@ export const SignatureReelScene = ({ scene }) => {
                 to={`/work/${PROJECTS[activeIdx]?.slug}`}
                 style={{
                   ...CTA.secondary,
-                  color: T.gold,
-                  borderBottom: '1px solid rgba(181,146,79,0.3)',
+                  color: 'var(--color-accent, rgba(220,235,255,0.9))',
+                  borderBottom: '1px solid rgba(220,235,255,0.28)',
                   padding: 0,
                 }}
               >
                 View Case Study
-                <ArrowSvg color={T.gold} size={10} />
+                <ArrowSvg
+                  color="var(--color-accent, rgba(220,235,255,0.9))"
+                  size={10}
+                />
               </Link>
             </motion.div>
           </AnimatePresence>
@@ -942,7 +1203,7 @@ export const SignatureReelScene = ({ scene }) => {
             }}
             onMouseEnter={e => {
               if (activeIdx > 0)
-                e.currentTarget.style.borderColor = T.gold
+                e.currentTarget.style.borderColor = 'rgba(220,235,255,0.56)'
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor =
@@ -975,7 +1236,7 @@ export const SignatureReelScene = ({ scene }) => {
             }}
             onMouseEnter={e => {
               if (activeIdx < PROJECTS.length - 1)
-                e.currentTarget.style.borderColor = T.gold
+                e.currentTarget.style.borderColor = 'rgba(220,235,255,0.56)'
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor =
@@ -1001,7 +1262,7 @@ export const SignatureReelScene = ({ scene }) => {
           <div
             style={{
               height: '100%',
-              background: T.gold,
+              background: 'var(--color-accent, rgba(220,235,255,0.9))',
               width: `${((activeIdx + 1) / PROJECTS.length) * 100}%`,
               transition:
                 'width 0.6s cubic-bezier(0.22, 0.61, 0.36, 1)',
@@ -1026,15 +1287,37 @@ export const SignatureReelScene = ({ scene }) => {
 //   - Reducing numeric ghost size slightly (8vw → 6vw) to not echo §2's overscale
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const CapabilityMatrixScene = ({ scene }) => (
-  <SceneWrapper
-    id={scene?.id || 'capability-matrix'}
-    tone={scene?.tone || 'steel'}
-    theme="light"
-    transitionReady={scene?.transitionReady}
-    minHeight={sceneVh(scene, 100)}
-    className="scene-cinematic scene-capability-matrix"
-  >
+export const CapabilityMatrixScene = ({ scene }) => {
+  const rootRef = useRef(null)
+  useFreeSceneReveal(rootRef, {
+    start: 'top 75%',
+    itemSelector:
+      '[data-capability-head], [data-capability-cta], [data-capability-block]',
+    itemY: 10,
+    stagger: 0.15,
+    duration: 0.35,
+  })
+
+  return (
+    <SceneWrapper
+      id={scene?.id || 'capability-matrix'}
+      tone="dark"
+      theme="dark"
+      transitionReady={scene?.transitionReady}
+      minHeight={sceneVh(scene, 100)}
+      className="scene-cinematic scene-capability-matrix"
+    >
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 0,
+        background:
+          'linear-gradient(180deg, rgba(246,247,249,0.8) 0%, rgba(13,12,10,0) 22%, rgba(13,12,10,0) 78%, rgba(246,247,249,0.78) 100%)',
+      }}
+    />
     {/*
       FIX [3]: Container is NOT centered like §2.
       It is left-offset with a margin-left, giving it a distinct grid rhythm.
@@ -1042,12 +1325,15 @@ export const CapabilityMatrixScene = ({ scene }) => (
       so it doesn't feel like a clone of the generous §2 spacing.
     */}
     <div
+      ref={rootRef}
       style={{
         width: 'min(1100px, 100%)',
         marginInline: 'auto',
         marginLeft: 'clamp(2rem, 8vw, 10rem)',
         padding:
-          'clamp(3rem, 6vh, 5rem) clamp(2rem, 4vw, 4rem) clamp(3rem, 7vh, 6rem)',
+          'clamp(3.4rem, 7vh, 6rem) clamp(2rem, 4vw, 4rem) clamp(3.4rem, 7vh, 6rem)',
+        position: 'relative',
+        zIndex: 1,
       }}
     >
       {/*
@@ -1055,6 +1341,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
         breaking the §2 pattern of eyebrow-then-heading stacked the same way.
       */}
       <div
+        data-capability-cta
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -1064,12 +1351,12 @@ export const CapabilityMatrixScene = ({ scene }) => (
           marginBottom: 'clamp(1rem, 2vh, 1.5rem)',
         }}
       >
-        <Eyebrow color={T.inkSubtle}>Capabilities</Eyebrow>
+        <Eyebrow color="rgba(250,247,242,0.38)">Capabilities</Eyebrow>
 
         <ScribbleButton
           to="/services"
           variant="outline"
-          tone="dark"
+          tone="light"
           size="sm"
           className="scene-cta"
         >
@@ -1079,6 +1366,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
 
       {/* Heading sits directly below the eyebrow/link row */}
       <h2
+        data-capability-head
         style={{
           margin: '0 0 clamp(2rem, 5vh, 4rem)',
           fontFamily: T.fontHead,
@@ -1086,7 +1374,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
           lineHeight: 1.0,
           letterSpacing: '-0.04em',
           fontWeight: 500,
-          color: T.ink,
+          color: T.hero,
           maxWidth: '18ch',
         }}
       >
@@ -1107,7 +1395,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
             style={{
               display: 'grid',
               alignItems: 'start',
-              borderTop: `1px solid ${T.border}`,
+              borderTop: '1px solid rgba(250,247,242,0.12)',
               padding: 'clamp(2rem, 5vh, 4rem) 0',
               gap: 'clamp(1.5rem, 4vw, 4rem)',
             }}
@@ -1122,7 +1410,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
                 lineHeight: 0.85,
                 letterSpacing: '-0.06em',
                 fontWeight: 300,
-                color: 'rgba(16,15,13,0.07)',
+                color: 'rgba(250,247,242,0.11)',
               }}
             >
               {cap.num}
@@ -1137,7 +1425,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
                 lineHeight: 1.0,
                 letterSpacing: '-0.03em',
                 fontWeight: 500,
-                color: T.ink,
+                color: T.hero,
                 paddingTop: '0.4rem',
               }}
             >
@@ -1151,7 +1439,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
                   margin: '0 0 1.4rem',
                   fontSize: 'clamp(0.85rem, 1.1vw, 1rem)',
                   lineHeight: 1.74,
-                  color: T.inkMuted,
+                  color: 'rgba(250,247,242,0.6)',
                   maxWidth: '38ch',
                 }}
               >
@@ -1172,7 +1460,7 @@ export const CapabilityMatrixScene = ({ scene }) => (
                       fontWeight: 600,
                       letterSpacing: '0.22em',
                       textTransform: 'uppercase',
-                      color: T.gold,
+                      color: 'var(--color-accent, rgba(220,235,255,0.9))',
                       opacity: 0.82,
                     }}
                   >
@@ -1183,11 +1471,12 @@ export const CapabilityMatrixScene = ({ scene }) => (
             </div>
           </div>
         ))}
-        <div style={{ borderTop: `1px solid ${T.border}` }} />
+        <div style={{ borderTop: '1px solid rgba(250,247,242,0.12)' }} />
       </div>
     </div>
-  </SceneWrapper>
-)
+    </SceneWrapper>
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SCENE 06 — NARRATIVE BRIDGE
@@ -1199,15 +1488,25 @@ export const CapabilityMatrixScene = ({ scene }) => (
 // No ambiguous partial centering.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const NarrativeBridgeScene = ({ scene }) => (
-  <SceneWrapper
-    id={scene?.id || 'narrative-bridge'}
-    tone={scene?.tone || 'warm'}
-    theme="light"
-    transitionReady={scene?.transitionReady}
-    minHeight={sceneVh(scene, 75)}
-    className="scene-cinematic scene-narrative-bridge"
-  >
+export const NarrativeBridgeScene = ({ scene }) => {
+  const rootRef = useRef(null)
+  useFreeSceneReveal(rootRef, {
+    start: 'top 80%',
+    itemSelector: '[data-bridge-copy]',
+    itemY: 8,
+    stagger: 0.15,
+    duration: 0.5,
+  })
+
+  return (
+    <SceneWrapper
+      id={scene?.id || 'narrative-bridge'}
+      tone={scene?.tone || 'warm'}
+      theme="light"
+      transitionReady={scene?.transitionReady}
+      minHeight={sceneVh(scene, 75)}
+      className="scene-cinematic scene-narrative-bridge"
+    >
     {/*
       FIX [4]: was minHeight:'60vh' duplicated inside the wrapper — removed.
       Flex container now explicitly centers both axes.
@@ -1215,6 +1514,7 @@ export const NarrativeBridgeScene = ({ scene }) => (
       to remove excess vertical dead space that caused the drift impression.
     */}
     <div
+      ref={rootRef}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -1227,6 +1527,7 @@ export const NarrativeBridgeScene = ({ scene }) => (
       }}
     >
       <h2
+        data-bridge-copy
         style={{
           margin: '0 auto',
           fontFamily: T.fontHead,
@@ -1242,8 +1543,9 @@ export const NarrativeBridgeScene = ({ scene }) => (
         Precision is only credible when proof carries the weight.
       </h2>
     </div>
-  </SceneWrapper>
-)
+    </SceneWrapper>
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SCENE 07 — PROOF THEATER
@@ -1330,7 +1632,7 @@ const TestimonialCarousel = () => {
                   fontFamily: T.fontHead,
                   fontSize: 'clamp(4rem, 7vw, 8rem)',
                   lineHeight: 0.7,
-                  color: T.gold,
+                  color: 'var(--color-accent, rgba(220,235,255,0.9))',
                   opacity: 0.16,
                   marginBottom: '-1.2rem',
                   userSelect: 'none',
@@ -1357,7 +1659,7 @@ const TestimonialCarousel = () => {
 
               <footer
                 style={{
-                  borderLeft: `2px solid ${T.gold}`,
+                  borderLeft: '2px solid rgba(220,235,255,0.52)',
                   paddingLeft: '1.2rem',
                 }}
               >
@@ -1390,7 +1692,7 @@ const TestimonialCarousel = () => {
                       fontWeight: 600,
                       letterSpacing: '0.3em',
                       textTransform: 'uppercase',
-                      color: T.gold,
+                      color: 'var(--color-accent, rgba(220,235,255,0.9))',
                       opacity: 0.7,
                     }}
                   >
@@ -1462,12 +1764,13 @@ const TestimonialCarousel = () => {
               opacity: hasPrev ? 1 : 0.22,
               color: T.hero,
               WebkitTapHighlightColor: 'transparent',
-              transition: 'border-color 0.2s',
-            }}
-            aria-label="Previous testimonial"
-            onMouseEnter={e => {
-              if (hasPrev) e.currentTarget.style.borderColor = T.gold
-            }}
+            transition: 'border-color 0.2s',
+          }}
+          aria-label="Previous testimonial"
+          onMouseEnter={e => {
+              if (hasPrev)
+                e.currentTarget.style.borderColor = 'rgba(220,235,255,0.56)'
+          }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor =
                 'rgba(250,247,242,0.14)'
@@ -1490,12 +1793,13 @@ const TestimonialCarousel = () => {
               opacity: hasNext ? 1 : 0.22,
               color: T.hero,
               WebkitTapHighlightColor: 'transparent',
-              transition: 'border-color 0.2s',
-            }}
-            aria-label="Next testimonial"
-            onMouseEnter={e => {
-              if (hasNext) e.currentTarget.style.borderColor = T.gold
-            }}
+            transition: 'border-color 0.2s',
+          }}
+          aria-label="Next testimonial"
+          onMouseEnter={e => {
+              if (hasNext)
+                e.currentTarget.style.borderColor = 'rgba(220,235,255,0.56)'
+          }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor =
                 'rgba(250,247,242,0.14)'
@@ -1521,7 +1825,7 @@ const TestimonialCarousel = () => {
               top: 0,
               left: 0,
               height: '100%',
-              background: T.gold,
+              background: 'var(--color-accent, rgba(220,235,255,0.9))',
               width: `${((safe + 1) / TESTIMONIALS.length) * 100}%`,
               transition: 'width 0.5s ease',
               opacity: 0.7,
@@ -1539,7 +1843,7 @@ const TestimonialCarousel = () => {
             flexShrink: 0,
           }}
         >
-          <span style={{ color: T.gold }}>
+          <span style={{ color: 'var(--color-accent, rgba(220,235,255,0.9))' }}>
             {String(safe + 1).padStart(2, '0')}
           </span>
           {' / '}
@@ -1550,16 +1854,37 @@ const TestimonialCarousel = () => {
   )
 }
 
-export const ProofTheaterScene = ({ scene }) => (
-  <SceneWrapper
-    id={scene?.id || 'proof-theater'}
-    tone={scene?.tone || 'linen'}
-    theme="light"
-    transitionReady={scene?.transitionReady}
-    minHeight={sceneVh(scene, 120)}
-    className="scene-cinematic scene-proof-theater"
-    style={{ background: T.dark }}
-  >
+export const ProofTheaterScene = ({ scene }) => {
+  const rootRef = useRef(null)
+  useFreeSceneReveal(rootRef, {
+    start: 'top 75%',
+    itemSelector: '[data-proof-header], [data-proof-carousel]',
+    itemY: 10,
+    stagger: 0.15,
+    duration: 0.35,
+  })
+
+  return (
+    <SceneWrapper
+      id={scene?.id || 'proof-theater'}
+      tone="dark"
+      theme="dark"
+      transitionReady={scene?.transitionReady}
+      minHeight={sceneVh(scene, 120)}
+      className="scene-cinematic scene-proof-theater"
+      style={{ background: T.dark }}
+    >
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 0,
+        background:
+          'linear-gradient(180deg, rgba(246,247,249,0.82) 0%, rgba(13,12,10,0) 20%, rgba(13,12,10,0) 80%, rgba(246,247,249,0.86) 100%)',
+      }}
+    />
     <div
       aria-hidden="true"
       style={{
@@ -1574,6 +1899,7 @@ export const ProofTheaterScene = ({ scene }) => (
 
     {/* FIX [5]: top padding reduced from clamp(5rem,12vh,10rem) → clamp(2.5rem,5vh,4rem) */}
     <div
+      ref={rootRef}
       style={{
         width: 'min(1320px, 100%)',
         marginInline: 'auto',
@@ -1585,6 +1911,7 @@ export const ProofTheaterScene = ({ scene }) => (
     >
       {/* Header — FIX [5]: marginBottom reduced from clamp(3.5rem,8vh,7rem) */}
       <div
+        data-proof-header
         style={{
           display: 'flex',
           alignItems: 'flex-end',
@@ -1619,10 +1946,13 @@ export const ProofTheaterScene = ({ scene }) => (
         </div>
       </div>
 
-      <TestimonialCarousel />
+      <div data-proof-carousel>
+        <TestimonialCarousel />
+      </div>
     </div>
-  </SceneWrapper>
-)
+    </SceneWrapper>
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SCENE 08 — CONVERSION CHAMBER
@@ -1642,10 +1972,10 @@ export const ProofTheaterScene = ({ scene }) => (
 const inputStyle = {
   width: '100%',
   height: '3.2rem',
-  border: '1px solid rgba(250,247,242,0.14)',
-  background: 'transparent',
+  border: '1px solid rgba(28,28,28,0.16)',
+  background: 'rgba(255,255,255,0.9)',
   fontSize: '0.88rem',
-  color: T.hero,
+  color: T.ink,
   padding: '0.875rem',
   outline: 'none',
   fontFamily: 'inherit',
@@ -1660,6 +1990,9 @@ const textareaStyle = {
   resize: 'none',
   paddingTop: '0.875rem',
 }
+
+const FORM_BASE_BORDER = 'rgba(28,28,28,0.16)'
+const FORM_FOCUS_BORDER = 'var(--color-accent, #1a1a1a)'
 
 const STUB_DELAY = 680
 let submitLeadFn = null
@@ -1696,7 +2029,7 @@ const ConversionForm = () => {
     fontWeight: 600,
     letterSpacing: '0.28em',
     textTransform: 'uppercase',
-    color: 'rgba(250,247,242,0.3)',
+    color: T.inkSubtle,
   }
 
   const handleSubmit = async e => {
@@ -1787,11 +2120,11 @@ const ConversionForm = () => {
           placeholder="Full name"
           style={inputStyle}
           onFocus={e => {
-            e.currentTarget.style.borderColor = T.gold
+            e.currentTarget.style.borderColor = FORM_FOCUS_BORDER
           }}
           onBlur={e => {
             e.currentTarget.style.borderColor =
-              'rgba(250,247,242,0.14)'
+              FORM_BASE_BORDER
           }}
         />
       </div>
@@ -1807,11 +2140,11 @@ const ConversionForm = () => {
           placeholder="Work email"
           style={inputStyle}
           onFocus={e => {
-            e.currentTarget.style.borderColor = T.gold
+            e.currentTarget.style.borderColor = FORM_FOCUS_BORDER
           }}
           onBlur={e => {
             e.currentTarget.style.borderColor =
-              'rgba(250,247,242,0.14)'
+              FORM_BASE_BORDER
           }}
         />
       </div>
@@ -1835,11 +2168,11 @@ const ConversionForm = () => {
             placeholder="Organisation"
             style={inputStyle}
             onFocus={e => {
-              e.currentTarget.style.borderColor = T.gold
+              e.currentTarget.style.borderColor = FORM_FOCUS_BORDER
             }}
             onBlur={e => {
               e.currentTarget.style.borderColor =
-                'rgba(250,247,242,0.14)'
+                FORM_BASE_BORDER
             }}
           />
         </div>
@@ -1853,11 +2186,11 @@ const ConversionForm = () => {
             placeholder="+971"
             style={inputStyle}
             onFocus={e => {
-              e.currentTarget.style.borderColor = T.gold
+              e.currentTarget.style.borderColor = FORM_FOCUS_BORDER
             }}
             onBlur={e => {
               e.currentTarget.style.borderColor =
-                'rgba(250,247,242,0.14)'
+                FORM_BASE_BORDER
             }}
           />
         </div>
@@ -1880,11 +2213,11 @@ const ConversionForm = () => {
             required
             style={selectStyle}
             onFocus={e => {
-              e.currentTarget.style.borderColor = T.gold
+              e.currentTarget.style.borderColor = FORM_FOCUS_BORDER
             }}
             onBlur={e => {
               e.currentTarget.style.borderColor =
-                'rgba(250,247,242,0.14)'
+                FORM_BASE_BORDER
             }}
           >
             <option value="" disabled>
@@ -1905,11 +2238,11 @@ const ConversionForm = () => {
             required
             style={selectStyle}
             onFocus={e => {
-              e.currentTarget.style.borderColor = T.gold
+              e.currentTarget.style.borderColor = FORM_FOCUS_BORDER
             }}
             onBlur={e => {
               e.currentTarget.style.borderColor =
-                'rgba(250,247,242,0.14)'
+                FORM_BASE_BORDER
             }}
           >
             <option value="" disabled>
@@ -1934,11 +2267,11 @@ const ConversionForm = () => {
           placeholder="Q3 2025, October, flexible"
           style={inputStyle}
           onFocus={e => {
-            e.currentTarget.style.borderColor = T.gold
+            e.currentTarget.style.borderColor = FORM_FOCUS_BORDER
           }}
           onBlur={e => {
             e.currentTarget.style.borderColor =
-              'rgba(250,247,242,0.14)'
+              FORM_BASE_BORDER
           }}
         />
       </div>
@@ -1953,11 +2286,11 @@ const ConversionForm = () => {
           placeholder="Describe the event, audience scale, and key deliverables."
           style={textareaStyle}
           onFocus={e => {
-            e.currentTarget.style.borderColor = T.gold
+            e.currentTarget.style.borderColor = FORM_FOCUS_BORDER
           }}
           onBlur={e => {
             e.currentTarget.style.borderColor =
-              'rgba(250,247,242,0.14)'
+              FORM_BASE_BORDER
           }}
         />
       </div>
@@ -1987,7 +2320,7 @@ const ConversionForm = () => {
               style={{
                 margin: 0,
                 fontSize: '0.82rem',
-                color: 'rgba(250,247,242,0.78)',
+                color: success ? 'rgba(12,45,28,0.85)' : 'rgba(90,37,37,0.92)',
               }}
             >
               {msg}
@@ -1996,33 +2329,22 @@ const ConversionForm = () => {
         )}
       </AnimatePresence>
 
-      <button
+      <ScribbleButton
         type="submit"
         disabled={submitting}
+        variant="primary"
+        tone="dark"
+        size="md"
+        disableScribble={submitting}
         style={{
           width: '100%',
-          padding: '1rem 1.5rem',
-          background: submitting ? 'rgba(181,146,79,0.6)' : T.gold,
-          border: 'none',
-          color: T.ink,
-          fontSize: '9px',
-          fontWeight: 700,
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          cursor: submitting ? 'not-allowed' : 'pointer',
-          transition: 'opacity 0.2s ease',
-          fontFamily: 'inherit',
+          justifyContent: 'center',
           marginTop: '0.25rem',
-        }}
-        onMouseEnter={e => {
-          if (!submitting) e.currentTarget.style.opacity = '0.88'
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.opacity = '1'
+          opacity: submitting ? 0.72 : 1,
         }}
       >
         {submitting ? 'Submitting…' : 'Submit Request'}
-      </button>
+      </ScribbleButton>
 
       <p
         style={{
@@ -2030,7 +2352,7 @@ const ConversionForm = () => {
           fontSize: '0.72rem',
           textTransform: 'uppercase',
           letterSpacing: '0.12em',
-          color: 'rgba(250,247,242,0.38)',
+          color: T.inkSubtle,
           textAlign: 'center',
         }}
       >
@@ -2044,7 +2366,18 @@ const ConversionForm = () => {
   )
 }
 
-export const ConversionChamberScene = ({ scene }) => (
+export const ConversionChamberScene = ({ scene }) => {
+  const rootRef = useRef(null)
+  useFreeSceneReveal(rootRef, {
+    start: 'top 80%',
+    itemSelector:
+      '[data-conversion-left], [data-conversion-right], [data-conversion-right] label, [data-conversion-right] input, [data-conversion-right] select, [data-conversion-right] textarea, [data-conversion-right] button',
+    itemY: 8,
+    stagger: 0.1,
+    duration: 0.35,
+  })
+
+  return (
   /*
     FIX [6]: SceneWrapper was adding its own padding which compounded with the
     inner grid padding causing a ~30px air gap top and right.
@@ -2055,7 +2388,7 @@ export const ConversionChamberScene = ({ scene }) => (
   */
   <SceneWrapper
     id={scene?.id || 'conversion-chamber'}
-    tone={scene?.tone || 'dark'}
+    tone="linen"
     theme="light"
     transitionReady={scene?.transitionReady}
     minHeight={sceneVh(scene, 120)}
@@ -2063,16 +2396,31 @@ export const ConversionChamberScene = ({ scene }) => (
     style={{ padding: 0, overflow: 'hidden' }}
   >
     <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 0,
+        background:
+          'linear-gradient(180deg, rgba(13,12,10,0.44) 0%, rgba(246,247,249,0) 22%, rgba(246,247,249,0.85) 100%)',
+      }}
+    />
+    <div
+      ref={rootRef}
       className="conversion-chamber-grid"
       style={{
         display: 'grid',
         width: '100%',
         minHeight: '100vh',
-        background: T.dark,
+        background: 'linear-gradient(180deg, #f6f7f9 0%, #ffffff 100%)',
+        position: 'relative',
+        zIndex: 1,
       }}
     >
       {/* ── LEFT: Statement panel ── */}
       <div
+        data-conversion-left
         data-chamber-left
         style={{
           padding:
@@ -2080,12 +2428,13 @@ export const ConversionChamberScene = ({ scene }) => (
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          borderRight: '1px solid rgba(250,247,242,0.06)',
+          borderRight: `1px solid ${T.border}`,
+          background: 'rgba(255,255,255,0.92)',
         }}
       >
         <div>
           <Eyebrow
-            color="rgba(250,247,242,0.28)"
+            color={T.inkSubtle}
             style={{ marginBottom: '2.5rem' }}
           >
             Request Proposal
@@ -2099,7 +2448,7 @@ export const ConversionChamberScene = ({ scene }) => (
               lineHeight: 0.96,
               letterSpacing: '-0.045em',
               fontWeight: 500,
-              color: T.hero,
+              color: T.ink,
               maxWidth: '14ch',
             }}
           >
@@ -2111,7 +2460,7 @@ export const ConversionChamberScene = ({ scene }) => (
               margin: 'clamp(1.5rem, 3vh, 2.5rem) 0 0',
               fontSize: 'clamp(0.82rem, 1vw, 0.94rem)',
               lineHeight: 1.74,
-              color: 'rgba(250,247,242,0.42)',
+              color: T.inkMuted,
               maxWidth: '34ch',
             }}
           >
@@ -2148,7 +2497,7 @@ export const ConversionChamberScene = ({ scene }) => (
                     margin: 0,
                     fontSize: '13px',
                     lineHeight: 1.62,
-                    color: 'rgba(250,247,242,0.5)',
+                    color: T.inkMuted,
                   }}
                 >
                   {item}
@@ -2159,7 +2508,7 @@ export const ConversionChamberScene = ({ scene }) => (
 
           <div
             style={{
-              borderTop: '1px solid rgba(250,247,242,0.07)',
+              borderTop: `1px solid ${T.border}`,
               paddingTop: '1.6rem',
             }}
           >
@@ -2168,17 +2517,16 @@ export const ConversionChamberScene = ({ scene }) => (
               style={{
                 display: 'block',
                 fontSize: '13px',
-                color: 'rgba(250,247,242,0.48)',
+                color: T.inkMuted,
                 textDecoration: 'none',
                 marginBottom: '0.4rem',
                 transition: 'color 0.2s',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.color = 'rgba(250,247,242,0.6)'
+                e.currentTarget.style.color = T.ink
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.color =
-                  'rgba(250,247,242,0.25)'
+                e.currentTarget.style.color = T.inkMuted
               }}
             >
               +971 4 234 5678
@@ -2188,16 +2536,15 @@ export const ConversionChamberScene = ({ scene }) => (
               style={{
                 display: 'block',
                 fontSize: '13px',
-                color: 'rgba(250,247,242,0.48)',
+                color: T.inkMuted,
                 textDecoration: 'none',
                 transition: 'color 0.2s',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.color = 'rgba(250,247,242,0.6)'
+                e.currentTarget.style.color = T.ink
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.color =
-                  'rgba(250,247,242,0.25)'
+                e.currentTarget.style.color = T.inkMuted
               }}
             >
               hello@ghaimuae.com
@@ -2208,11 +2555,12 @@ export const ConversionChamberScene = ({ scene }) => (
 
       {/* ── RIGHT: Form panel ── */}
       <div
+        data-conversion-right
         data-chamber-right
         style={{
           padding:
             'clamp(4rem, 10vw, 8rem) clamp(2rem, 6vw, 6rem)',
-          background: 'rgba(250,247,242,0.02)',
+          background: 'rgba(246,247,249,0.88)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -2222,7 +2570,8 @@ export const ConversionChamberScene = ({ scene }) => (
       </div>
     </div>
   </SceneWrapper>
-)
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SCENE 09 — GLOBAL FOOTER
@@ -2239,15 +2588,25 @@ export const ConversionChamberScene = ({ scene }) => (
 //   - z-index on content wrapper confirmed at zIndex:1 above grain/glow layers.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const GlobalFooterScene = ({ scene }) => (
-  <SceneWrapper
-    id={scene?.id || 'global-footer'}
-    tone="linen"
-    theme="light"
-    transitionReady={scene?.transitionReady}
-    minHeight={sceneVh(scene, 70)}
-    className="scene-cinematic scene-global-footer"
-  >
+export const GlobalFooterScene = ({ scene }) => {
+  const rootRef = useRef(null)
+  useFreeSceneReveal(rootRef, {
+    start: 'top 85%',
+    itemSelector: '[data-footer-reveal]',
+    itemY: 8,
+    stagger: 0.2,
+    duration: 0.35,
+  })
+
+  return (
+    <SceneWrapper
+      id={scene?.id || 'global-footer'}
+      tone="linen"
+      theme="light"
+      transitionReady={scene?.transitionReady}
+      minHeight={sceneVh(scene, 70)}
+      className="scene-cinematic scene-global-footer"
+    >
     <div style={{ position: 'relative', width: '100%' }}>
       {/* Grain */}
       <div
@@ -2276,6 +2635,7 @@ export const GlobalFooterScene = ({ scene }) => (
       />
 
       <div
+        ref={rootRef}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -2290,6 +2650,7 @@ export const GlobalFooterScene = ({ scene }) => (
       >
         {/* FIX [7]: was opacity 0.2 — raised to 0.5 for visible contrast */}
         <Eyebrow
+          data-footer-reveal
           color={T.inkSubtle}
           style={{ marginBottom: 'clamp(2rem, 4vh, 3.5rem)' }}
         >
@@ -2297,6 +2658,7 @@ export const GlobalFooterScene = ({ scene }) => (
         </Eyebrow>
 
         <h2
+          data-footer-reveal
           style={{
             margin: 0,
             fontFamily: T.fontHead,
@@ -2313,6 +2675,7 @@ export const GlobalFooterScene = ({ scene }) => (
 
         {/* FIX [7]: was rgba(250,247,242,0.34) — raised to 0.55 */}
         <p
+          data-footer-reveal
           style={{
             margin: 'clamp(2rem, 4vh, 3rem) 0 0',
             fontSize: 'clamp(0.82rem, 1vw, 0.96rem)',
@@ -2327,6 +2690,7 @@ export const GlobalFooterScene = ({ scene }) => (
 
         {/* CTAs */}
         <div
+          data-footer-reveal
           style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -2357,6 +2721,7 @@ export const GlobalFooterScene = ({ scene }) => (
         </div>
 
         <p
+          data-footer-reveal
           style={{
             margin: 'clamp(3.5rem, 7vh, 6rem) 0 0',
             fontSize: '9px',
@@ -2370,5 +2735,6 @@ export const GlobalFooterScene = ({ scene }) => (
         </p>
       </div>
     </div>
-  </SceneWrapper>
-)
+    </SceneWrapper>
+  )
+}
