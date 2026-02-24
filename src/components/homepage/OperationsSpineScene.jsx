@@ -1,10 +1,10 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
-import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { MOBILE_BREAKPOINT } from '../../lib/constants'
 import { assetUrl } from '../../lib/assetUrl'
+import ScribbleButton from '../ScribbleButton'
 import styles from './OperationsSpineScene.module.css'
 
 const PHASES = [
@@ -42,9 +42,6 @@ const PHASES = [
   },
 ]
 
-const VH_PER_PHASE = 0.9
-// Total scroll height multiplier: phases * vhPerPhase + entry/exit buffer
-const SCROLL_MULTIPLIER = PHASES.length * VH_PER_PHASE + 1.2
 const pad = n => String(n).padStart(2, '0')
 
 const LEFT_PHASES = PHASES.filter((_, i) => i % 2 === 0)
@@ -196,7 +193,7 @@ export const OperationsSpineScene = ({ scene }) => {
               trigger: outer,
               start: 'top top',
               end: () =>
-                `+=${window.innerHeight * SCROLL_MULTIPLIER}`,
+                `+=${window.innerHeight * ((scene?.length || 240) / 100)}`,
               // No pin: sticky — CSS position:sticky on .osv2Sticky handles this
               // No pinSpacing — no spacer div injected
               scrub: 1.5,
@@ -316,7 +313,7 @@ export const OperationsSpineScene = ({ scene }) => {
       gsapInitRef.current = false
       ctx.revert()
     }
-  }, [reducedMotion])
+  }, [reducedMotion, scene?.length])
 
   const displayIdx = reducedMotion ? PHASES.length - 1 : activeIdx
   const progressPercent = Math.round(((displayIdx + 1) / PHASES.length) * 100)
@@ -328,6 +325,7 @@ export const OperationsSpineScene = ({ scene }) => {
       data-scene-id={scene?.id}
       data-theme="dark"
       className={styles.osv2Outer}
+      style={{ '--osv2-outer-height': `${scene?.length || 240}vh` }}
       aria-label="Delivery Framework - scroll to advance through phases"
     >
       {/* CSS sticky container — GSAP never touches position/transform of this element */}
@@ -389,17 +387,17 @@ export const OperationsSpineScene = ({ scene }) => {
             </div>
 
             <div ref={ctaRef} className={styles.osv2Cta}>
-              <Link
+              <ScribbleButton
                 to="/process"
-                className={styles.osv2CtaBtn}
+                className="scene-cta"
+                variant="primary"
+                tone="light"
+                size="sm"
                 title="View the full delivery process documentation"
                 aria-label="View full delivery process"
               >
                 View Full Process
-                <span className={styles.osv2CtaArrow} aria-hidden="true">
-                  →
-                </span>
-              </Link>
+              </ScribbleButton>
             </div>
           </div>
 

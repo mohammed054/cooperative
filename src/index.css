@@ -721,6 +721,12 @@
   padding-block: clamp(2.8rem, 6vw, 5.5rem);
 }
 
+/* Homepage cinematic scenes own their internal spacing to avoid wrapper air gaps. */
+.flagship-home-cinematic .scene-cinematic .flagship-scene-content {
+  padding-block: 0;
+  align-items: stretch;
+}
+
 /* =========================================================
    Scene Tone Backgrounds — section-owned, never inherited
    Each tone sets its own background. No wrapper leaks.

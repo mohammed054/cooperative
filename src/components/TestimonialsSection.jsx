@@ -14,7 +14,7 @@ import ScribbleButton from './ScribbleButton'
 const getInitials = name => {
   const parts = String(name).trim().split(/\s+/).filter(Boolean)
   const first = parts[0]?.[0] ?? ''
-  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? '' : ''
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : ''
   return (first + last).toUpperCase()
 }
 
@@ -61,7 +61,7 @@ const TESTIMONIALS = [
 ]
 
 const TestimonialsSection = ({
-  title = "Trusted by teams who cannot miss.",
+  title = 'Trusted by teams who cannot miss.',
   intro = 'Premium rentals and production systems delivered with composed precision.',
   showLink = true,
 }) => {
@@ -85,15 +85,26 @@ const TestimonialsSection = ({
   const sideRailY = useTransform(scrollYProgress, [0, 1], [8, -8])
   // Floating gradient motion keeps transition continuity with adjacent scenes.
   const auraY = useTransform(scrollYProgress, [0, 1], [22, -18])
-  const auraOpacity = useTransform(scrollYProgress, [0.1, 0.62, 1], [0.08, 0.2, 0.08])
+  const auraOpacity = useTransform(
+    scrollYProgress,
+    [0.1, 0.62, 1],
+    [0.08, 0.2, 0.08]
+  )
 
   const activeIndex = useMemo(
-    () => Math.max(0, TESTIMONIALS.findIndex(item => item.id === activeId)),
+    () =>
+      Math.max(
+        0,
+        TESTIMONIALS.findIndex(item => item.id === activeId)
+      ),
     [activeId]
   )
   const active = TESTIMONIALS[activeIndex] ?? TESTIMONIALS[0]
   const quoteWords = useMemo(
-    () => String(active?.quote ?? '').split(/\s+/).filter(Boolean),
+    () =>
+      String(active?.quote ?? '')
+        .split(/\s+/)
+        .filter(Boolean),
     [active?.quote]
   )
 
@@ -106,7 +117,8 @@ const TestimonialsSection = ({
     : { duration: 0.66, ease: [0.23, 1, 0.32, 1] }
 
   const goPrev = () => {
-    const nextIndex = (activeIndex - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
+    const nextIndex =
+      (activeIndex - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
     setActiveId(TESTIMONIALS[nextIndex]?.id)
   }
 
@@ -125,7 +137,9 @@ const TestimonialsSection = ({
       ].join(' ')}
     >
       <motion.div
-        style={shouldReduceMotion ? undefined : { y: auraY, opacity: auraOpacity }}
+        style={
+          shouldReduceMotion ? undefined : { y: auraY, opacity: auraOpacity }
+        }
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(48%_40%_at_76%_24%,rgba(255,255,255,0.58),rgba(255,255,255,0)_74%),radial-gradient(52%_36%_at_14%_74%,rgba(209,178,131,0.24),rgba(209,178,131,0)_80%)]"
       />
 
@@ -136,9 +150,14 @@ const TestimonialsSection = ({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={transition}
-          className={[isHome ? 'mb-8 lg:mb-4' : 'mb-10 lg:mb-14', 'max-w-2xl'].join(' ')}
+          className={[
+            isHome ? 'mb-8 lg:mb-4' : 'mb-10 lg:mb-14',
+            'max-w-2xl',
+          ].join(' ')}
         >
-          <p className="cinematic-eyebrow mb-3 text-[#a7a7a7]">Social proof elevation</p>
+          <p className="cinematic-eyebrow mb-3 text-[#a7a7a7]">
+            Social proof elevation
+          </p>
           <h2 className="mb-4 max-w-[16ch] font-serif text-[clamp(1.64rem,4vw,2.7rem)] font-semibold leading-[1.07] tracking-[-0.022em] text-ink">
             {title}
           </h2>
@@ -195,7 +214,10 @@ const TestimonialsSection = ({
                     </div>
 
                     <div className="mt-1">
-                      <FaQuoteLeft className="mt-4 text-2xl text-ink-subtle opacity-30" aria-hidden="true" />
+                      <FaQuoteLeft
+                        className="mt-4 text-2xl text-ink-subtle opacity-30"
+                        aria-hidden="true"
+                      />
                       <blockquote
                         className="mt-4 max-w-[34ch] text-[clamp(1rem,1.25vw,1.16rem)] font-medium leading-[1.68] tracking-[-0.003em] text-ink"
                         style={{ textWrap: 'balance' }}
@@ -225,7 +247,9 @@ const TestimonialsSection = ({
                         {getInitials(active?.name)}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-ink">{active?.name}</p>
+                        <p className="truncate text-sm font-semibold text-ink">
+                          {active?.name}
+                        </p>
                         <p className="truncate text-xs text-ink-muted">
                           {active?.role} - {active?.company}
                         </p>
@@ -242,7 +266,7 @@ const TestimonialsSection = ({
                       alt={`${active?.event} in ${active?.location}`}
                       loading="lazy"
                       decoding="async"
-                      className="h-48 w-full object-cover lg:h-full"
+                      className="h-48 w-full object-cover lg:max-h-[calc(100vh-16rem)]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-tr from-black/44 via-black/12 to-transparent" />
                     <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5">
@@ -292,7 +316,11 @@ const TestimonialsSection = ({
               <p className="mb-3 text-xs font-medium uppercase tracking-[0.14em] text-ink-subtle">
                 More feedback
               </p>
-              <div className="flex flex-col gap-2" role="tablist" aria-label="Testimonials">
+              <div
+                className="flex flex-col gap-2"
+                role="tablist"
+                aria-label="Testimonials"
+              >
                 {TESTIMONIALS.map(item => {
                   const isActive = item.id === active?.id
                   return (
@@ -316,19 +344,36 @@ const TestimonialsSection = ({
                         <div
                           className={[
                             'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
-                            isActive ? 'bg-white/[0.12] text-white' : 'bg-ink text-white',
+                            isActive
+                              ? 'bg-white/[0.12] text-white'
+                              : 'bg-ink text-white',
                           ].join(' ')}
                         >
                           {getInitials(item.name)}
                         </div>
                         <div className="min-w-0">
-                          <p className={['truncate text-sm font-semibold', isActive ? 'text-white' : 'text-ink'].join(' ')}>
+                          <p
+                            className={[
+                              'truncate text-sm font-semibold',
+                              isActive ? 'text-white' : 'text-ink',
+                            ].join(' ')}
+                          >
                             {item.name}
                           </p>
-                          <p className={['truncate text-xs', isActive ? 'text-white/70' : 'text-ink-muted'].join(' ')}>
+                          <p
+                            className={[
+                              'truncate text-xs',
+                              isActive ? 'text-white/70' : 'text-ink-muted',
+                            ].join(' ')}
+                          >
                             {item.role} - {item.company}
                           </p>
-                          <p className={['mt-2 text-xs leading-relaxed', isActive ? 'text-white/[0.85]' : 'text-ink-muted'].join(' ')}>
+                          <p
+                            className={[
+                              'mt-2 text-xs leading-relaxed',
+                              isActive ? 'text-white/[0.85]' : 'text-ink-muted',
+                            ].join(' ')}
+                          >
                             {item.headline}
                           </p>
                         </div>
@@ -340,7 +385,9 @@ const TestimonialsSection = ({
             </div>
 
             <div className="flex flex-1 flex-col rounded-xl border border-black/[0.06] bg-white/78 p-5 backdrop-blur-[2px] lg:p-4">
-              <p className="text-sm font-semibold text-ink">Why leadership teams return</p>
+              <p className="text-sm font-semibold text-ink">
+                Why leadership teams return
+              </p>
               <ul className="mt-3 grid grid-cols-2 gap-2.5 text-[13px] text-ink-muted">
                 <li className="flex gap-2.5">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ink opacity-40" />
@@ -372,7 +419,12 @@ const TestimonialsSection = ({
           </motion.div>
         </div>
 
-        <div className={[isHome ? 'mt-5 lg:mt-4' : 'mt-7', 'flex items-center gap-2.5'].join(' ')}>
+        <div
+          className={[
+            isHome ? 'mt-5 lg:mt-4' : 'mt-7',
+            'flex items-center gap-2.5',
+          ].join(' ')}
+        >
           <button
             type="button"
             onClick={goPrev}
@@ -390,7 +442,8 @@ const TestimonialsSection = ({
             <FaChevronRight size={12} />
           </button>
           <p className="text-xs font-medium tabular-nums text-ink-muted">
-            {String(activeIndex + 1).padStart(2, '0')} / {String(TESTIMONIALS.length).padStart(2, '0')}
+            {String(activeIndex + 1).padStart(2, '0')} /{' '}
+            {String(TESTIMONIALS.length).padStart(2, '0')}
           </p>
         </div>
       </div>

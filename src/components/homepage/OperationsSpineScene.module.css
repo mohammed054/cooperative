@@ -11,8 +11,8 @@
 */
 .osv2Outer {
   position: relative;
-  /* 480vh = scroll track height — keeps the sticky panel live for 4.8 viewports */
-  height: 480vh;
+  /* Height is driven by scene contract (default 240vh). */
+  height: var(--osv2-outer-height, 240vh);
   /* No background — section is transparent, background lives on sticky panel */
 }
 

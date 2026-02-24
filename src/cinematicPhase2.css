@@ -53,6 +53,18 @@
   background: var(--color-surface, #f6f7f9);
 }
 
+.capability-row-grid {
+  grid-template-columns: clamp(4rem, 8vw, 7rem) clamp(12rem, 26vw, 20rem) 1fr;
+}
+
+.conversion-chamber-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.conversion-form-row {
+  grid-template-columns: 1fr 1fr;
+}
+
 /* ---------------------------------------------------------------------------
    BREATHING GRADIENT MESH — Capability scene only
    --------------------------------------------------------------------------- */
@@ -329,6 +341,37 @@
   .scene-ambient-layer {
     will-change: auto !important;
     transform: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .capability-row-grid {
+    grid-template-columns: clamp(3rem, 10vw, 5rem) 1fr;
+  }
+
+  .capability-row-grid > :nth-child(3) {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 900px) {
+  .conversion-chamber-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .conversion-chamber-grid [data-chamber-left] {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(250, 247, 242, 0.08);
+  }
+}
+
+@media (max-width: 768px) {
+  .conversion-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .scene-cinematic.scene-capability-matrix .flagship-scene-content > div {
+    margin-left: 0 !important;
   }
 }
 
