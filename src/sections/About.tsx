@@ -18,7 +18,7 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { fadeInUp, fadeIn, staggerContainer } from '@/animations/fadeInUp';
+import { fadeIn, staggerContainer } from '@/animations/fadeInUp';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -468,7 +468,7 @@ export function About() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(32px, 4vw, 52px)' }}>
 
           <motion.p
-            variants={fadeInUp}
+            variants={fadeIn}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
@@ -489,7 +489,7 @@ export function About() {
           </motion.p>
 
           <motion.p
-            variants={fadeInUp}
+            variants={fadeIn}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
@@ -545,8 +545,12 @@ export function About() {
           Three horizontal statements, separated by border-top lines.
           Editorial, not UI.
       ══════════════════════════════════════════════════════════ */}
-      <div
+      <motion.div
         ref={pillarsRef}
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
         style={{
           position: 'relative',
           zIndex: 1,
@@ -559,7 +563,7 @@ export function About() {
         {PILLARS.map((pillar) => (
           <Pillar key={pillar.number} pillar={pillar} />
         ))}
-      </div>
+      </motion.div>
 
       {/* ══════════════════════════════════════════════════════════
           SECTION 4 — Client trust marquee
