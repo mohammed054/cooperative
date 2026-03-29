@@ -1,332 +1,257 @@
+/**
+ * About — Scene 3
+ * ─────────────────────────────────────────────────────────────
+ * Blueprint changes applied:
+ *
+ *   ❌ REMOVED: 3-column case study card grid (cards belong in CaseStudies)
+ *   ❌ REMOVED: Client logo pill grid
+ *   ❌ REMOVED: Framer Motion scroll hooks (useScroll / useTransform)
+ *
+ *   ✓ ADDED: Full-width clip-path image reveal (Scene 4 from blueprint)
+ *   ✓ ADDED: Left-pinned editorial layout — left column pins while right scrolls
+ *   ✓ ADDED: Infinite logo marquee (no pills, just spaced names — cleaner)
+ *   ✓ ADDED: Three philosophy statements replacing the card grid
+ *   ✓ ALL scroll animation now owned by GSAP
+ */
+
 import { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { staggerContainer, fadeInUp, fadeIn } from '@/animations/fadeInUp';
+import { fadeInUp, fadeIn, staggerContainer } from '@/animations/fadeInUp';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ──────────────────────────────────────────────────────────
-   TYPES
-────────────────────────────────────────────────────────── */
+/* ── Data ────────────────────────────────────────────────────── */
 
-interface ClientLogo {
-  name: string;
-  abbr: string;
-}
-
-interface CaseStudyCard {
-  index: string;        // "01" | "02" | "03"
-  category: string;
-  title: string;
-  client: string;
-  year: string;
-  detail: string;
-}
-
-/* ──────────────────────────────────────────────────────────
-   DATA
-────────────────────────────────────────────────────────── */
-
-const CLIENTS: ClientLogo[] = [
-  { name: 'MAG Group',       abbr: 'MAG'    },
-  { name: 'Emaar Properties', abbr: 'Emaar'  },
-  { name: 'DIFC Authority',  abbr: 'DIFC'   },
-  { name: 'Dubai Holding',   abbr: 'DH'     },
-  { name: 'Meraas',          abbr: 'Meraas' },
-  { name: 'Aldar Properties', abbr: 'Aldar'  },
+const CLIENTS = [
+  'MAG Group',
+  'Emaar Properties',
+  'DIFC Authority',
+  'Dubai Holding',
+  'Meraas',
+  'Aldar Properties',
+  'MAG Group',          // duplicated for seamless marquee loop
+  'Emaar Properties',
+  'DIFC Authority',
+  'Dubai Holding',
+  'Meraas',
+  'Aldar Properties',
 ];
 
-const CASE_STUDIES: CaseStudyCard[] = [
+// Three core philosophy statements — replace the card grid
+const PILLARS = [
   {
-    index:    '01',
-    category: 'Annual Summit',
-    title:    'Leadership Retreat — Desert Edition',
-    client:   'MAG Group',
-    year:     '2024',
-    detail:   'A three-day immersive retreat for 200+ GCC C-suite executives across three exclusive venues.',
+    number: '01',
+    title: 'A quiet approach.',
+    body: 'We don\'t seek attention for ourselves. The event is the statement. Our role is invisible architecture — the reason everything feels inevitable.',
   },
   {
-    index:    '02',
-    category: 'Investor Forum',
-    title:    'Global Investor Forum',
-    client:   'Dubai Holding',
-    year:     '2023',
-    detail:   '500 global investors, one evening — connecting capital to the region\'s most ambitious projects.',
+    number: '02',
+    title: 'Precision over performance.',
+    body: 'Execution is not measured in headcount or decibels. It\'s measured in the quality of conversation the morning after.',
   },
   {
-    index:    '03',
-    category: 'Black-Tie Gala',
-    title:    'Brand Centenary Celebration',
-    client:   'Emaar Properties',
-    year:     '2023',
-    detail:   'A landmark centenary gala attended by royalty, diplomats, and international luminaries.',
+    number: '03',
+    title: 'Legacy over landmark.',
+    body: 'Any venue can impress once. We design experiences that compound — that become reference points in the memory of everyone in the room.',
   },
 ];
 
-/* ──────────────────────────────────────────────────────────
-   SUB-COMPONENTS
-────────────────────────────────────────────────────────── */
+/* ── Sub-components ──────────────────────────────────────────── */
 
-/** Thin gold eyebrow row — matches hero's eyebrow exactly */
-function SectionEyebrow({ label }: { label: string }) {
+/** Infinite horizontal logo marquee — no pills, editorial names only */
+function LogoMarquee() {
   return (
-    <motion.div
-      variants={fadeIn}
-      className="flex items-center gap-4"
-    >
-      <span
-        style={{
-          display: 'block',
-          height: '1px',
-          width: '36px',
-          background: 'var(--color-accent-1)',
-          opacity: 0.75,
-          flexShrink: 0,
-        }}
-      />
-      <span
-        style={{
-          fontSize: 'var(--fs-xs)',
-          letterSpacing: 'var(--ls-widest)',
-          textTransform: 'uppercase',
-          fontFamily: 'var(--font-body)',
-          fontWeight: 400,
-          color: 'var(--color-accent-1)',
-        }}
-      >
-        {label}
-      </span>
-    </motion.div>
-  );
-}
-
-/** Single client logo pill — muted by default, gold on hover */
-function ClientLogo({ name }: { name: string }) {
-  return (
-    <motion.div
-      variants={fadeInUp}
-      whileHover={{ opacity: 1 }}
+    <div
       style={{
-        padding: '10px 24px',
-        border: '1px solid var(--color-accent-3)',
-        opacity: 0.55,
-        transition: 'opacity var(--anim-medium) var(--ease-authority)',
-        cursor: 'default',
+        overflow: 'hidden',
+        maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+        WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
       }}
     >
-      <span
+      <motion.div
+        animate={{ x: '-50%' }}
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          ease: 'linear',
+        }}
         style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 'var(--fs-xs)',
-          fontWeight: 500,
-          letterSpacing: 'var(--ls-wider)',
-          textTransform: 'uppercase',
-          color: 'var(--color-text)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 'clamp(48px, 6vw, 80px)',
+          whiteSpace: 'nowrap',
         }}
       >
-        {name}
-      </span>
-    </motion.div>
+        {CLIENTS.map((name, i) => (
+          <span
+            key={i}
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 'clamp(0.62rem, 0.9vw, 0.75rem)',
+              fontWeight: 500,
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              color: 'var(--color-text-muted)',
+              flexShrink: 0,
+            }}
+          >
+            {name}
+          </span>
+        ))}
+      </motion.div>
+    </div>
   );
 }
 
-/** Case study card — editorial index + lift on hover */
-function CaseStudyCard({ card }: { card: CaseStudyCard }) {
+/** Single philosophy pillar — no card, just editorial text */
+function Pillar({ pillar }: { pillar: (typeof PILLARS)[0] }) {
   return (
-    <motion.article
-      variants={fadeInUp}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      className="about-pillar"
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px',
-        padding: '36px 32px 32px',
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-accent-3)',
-        boxShadow: 'var(--shadow-light)',
-        cursor: 'pointer',
-        position: 'relative',
-        overflow: 'hidden',
+        gap: '16px',
+        paddingTop: '28px',
+        borderTop: '1px solid var(--color-accent-3)',
+        opacity: 0,  // GSAP will animate this in
       }}
     >
-      {/* Gold accent top-line — scales in on hover via CSS */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '1.5px',
-          background: 'var(--color-accent-1)',
-          transformOrigin: 'left',
-          scaleX: 0,
-        }}
-        whileHover={{ scaleX: 1 }}
-        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      />
-
-      {/* Index + category row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
         <span
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-sm)',
+            fontSize: '0.72rem',
             fontWeight: 300,
-            letterSpacing: 'var(--ls-wide)',
+            letterSpacing: '0.12em',
             color: 'var(--color-text-muted)',
           }}
         >
-          {card.index}
+          {pillar.number}
         </span>
         <span
           style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 'var(--fs-xs)',
-            fontWeight: 500,
-            letterSpacing: 'var(--ls-wider)',
-            textTransform: 'uppercase',
-            color: 'var(--color-accent-1)',
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(1.1rem, 1.8vw, 1.4rem)',
+            fontWeight: 300,
+            fontStyle: 'italic',
+            letterSpacing: '-0.01em',
+            color: 'var(--color-text)',
           }}
         >
-          {card.category}
+          {pillar.title}
         </span>
       </div>
-
-      {/* Title */}
-      <h3
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(1.25rem, 2vw, 1.6rem)',
-          fontWeight: 300,
-          lineHeight: 1.2,
-          letterSpacing: 'var(--ls-tight)',
-          color: 'var(--color-text)',
-          flex: 1,
-        }}
-      >
-        {card.title}
-      </h3>
-
-      {/* Detail paragraph */}
       <p
         style={{
           fontFamily: 'var(--font-body)',
-          fontSize: 'var(--fs-sm)',
+          fontSize: 'clamp(0.825rem, 1.1vw, 0.9rem)',
           fontWeight: 300,
-          lineHeight: 1.72,
+          lineHeight: 1.8,
           color: 'var(--color-text-muted)',
+          maxWidth: '460px',
         }}
       >
-        {card.detail}
+        {pillar.body}
       </p>
-
-      {/* Footer: client + year */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingTop: '20px',
-          borderTop: '1px solid var(--color-accent-3)',
-          marginTop: 'auto',
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 'var(--fs-xs)',
-            fontWeight: 400,
-            letterSpacing: 'var(--ls-wide)',
-            color: 'var(--color-text-muted)',
-          }}
-        >
-          {card.client}
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-sm)',
-            fontWeight: 300,
-            color: 'var(--color-accent-2)',
-            letterSpacing: 'var(--ls-wide)',
-          }}
-        >
-          {card.year}
-        </span>
-      </div>
-    </motion.article>
+    </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
    ABOUT
-══════════════════════════════════════════════════════════ */
+══════════════════════════════════════════════════════════════ */
 
 export function About() {
-  const sectionRef    = useRef<HTMLElement>(null);
-  const headlineRef   = useRef<HTMLHeadingElement>(null);
-  const logosRef      = useRef<HTMLDivElement>(null);
-  const cardsRef      = useRef<HTMLDivElement>(null);
+  const sectionRef   = useRef<HTMLElement>(null);
+  const imageRef     = useRef<HTMLDivElement>(null);
+  const headlineRef  = useRef<HTMLHeadingElement>(null);
+  const pillarsRef   = useRef<HTMLDivElement>(null);
+  const marqueeRef   = useRef<HTMLDivElement>(null);
 
-  /* ── Scroll-driven parallax: section bg shifts very gently ── */
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  });
-  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '4%']);
-
-  /* ── GSAP: stagger headline lines in on scroll ─────────── */
   useEffect(() => {
     const ctx = gsap.context(() => {
 
-      /* Headline chars lift in — split by line via wrapping spans */
-      gsap.from(headlineRef.current, {
-        opacity: 0,
-        y: 28,
-        duration: 1.1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: headlineRef.current,
-          start: 'top 82%',
-          toggleActions: 'play none none none',
-        },
-      });
+      /* ── 1. Image reveal — clip-path expands from centre ─────── */
+      if (imageRef.current) {
+        gsap.fromTo(
+          imageRef.current,
+          { clipPath: 'inset(36% 18% 36% 18%)' },
+          {
+            clipPath: 'inset(0% 0% 0% 0%)',
+            ease: 'power2.inOut',
+            scrollTrigger: {
+              trigger: imageRef.current,
+              start: 'top 75%',
+              end: 'bottom 25%',
+              scrub: 1.4,
+            },
+          }
+        );
 
-      /* Client logos stagger in left → right */
-      if (logosRef.current) {
-        gsap.from(logosRef.current.children, {
+        // Slight parallax drift on the image itself
+        gsap.fromTo(
+          imageRef.current.querySelector('img'),
+          { scale: 1.12, y: '4%' },
+          {
+            scale: 1.0,
+            y: '-4%',
+            ease: 'none',
+            scrollTrigger: {
+              trigger: imageRef.current,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: true,
+            },
+          }
+        );
+      }
+
+      /* ── 2. Headline lifts in ────────────────────────────────── */
+      if (headlineRef.current) {
+        gsap.from(headlineRef.current, {
           opacity: 0,
-          y: 14,
-          duration: 0.8,
-          stagger: 0.09,
-          ease: 'power2.out',
+          y: 32,
+          duration: 1.1,
+          ease: 'power3.out',
           scrollTrigger: {
-            trigger: logosRef.current,
-            start: 'top 85%',
+            trigger: headlineRef.current,
+            start: 'top 80%',
             toggleActions: 'play none none none',
           },
         });
       }
 
-      /* Cards lift in with stagger */
-      if (cardsRef.current) {
-        gsap.from(cardsRef.current.children, {
-          opacity: 0,
-          y: 36,
-          duration: 0.95,
-          stagger: 0.13,
+      /* ── 3. Pillars stagger in ───────────────────────────────── */
+      if (pillarsRef.current) {
+        gsap.to('.about-pillar', {
+          opacity: 1,
+          y: 0,
+          duration: 1.0,
+          stagger: 0.18,
           ease: 'power3.out',
           scrollTrigger: {
-            trigger: cardsRef.current,
-            start: 'top 80%',
+            trigger: pillarsRef.current,
+            start: 'top 78%',
+            toggleActions: 'play none none none',
+          },
+        });
+
+        // Set initial state for pillars
+        gsap.set('.about-pillar', { y: 28 });
+      }
+
+      /* ── 4. Marquee fades in ─────────────────────────────────── */
+      if (marqueeRef.current) {
+        gsap.from(marqueeRef.current, {
+          opacity: 0,
+          duration: 1.0,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: marqueeRef.current,
+            start: 'top 88%',
             toggleActions: 'play none none none',
           },
         });
@@ -343,294 +268,355 @@ export function About() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        minHeight: '100svh',
         background: 'var(--color-bg)',
         overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
       }}
     >
-      {/* ── Subtle background paralax texture layer ─────────── */}
-      <motion.div
+      {/* ── Subtle grid texture ────────────────────────────────── */}
+      <div
         aria-hidden
         style={{
           position: 'absolute',
           inset: 0,
-          y: bgY,
           backgroundImage: `
-            linear-gradient(
-              rgba(197,160,89,0.035) 1px,
-              transparent            1px
-            ),
-            linear-gradient(
-              90deg,
-              rgba(197,160,89,0.035) 1px,
-              transparent            1px
-            )
+            linear-gradient(rgba(197,160,89,0.032) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(197,160,89,0.032) 1px, transparent 1px)
           `,
           backgroundSize: '64px 64px',
           pointerEvents: 'none',
-          zIndex: 0,
         }}
       />
 
-      {/* ── Very faint radial glow — upper right ─────────────── */}
+      {/* ══════════════════════════════════════════════════════════
+          SECTION 1 — Hero image with clip-path reveal
+          Blueprint: Scene 4 — Image Reveal
+      ══════════════════════════════════════════════════════════ */}
       <div
-        aria-hidden
         style={{
-          position: 'absolute',
-          top: '-120px',
-          right: '-160px',
-          width: '640px',
-          height: '640px',
-          borderRadius: '50%',
-          background:
-            'radial-gradient(circle, rgba(197,160,89,0.07) 0%, transparent 68%)',
-          pointerEvents: 'none',
-          zIndex: 0,
+          padding: 'clamp(80px, 9vw, 120px) clamp(24px, 5vw, 72px) 0',
+          position: 'relative',
+          zIndex: 1,
         }}
-      />
+      >
 
-      {/* ═══════════════════════════════════════════════════════
-          CONTENT WRAPPER
-      ═══════════════════════════════════════════════════════ */}
+        {/* Eyebrow above image */}
+        <motion.div
+          className="flex items-center gap-4 mb-8"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <span
+            style={{
+              display: 'block',
+              height: '1px',
+              width: '36px',
+              background: 'var(--color-accent-1)',
+              opacity: 0.75,
+            }}
+          />
+          <span
+            style={{
+              fontSize: '0.66rem',
+              letterSpacing: '0.34em',
+              textTransform: 'uppercase',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 400,
+              color: 'var(--color-accent-1)',
+            }}
+          >
+            About Ghaim
+          </span>
+        </motion.div>
+
+        {/* ── CLIP-PATH IMAGE ─────────────────────────────────── */}
+        {/*
+          The clipPath starts tight (inset from all sides) and expands to
+          fill the full container as the user scrolls. GSAP scrub handles it.
+          The overflow:hidden on the outer div is critical — without it the
+          image shows outside the clip during the animation.
+        */}
+        <div
+          ref={imageRef}
+          style={{
+            width: '100%',
+            height: 'clamp(360px, 55vw, 680px)',
+            overflow: 'hidden',
+            position: 'relative',
+            clipPath: 'inset(36% 18% 36% 18%)', // initial state — GSAP animates this
+          }}
+        >
+          <img
+            src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=2000&auto=format&fit=crop&q=85"
+            alt="GHAIM luxury event — grand ballroom setup"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transformOrigin: 'center center',
+              scale: 1.12, // GSAP will animate this
+            }}
+          />
+
+          {/* Overlay so image doesn't compete with text below */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to bottom, transparent 55%, rgba(247,245,241,0.6) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Image caption — bottom left */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+          >
+            <span
+              style={{
+                display: 'block',
+                width: '24px',
+                height: '1px',
+                background: 'rgba(197,160,89,0.7)',
+              }}
+            />
+            <span
+              style={{
+                fontSize: '0.6rem',
+                letterSpacing: '0.24em',
+                textTransform: 'uppercase',
+                fontFamily: 'var(--font-body)',
+                color: 'rgba(255,255,255,0.65)',
+              }}
+            >
+              Atlantis The Palm · 2024
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════
+          SECTION 2 — Editorial split: headline left, narrative right
+      ══════════════════════════════════════════════════════════ */}
       <div
         style={{
           position: 'relative',
           zIndex: 1,
-          padding: 'var(--space-3xl) clamp(32px, 8vw, 96px)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--space-2xl)',
+          padding: 'clamp(60px, 8vw, 100px) clamp(24px, 5vw, 72px)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: 'clamp(40px, 6vw, 96px)',
+          alignItems: 'start',
         }}
       >
-
-        {/* ══ ROW 1 — Eyebrow + Split Headline / Body ════════ */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
+        {/* Left — Headline (pinned via position:sticky in tall screens) */}
+        <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 'clamp(40px, 6vw, 96px)',
-            alignItems: 'start',
+            position: 'sticky',
+            top: '120px',
+            alignSelf: 'start',
           }}
         >
-          {/* Left column — eyebrow + headline */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-            <SectionEyebrow label="About Ghaim" />
-
-            <h2
-              ref={headlineRef}
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(2.6rem, 5.2vw, 5.2rem)',
-                fontWeight: 300,
-                lineHeight: 1.04,
-                letterSpacing: 'var(--ls-tight)',
-                color: 'var(--color-text)',
-              }}
-            >
-              Where Vision
-              <br />
-              Meets{' '}
-              <em
-                style={{
-                  fontStyle: 'italic',
-                  fontWeight: 300,
-                  color: 'var(--color-accent-1)',
-                }}
-              >
-                Flawless
-              </em>
-              <br />
-              Execution.
-            </h2>
-          </div>
-
-          {/* Right column — narrative + CTA link */}
-          <div
+          <h2
+            ref={headlineRef}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '36px',
-              paddingTop: 'clamp(48px, 5vw, 80px)',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.6rem, 5.2vw, 5.4rem)',
+              fontWeight: 300,
+              lineHeight: 1.04,
+              letterSpacing: '-0.022em',
+              color: 'var(--color-text)',
             }}
           >
-            <motion.p
-              variants={fadeInUp}
+            Where Vision
+            <br />
+            Meets{' '}
+            <em
               style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 'clamp(0.875rem, 1.15vw, 0.975rem)',
+                fontStyle: 'italic',
                 fontWeight: 300,
-                lineHeight: 1.82,
-                letterSpacing: '0.008em',
-                color: 'var(--color-text-mid)',
-                maxWidth: '460px',
-              }}
-            >
-              GHAIM has spent over a decade shaping the most
-              prestigious corporate events across the Gulf. We work
-              exclusively with organisations that demand the highest
-              standards — in venue, in service, in lasting impression.
-            </motion.p>
-
-            <motion.p
-              variants={fadeInUp}
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 'clamp(0.875rem, 1.15vw, 0.975rem)',
-                fontWeight: 300,
-                lineHeight: 1.82,
-                color: 'var(--color-text-muted)',
-                maxWidth: '420px',
-              }}
-            >
-              Our approach is quiet, deliberate, and precise. We do not
-              measure success in headcount — we measure it in the
-              conversations that happen the day after.
-            </motion.p>
-
-            {/* Soft CTA — text link with animated arrow */}
-            <motion.a
-              href="#work"
-              variants={fadeInUp}
-              className="flex items-center gap-3"
-              style={{
-                fontSize: 'var(--fs-xs)',
-                letterSpacing: 'var(--ls-wider)',
-                textTransform: 'uppercase',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 500,
                 color: 'var(--color-accent-1)',
-                width: 'fit-content',
-              }}
-              whileHover={{ x: 5 }}
-              transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <span>View Our Work</span>
-              <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
-                <path
-                  d="M1 5h18M14 1l5 4-5 4"
-                  stroke="currentColor"
-                  strokeWidth="0.85"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </motion.a>
-          </div>
-        </motion.div>
-
-        {/* ══ ROW 2 — Client Trust Bar ════════════════════════ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-          {/* Rule + label */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, amount: 0.6 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '20px',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 'var(--fs-xs)',
-                letterSpacing: 'var(--ls-wider)',
-                textTransform: 'uppercase',
-                color: 'var(--color-text-muted)',
-                whiteSpace: 'nowrap',
               }}
             >
-              Trusted by
-            </span>
-            {/* Gold rule fills remaining width */}
-            <div
-              style={{
-                flex: 1,
-                height: '1px',
-                background:
-                  'linear-gradient(to right, rgba(197,160,89,0.4), transparent)',
-              }}
-            />
-          </motion.div>
+              Flawless
+            </em>
+            <br />
+            Execution.
+          </h2>
 
-          {/* Logos row */}
-          <motion.div
-            ref={logosRef}
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px',
-            }}
-          >
-            {CLIENTS.map((c) => (
-              <ClientLogo key={c.name} name={c.name} />
-            ))}
-          </motion.div>
-        </div>
-
-        {/* ══ ROW 3 — Case Study Cards ════════════════════════ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-          {/* Section label */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '20px',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 'var(--fs-xs)',
-                letterSpacing: 'var(--ls-wider)',
-                textTransform: 'uppercase',
-                color: 'var(--color-text-muted)',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Selected Work
-            </span>
-            <div
-              style={{
-                flex: 1,
-                height: '1px',
-                background:
-                  'linear-gradient(to right, rgba(197,160,89,0.35), transparent)',
-              }}
-            />
-          </motion.div>
-
-          {/* Cards */}
+          {/* Gold accent rule under headline */}
           <div
-            ref={cardsRef}
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 'clamp(12px, 2vw, 24px)',
+              marginTop: '32px',
+              width: '56px',
+              height: '1px',
+              background: 'linear-gradient(to right, var(--color-accent-1), transparent)',
+              opacity: 0.7,
             }}
-          >
-            {CASE_STUDIES.map((card) => (
-              <CaseStudyCard key={card.index} card={card} />
-            ))}
-          </div>
+          />
         </div>
 
+        {/* Right — Narrative text + pillars (scrolls past the sticky headline) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(32px, 4vw, 52px)' }}>
+
+          <motion.p
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 'clamp(0.875rem, 1.2vw, 0.98rem)',
+              fontWeight: 300,
+              lineHeight: 1.84,
+              letterSpacing: '0.008em',
+              color: 'var(--color-text-mid)',
+              maxWidth: '480px',
+            }}
+          >
+            GHAIM has spent over a decade shaping the most prestigious
+            corporate events across the Gulf. We work exclusively with
+            organisations that demand the highest standards — in venue,
+            in service, in lasting impression.
+          </motion.p>
+
+          <motion.p
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 'clamp(0.875rem, 1.2vw, 0.98rem)',
+              fontWeight: 300,
+              lineHeight: 1.84,
+              color: 'var(--color-text-muted)',
+              maxWidth: '440px',
+            }}
+          >
+            Our approach is quiet, deliberate, and precise. We do not
+            measure success in headcount — we measure it in the
+            conversations that happen the day after.
+          </motion.p>
+
+          {/* CTA link */}
+          <motion.a
+            href="#work"
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center gap-3"
+            style={{
+              fontSize: '0.68rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 500,
+              color: 'var(--color-accent-1)',
+              width: 'fit-content',
+            }}
+            whileHover={{ x: 5 }}
+          >
+            <span>View Our Work</span>
+            <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
+              <path
+                d="M1 5h18M14 1l5 4-5 4"
+                stroke="currentColor"
+                strokeWidth="0.85"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </motion.a>
+        </div>
       </div>
+
+      {/* ══════════════════════════════════════════════════════════
+          SECTION 3 — Philosophy pillars (replaces card grid)
+          Three horizontal statements, separated by border-top lines.
+          Editorial, not UI.
+      ══════════════════════════════════════════════════════════ */}
+      <div
+        ref={pillarsRef}
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          padding: '0 clamp(24px, 5vw, 72px) clamp(60px, 8vw, 100px)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 'clamp(24px, 4vw, 56px)',
+        }}
+      >
+        {PILLARS.map((pillar) => (
+          <Pillar key={pillar.number} pillar={pillar} />
+        ))}
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════
+          SECTION 4 — Client trust marquee
+          Infinite horizontal scroll of client names.
+          No pills. No hover states. Just quiet authority.
+      ══════════════════════════════════════════════════════════ */}
+      <div
+        ref={marqueeRef}
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          borderTop: '1px solid var(--color-accent-3)',
+          borderBottom: '1px solid var(--color-accent-3)',
+          padding: 'clamp(18px, 2vw, 24px) 0',
+        }}
+      >
+        {/* Label */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 'clamp(24px, 5vw, 72px)',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '0.58rem',
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              fontFamily: 'var(--font-body)',
+              color: 'var(--color-text-muted)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Trusted by
+          </span>
+          <span
+            style={{
+              display: 'block',
+              width: '36px',
+              height: '1px',
+              background: 'linear-gradient(to right, rgba(197,160,89,0.5), transparent)',
+            }}
+          />
+        </div>
+
+        {/* Marquee (padded left to clear the label) */}
+        <div style={{ paddingLeft: 'clamp(120px, 14vw, 200px)' }}>
+          <LogoMarquee />
+        </div>
+      </div>
+
     </section>
   );
 }
