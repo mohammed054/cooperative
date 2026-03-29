@@ -1,4 +1,4 @@
-/* ── Reset ────────────────────────────────────────────── */
+/* ── Reset ─────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -16,20 +16,20 @@ html {
 
 body {
   font-family: var(--font-body);
-  background-color: var(--color-primary);
+  background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
   overflow-x: hidden;
 }
 
-/* ── Selection ────────────────────────────────────────── */
+/* ── Selection ─────────────────────────────────────────────────── */
 ::selection {
   background-color: var(--color-accent-1);
   color: #FFFFFF;
 }
 
-/* ── Scrollbar ────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
+/* ── Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--color-bg); }
 ::-webkit-scrollbar-thumb {
   background: var(--color-accent-2);
@@ -37,19 +37,19 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-1); }
 
-/* ── Focus ────────────────────────────────────────────── */
+/* ── Focus ─────────────────────────────────────────────────────── */
 :focus-visible {
   outline: 1px solid var(--color-accent-1);
   outline-offset: 4px;
 }
 
-/* ── Images ───────────────────────────────────────────── */
+/* ── Images / Video ────────────────────────────────────────────── */
 img, video {
   display: block;
   max-width: 100%;
 }
 
-/* ── Typography base ──────────────────────────────────── */
+/* ── Typography base ───────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 300;
@@ -74,4 +74,108 @@ button {
   border: none;
   background: none;
   font-family: var(--font-body);
+}
+
+/* ── Section transitions ───────────────────────────────────────── */
+
+/* Each major section has smooth background color transition capability */
+.section-transition {
+  transition: background-color 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Mobile: prevent horizontal overflow ───────────────────────── */
+main, footer, header {
+  overflow-x: hidden;
+}
+
+/* ── Mobile: base responsive type scaling ──────────────────────── */
+@media (max-width: 640px) {
+  html { font-size: 15px; }
+
+  /* Prevent hero headline from being too large */
+  h1 { font-size: clamp(2.4rem, 10vw, 4rem) !important; }
+  h2 { font-size: clamp(1.8rem, 7vw, 2.8rem) !important; }
+}
+
+/* ── Testimonials — mobile single column ───────────────────────── */
+@media (max-width: 767px) {
+  /* Testimonials sticky layout collapse */
+  #testimonials [style*="gridTemplateColumns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Testimonials right column hidden on mobile */
+  #testimonials .t-step {
+    display: none !important;
+  }
+
+  /* Show full testimonials in single column on mobile */
+  #testimonials .sticky-quote {
+    position: relative !important;
+    top: auto !important;
+    transform: none !important;
+  }
+}
+
+/* ── About section responsive ──────────────────────────────────── */
+@media (max-width: 767px) {
+  /* About sticky headline: remove sticky on mobile */
+  .about-headline-col {
+    position: relative !important;
+    top: auto !important;
+  }
+}
+
+/* ── CaseStudies mobile ─────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Featured card height reduction */
+  #work [style*="height: clamp(380px"] {
+    height: clamp(280px, 70vw, 400px) !important;
+  }
+}
+
+/* ── Contact section responsive ────────────────────────────────── */
+@media (max-width: 640px) {
+  #contact .cta-section-inner {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+
+/* ── Navbar: prevent overlap on mobile ─────────────────────────── */
+@media (max-width: 1024px) {
+  main {
+    /* Account for fixed navbar height */
+    padding-top: 0;
+  }
+}
+
+/* ── Loading screen: ensure no layout shift ────────────────────── */
+#root > div {
+  will-change: opacity;
+}
+
+/* ── Print reset ───────────────────────────────────────────────── */
+@media print {
+  .fixed, [style*="position: fixed"] {
+    display: none !important;
+  }
+}
+
+/* ── Reduced motion support ────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Touch scroll performance ──────────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable custom scrollbar on touch devices */
+  ::-webkit-scrollbar { display: none; }
 }

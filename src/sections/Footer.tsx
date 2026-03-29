@@ -1,6 +1,13 @@
 /**
- * Footer — cleaned up. CTA block removed (lives in Contact.tsx now).
- * Nav columns + contact + social + legal. Feels like an exhale.
+ * Footer — Fully Mobile Responsive (FIXED)
+ * ─────────────────────────────────────────────────────────────
+ * Fixes:
+ *   ✓ Grid collapses properly on mobile (5-col → 2-col → 1-col)
+ *   ✓ Logo column stacks correctly
+ *   ✓ Contact info legible on mobile
+ *   ✓ Bottom bar wraps gracefully on narrow screens
+ *   ✓ Social icons accessible and properly spaced
+ *   ✓ Official logo image used
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -11,13 +18,15 @@ import { fadeInUp, staggerContainer } from '@/animations/fadeInUp';
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* ── Data ─────────────────────────────────────────────────────── */
+
 const NAV_GROUPS = [
   {
     label: 'Company',
     links: [
       { label: 'About',        href: '#about' },
       { label: 'Our Work',     href: '#work' },
-      { label: 'Case Studies', href: '#case-studies' },
+      { label: 'Process',      href: '#process' },
     ],
   },
   {
@@ -98,6 +107,8 @@ const SOCIAL_LINKS = [
   },
 ];
 
+/* ── Sub-components ───────────────────────────────────────────── */
+
 function FooterNavLink({ label, href }: { label: string; href: string }) {
   return (
     <motion.a
@@ -154,7 +165,7 @@ function BackToTop({ visible }: { visible: boolean }) {
           transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Back to top"
-          style={{ position: 'fixed', bottom: '36px', right: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', border: '1px solid rgba(197,160,89,0.4)', background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)', color: 'var(--color-accent-1)', cursor: 'pointer', zIndex: 40, boxShadow: 'var(--shadow-medium)' }}
+          style={{ position: 'fixed', bottom: '32px', right: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', border: '1px solid rgba(197,160,89,0.4)', background: 'rgba(255,255,255,0.94)', backdropFilter: 'blur(12px)', color: 'var(--color-accent-1)', cursor: 'pointer', zIndex: 40, boxShadow: 'var(--shadow-medium)' }}
           whileHover={{ borderColor: 'rgba(197,160,89,0.75)', y: -3, boxShadow: '0 8px 24px rgba(197,160,89,0.15)' }}
           whileTap={{ scale: 0.92 }}
         >
@@ -167,11 +178,15 @@ function BackToTop({ visible }: { visible: boolean }) {
   );
 }
 
+/* ══════════════════════════════════════════════════════════════
+   FOOTER MAIN
+══════════════════════════════════════════════════════════════ */
+
 export function Footer() {
-  const footerRef   = useRef<HTMLElement>(null);
-  const dividerRef  = useRef<HTMLDivElement>(null);
-  const columnsRef  = useRef<HTMLDivElement>(null);
-  const bottomRef   = useRef<HTMLDivElement>(null);
+  const footerRef  = useRef<HTMLElement>(null);
+  const dividerRef = useRef<HTMLDivElement>(null);
+  const columnsRef = useRef<HTMLDivElement>(null);
+  const bottomRef  = useRef<HTMLDivElement>(null);
   const [backToTopVisible, setBackToTopVisible] = useState(false);
 
   useEffect(() => {
@@ -183,16 +198,24 @@ export function Footer() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       if (dividerRef.current) {
-        gsap.from(dividerRef.current, { scaleX: 0, transformOrigin: 'left', duration: 1.4, ease: 'power3.inOut', scrollTrigger: { trigger: dividerRef.current, start: 'top 92%', toggleActions: 'play none none none' } });
+        gsap.from(dividerRef.current, {
+          scaleX: 0, transformOrigin: 'left', duration: 1.4, ease: 'power3.inOut',
+          scrollTrigger: { trigger: dividerRef.current, start: 'top 92%', toggleActions: 'play none none none' },
+        });
       }
       if (columnsRef.current) {
-        gsap.from(columnsRef.current.children, { opacity: 0, y: 24, duration: 0.9, stagger: 0.1, ease: 'power2.out', scrollTrigger: { trigger: columnsRef.current, start: 'top 88%', toggleActions: 'play none none none' } });
+        gsap.from(Array.from(columnsRef.current.children), {
+          opacity: 0, y: 24, duration: 0.9, stagger: 0.09, ease: 'power2.out',
+          scrollTrigger: { trigger: columnsRef.current, start: 'top 88%', toggleActions: 'play none none none' },
+        });
       }
       if (bottomRef.current) {
-        gsap.from(bottomRef.current, { opacity: 0, duration: 0.85, ease: 'power2.out', delay: 0.2, scrollTrigger: { trigger: bottomRef.current, start: 'top 95%', toggleActions: 'play none none none' } });
+        gsap.from(bottomRef.current, {
+          opacity: 0, duration: 0.85, ease: 'power2.out', delay: 0.2,
+          scrollTrigger: { trigger: bottomRef.current, start: 'top 96%', toggleActions: 'play none none none' },
+        });
       }
     }, footerRef);
-
     return () => ctx.revert();
   }, []);
 
@@ -203,24 +226,41 @@ export function Footer() {
         ref={footerRef}
         style={{ position: 'relative', background: 'var(--color-bg)', overflow: 'hidden', borderTop: '1px solid rgba(197,160,89,0.1)' }}
       >
-        {/* Subtle gold bloom */}
-        <div aria-hidden style={{ position: 'absolute', top: '-80px', right: '-100px', width: '440px', height: '440px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(197,160,89,0.045) 0%, transparent 68%)', pointerEvents: 'none', zIndex: 0 }} />
+        {/* Gold bloom */}
+        <div aria-hidden style={{ position: 'absolute', top: '-80px', right: '-100px', width: '440px', height: '440px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(197,160,89,0.04) 0%, transparent 68%)', pointerEvents: 'none', zIndex: 0 }} />
 
-        <div style={{ position: 'relative', zIndex: 1, padding: 'clamp(64px, 8vw, 96px) clamp(32px, 8vw, 96px) 0', display: 'flex', flexDirection: 'column', gap: 'clamp(48px, 6vw, 72px)' }}>
-
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            padding: 'clamp(56px, 7vw, 88px) clamp(20px, 5vw, 80px) 0',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'clamp(40px, 5vw, 64px)',
+          }}
+        >
           {/* Divider */}
           <div ref={dividerRef} style={{ height: '1px', background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.35) 30%, rgba(197,160,89,0.35) 70%, transparent)' }} />
 
-          {/* Main columns */}
-          <div ref={columnsRef} style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(3, 1fr) 1fr', gap: 'clamp(24px, 4vw, 56px)', alignItems: 'start' }}>
-
+          {/* Main columns — responsive grid */}
+          <div
+            ref={columnsRef}
+            className="footer-columns-grid"
+          >
             {/* Logo column */}
-            <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-              <a href="#" style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '1.3rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--color-text)', width: 'fit-content' }}>GHAIM</a>
-              <div style={{ width: '40px', height: '1px', background: 'var(--color-accent-1)', opacity: 0.5 }} />
-              <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 300, fontSize: 'var(--fs-md)', lineHeight: 1.5, letterSpacing: '0.01em', color: 'var(--color-text-mid)', maxWidth: '200px' }}>
+            <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* Logo */}
+              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', width: 'fit-content' }}>
+                <img src="/logo.webp" alt="GHAIM" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '0.95rem', letterSpacing: '0.32em', textTransform: 'uppercase', color: 'var(--color-text)' }}>GHAIM</span>
+              </a>
+
+              <div style={{ width: '36px', height: '1px', background: 'var(--color-accent-1)', opacity: 0.5 }} />
+
+              <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 300, fontSize: 'var(--fs-md)', lineHeight: 1.55, letterSpacing: '0.01em', color: 'var(--color-text-mid)', maxWidth: '200px' }}>
                 Where vision meets flawless execution.
               </p>
+
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {SOCIAL_LINKS.map((s) => <SocialIcon key={s.label} {...s} />)}
               </div>
@@ -228,42 +268,106 @@ export function Footer() {
 
             {/* Nav groups */}
             {NAV_GROUPS.map((group) => (
-              <motion.div key={group.label} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <motion.div key={group.label} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                 <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-xs)', letterSpacing: 'var(--ls-widest)', textTransform: 'uppercase', fontWeight: 500, color: 'var(--color-text)', paddingBottom: '6px', borderBottom: '1px solid var(--color-accent-3)' }}>
                   {group.label}
                 </span>
-                <motion.nav variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }} aria-label={`${group.label} navigation`}>
+                <motion.nav
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+                  aria-label={`${group.label} navigation`}
+                >
                   {group.links.map((link) => <FooterNavLink key={link.label} {...link} />)}
                 </motion.nav>
               </motion.div>
             ))}
 
             {/* Contact column */}
-            <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-xs)', letterSpacing: 'var(--ls-widest)', textTransform: 'uppercase', fontWeight: 500, color: 'var(--color-text)', paddingBottom: '6px', borderBottom: '1px solid var(--color-accent-3)' }}>Contact</span>
-              <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-xs)', letterSpacing: 'var(--ls-widest)', textTransform: 'uppercase', fontWeight: 500, color: 'var(--color-text)', paddingBottom: '6px', borderBottom: '1px solid var(--color-accent-3)' }}>
+                Contact
+              </span>
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
+              >
                 {CONTACT_LINES.map((c) => <ContactLine key={c.id} {...c} />)}
               </motion.div>
             </motion.div>
           </div>
 
           {/* Bottom bar */}
-          <div ref={bottomRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', padding: 'clamp(20px, 3vw, 28px) 0', borderTop: '1px solid var(--color-accent-3)' }}>
+          <div
+            ref={bottomRef}
+            className="footer-bottom-bar"
+          >
             <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-xs)', fontWeight: 300, letterSpacing: '0.02em', color: 'var(--color-text-muted)' }}>
               © {new Date().getFullYear()} GHAIM Events. All rights reserved.
             </span>
-            <div style={{ display: 'flex', gap: '24px' }}>
+
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
               {['Privacy Policy', 'Terms of Service'].map((label) => (
-                <motion.a key={label} href="#" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-xs)', fontWeight: 300, letterSpacing: '0.01em', color: 'var(--color-text-muted)' }} whileHover={{ color: 'var(--color-accent-1)' }} transition={{ duration: 0.2 }}>
+                <motion.a
+                  key={label}
+                  href="#"
+                  style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-xs)', fontWeight: 300, letterSpacing: '0.01em', color: 'var(--color-text-muted)' }}
+                  whileHover={{ color: 'var(--color-accent-1)' }}
+                  transition={{ duration: 0.2 }}
+                >
                   {label}
                 </motion.a>
               ))}
             </div>
+
             <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--fs-xs)', fontWeight: 300, letterSpacing: 'var(--ls-wide)', color: 'var(--color-accent-1)', opacity: 0.65, textTransform: 'uppercase' }}>
               Registered · Dubai, UAE
             </span>
           </div>
         </div>
+
+        {/* Responsive styles */}
+        <style>{`
+          .footer-columns-grid {
+            display: grid;
+            gap: clamp(28px, 4vw, 48px);
+            align-items: start;
+            /* Mobile: 2 columns */
+            grid-template-columns: 1fr 1fr;
+          }
+          /* Tablet and above: full layout */
+          @media (min-width: 768px) {
+            .footer-columns-grid {
+              grid-template-columns: 1.5fr repeat(3, 1fr) 1.2fr;
+            }
+          }
+          /* Small mobile: single column */
+          @media (max-width: 480px) {
+            .footer-columns-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+          .footer-bottom-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            padding: clamp(18px, 2.5vw, 26px) 0;
+            border-top: 1px solid var(--color-accent-3);
+          }
+          @media (max-width: 640px) {
+            .footer-bottom-bar {
+              flex-direction: column;
+              align-items: flex-start;
+            }
+          }
+        `}</style>
       </footer>
 
       <BackToTop visible={backToTopVisible} />

@@ -1,45 +1,67 @@
 /**
- * App.tsx — Updated scene order
- * ─────────────────────────────────────────────────────────────
+ * App.tsx — With LoadingScreen & polished section order
+ * ─────────────────────────────────────────────────────
  * Changes:
- *   + Statement scene inserted between Hero and About
- *   All other sections unchanged (CaseStudies, Testimonials,
- *   Contact, Footer will be upgraded in subsequent sprints)
+ *   + LoadingScreen preloader (dissolves into Hero on complete)
+ *   + Navbar delay synced with loading screen exit
+ *   + All sections in correct order
  */
 
-import { ScrollLayout } from '@/layouts/ScrollLayout';
-import { Navbar }       from '@/components/Navbar';
-import { Hero }         from '@/sections/Hero';
-import { Statement }    from '@/sections/Statement';
-import { About }        from '@/sections/About';
-import { CaseStudies }  from '@/sections/CaseStudies';
-import { Testimonials } from '@/sections/Testimonials';
-import { Contact }      from '@/sections/Contact';
-import { Footer }       from '@/sections/Footer';
+import { useState } from 'react';
+import { ScrollLayout }   from '@/layouts/ScrollLayout';
+import { LoadingScreen }  from '@/components/LoadingScreen';
+import { Navbar }         from '@/components/Navbar';
+import { Hero }           from '@/sections/Hero';
+import { Statement }      from '@/sections/Statement';
+import { About }          from '@/sections/About';
+import { CaseStudies }    from '@/sections/CaseStudies';
+import { Testimonials }   from '@/sections/Testimonials';
+import { Contact }        from '@/sections/Contact';
+import { Footer }         from '@/sections/Footer';
 
 export default function App() {
+  const [loading, setLoading] = useState(true);
+
   return (
-    <ScrollLayout>
-      {/* Fixed navigation */}
-      <Navbar />
+    <>
+      {/* Loading screen — dissolves when done */}
+      {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
 
-      <main>
-        {/* Scene 1 — Hero (200vh, sticky, word stagger) */}
-        <Hero />
+      {/* Main site — hidden during load to prevent flash */}
+      <div
+        style={{
+          opacity:    loading ? 0 : 1,
+          transition: 'opacity 0.6s ease',
+          pointerEvents: loading ? 'none' : 'auto',
+        }}
+      >
+        <ScrollLayout>
+          {/* Fixed navigation */}
+          <Navbar />
 
-        {/* Scene 2 — Statement (pinned, "We craft legacy.") */}
-        <Statement />
+          <main>
+            {/* Scene 1 — Hero (200vh, sticky, word stagger) */}
+            <Hero />
 
-        {/* Scene 3 — About (clip-path image reveal, no cards) */}
-        <About />
+            {/* Scene 2 — Statement ("We craft legacy.") */}
+            <Statement />
 
-        {/* Scene 4 onwards — unchanged in this sprint */}
-        <CaseStudies />
-        <Testimonials />
-        <Contact />
-      </main>
+            {/* Scene 3 — About (clip-path reveal, editorial split) */}
+            <About />
 
-      <Footer />
-    </ScrollLayout>
+            {/* Scene 4 — Case Studies (featured + horizontal scroll) */}
+            <CaseStudies />
+
+            {/* Scene 5 — Testimonials (sticky scroll-stepped) */}
+            <Testimonials />
+
+            {/* Scene 6 — Contact (dark CTA) */}
+            <Contact />
+          </main>
+
+          <Footer />
+        </ScrollLayout>
+      </div>
+    </>
   );
 }

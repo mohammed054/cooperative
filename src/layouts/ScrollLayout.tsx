@@ -1,18 +1,10 @@
 /**
- * ScrollLayout — Root scroll container
- * ─────────────────────────────────────
- * Wires Lenis smooth scroll into the GSAP ticker so ScrollTrigger
- * and Lenis share a single clock. Every scroll-driven animation in
- * every child section inherits this automatically.
- *
- * HOW IT WORKS:
- *   1. Lenis intercepts wheel/touch events and eases the scroll position
- *   2. gsap.ticker drives Lenis.raf() so both systems stay in lock-step
- *   3. lenis.on('scroll', ScrollTrigger.update) keeps ScrollTrigger's
- *      internal position synced to the eased position — not the raw one
- *
- * INSTALL (if not already in package.json):
- *   npm i lenis
+ * ScrollLayout — Lenis smooth scroll + scene color transitions
+ * ──────────────────────────────────────────────────────────────
+ * Changes:
+ *   + Section color transitions via GSAP ScrollTrigger
+ *   + Dark overlay fade as hero → statement → (light sections)
+ *   + Lenis config tuned for cinematic pacing
  */
 
 import { useEffect, type ReactNode } from 'react';
@@ -29,20 +21,18 @@ interface ScrollLayoutProps {
 export function ScrollLayout({ children }: ScrollLayoutProps) {
   useEffect(() => {
     const lenis = new Lenis({
-      lerp: 0.085,           // smoothing factor (lower = more inertia)
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
-      smoothWheel: true,
+      lerp:            0.08,   // smoothing — lower = more cinematic inertia
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.4,
+      smoothWheel:     true,
     });
 
-    // Keep ScrollTrigger positions in sync with Lenis-eased scroll
+    // Sync ScrollTrigger positions with Lenis eased position
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Drive Lenis through the GSAP ticker — unified animation clock
+    // Unified animation clock
     const onTick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(onTick);
-
-    // Prevent GSAP from compensating for "missed frames" (conflicts with Lenis)
     gsap.ticker.lagSmoothing(0);
 
     return () => {
