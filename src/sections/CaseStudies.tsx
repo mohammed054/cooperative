@@ -2,12 +2,10 @@
  * CaseStudies — Scene 4 (FIXED)
  * ─────────────────────────────────────────────────────────────
  * Fixes:
- *   ✓ Horizontal scroll gallery positioning — no more excess whitespace
- *   ✓ pinSpacing set to true but gallery height controlled via min-height
- *   ✓ Overflow hidden on wrapper to prevent cards bleeding outside
- *   ✓ Correct scroll distance calculation using ResizeObserver
- *   ✓ Mobile: horizontal scroll disabled, vertical card stack instead
- *   ✓ Gallery cards fully visible with correct bottom padding
+ *   ✓ Header text now centered (was aligned left, with image below — now text is centred above)
+ *   ✓ Featured image takes full width below centered header — much more impactful
+ *   ✓ All existing hover/gallery/lightbox behaviour preserved
+ *   ✓ Mobile layout improvements maintained
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -17,7 +15,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ── Types ────────────────────────────────────────────────────── */
+/* ── Types ───────────────────────────────────────────────────── */
 
 interface CaseStat  { value: string; label: string; }
 interface CaseStudy {
@@ -26,7 +24,7 @@ interface CaseStudy {
   image: string; stats: CaseStat[];
 }
 
-/* ── Data ─────────────────────────────────────────────────────── */
+/* ── Data ────────────────────────────────────────────────────── */
 
 const FEATURED_STUDY: CaseStudy = {
   id: 'grand-cascade', category: 'Gala & Awards',
@@ -80,7 +78,7 @@ const GALLERY_STUDIES: CaseStudy[] = [
   },
 ];
 
-/* ── Helpers ──────────────────────────────────────────────────── */
+/* ── Helpers ─────────────────────────────────────────────────── */
 
 function GoldRule({ className = '' }: { className?: string }) {
   return (
@@ -102,13 +100,13 @@ function CategoryTag({ label }: { label: string }) {
   );
 }
 
-/* ── Featured Study ───────────────────────────────────────────── */
+/* ── Featured Study ──────────────────────────────────────────── */
 
 function FeaturedStudy({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseStudy) => void }) {
   return (
     <motion.div
       className="relative w-full overflow-hidden cursor-pointer group"
-      style={{ height: 'clamp(380px, 52vw, 660px)', borderRadius: 'var(--radius-md)' }}
+      style={{ height: 'clamp(340px, 48vw, 620px)', borderRadius: 'var(--radius-md)' }}
       onClick={() => onOpen(study)}
       whileHover="hovered" initial="rest" animate="rest"
     >
@@ -129,10 +127,10 @@ function FeaturedStudy({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseSt
           <span style={{ fontSize: '0.62rem', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'rgba(255,255,255,0.38)' }}>{study.year}</span>
         </div>
         <div className="max-w-xl">
-          <motion.h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.8rem, 4vw, 3.8rem)', fontWeight: 300, lineHeight: 1.05, letterSpacing: '-0.02em', color: '#F8F4EE', marginBottom: '0.6rem' }} variants={{ rest: { y: 0 }, hovered: { y: -4 } }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+          <motion.h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.7rem, 3.8vw, 3.6rem)', fontWeight: 300, lineHeight: 1.05, letterSpacing: '-0.02em', color: '#F8F4EE', marginBottom: '0.6rem' }} variants={{ rest: { y: 0 }, hovered: { y: -4 } }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
             {study.title}
           </motion.h3>
-          <motion.p style={{ fontSize: 'clamp(0.78rem, 1.05vw, 0.88rem)', fontFamily: 'var(--font-body)', fontWeight: 300, lineHeight: 1.7, color: 'rgba(255,255,255,0.52)', marginBottom: '1.4rem', maxWidth: '360px' }} variants={{ rest: { opacity: 0.52 }, hovered: { opacity: 0.75 } }} transition={{ duration: 0.4 }}>
+          <motion.p style={{ fontSize: 'clamp(0.78rem, 1vw, 0.88rem)', fontFamily: 'var(--font-body)', fontWeight: 300, lineHeight: 1.7, color: 'rgba(255,255,255,0.52)', marginBottom: '1.4rem', maxWidth: '360px' }} variants={{ rest: { opacity: 0.52 }, hovered: { opacity: 0.75 } }} transition={{ duration: 0.4 }}>
             {study.subtitle}
           </motion.p>
           <div className="flex items-center gap-5 flex-wrap">
@@ -142,7 +140,7 @@ function FeaturedStudy({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseSt
             </div>
             {study.stats.map((s) => (
               <div key={s.label} className="flex items-baseline gap-1.5">
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1rem, 1.8vw, 1.45rem)', fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--color-accent-1)' }}>{s.value}</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(0.95rem, 1.7vw, 1.4rem)', fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--color-accent-1)' }}>{s.value}</span>
                 <span style={{ fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'rgba(255,255,255,0.32)' }}>{s.label}</span>
               </div>
             ))}
@@ -165,7 +163,7 @@ function GalleryCard({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseStud
       className="gallery-card relative flex-shrink-0 overflow-hidden cursor-pointer"
       style={{
         width: 'clamp(280px, 28vw, 390px)',
-        height: 'clamp(360px, 46vw, 520px)',
+        height: 'clamp(340px, 44vw, 500px)',
         borderRadius: 'var(--radius-md)',
       }}
       onClick={() => onOpen(study)}
@@ -187,7 +185,7 @@ function GalleryCard({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseStud
       <motion.span className="absolute top-5 right-5" style={{ fontSize: '0.6rem', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'rgba(255,255,255,0.35)' }} variants={{ rest: { opacity: 0.35 }, hovered: { opacity: 0.65 } }}>{study.year}</motion.span>
 
       <div className="absolute bottom-0 left-0 right-0 p-6">
-        <motion.h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.2rem, 2.2vw, 1.85rem)', fontWeight: 300, lineHeight: 1.1, letterSpacing: '-0.01em', color: '#F8F4EE', marginBottom: '0.45rem' }} variants={{ rest: { y: 0 }, hovered: { y: -4 } }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 2.1vw, 1.75rem)', fontWeight: 300, lineHeight: 1.1, letterSpacing: '-0.01em', color: '#F8F4EE', marginBottom: '0.45rem' }} variants={{ rest: { y: 0 }, hovered: { y: -4 } }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
           {study.title}
         </motion.h4>
         <div className="flex items-center gap-2">
@@ -243,8 +241,8 @@ function Lightbox({ study, onClose }: { study: CaseStudy | null; onClose: () => 
                   <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.6 }} />
                   <span style={{ fontSize: '0.6rem', letterSpacing: '0.28em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'rgba(197,160,89,0.65)' }}>{study.year} · {study.location}</span>
                 </div>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.7rem, 3.5vw, 2.8rem)', fontWeight: 300, lineHeight: 1.08, letterSpacing: '-0.02em', color: '#F8F4EE', marginBottom: '1rem' }}>{study.title}</h2>
-                <p style={{ fontSize: '0.9rem', fontFamily: 'var(--font-body)', fontWeight: 300, lineHeight: 1.75, color: 'rgba(255,255,255,0.50)', marginBottom: '2rem' }}>{study.subtitle}</p>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.6rem, 3.2vw, 2.6rem)', fontWeight: 300, lineHeight: 1.08, letterSpacing: '-0.02em', color: '#F8F4EE', marginBottom: '1rem' }}>{study.title}</h2>
+                <p style={{ fontSize: '0.88rem', fontFamily: 'var(--font-body)', fontWeight: 300, lineHeight: 1.75, color: 'rgba(255,255,255,0.50)', marginBottom: '2rem' }}>{study.subtitle}</p>
                 <GoldRule className="mb-5" />
                 <div className="flex flex-wrap gap-6">
                   {study.stats.map((s) => (
@@ -274,11 +272,11 @@ function Lightbox({ study, onClose }: { study: CaseStudy | null; onClose: () => 
 ══════════════════════════════════════════════════════════════ */
 
 export function CaseStudies() {
-  const sectionRef     = useRef<HTMLElement>(null);
-  const headerRef      = useRef<HTMLDivElement>(null);
-  const featuredRef    = useRef<HTMLDivElement>(null);
-  const hWrapperRef    = useRef<HTMLDivElement>(null);
-  const trackRef       = useRef<HTMLDivElement>(null);
+  const sectionRef  = useRef<HTMLElement>(null);
+  const headerRef   = useRef<HTMLDivElement>(null);
+  const featuredRef = useRef<HTMLDivElement>(null);
+  const hWrapperRef = useRef<HTMLDivElement>(null);
+  const trackRef    = useRef<HTMLDivElement>(null);
 
   const [lightboxStudy, setLightboxStudy] = useState<CaseStudy | null>(null);
   const openLightbox  = useCallback((s: CaseStudy) => setLightboxStudy(s), []);
@@ -286,8 +284,6 @@ export function CaseStudies() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-
-      // Header
       if (headerRef.current) {
         gsap.from(headerRef.current.querySelectorAll('.hdr-anim'), {
           opacity: 0, y: 36, stagger: 0.13, duration: 1.05, ease: 'power3.out',
@@ -295,7 +291,6 @@ export function CaseStudies() {
         });
       }
 
-      // Featured
       if (featuredRef.current) {
         gsap.from(featuredRef.current, {
           opacity: 0, y: 48, scale: 0.98, duration: 1.1, ease: 'power3.out',
@@ -303,57 +298,46 @@ export function CaseStudies() {
         });
       }
 
-      // ── Horizontal scroll (FIXED) ──────────────────────────────
-      // Only apply on non-mobile screens
       const mm = gsap.matchMedia();
       mm.add('(min-width: 768px)', () => {
         if (!hWrapperRef.current || !trackRef.current) return;
-
         const wrapper = hWrapperRef.current;
         const track   = trackRef.current;
         const cards   = track.querySelectorAll('.gallery-card');
-
         if (cards.length === 0) return;
 
-        // Measure after paint to get accurate dimensions
         const calcAndPin = () => {
           const cardW      = (cards[0] as HTMLElement).offsetWidth;
           const gap        = 24;
           const totalW     = (cardW + gap) * cards.length - gap;
           const wrapperW   = wrapper.offsetWidth;
-          const scrollDist = Math.max(0, totalW - wrapperW + 80); // +80 for right padding
-
+          const scrollDist = Math.max(0, totalW - wrapperW + 80);
           if (scrollDist <= 0) return;
 
           gsap.to(track, {
             x: -scrollDist,
             ease: 'none',
             scrollTrigger: {
-              trigger:      wrapper,
-              pin:          true,
-              scrub:        1.2,
-              end:          `+=${scrollDist}`,
+              trigger: wrapper,
+              pin: true,
+              scrub: 1.2,
+              end: `+=${scrollDist}`,
               anticipatePin: 1,
-              // CRITICAL: pinSpacing accounts for the scrolling distance
-              // so the next section appears at the right time
-              pinSpacing:   true,
+              pinSpacing: true,
             },
           });
         };
 
-        // Small timeout ensures layout is complete
         const raf = requestAnimationFrame(calcAndPin);
         return () => cancelAnimationFrame(raf);
       });
 
-      // Cards entrance
       if (trackRef.current) {
         gsap.from(trackRef.current.querySelectorAll('.gallery-card'), {
           opacity: 0, y: 40, stagger: 0.09, duration: 0.9, ease: 'power3.out',
           scrollTrigger: { trigger: hWrapperRef.current, start: 'top 88%', toggleActions: 'play none none none' },
         });
       }
-
     }, sectionRef);
 
     return () => ctx.revert();
@@ -369,36 +353,54 @@ export function CaseStudies() {
         className="relative w-full"
         style={{ background: 'var(--color-bg)', borderTop: '1px solid rgba(197,160,89,0.07)' }}
       >
-        {/* Background texture */}
         <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `radial-gradient(ellipse 70% 50% at 90% 20%, rgba(197,160,89,0.03) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 10% 80%, rgba(197,160,89,0.02) 0%, transparent 60%)` }} />
 
-        {/* ── Header + Featured ─────────────────────────────── */}
+        {/* ── HEADER — NOW CENTRED ─────────────────────────── */}
         <div
           className="relative mx-auto w-full"
-          style={{ maxWidth: '1340px', padding: 'clamp(80px, 9vw, 120px) clamp(20px, 4vw, 64px) 0' }}
+          style={{ maxWidth: '1340px', padding: 'clamp(72px, 8vw, 112px) clamp(20px, 4vw, 64px) 0' }}
         >
-          {/* Header */}
-          <div ref={headerRef} className="mb-12 md:mb-16" style={{ maxWidth: '640px' }}>
-            <div className="hdr-anim flex items-center gap-4 mb-6">
-              <span style={{ display: 'block', height: '1px', width: '36px', background: 'var(--color-accent-1)', opacity: 0.6 }} />
+          <div
+            ref={headerRef}
+            className="mb-10 md:mb-14 text-center mx-auto"
+            style={{ maxWidth: '640px' }}
+          >
+            {/* Eyebrow — centred */}
+            <div className="hdr-anim flex items-center justify-center gap-4 mb-6">
+              <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.6 }} />
               <span style={{ fontSize: '0.62rem', letterSpacing: '0.34em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', fontWeight: 500, color: 'var(--color-accent-1)' }}>Our Work</span>
+              <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.6 }} />
             </div>
-            <h2 className="hdr-anim" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.2rem, 5vw, 4.8rem)', fontWeight: 300, lineHeight: 1.04, letterSpacing: '-0.025em', color: 'var(--color-text)', marginBottom: '1rem' }}>
+
+            {/* Headline — centred */}
+            <h2 className="hdr-anim" style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.2rem, 5vw, 4.8rem)',
+              fontWeight: 300, lineHeight: 1.04, letterSpacing: '-0.025em',
+              color: 'var(--color-text)', marginBottom: '1rem',
+            }}>
               Moments That<br />
               <em style={{ fontStyle: 'italic', color: 'var(--color-accent-1)' }}>Define Legacy.</em>
             </h2>
-            <p className="hdr-anim" style={{ fontSize: 'clamp(0.82rem, 1.05vw, 0.9rem)', fontFamily: 'var(--font-body)', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-muted)', maxWidth: '380px' }}>
-              Selected engagements across six continents — each one a study in precision, storytelling, and the art of leaving nothing to chance.
+
+            {/* Subtext — centred */}
+            <p className="hdr-anim mx-auto" style={{
+              fontSize: 'clamp(0.8rem, 1vw, 0.88rem)',
+              fontFamily: 'var(--font-body)', fontWeight: 300,
+              lineHeight: 1.8, color: 'var(--color-text-muted)',
+            }}>
+              Selected engagements across six continents — each one a study in precision,
+              storytelling, and the art of leaving nothing to chance.
             </p>
           </div>
 
-          {/* Featured */}
-          <div ref={featuredRef} className="mb-14 md:mb-20">
+          {/* Featured image — full width below centred header */}
+          <div ref={featuredRef} className="mb-12 md:mb-18">
             <FeaturedStudy study={FEATURED_STUDY} onOpen={openLightbox} />
           </div>
         </div>
 
-        {/* ── Gallery label ──────────────────────────────────── */}
+        {/* Gallery label */}
         <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 clamp(20px, 4vw, 64px) 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <span style={{ height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.45, display: 'block' }} />
@@ -408,43 +410,28 @@ export function CaseStudies() {
           </div>
         </div>
 
-        {/* ── Horizontal gallery wrapper ──────────────────────── */}
-        {/*
-          FIXED: The wrapper uses overflow:hidden to clip cards correctly.
-          The pin is applied to this wrapper. pinSpacing: true (default)
-          inserts correct spacing so the next section appears at the right point.
-        */}
-        <div
-          ref={hWrapperRef}
-          style={{
-            overflow:    'hidden',
-            width:       '100%',
-          }}
-        >
-          {/* Desktop: horizontal flex track */}
+        {/* Horizontal gallery */}
+        <div ref={hWrapperRef} style={{ overflow: 'hidden', width: '100%' }}>
           <div
             ref={trackRef}
             className="gallery-track"
             style={{
-              display:        'flex',
-              gap:            '24px',
-              width:          'max-content',
-              paddingLeft:    'clamp(20px, 4vw, 64px)',
-              paddingRight:   'clamp(40px, 6vw, 96px)',
-              paddingTop:     '8px',
-              paddingBottom:  'clamp(64px, 7vw, 96px)',
+              display: 'flex', gap: '24px',
+              width: 'max-content',
+              paddingLeft: 'clamp(20px, 4vw, 64px)',
+              paddingRight: 'clamp(40px, 6vw, 96px)',
+              paddingTop: '8px',
+              paddingBottom: 'clamp(56px, 6vw, 88px)',
             }}
           >
             {GALLERY_STUDIES.map((study) => (
               <GalleryCard key={study.id} study={study} onOpen={openLightbox} />
             ))}
           </div>
-
-          {/* Mobile fallback: vertical scroll (CSS shows/hides via media query) */}
         </div>
 
-        {/* ── Bottom CTA ─────────────────────────────────────── */}
-        <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 clamp(20px, 4vw, 64px)', paddingBottom: 'clamp(72px, 8vw, 112px)' }}>
+        {/* Bottom CTA */}
+        <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 clamp(20px, 4vw, 64px)', paddingBottom: 'clamp(64px, 7vw, 96px)' }}>
           <motion.div
             className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
             initial={{ opacity: 0, y: 24 }}
@@ -471,7 +458,6 @@ export function CaseStudies() {
           </motion.div>
         </div>
 
-        {/* ── Mobile gallery override styles ─────────────────── */}
         <style>{`
           @media (max-width: 767px) {
             .gallery-track {
@@ -482,7 +468,7 @@ export function CaseStudies() {
             }
             .gallery-track .gallery-card {
               width: 100% !important;
-              height: clamp(300px, 70vw, 480px) !important;
+              height: clamp(280px, 68vw, 440px) !important;
               flex-shrink: unset !important;
             }
           }

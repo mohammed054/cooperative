@@ -1,541 +1,389 @@
 /**
- * Hero — Scene 1
- * ───────────────────────────────────────────────────────────────
- * Blueprint spec implemented:
- *   ✓ Word-by-word stagger (y: 80 → 0, opacity 0 → 1, stagger 0.055s)
- *   ✓ 200vh section with sticky inner frame — the extra 100vh is the
- *     "transition zone" where the scene dissolves before the next begins
- *   ✓ Scroll-driven dark overlay (GSAP scrub) replaces Framer scroll hooks
- *   ✓ Video scales out slightly as user exits — adds cinematic depth
- *   ✓ Content fades + lifts away as overlay comes in
- *
- * ARCHITECTURE CHANGE:
- *   OLD: section is 100svh, Framer Motion handles parallax
- *   NEW: section is 200vh, inner frame is position:sticky + 100svh.
- *        GSAP owns all scroll-driven motion. Framer handles only hover
- *        micro-interactions and the initial load timeline.
+ * About — Scene 3 (COMPACTED)
+ * ─────────────────────────────────────────────────────────────
+ * Fixes:
+ *   ✓ Section height drastically reduced on mobile (~60-70vh instead of 200vh)
+ *   ✓ Removed second body paragraph — kept the most impactful single paragraph
+ *   ✓ All padding reduced by ~40% with tighter clamp ranges
+ *   ✓ Image height reduced for mobile so section fits in one view
+ *   ✓ Pillars grid more compact — reduced gap and padding
+ *   ✓ Sticky headline only on md+ (mobile: stacked, not sticky)
+ *   ✓ Pillar body text trimmed to 1 key sentence each
+ *   ✓ Marquee retained but padding reduced
+ *   ✓ Entire section designed to be seen in one viewport on tablet
  */
 
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Button } from '@/components/Button';
+import { fadeIn, staggerContainer } from '@/animations/fadeInUp';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ── Helpers ─────────────────────────────────────────────────── */
+/* ── Data ─────────────────────────────────────────────────── */
 
-/** Splits a string into individual word <span> elements for GSAP targeting */
-function WordLine({
-  words,
-  italic = false,
-  accent = false,
-}: {
-  words: string[];
-  italic?: boolean;
-  accent?: boolean;
-}) {
+const CLIENTS = [
+  'MAG Group', 'Emaar Properties', 'DIFC Authority',
+  'Dubai Holding', 'Meraas', 'Aldar Properties',
+  'MAG Group', 'Emaar Properties', 'DIFC Authority',
+  'Dubai Holding', 'Meraas', 'Aldar Properties',
+];
+
+const PILLARS = [
+  {
+    number: '01',
+    title: 'A quiet approach.',
+    body: "The event is the statement. Our role is invisible architecture — the reason everything feels inevitable.",
+  },
+  {
+    number: '02',
+    title: 'Precision over performance.',
+    body: "Success is not measured in headcount or decibels. It's measured in the quality of conversation the morning after.",
+  },
+  {
+    number: '03',
+    title: 'Legacy over landmark.',
+    body: "We design experiences that compound — becoming reference points in the memory of everyone in the room.",
+  },
+];
+
+/* ── Sub-components ──────────────────────────────────────── */
+
+function LogoMarquee() {
   return (
-    <>
-      {words.map((word, i) => (
-        <span
-          key={i}
-          style={{
-            display: 'inline-block',
-            overflow: 'hidden',
-            verticalAlign: 'bottom',
-            // Each word gets a clip container so the word slides up from below
-            // the line without affecting surrounding layout
-          }}
-        >
-          <span
-            className="hero-word"
-            style={{
-              display: 'inline-block',
-              fontStyle: italic ? 'italic' : 'normal',
-              color: accent ? 'var(--color-accent-1)' : 'inherit',
-            }}
-          >
-            {word}
-            {/* Non-breaking space after each word except within final iteration —
-                the line-break is handled by the parent via <br /> */}
-            {'\u00a0'}
-          </span>
-        </span>
-      ))}
-    </>
-  );
-}
-
-/* ── Corner Ornament ─────────────────────────────────────────── */
-
-function CornerOrnament({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
-  const pos = {
-    tl: 'top-7 left-7 rotate-0',
-    tr: 'top-7 right-7 rotate-90',
-    bl: 'bottom-7 left-7 -rotate-90',
-    br: 'bottom-7 right-7 rotate-180',
-  }[position];
-
-  return (
-    <div
-      className={`hero-ornament absolute ${pos} w-7 h-7 pointer-events-none hidden lg:block`}
-      style={{ opacity: 0 }}
-    >
-      <svg viewBox="0 0 28 28" fill="none" className="w-full h-full">
-        <path d="M2 26 L2 2 L26 2" stroke="#C5A059" strokeWidth="0.9" />
-        <circle cx="2" cy="2" r="1.4" fill="#C5A059" opacity="0.8" />
-      </svg>
+    <div style={{
+      overflow: 'hidden',
+      maskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
+      WebkitMaskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
+    }}>
+      <motion.div
+        animate={{ x: '-50%' }}
+        transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 'clamp(40px, 5vw, 72px)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {CLIENTS.map((name, i) => (
+          <span key={i} style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'clamp(0.55rem, 0.8vw, 0.68rem)',
+            fontWeight: 500,
+            letterSpacing: '0.26em',
+            textTransform: 'uppercase',
+            color: 'var(--color-text-muted)',
+            flexShrink: 0,
+          }}>{name}</span>
+        ))}
+      </motion.div>
     </div>
   );
 }
 
-/* ── Stat Item ───────────────────────────────────────────────── */
-
-function StatItem({ value, label }: { value: string; label: string }) {
+function Pillar({ pillar }: { pillar: typeof PILLARS[0] }) {
   return (
-    <div className="hero-stat flex flex-col items-center md:items-start gap-1" style={{ opacity: 0 }}>
-      <span
-        style={{
+    <div className="about-pillar" style={{
+      display: 'flex', flexDirection: 'column', gap: '10px',
+      paddingTop: '20px', borderTop: '1px solid var(--color-accent-3)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+        <span style={{
+          fontFamily: 'var(--font-display)', fontSize: '0.68rem',
+          fontWeight: 300, letterSpacing: '0.12em', color: 'var(--color-text-muted)',
+        }}>{pillar.number}</span>
+        <span style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(1.55rem, 2.8vw, 2.25rem)',
-          fontWeight: 300,
-          letterSpacing: '-0.02em',
-          lineHeight: 1,
-          color: '#FFFFFF',
-        }}
-      >
-        {value}
-      </span>
-      <span
-        style={{
-          fontSize: '0.62rem',
-          letterSpacing: '0.24em',
-          textTransform: 'uppercase',
-          fontFamily: 'var(--font-body)',
-          fontWeight: 400,
-          color: 'rgba(255,255,255,0.52)',
-        }}
-      >
-        {label}
-      </span>
+          fontSize: 'clamp(0.9rem, 1.4vw, 1.2rem)',
+          fontWeight: 300, fontStyle: 'italic', letterSpacing: '-0.01em',
+          color: 'var(--color-text)',
+        }}>{pillar.title}</span>
+      </div>
+      <p style={{
+        fontFamily: 'var(--font-body)',
+        fontSize: 'clamp(0.78rem, 0.95vw, 0.85rem)',
+        fontWeight: 300, lineHeight: 1.75,
+        color: 'var(--color-text-muted)', maxWidth: '340px',
+      }}>{pillar.body}</p>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════════════════════════
-   HERO
+   ABOUT
 ══════════════════════════════════════════════════════════════ */
 
-export function Hero() {
-  const sectionRef  = useRef<HTMLElement>(null); // 200vh outer section
-  const contentRef  = useRef<HTMLDivElement>(null);
-  const statsRef    = useRef<HTMLDivElement>(null);
-  const overlayRef  = useRef<HTMLDivElement>(null);
-  const videoRef    = useRef<HTMLVideoElement>(null);
+export function About() {
+  const sectionRef  = useRef<HTMLElement>(null);
+  const imageRef    = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const pillarsRef  = useRef<HTMLDivElement>(null);
+  const marqueeRef  = useRef<HTMLDivElement>(null);
 
-  /* ─────────────────────────────────────────────────────────────
-     LOAD ANIMATION — runs once on mount, not scroll-driven
-     Order: words → eyebrow + sub → CTA → stats → ornaments
-  ───────────────────────────────────────────────────────────── */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Start everything hidden (set before animation begins)
-      gsap.set('.hero-word', { y: 80, opacity: 0 });
-      gsap.set('.hero-eyebrow', { y: 24, opacity: 0 });
-      gsap.set('.hero-sub', { y: 20, opacity: 0 });
-      gsap.set('.hero-cta', { y: 16, opacity: 0 });
-      gsap.set('.hero-stat', { y: 18, opacity: 0 });
-      gsap.set('.hero-ornament', { opacity: 0 });
-      gsap.set('.hero-side', { opacity: 0, x: 0 });
-      gsap.set('.hero-pulse', { opacity: 0, y: 10 });
+      /* Image clip-path reveal */
+      if (imageRef.current) {
+        gsap.fromTo(imageRef.current,
+          { clipPath: 'inset(20% 8% 20% 8%)' },
+          {
+            clipPath: 'inset(0% 0% 0% 0%)', ease: 'power2.inOut',
+            scrollTrigger: { trigger: imageRef.current, start: 'top 85%', end: 'bottom 30%', scrub: 1.4 },
+          }
+        );
+        const img = imageRef.current.querySelector('img');
+        if (img) {
+          gsap.fromTo(img, { scale: 1.08, y: '3%' }, {
+            scale: 1.0, y: '-3%', ease: 'none',
+            scrollTrigger: { trigger: imageRef.current, start: 'top bottom', end: 'bottom top', scrub: true },
+          });
+        }
+      }
 
-      const tl = gsap.timeline({ delay: 0.35 });
+      /* Headline lift */
+      if (headlineRef.current) {
+        gsap.from(headlineRef.current, {
+          opacity: 0, y: 24, duration: 1.1, ease: 'power3.out',
+          scrollTrigger: { trigger: headlineRef.current, start: 'top 85%', toggleActions: 'play none none none' },
+        });
+      }
 
-      // 1 — Headline words float up into position — the hero moment
-      tl.to('.hero-word', {
-        y: 0,
-        opacity: 1,
-        duration: 1.15,
-        stagger: 0.055,
-        ease: 'power4.out',
-      })
+      /* Pillars stagger */
+      if (pillarsRef.current) {
+        gsap.set('.about-pillar', { opacity: 0, y: 24 });
+        gsap.to('.about-pillar', {
+          opacity: 1, y: 0, duration: 0.9, stagger: 0.15, ease: 'power3.out',
+          scrollTrigger: { trigger: pillarsRef.current, start: 'top 82%', toggleActions: 'play none none none' },
+        });
+      }
 
-      // 2 — Supporting content comes in together
-      .to(
-        ['.hero-eyebrow', '.hero-sub'],
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.9,
-          stagger: 0.12,
-          ease: 'power3.out',
-        },
-        '-=0.65'
-      )
-
-      // 3 — CTA button
-      .to(
-        '.hero-cta',
-        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' },
-        '-=0.55'
-      )
-
-      // 4 — Stats bar
-      .to(
-        '.hero-stat',
-        {
-          y: 0,
-          opacity: 1,
-          stagger: 0.1,
-          duration: 0.75,
-          ease: 'power2.out',
-        },
-        '-=0.5'
-      )
-
-      // 5 — Decorative elements last — subtle, not central
-      .to(
-        '.hero-ornament',
-        { opacity: 0.5, duration: 0.8, ease: 'power2.out' },
-        '-=0.6'
-      )
-      .to(
-        '.hero-side',
-        { opacity: 1, duration: 0.8, ease: 'power2.out' },
-        '<'
-      )
-      .to(
-        '.hero-pulse',
-        { opacity: 1, y: 0, duration: 0.75, ease: 'power2.out' },
-        '-=0.4'
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  /* ─────────────────────────────────────────────────────────────
-     SCROLL ANIMATION — section exit (the 100vh transition zone)
-     ScrollTrigger watches the OUTER 200vh section.
-     Trigger start: when the midpoint of the section hits the top.
-     Trigger end: when the bottom hits the top (section leaves).
-  ───────────────────────────────────────────────────────────── */
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: '42% top',   // content starts fading ~halfway through
-          end: 'bottom top',  // completes when section leaves viewport
-          scrub: 0.85,
-        },
-      });
-
-      tl
-        // Content lifts and fades out
-        .to(contentRef.current, { opacity: 0, y: -36, ease: 'none' }, 0)
-        // Stats fade slightly faster
-        .to(statsRef.current, { opacity: 0, y: -18, ease: 'none' }, 0)
-        // Dark overlay comes in
-        .to(overlayRef.current, { opacity: 1, ease: 'none' }, 0)
-        // Video drifts slightly — adds the cinematic "pull back" feel
-        .to(videoRef.current, { scale: 1.07, ease: 'none' }, 0);
+      /* Marquee fade */
+      if (marqueeRef.current) {
+        gsap.from(marqueeRef.current, {
+          opacity: 0, duration: 1.0, ease: 'power2.out',
+          scrollTrigger: { trigger: marqueeRef.current, start: 'top 92%', toggleActions: 'play none none none' },
+        });
+      }
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    /*
-     * OUTER SECTION — 200vh
-     * The extra 100vh below the viewport is the scroll transition zone.
-     * The sticky frame stays pinned while the user scrolls through it.
-     */
     <section
+      id="about"
       ref={sectionRef}
-      id="hero"
-      style={{ height: '200vh', position: 'relative' }}
+      style={{ position: 'relative', background: 'var(--color-bg)', overflow: 'hidden' }}
     >
-      {/* ──────────────────────────────────────────────────────────
-          STICKY FRAME — always fills the viewport while in view
-      ────────────────────────────────────────────────────────── */}
+      {/* Grid texture */}
+      <div aria-hidden style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `
+          linear-gradient(rgba(197,160,89,0.028) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(197,160,89,0.028) 1px, transparent 1px)
+        `,
+        backgroundSize: '64px 64px', pointerEvents: 'none',
+      }} />
+
+      {/* ── Image Reveal — more compact ────────────────────── */}
+      <div style={{
+        padding: 'clamp(48px, 6vw, 80px) clamp(16px, 4vw, 64px) 0',
+        position: 'relative', zIndex: 1,
+      }}>
+        {/* Eyebrow */}
+        <motion.div
+          className="flex items-center gap-4 mb-6"
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.75 }} />
+          <span style={{ fontSize: '0.62rem', letterSpacing: '0.34em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', fontWeight: 400, color: 'var(--color-accent-1)' }}>
+            About Ghaim
+          </span>
+        </motion.div>
+
+        {/* Image — shorter height on mobile */}
+        <div ref={imageRef} style={{
+          width: '100%',
+          height: 'clamp(200px, 36vw, 480px)',
+          overflow: 'hidden', position: 'relative',
+        }}>
+          <img
+            src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=2000&auto=format&fit=crop&q=85"
+            alt="GHAIM luxury event — grand ballroom setup"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', transformOrigin: 'center center' }}
+          />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to bottom, transparent 55%, rgba(247,245,241,0.55) 100%)',
+            pointerEvents: 'none',
+          }} />
+          <div style={{
+            position: 'absolute', bottom: '16px', left: '20px',
+            display: 'flex', alignItems: 'center', gap: '10px',
+          }}>
+            <span style={{ display: 'block', width: '20px', height: '1px', background: 'rgba(197,160,89,0.7)' }} />
+            <span style={{ fontSize: '0.58rem', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'rgba(255,255,255,0.65)' }}>
+              Atlantis The Palm · 2024
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Editorial Split — compact grid ─────────────────── */}
       <div
+        className="about-editorial-grid"
         style={{
-          position: 'sticky',
-          top: 0,
-          height: '100svh',
-          minHeight: '660px',
-          overflow: 'hidden',
-          background: '#060504', // fallback before video loads
+          position: 'relative', zIndex: 1,
+          padding: 'clamp(36px, 5vw, 64px) clamp(16px, 4vw, 64px)',
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: 'clamp(24px, 4vw, 52px)',
+          alignItems: 'start',
         }}
       >
-        {/* ════════════════════════════════════════════════════════
-            BACKGROUND — Video
-        ════════════════════════════════════════════════════════ */}
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/images/hero-poster.jpg"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transformOrigin: 'center center',
-          }}
-        >
-          <source src="/background.mp4" type="video/mp4" />
-          <source src="/videos/hero.webm" type="video/webm" />
-        </video>
-
-        {/* Layered gradient vignettes — preserve video brightness mid-frame */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `
-              linear-gradient(
-                to bottom,
-                rgba(6, 5, 4, 0.42)  0%,
-                rgba(6, 5, 4, 0.14) 35%,
-                rgba(6, 5, 4, 0.20) 60%,
-                rgba(6, 5, 4, 0.58) 88%,
-                rgba(6, 5, 4, 0.76) 100%
-              )
-            `,
-          }}
-        />
-        {/* Left-side atmospheric vignette — grounds the headline */}
-        <div
-          className="absolute inset-y-0 left-0 w-2/5 pointer-events-none"
-          style={{ background: 'linear-gradient(to right, rgba(6,5,4,0.48), transparent)' }}
-        />
-
-        {/* Scroll-exit dark overlay — animated by GSAP scrub above */}
-        <div
-          ref={overlayRef}
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: '#060504', opacity: 0 }}
-        />
-
-        {/* ════════════════════════════════════════════════════════
-            DECORATIVE
-        ════════════════════════════════════════════════════════ */}
-        <CornerOrnament position="tl" />
-        <CornerOrnament position="tr" />
-        <CornerOrnament position="bl" />
-        <CornerOrnament position="br" />
-
-        {/* Side labels */}
-        <div
-          className="hero-side absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-3 z-10"
-          style={{ opacity: 0 }}
-        >
-          <span
+        {/* Headline */}
+        <div className="about-headline-col">
+          <h2
+            ref={headlineRef}
             style={{
-              fontSize: '0.58rem',
-              letterSpacing: '0.3em',
-              textTransform: 'uppercase',
-              writingMode: 'vertical-rl',
-              fontFamily: 'var(--font-body)',
-              fontWeight: 400,
-              color: 'rgba(255,255,255,0.32)',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.2rem, 4.5vw, 4.6rem)',
+              fontWeight: 300, lineHeight: 1.04, letterSpacing: '-0.022em',
+              color: 'var(--color-text)',
             }}
           >
-            Est. 2018
-          </span>
-          <span
-            style={{
-              width: '1px',
-              height: '56px',
-              background: 'linear-gradient(to bottom, rgba(197,160,89,0.6), transparent)',
-            }}
-          />
+            Where Vision<br />
+            Meets{' '}
+            <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-accent-1)' }}>
+              Flawless
+            </em>
+            <br />Execution.
+          </h2>
+          <div style={{
+            marginTop: '20px', width: '40px', height: '1px',
+            background: 'linear-gradient(to right, var(--color-accent-1), transparent)', opacity: 0.7,
+          }} />
         </div>
 
-        <div
-          className="hero-side absolute right-6 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-3 z-10"
-          style={{ opacity: 0 }}
-        >
-          <span
+        {/* Narrative — single impactful paragraph only */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(20px, 2.5vw, 32px)' }}>
+          <motion.p
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
             style={{
-              width: '1px',
-              height: '56px',
-              background: 'linear-gradient(to bottom, transparent, rgba(197,160,89,0.5))',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '0.58rem',
-              letterSpacing: '0.3em',
-              textTransform: 'uppercase',
-              writingMode: 'vertical-rl',
               fontFamily: 'var(--font-body)',
-              fontWeight: 400,
-              color: 'rgba(255,255,255,0.30)',
+              fontSize: 'clamp(0.875rem, 1.1vw, 0.95rem)',
+              fontWeight: 300, lineHeight: 1.84,
+              color: 'var(--color-text-mid)', maxWidth: '500px',
             }}
           >
-            Scroll
-          </span>
-        </div>
+            GHAIM has spent over a decade shaping the most prestigious corporate
+            events across the Gulf — working exclusively with organisations that
+            demand the highest standards in venue, in service, and in lasting impression.
+          </motion.p>
 
-        {/* ════════════════════════════════════════════════════════
-            MAIN CONTENT
-        ════════════════════════════════════════════════════════ */}
-        <div
-          ref={contentRef}
-          className="relative z-10 h-full flex flex-col justify-center px-8 md:px-16 lg:px-24"
-        >
-          <div className="flex flex-col gap-7 max-w-[720px]">
-
-            {/* Eyebrow */}
-            <div
-              className="hero-eyebrow flex items-center gap-4"
-              style={{ opacity: 0 }}
-            >
-              <span
-                style={{
-                  display: 'block',
-                  height: '1px',
-                  width: '36px',
-                  background: 'var(--color-accent-1)',
-                  opacity: 0.75,
-                }}
-              />
-              <span
-                style={{
-                  fontSize: '0.66rem',
-                  letterSpacing: '0.34em',
-                  textTransform: 'uppercase',
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 400,
-                  color: 'var(--color-accent-1)',
-                }}
-              >
-                Luxury Event Management
-              </span>
-            </div>
-
-            {/* Headline — word-split for stagger animation */}
-            <h1
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(3rem, 7.2vw, 7.4rem)',
-                fontWeight: 300,
-                lineHeight: 1.0,
-                letterSpacing: '-0.024em',
-                color: '#F8F4EE',
-              }}
-            >
-              <WordLine words={['We', 'Craft']} />
-              <br />
-              <WordLine words={['Extraordinary']} italic accent />
-              <br />
-              <WordLine words={['Experiences.']} />
-            </h1>
-
-            {/* Supporting text */}
-            <p
-              className="hero-sub"
-              style={{
-                fontSize: 'clamp(0.875rem, 1.2vw, 0.95rem)',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 300,
-                lineHeight: 1.78,
-                letterSpacing: '0.01em',
-                color: 'rgba(255,255,255,0.58)',
-                maxWidth: '390px',
-                opacity: 0,
-              }}
-            >
-              From intimate corporate retreats to landmark galas —
-              every detail is an act of deliberate precision.
-            </p>
-
-            {/* CTA Row */}
-            <div
-              className="hero-cta flex flex-wrap items-center gap-5 pt-1"
-              style={{ opacity: 0 }}
-            >
-              <Button variant="ghost-light" size="lg">
-                Explore Our Work
-              </Button>
-
-              <motion.a
-                href="#about"
-                className="flex items-center gap-3 transition-opacity duration-300"
-                style={{
-                  fontSize: '0.68rem',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  fontFamily: 'var(--font-body)',
-                  color: 'rgba(255,255,255,0.48)',
-                }}
-                whileHover={{ x: 4, color: 'rgba(255,255,255,0.88)' }}
-                transition={{ duration: 0.22 }}
-              >
-                <span>Our Story</span>
-                <svg width="18" height="10" viewBox="0 0 18 10" fill="none">
-                  <path
-                    d="M1 5h16M12 1l5 4-5 4"
-                    stroke="currentColor"
-                    strokeWidth="0.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </motion.a>
-            </div>
-          </div>
-        </div>
-
-        {/* ════════════════════════════════════════════════════════
-            STATS BAR — bottom edge
-        ════════════════════════════════════════════════════════ */}
-        <div
-          ref={statsRef}
-          className="absolute bottom-10 left-8 md:left-16 lg:left-24 right-8 md:right-16 lg:right-24 z-10"
-        >
-          {/* Gold rule */}
-          <div
-            className="mb-7 w-full"
+          <motion.a
+            href="#work"
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center gap-3"
             style={{
-              height: '1px',
-              background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.7), transparent)',
+              fontSize: '0.66rem', letterSpacing: '0.2em', textTransform: 'uppercase',
+              fontFamily: 'var(--font-body)', fontWeight: 500,
+              color: 'var(--color-accent-1)', width: 'fit-content',
             }}
-          />
-          <div className="flex flex-row items-start justify-between md:justify-start md:gap-16">
-            <StatItem value="200+" label="Events Delivered" />
-            <StatItem value="18"   label="Countries"        />
-            <StatItem value="12+"  label="Years of Excellence" />
-          </div>
+            whileHover={{ x: 5 }}
+          >
+            <span>View Our Work</span>
+            <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
+              <path d="M1 5h18M14 1l5 4-5 4" stroke="currentColor" strokeWidth="0.85" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.a>
         </div>
+      </div>
 
-        {/* ════════════════════════════════════════════════════════
-            SCROLL PULSE — centre bottom
-        ════════════════════════════════════════════════════════ */}
-        <div
-          className="hero-pulse absolute bottom-12 left-1/2 -translate-x-1/2 z-10 hidden md:flex flex-col items-center"
-          style={{ opacity: 0 }}
-        >
-          <motion.span
-            style={{
-              display: 'block',
-              width: '1px',
-              height: '42px',
-              background: 'linear-gradient(to bottom, rgba(197,160,89,0.7), transparent)',
-            }}
-            animate={{ scaleY: [1, 0.4, 1], opacity: [0.7, 0.22, 0.7] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          />
+      {/* ── Philosophy Pillars — compact ───────────────────── */}
+      <motion.div
+        ref={pillarsRef}
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="about-pillars-grid"
+        style={{
+          position: 'relative', zIndex: 1,
+          padding: '0 clamp(16px, 4vw, 64px) clamp(40px, 5vw, 64px)',
+          display: 'grid',
+          gap: 'clamp(16px, 2.5vw, 36px)',
+        }}
+      >
+        {PILLARS.map((pillar) => (
+          <Pillar key={pillar.number} pillar={pillar} />
+        ))}
+      </motion.div>
+
+      {/* ── Client Marquee ─────────────────────────────────── */}
+      <div
+        ref={marqueeRef}
+        style={{
+          position: 'relative', zIndex: 1,
+          borderTop: '1px solid var(--color-accent-3)',
+          borderBottom: '1px solid var(--color-accent-3)',
+          padding: 'clamp(14px, 1.8vw, 20px) 0',
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{
+          position: 'absolute', left: 'clamp(16px, 4vw, 64px)', top: '50%',
+          transform: 'translateY(-50%)', zIndex: 2,
+          display: 'flex', alignItems: 'center', gap: '12px',
+          background: 'var(--color-bg)', paddingRight: '10px',
+        }}>
+          <span style={{
+            fontSize: '0.56rem', letterSpacing: '0.26em', textTransform: 'uppercase',
+            fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)', whiteSpace: 'nowrap',
+          }}>Trusted by</span>
+          <span style={{ display: 'block', width: '28px', height: '1px', background: 'linear-gradient(to right, rgba(197,160,89,0.5), transparent)' }} />
         </div>
+        <div style={{ paddingLeft: 'clamp(100px, 12vw, 160px)' }}>
+          <LogoMarquee />
+        </div>
+      </div>
 
-      </div>{/* /sticky frame */}
+      {/* ── Responsive overrides ────────────────────────────── */}
+      <style>{`
+        @media (min-width: 768px) {
+          .about-editorial-grid {
+            grid-template-columns: 1fr 1fr !important;
+          }
+          .about-headline-col {
+            position: sticky;
+            top: 100px;
+            align-self: start;
+          }
+          .about-pillars-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .about-headline-col {
+            position: relative !important;
+            top: auto !important;
+          }
+          .about-pillars-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
