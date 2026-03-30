@@ -1,21 +1,13 @@
 /**
- * Navbar — FIXED
- * ─────────────────────────────────────────────────────────────
- * FIX: Hamburger menu was visible on desktop.
- *   Root cause: Tailwind 'lg:hidden' might not compile if content path
- *   is misconfigured. Added explicit CSS class 'nav-hamburger' with
- *   a media query in this component to guarantee correct behavior.
- *
- * FIX: Desktop nav items ('nav-desktop') also have explicit media query.
- *   Prevents dual-display if Tailwind classes fail.
- *
- * No design changes — purely a visibility fix.
+ * Navbar — LIGHT-THEME AWARE
+ * FIX: Adapts between dark (hero/statement) and light (about/testimonials) sections.
+ * - Top of page: transparent, white text
+ * - Scrolled in dark zone (<280vh): dark glass bg, white text
+ * - Scrolled in light zone (>280vh): cream bg, dark text
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-/* ── Dropdown data ──────────────────────────────────────────── */
 
 const NAV_ITEMS = [
   {
@@ -24,12 +16,12 @@ const NAV_ITEMS = [
       heading: 'What We Do',
       description: 'End-to-end production for events that demand the extraordinary.',
       links: [
-        { label: 'Event Production',   sub: 'Full-spectrum management',      href: '#services' },
-        { label: 'Corporate Retreats', sub: 'Executive-level experiences',   href: '#services' },
-        { label: 'Gala & Ceremonies',  sub: 'Prestige celebrations',         href: '#services' },
-        { label: 'Investor Forums',    sub: 'High-stakes convening',         href: '#services' },
-        { label: 'Brand Activations',  sub: 'Immersive brand experiences',   href: '#services' },
-        { label: 'Summit & Retreats',  sub: 'Thought leadership platforms',  href: '#services' },
+        { label: 'Event Production',   sub: 'Full-spectrum management',     href: '#services' },
+        { label: 'Corporate Retreats', sub: 'Executive-level experiences',  href: '#services' },
+        { label: 'Gala & Ceremonies',  sub: 'Prestige celebrations',        href: '#services' },
+        { label: 'Investor Forums',    sub: 'High-stakes convening',        href: '#services' },
+        { label: 'Brand Activations',  sub: 'Immersive brand experiences',  href: '#services' },
+        { label: 'Summit & Retreats',  sub: 'Thought leadership platforms', href: '#services' },
       ],
     },
   },
@@ -39,11 +31,11 @@ const NAV_ITEMS = [
       heading: 'Selected Projects',
       description: 'A curated portfolio across six continents.',
       links: [
-        { label: 'All Projects',       sub: 'View full portfolio',           href: '#work' },
-        { label: 'Corporate',          sub: 'Retreats & investor forums',    href: '#work' },
-        { label: 'Galas & Awards',     sub: 'Landmark ceremony events',      href: '#work' },
-        { label: 'Weddings',           sub: 'Luxury private celebrations',   href: '#work' },
-        { label: 'Brand & Activation', sub: 'Experiential campaigns',        href: '#work' },
+        { label: 'All Projects',       sub: 'View full portfolio',          href: '#work' },
+        { label: 'Corporate',          sub: 'Retreats & investor forums',   href: '#work' },
+        { label: 'Galas & Awards',     sub: 'Landmark ceremony events',     href: '#work' },
+        { label: 'Weddings',           sub: 'Luxury private celebrations',  href: '#work' },
+        { label: 'Brand & Activation', sub: 'Experiential campaigns',       href: '#work' },
       ],
     },
   },
@@ -54,36 +46,30 @@ const NAV_ITEMS = [
       heading: 'About GHAIM',
       description: 'Twelve years. Six continents. One standard: extraordinary.',
       links: [
-        { label: 'Our Story',    sub: 'Where it all began',           href: '#about' },
-        { label: 'Our Team',     sub: 'The people behind the events', href: '#about' },
-        { label: 'Testimonials', sub: 'Words from our clients',       href: '#testimonials' },
-        { label: 'Press & Media',sub: 'Coverage and mentions',        href: '#about' },
+        { label: 'Our Story',     sub: 'Where it all began',           href: '#about' },
+        { label: 'Our Team',      sub: 'The people behind the events', href: '#about' },
+        { label: 'Testimonials',  sub: 'Words from our clients',       href: '#testimonials' },
+        { label: 'Press & Media', sub: 'Coverage and mentions',        href: '#about' },
       ],
     },
   },
   { label: 'Pricing', href: '#pricing', hasDropdown: false },
 ] as const;
 
-/* ── Chevron ─────────────────────────────────────────────────── */
-
-function Chevron({ open }: { open: boolean }) {
+function Chevron({ open, light }: { open: boolean; light: boolean }) {
   return (
     <svg width="8" height="5" viewBox="0 0 8 5" fill="none"
-      style={{ transition: 'transform 0.28s ease', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}>
-      <path d="M1 1l3 3 3-3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+      style={{ transition: 'transform 0.28s ease', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0, opacity: 0.5 }}>
+      <path d="M1 1l3 3 3-3" stroke={light ? '#1A1A1A' : '#FFFFFF'} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
-
-/* ── Mega Dropdown ──────────────────────────────────────────── */
 
 function MegaDropdown({ item }: { item: (typeof NAV_ITEMS)[number] & { hasDropdown: true } }) {
   const { dropdown } = item;
   return (
     <motion.div
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
+      initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       style={{
         position: 'absolute', top: 'calc(100% + 16px)', left: '50%', transform: 'translateX(-50%)',
@@ -95,12 +81,8 @@ function MegaDropdown({ item }: { item: (typeof NAV_ITEMS)[number] & { hasDropdo
     >
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.5), transparent)' }} />
       <div style={{ marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid rgba(197,160,89,0.1)' }}>
-        <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.58rem', letterSpacing: '0.32em', textTransform: 'uppercase', color: 'var(--color-accent-1)', display: 'block', marginBottom: '6px' }}>
-          {dropdown.heading}
-        </span>
-        <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 300, fontSize: '0.9rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-          {dropdown.description}
-        </p>
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.58rem', letterSpacing: '0.32em', textTransform: 'uppercase', color: 'var(--color-accent-1)', display: 'block', marginBottom: '6px' }}>{dropdown.heading}</span>
+        <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 300, fontSize: '0.9rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>{dropdown.description}</p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4px' }}>
         {'links' in dropdown && dropdown.links.map((link) => (
@@ -109,7 +91,7 @@ function MegaDropdown({ item }: { item: (typeof NAV_ITEMS)[number] & { hasDropdo
             onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(197,160,89,0.05)'; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
-            <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.78rem', fontWeight: 500, color: 'var(--color-text)', letterSpacing: '0.01em' }}>{link.label}</span>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.78rem', fontWeight: 500, color: 'var(--color-text)' }}>{link.label}</span>
             <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.68rem', fontWeight: 300, color: 'var(--color-text-muted)' }}>{link.sub}</span>
           </a>
         ))}
@@ -117,16 +99,12 @@ function MegaDropdown({ item }: { item: (typeof NAV_ITEMS)[number] & { hasDropdo
       <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid rgba(197,160,89,0.1)', display: 'flex', justifyContent: 'flex-end' }}>
         <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-body)', fontSize: '0.62rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-accent-1)', fontWeight: 500 }}>
           Enquire Now
-          <svg width="16" height="8" viewBox="0 0 16 8" fill="none">
-            <path d="M1 4h14M10 1l4 3-4 3" stroke="currentColor" strokeWidth="0.85" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <svg width="16" height="8" viewBox="0 0 16 8" fill="none"><path d="M1 4h14M10 1l4 3-4 3" stroke="currentColor" strokeWidth="0.85" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </a>
       </div>
     </motion.div>
   );
 }
-
-/* ── Mobile Overlay ─────────────────────────────────────────── */
 
 function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
@@ -142,11 +120,8 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
               <img src="/logo.webp" alt="GHAIM" style={{ width: '32px', height: 'auto' }} />
               <span style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '1rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.9)' }}>GHAIM</span>
             </a>
-            <button onClick={onClose} aria-label="Close menu"
-              style={{ width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)', background: 'none', border: '1px solid rgba(197,160,89,0.2)', cursor: 'pointer' }}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M13 1L1 13M1 1l12 12" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-              </svg>
+            <button onClick={onClose} aria-label="Close menu" style={{ width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)', background: 'none', border: '1px solid rgba(197,160,89,0.2)', cursor: 'pointer' }}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M13 1L1 13M1 1l12 12" stroke="currentColor" strokeWidth="1" strokeLinecap="round" /></svg>
             </button>
           </div>
           <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 40px' }}>
@@ -159,18 +134,12 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
               </motion.a>
             ))}
           </nav>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
             style={{ padding: '32px 40px', borderTop: '1px solid rgba(197,160,89,0.1)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <a href="mailto:enquiries@ghaim.ae" style={{ fontFamily: 'var(--font-body)', fontSize: '0.78rem', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em' }}>
-              enquiries@ghaim.ae
-            </a>
-            <a href="#contact" onClick={onClose}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-body)', fontSize: '0.68rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-accent-1)', fontWeight: 500, marginTop: '8px' }}>
+            <a href="mailto:enquiries@ghaim.ae" style={{ fontFamily: 'var(--font-body)', fontSize: '0.78rem', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em' }}>enquiries@ghaim.ae</a>
+            <a href="#contact" onClick={onClose} style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-body)', fontSize: '0.68rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-accent-1)', fontWeight: 500, marginTop: '8px' }}>
               Begin the Conversation
-              <svg width="18" height="8" viewBox="0 0 18 8" fill="none">
-                <path d="M1 4h16M11 1l4 3-4 3" stroke="currentColor" strokeWidth="0.85" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M1 4h16M11 1l4 3-4 3" stroke="currentColor" strokeWidth="0.85" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </a>
           </motion.div>
         </motion.div>
@@ -179,28 +148,25 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   NAVBAR
-══════════════════════════════════════════════════════════════ */
-
 export function Navbar() {
-  const [scrolled,       setScrolled]       = useState(false);
-  const [hidden,         setHidden]         = useState(false);
-  const [mobileOpen,     setMobileOpen]     = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [scrolled,        setScrolled]        = useState(false);
+  const [hidden,          setHidden]          = useState(false);
+  const [isLightSection,  setIsLightSection]  = useState(false);
+  const [mobileOpen,      setMobileOpen]      = useState(false);
+  const [activeDropdown,  setActiveDropdown]  = useState<string | null>(null);
   const lastScrollY = useRef(0);
   const hideTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
-      const y   = window.scrollY;
+      const y  = window.scrollY;
+      const vh = window.innerHeight;
       const dir = y > lastScrollY.current ? 'down' : 'up';
       setScrolled(y > 60);
-      if (dir === 'down' && y - lastScrollY.current > 6 && y > window.innerHeight * 0.7) {
-        setHidden(true);
-      } else if (dir === 'up') {
-        setHidden(false);
-      }
+      // Hero = 0–100vh, Statement outer = 100–280vh. Past 280vh = light cream sections.
+      setIsLightSection(y > vh * 2.6);
+      if (dir === 'down' && y - lastScrollY.current > 6 && y > vh * 0.7) setHidden(true);
+      else if (dir === 'up') setHidden(false);
       lastScrollY.current = y;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -212,13 +178,34 @@ export function Navbar() {
   const stayOpen      = useCallback(() => { if (hideTimer.current) clearTimeout(hideTimer.current); }, []);
   useEffect(() => () => { if (hideTimer.current) clearTimeout(hideTimer.current); }, []);
 
+  // Derived visual state
+  const isLight = isLightSection; // true = cream bg territory
+
+  let navBg: string;
+  let navBorder: string;
+  if (!scrolled) {
+    navBg = 'transparent';
+    navBorder = '1px solid transparent';
+  } else if (isLight) {
+    navBg = 'rgba(247,245,241,0.97)';
+    navBorder = '1px solid rgba(197,160,89,0.12)';
+  } else {
+    navBg = 'rgba(7,6,5,0.88)';
+    navBorder = '1px solid rgba(197,160,89,0.10)';
+  }
+
+  const textBase  = isLight ? 'rgba(26,26,26,0.62)' : 'rgba(255,255,255,0.62)';
+  const textFull  = isLight ? '#1A1A1A' : '#FFFFFF';
+  const logoFilt  = isLight ? 'brightness(0)' : 'brightness(0) invert(1)';
+  const logoColor = isLight ? 'rgba(26,26,26,0.88)' : 'rgba(255,255,255,0.92)';
+  const divColor  = isLight ? 'rgba(26,26,26,0.12)' : 'rgba(255,255,255,0.18)';
+  const burgerColor = isLight ? 'rgba(26,26,26,0.72)' : 'rgba(255,255,255,0.78)';
+
   return (
     <>
-      {/* Explicit responsive CSS — Tailwind backup */}
       <style>{`
-        .nav-hamburger { display: flex !important; }
+        .nav-hamburger { display: flex !important; flex-direction: column; gap: 5px; }
         .nav-desktop   { display: none !important; }
-
         @media (min-width: 1024px) {
           .nav-hamburger { display: none !important; }
           .nav-desktop   { display: flex !important; }
@@ -236,37 +223,21 @@ export function Navbar() {
         }}
         className="fixed top-0 left-0 right-0 z-50"
         style={{
-          background:           scrolled ? 'rgba(7,6,5,0.82)' : 'transparent',
+          background:           navBg,
           backdropFilter:       scrolled ? 'blur(20px) saturate(1.6)' : 'none',
           WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(1.6)' : 'none',
-          borderBottom:         scrolled ? '1px solid rgba(197,160,89,0.10)' : '1px solid transparent',
-          transition:           'background 0.55s ease, border-color 0.55s ease, backdrop-filter 0.55s ease',
+          borderBottom:         navBorder,
+          transition:           'background 0.45s ease, border-color 0.45s ease',
         }}
       >
-        <nav style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 clamp(20px, 4vw, 56px)', height: '70px',
-          maxWidth: '1600px', margin: '0 auto',
-        }}>
+        <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(20px, 4vw, 56px)', height: '70px', maxWidth: '1600px', margin: '0 auto' }}>
 
-          {/* ── Logo ───────────────────────────── */}
           <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, textDecoration: 'none' }}>
-            <img src="/logo.webp" alt="GHAIM" style={{
-              height: '36px', width: 'auto', objectFit: 'contain',
-              filter: 'brightness(0) invert(1)', transition: 'filter 0.45s ease',
-            }} />
-            <span style={{
-              fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '0.9rem',
-              letterSpacing: '0.36em', textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.92)', transition: 'color 0.45s ease',
-            }}>GHAIM</span>
+            <img src="/logo.webp" alt="GHAIM" style={{ height: '36px', width: 'auto', objectFit: 'contain', filter: logoFilt, transition: 'filter 0.45s ease' }} />
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '0.9rem', letterSpacing: '0.36em', textTransform: 'uppercase', color: logoColor, transition: 'color 0.45s ease' }}>GHAIM</span>
           </a>
 
-          {/* ── Desktop Nav — FIXED: uses .nav-desktop class ── */}
-          <ul
-            className="nav-desktop items-center"
-            style={{ gap: 'clamp(24px,3vw,40px)', listStyle: 'none', margin: 0, padding: 0 }}
-          >
+          <ul className="nav-desktop items-center" style={{ gap: 'clamp(24px,3vw,40px)', listStyle: 'none', margin: 0, padding: 0 }}>
             {NAV_ITEMS.map((item) => (
               <li key={item.label} style={{ position: 'relative' }}
                 onMouseEnter={() => item.hasDropdown && openDropdown(item.label)}
@@ -276,17 +247,16 @@ export function Navbar() {
                   display: 'inline-flex', alignItems: 'center', gap: '5px',
                   fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase',
                   fontFamily: 'var(--font-body)', fontWeight: 500,
-                  color: activeDropdown === item.label ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.62)',
+                  color: activeDropdown === item.label ? textFull : textBase,
                   transition: 'color 0.28s ease', position: 'relative', paddingBottom: '4px',
-                }}>
+                }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = textFull; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = activeDropdown === item.label ? textFull : textBase; }}
+                >
                   {item.label}
-                  {item.hasDropdown && <Chevron open={activeDropdown === item.label} />}
+                  {item.hasDropdown && <Chevron open={activeDropdown === item.label} light={isLight} />}
                   <motion.span
-                    style={{
-                      position: 'absolute', bottom: 0, left: 0, right: 0,
-                      height: '1px', background: 'var(--color-accent-1)', transformOrigin: 'left',
-                      scaleX: activeDropdown === item.label ? 1 : 0,
-                    }}
+                    style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px', background: 'var(--color-accent-1)', transformOrigin: 'left' }}
                     animate={{ scaleX: activeDropdown === item.label ? 1 : 0 }}
                     transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                   />
@@ -302,45 +272,20 @@ export function Navbar() {
             ))}
           </ul>
 
-          {/* ── Desktop Right Controls — .nav-desktop ─── */}
           <div className="nav-desktop items-center gap-5" style={{ flexShrink: 0 }}>
-            <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.18)', transition: 'background 0.45s ease' }} />
-            <a href="#contact"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                padding: '9px 20px', border: '1px solid rgba(197,160,89,0.50)',
-                fontFamily: 'var(--font-body)', fontSize: '0.62rem', letterSpacing: '0.2em',
-                textTransform: 'uppercase', fontWeight: 500, color: 'var(--color-accent-1)',
-                transition: 'background 0.28s ease, border-color 0.28s ease',
-              }}
+            <div style={{ width: '1px', height: '20px', background: divColor, transition: 'background 0.45s ease' }} />
+            <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '9px 20px', border: '1px solid rgba(197,160,89,0.50)', fontFamily: 'var(--font-body)', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: 'var(--color-accent-1)', transition: 'background 0.28s ease, border-color 0.28s ease' }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(197,160,89,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,89,0.8)'; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(197,160,89,0.50)'; }}
             >
               Contact
-              <svg width="14" height="7" viewBox="0 0 14 7" fill="none">
-                <path d="M1 3.5h12M9 1l3 2.5L9 6" stroke="currentColor" strokeWidth="0.85" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <svg width="14" height="7" viewBox="0 0 14 7" fill="none"><path d="M1 3.5h12M9 1l3 2.5L9 6" stroke="currentColor" strokeWidth="0.85" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </a>
           </div>
 
-          {/* ── Mobile Hamburger — FIXED: uses .nav-hamburger class ── */}
-          <button
-            className="nav-hamburger"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open menu"
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '8px', flexDirection: 'column', gap: '5px',
-            }}
-          >
+          <button className="nav-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}>
             {[0, 1, 2].map((i) => (
-              <span key={i} style={{
-                display: 'block',
-                width:   i === 1 ? '18px' : '24px',
-                height:  '1px',
-                background: 'rgba(255,255,255,0.78)',
-                transition: 'background 0.35s ease',
-              }} />
+              <span key={i} style={{ display: 'block', width: i === 1 ? '18px' : '24px', height: '1px', background: burgerColor, transition: 'background 0.35s ease' }} />
             ))}
           </button>
 
