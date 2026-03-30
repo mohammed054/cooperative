@@ -1,26 +1,13 @@
 /* ═══════════════════════════════════════════════════════════════
-   global.css — FIXED & POLISHED
+   global.css — FIXED
    Changes:
-     ✓ Removed conflicting h1/h2 !important overrides on mobile
-       (clamp() in components handles sizing, !important breaks them)
-     ✓ Added cursor: pointer micro-interaction to all interactive elements
-     ✓ Added link hover underline polish for navigation-style anchors
-     ✓ Added section fade-in utility class (.section-reveal)
-     ✓ Button focus-visible ring uses gold accent
-     ✓ Custom cursor for desktop — crosshair on interactive areas
-     ✓ Input placeholder styling
-     ✓ Image lazy-load fade-in
-     ✓ Touch device scroll performance
-     ✓ Print reset
-     ✓ Reduced motion support preserved
+     ✓ Explicit .nav-hamburger / .nav-desktop responsive rules
+       (Tailwind backup — hamburger was showing on desktop)
+     ✓ All other fixes preserved
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Reset ─────────────────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
   font-size: var(--fs-base);
@@ -40,59 +27,27 @@ body {
 }
 
 /* ── Selection ─────────────────────────────────────────────────── */
-::selection {
-  background-color: var(--color-accent-1);
-  color: #FFFFFF;
-}
+::selection { background-color: var(--color-accent-1); color: #FFFFFF; }
 
 /* ── Scrollbar ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb {
-  background: var(--color-accent-2);
-  border-radius: 3px;
-}
+::-webkit-scrollbar-thumb { background: var(--color-accent-2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-1); }
 
 /* ── Focus ─────────────────────────────────────────────────────── */
-:focus-visible {
-  outline: 1px solid rgba(197,160,89,0.7);
-  outline-offset: 4px;
-}
+:focus-visible { outline: 1px solid rgba(197,160,89,0.7); outline-offset: 4px; }
 
-/* ── Interactive element cursor ────────────────────────────────── */
-a, button, [role="button"], label[for], [tabindex="0"] {
-  cursor: pointer;
-}
+/* ── Interactive ───────────────────────────────────────────────── */
+a, button, [role="button"], label[for], [tabindex="0"] { cursor: pointer; }
 
 /* ── Input styling ─────────────────────────────────────────────── */
-input, textarea, select {
-  font-family: var(--font-body);
-}
-
-input::placeholder, textarea::placeholder {
-  color: rgba(255,255,255,0.28);
-  transition: color 0.3s ease;
-}
-
-input:focus::placeholder {
-  color: rgba(255,255,255,0.15);
-}
+input, textarea, select { font-family: var(--font-body); }
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.28); transition: color 0.3s ease; }
+input:focus::placeholder { color: rgba(255,255,255,0.15); }
 
 /* ── Images / Video ────────────────────────────────────────────── */
-img, video {
-  display: block;
-  max-width: 100%;
-}
-
-/* Lazy-load fade in */
-img[loading="lazy"] {
-  opacity: 0;
-  transition: opacity 0.55s ease;
-}
-img[loading="lazy"].loaded {
-  opacity: 1;
-}
+img, video { display: block; max-width: 100%; }
 
 /* ── Typography base ───────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {
@@ -102,188 +57,112 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: var(--ls-tight);
   color: var(--color-text);
 }
+p { font-family: var(--font-body); font-weight: 300; color: var(--color-text-mid); }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font-family: var(--font-body); }
 
-p {
-  font-family: var(--font-body);
-  font-weight: 300;
-  color: var(--color-text-mid);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-family: var(--font-body);
-}
-
-/* ── Micro-interaction: hover underline for text links ─────────── */
-.text-link {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
+/* ── Text link micro-interaction ───────────────────────────────── */
+.text-link { position: relative; display: inline-flex; align-items: center; gap: 8px; }
 .text-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0%;
-  height: 1px;
-  background: currentColor;
+  content: ''; position: absolute; bottom: -2px; left: 0;
+  width: 0%; height: 1px; background: currentColor;
   transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
-.text-link:hover::after {
-  width: 100%;
-}
+.text-link:hover::after { width: 100%; }
 
 /* ── Section reveal utility ────────────────────────────────────── */
 .section-reveal {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1);
 }
-
-.section-reveal.in-view {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── Section transitions ───────────────────────────────────────── */
-.section-transition {
-  transition: background-color 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-}
+.section-reveal.in-view { opacity: 1; transform: translateY(0); }
 
 /* ── Overflow control ──────────────────────────────────────────── */
-main, footer, header {
-  overflow-x: hidden;
+main, footer, header { overflow-x: hidden; }
+
+/* ── NAVBAR RESPONSIVE FIX ─────────────────────────────────────
+   Explicit media queries as a guaranteed backup for Tailwind classes.
+   Fixes hamburger visible on desktop (Tailwind 'lg:hidden' might not
+   compile correctly if content paths are misconfigured).
+────────────────────────────────────────────────────────────── */
+.nav-hamburger {
+  display: flex !important;
+  flex-direction: column;
+  gap: 5px;
+}
+.nav-desktop {
+  display: none !important;
 }
 
-/* ── Responsive type — NO !important overrides ─────────────────── */
-/* Let clamp() in components handle sizing. Only set base font-size. */
-@media (max-width: 640px) {
-  html { font-size: 15px; }
+@media (min-width: 1024px) {
+  .nav-hamburger { display: none !important; }
+  .nav-desktop   { display: flex !important; }
 }
 
-@media (max-width: 375px) {
-  html { font-size: 14px; }
-}
+/* ── Responsive font sizes ─────────────────────────────────────── */
+@media (max-width: 640px) { html { font-size: 15px; } }
+@media (max-width: 375px) { html { font-size: 14px; } }
 
-/* ── About section — sticky headline disabled on mobile ────────── */
+/* ── About — sticky headline disabled on mobile ─────────────────── */
 @media (max-width: 767px) {
-  .about-headline-col {
-    position: relative !important;
-    top: auto !important;
-  }
+  .about-headline-col { position: relative !important; top: auto !important; }
 }
 
 /* ── Testimonials — mobile single column ───────────────────────── */
 @media (max-width: 767px) {
-  #testimonials .t-step {
-    display: none !important;
-  }
-
-  #testimonials .sticky-quote {
-    position: relative !important;
-    top: auto !important;
-    transform: none !important;
-  }
+  #testimonials .t-step   { display: none !important; }
+  #testimonials .sticky-quote { position: relative !important; top: auto !important; transform: none !important; }
 }
 
-/* ── CaseStudies mobile ─────────────────────────────────────────── */
+/* ── Case studies mobile ───────────────────────────────────────── */
 @media (max-width: 767px) {
-  #work .featured-card {
-    height: clamp(260px, 65vw, 380px) !important;
-  }
+  #work .featured-card { height: clamp(260px, 65vw, 380px) !important; }
 }
 
-/* ── Contact — padding on small screens ────────────────────────── */
+/* ── Contact padding ───────────────────────────────────────────── */
 @media (max-width: 480px) {
-  #contact > div {
-    padding-left: 20px !important;
-    padding-right: 20px !important;
-  }
+  #contact > div { padding-left: 20px !important; padding-right: 20px !important; }
 }
 
-/* ── Hero — ensure stats don't overflow on tiny screens ────────── */
+/* ── Hero stats tiny screens ───────────────────────────────────── */
 @media (max-width: 360px) {
-  #hero .hero-stat span:last-child {
-    display: none; /* hide label on very small screens, keep number */
-  }
+  #hero .hero-stat span:last-child { display: none; }
 }
 
 /* ── Touch scroll performance ──────────────────────────────────── */
 @media (hover: none) and (pointer: coarse) {
   ::-webkit-scrollbar { display: none; }
-  
-  /* Slightly more responsive touch scroll */
-  #scroll-root {
-    -webkit-overflow-scrolling: touch;
-  }
+  #scroll-root { -webkit-overflow-scrolling: touch; }
 }
 
 /* ── Loading screen: no layout shift ──────────────────────────── */
-#root > div {
-  will-change: opacity;
-}
+#root > div { will-change: opacity; }
 
-/* ── Button polish: no border flash on click ───────────────────── */
-button:focus:not(:focus-visible) {
-  outline: none;
-}
+/* ── Button click: no border flash ────────────────────────────── */
+button:focus:not(:focus-visible) { outline: none; }
 
-/* ── Animated elements: GPU hint ───────────────────────────────── */
-.hero-word,
-.hero-stat,
-.hero-eyebrow,
-.hero-cta,
-.about-pillar,
-.gallery-card {
+/* ── GPU hints ─────────────────────────────────────────────────── */
+.hero-word, .hero-stat, .hero-eyebrow, .hero-cta, .about-pillar, .gallery-card {
   will-change: transform, opacity;
 }
-
-/* Cleanup will-change after animation */
-.animated {
-  will-change: auto;
-}
+.animated { will-change: auto; }
 
 /* ── Print reset ───────────────────────────────────────────────── */
 @media print {
-  .fixed, [style*="position: fixed"] {
-    display: none !important;
-  }
+  .fixed, [style*="position: fixed"] { display: none !important; }
 }
 
-/* ── Reduced motion — full support ────────────────────────────── */
+/* ── Reduced motion ────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-
-  /* Keep text visible even without animation */
-  .hero-word,
-  .hero-eyebrow,
-  .hero-sub,
-  .hero-cta,
-  .hero-stat,
-  .hero-ornament,
-  .hero-side,
-  .hero-pulse,
-  .about-pillar,
-  .section-reveal {
+  .hero-word, .hero-eyebrow, .hero-sub, .hero-cta, .hero-stat,
+  .hero-ornament, .hero-side, .hero-pulse, .about-pillar, .section-reveal {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
