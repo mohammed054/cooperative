@@ -1,314 +1,313 @@
 /**
- * Statement — Scene 2 — PREMIUM REBUILD
+ * Statement — Scene 2 — CINEMATIC REWRITE
  * ─────────────────────────────────────────────────────────────
- * BEHAVIOR:
- *   1. User scrolls through Hero (100vh) — Statement outer begins.
- *   2. Statement inner STICKS at the top for 250vh of outer scroll.
- *   3. While stuck: scroll drives a cinematic word-by-word reveal.
- *   4. Hold at full reveal for ~30% of total travel.
- *   5. Slow, breathtaking fade-out + slight scale with blur.
- *   6. Section releases — About section naturally appears below.
+ * Architecture:
+ *   • Section bg #060504 matches hero's exit overlay exactly → zero seam
+ *   • 4-line typography with statement/response contrast hierarchy
+ *   • Echo fade: statement lines recede when their response enters
+ *   • Ambient gold orb — materializes and blooms with the narrative
+ *   • Hold on "Legacy." — gold rule extends during the weighted pause
+ *   • Cream bloom exit (#F7F5F1) — About's bg is already waiting
  *
- * TRANSITIONS:
- *   - Each word enters from y:+40px through a clip mask (theatrical reveal).
- *   - Gold ornamental rule draws in from center on hold phase.
- *   - Subtle breathing ambient glow behind text.
- *   - Exit: words drift up + blur, glow fades — feels like dissolving into memory.
- *
- * TECH:
- *   - Outer: 300vh height, background: #070605 (no cream seam possible)
- *   - Inner: position sticky, top 0, height 100vh
- *   - GSAP timeline scrub 2.2 — ultra-damped, silky
+ * Transition system:
+ *   Hero bottom: rgba(6,5,4,0.82) ── seamless into ──► Statement: #060504
+ *   Statement bloom: #F7F5F1 ──────── seamless into ──► About: var(--color-bg)
  */
-
 import { useEffect, useRef } from 'react';
-import { gsap }          from 'gsap';
+import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export function Statement() {
-  const outerRef   = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-
-  // Individual word refs for theatrical per-word reveal
-  const word1Ref = useRef<HTMLSpanElement>(null);  // "We don't"
-  const word2Ref = useRef<HTMLSpanElement>(null);  // "plan events."
-  const word3Ref = useRef<HTMLSpanElement>(null);  // "We craft"
-  const word4Ref = useRef<HTMLSpanElement>(null);  // "legacy."
-
-  const runeRef    = useRef<HTMLDivElement>(null);
-  const ruleLeftRef  = useRef<HTMLSpanElement>(null);
-  const ruleRightRef = useRef<HTMLSpanElement>(null);
-  const glowRef    = useRef<HTMLDivElement>(null);
-  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const orbRef     = useRef<HTMLDivElement>(null);
+  const line1Ref   = useRef<HTMLDivElement>(null);
+  const line2Ref   = useRef<HTMLDivElement>(null);
+  const line3Ref   = useRef<HTMLDivElement>(null);
+  const line4Ref   = useRef<HTMLDivElement>(null);
+  const ruleRef    = useRef<HTMLSpanElement>(null);
+  const bloomRef   = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
 
-      // ── Initial state ──────────────────────────────────────
-      // Each word wrapped in a clip container — overflow hidden on parent
-      gsap.set([word1Ref.current, word2Ref.current], {
-        y: 52, opacity: 0, filter: 'blur(12px)',
-      });
-      gsap.set([word3Ref.current, word4Ref.current], {
-        y: 52, opacity: 0, filter: 'blur(12px)',
-      });
-      gsap.set(eyebrowRef.current, { opacity: 0, y: 18 });
-      gsap.set(glowRef.current,    { opacity: 0, scale: 0.8 });
-      gsap.set(ruleLeftRef.current,  { scaleX: 0, transformOrigin: 'right center' });
-      gsap.set(ruleRightRef.current, { scaleX: 0, transformOrigin: 'left center' });
-      gsap.set(runeRef.current,    { opacity: 0 });
+      // ── Initial states ───────────────────────────────────
+      gsap.set(orbRef.current,   { scale: 0.35, opacity: 0 });
+      gsap.set(line1Ref.current, { opacity: 0, y: 28,  filter: 'blur(10px)' });
+      gsap.set(line2Ref.current, { opacity: 0, y: 40,  filter: 'blur(14px)', scale: 0.96 });
+      gsap.set(line3Ref.current, { opacity: 0, y: 28,  filter: 'blur(10px)' });
+      gsap.set(line4Ref.current, { opacity: 0, y: 52,  filter: 'blur(18px)', scale: 0.95 });
+      gsap.set(ruleRef.current,  { scaleX: 0, opacity: 0, transformOrigin: 'center' });
+      gsap.set(bloomRef.current, { opacity: 0 });
 
-      /**
-       * Timeline tied to OUTER WRAPPER scroll.
-       *   300vh outer - 100vh inner = 200vh active scroll travel.
-       *   Phases distribute across that 200vh.
-       *   scrub: 2.2 = gorgeously over-damped / buttery
-       */
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: outerRef.current,
-          start:   'top top',
-          end:     'bottom bottom',
-          scrub:   2.2,
+          trigger: sectionRef.current,
+          start: 'top top',
+          end: '+=320%',
+          scrub: 2.2,
+          pin: true,
         },
       });
 
-      tl
-        // ── ACT I — AMBIENT GLOW BREATHES IN (0–10%) ──────────
-        .to(glowRef.current, {
-          opacity: 1, scale: 1, duration: 0.12, ease: 'power2.out',
-        }, 0)
+      // ── 0.00 → 0.10: Orb materializes from void ─────────
+      tl.to(orbRef.current, {
+        scale: 1, opacity: 0.42,
+        duration: 0.10, ease: 'power2.out',
+      }, 0);
 
-        // ── ACT II — EYEBROW (5–18%) ──────────────────────────
-        .to(eyebrowRef.current, {
-          opacity: 1, y: 0, duration: 0.14, ease: 'power3.out',
-        }, 0.05)
+      // ── 0.10 → 0.28: First couplet enters ───────────────
+      // "Not events." rises from dark
+      tl.to(line1Ref.current, {
+        opacity: 1, y: 0, filter: 'blur(0px)',
+        duration: 0.16, ease: 'power3.out',
+      }, 0.10);
+      // "Experiences." blooms — the response
+      tl.to(line2Ref.current, {
+        opacity: 1, y: 0, filter: 'blur(0px)', scale: 1,
+        duration: 0.20, ease: 'power3.out',
+      }, 0.22);
 
-        // ── ACT III — LINE 1: "We don't" (10–26%) ─────────────
-        .to(word1Ref.current, {
-          y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.18,
-          ease: 'power4.out',
-        }, 0.10)
+      // ── 0.32 → 0.52: Echo fade + second couplet enters ──
+      // First couplet recedes into whisper
+      tl.to(line1Ref.current, {
+        opacity: 0.11, filter: 'blur(3.5px)',
+        duration: 0.12, ease: 'power2.in',
+      }, 0.32);
+      tl.to(line2Ref.current, {
+        opacity: 0.14, filter: 'blur(2.5px)',
+        duration: 0.12, ease: 'power2.in',
+      }, 0.34);
+      // "Not moments." rises
+      tl.to(line3Ref.current, {
+        opacity: 1, y: 0, filter: 'blur(0px)',
+        duration: 0.16, ease: 'power3.out',
+      }, 0.38);
+      // "Legacy." — the apex — emerges
+      tl.to(line4Ref.current, {
+        opacity: 1, y: 0, filter: 'blur(0px)', scale: 1,
+        duration: 0.26, ease: 'power3.out',
+      }, 0.50);
 
-        // ── ACT IV — LINE 1: "plan events." (18–34%) ──────────
-        .to(word2Ref.current, {
-          y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.18,
-          ease: 'power4.out',
-        }, 0.18)
+      // ── 0.54 → 0.68: Legacy holds — ceremony ────────────
+      // Third line recedes
+      tl.to(line3Ref.current, {
+        opacity: 0.11, filter: 'blur(3.5px)',
+        duration: 0.10, ease: 'power2.in',
+      }, 0.54);
+      // Gold rule extends — this is the beat
+      tl.to(ruleRef.current, {
+        scaleX: 1, opacity: 0.65,
+        duration: 0.18, ease: 'power2.inOut',
+      }, 0.58);
+      // Orb breathes wider — Legacy is alive
+      tl.to(orbRef.current, {
+        scale: 1.28, opacity: 0.58,
+        duration: 0.18, ease: 'power2.out',
+      }, 0.58);
 
-        // ── ACT V — PAUSE — ornamental rule draws in (30–46%) ──
-        .to(runeRef.current, { opacity: 0.7, duration: 0.08, ease: 'none' }, 0.29)
-        .to(ruleLeftRef.current,  { scaleX: 1, duration: 0.16, ease: 'power2.inOut' }, 0.30)
-        .to(ruleRightRef.current, { scaleX: 1, duration: 0.16, ease: 'power2.inOut' }, 0.30)
+      // ── 0.68 → 0.80: Weighted hold on "Legacy." ─────────
+      tl.to({}, { duration: 0.12 }, 0.68);
 
-        // ── ACT VI — LINE 2: "We craft" (38–54%) ──────────────
-        .to(word3Ref.current, {
-          y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20,
-          ease: 'power4.out',
-        }, 0.38)
+      // ── 0.80 → 1.00: Cream bloom exit ───────────────────
+      // Rule dissolves first
+      tl.to(ruleRef.current, {
+        opacity: 0, scaleX: 0.4,
+        duration: 0.08, ease: 'power2.in',
+      }, 0.80);
+      // Ghost lines vanish
+      tl.to([line1Ref.current, line2Ref.current, line3Ref.current], {
+        opacity: 0, y: -18, filter: 'blur(14px)',
+        duration: 0.12, ease: 'power2.in',
+      }, 0.81);
+      // "Legacy." dematerializes
+      tl.to(line4Ref.current, {
+        opacity: 0, scale: 1.04, filter: 'blur(22px)',
+        duration: 0.15, ease: 'power2.in',
+      }, 0.84);
+      // Orb expands into pure light
+      tl.to(orbRef.current, {
+        scale: 2.8, opacity: 0,
+        duration: 0.20, ease: 'power2.in',
+      }, 0.82);
+      // Cream bloom fills viewport — About bg is waiting
+      tl.to(bloomRef.current, {
+        opacity: 1,
+        duration: 0.22, ease: 'power1.inOut',
+      }, 0.86);
 
-        // ── ACT VII — LINE 2: "legacy." GOLD, delayed (46–64%) ─
-        .to(word4Ref.current, {
-          y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.22,
-          ease: 'power4.out',
-        }, 0.46)
-
-        // ── HOLD (64–72%) — empty tween, pure pause ────────────
-        .to({}, { duration: 0.08 }, 0.64)
-
-        // ── ACT VIII — BREATHTAKING EXIT (72–100%) ────────────
-        // Words drift upward + blur out — cinematic dissolve
-        .to([word1Ref.current, word2Ref.current], {
-          y: -38, opacity: 0, filter: 'blur(10px)', duration: 0.20, ease: 'power2.in',
-        }, 0.72)
-        .to([word3Ref.current, word4Ref.current], {
-          y: -38, opacity: 0, filter: 'blur(10px)', duration: 0.20, ease: 'power2.in',
-        }, 0.76)
-        .to([ruleLeftRef.current, ruleRightRef.current], {
-          scaleX: 0, duration: 0.14, ease: 'power2.in',
-        }, 0.72)
-        .to([runeRef.current, eyebrowRef.current], {
-          opacity: 0, duration: 0.14, ease: 'power2.in',
-        }, 0.72)
-        .to(glowRef.current, {
-          opacity: 0, scale: 1.4, duration: 0.26, ease: 'power1.in',
-        }, 0.74);
-
-    });
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  const fontSize = 'clamp(2.6rem, 6.2vw, 7.2rem)';
-  const fontStyle: React.CSSProperties = {
-    fontFamily:    'var(--font-display)',
-    fontWeight:    300,
-    fontStyle:     'italic',
-    lineHeight:    1.08,
-    letterSpacing: '-0.026em',
-    display:       'block',
-  };
-
   return (
-    /*
-     * OUTER WRAPPER — provides 300vh of scroll distance.
-     * Background MUST be #070605 — dark all the way through.
-     * No GSAP spacer div = no cream gap between Hero and Statement.
-     */
-    <div
-      ref={outerRef}
+    <section
+      ref={sectionRef}
+      id="statement"
       style={{
-        height:     '300vh',
-        position:   'relative',
-        background: '#070605',
+        height: '100vh',
+        minHeight: '600px',
+        background: '#060504',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        position: 'relative',
       }}
     >
-      <section
-        ref={sectionRef}
-        id="statement"
+      {/* ── Hero → Statement bridge ──────────────────────────
+          Hero's bottom vignette ends at rgba(6,5,4,0.82).
+          This 100px gradient starts at exactly that value → invisible seam.
+      ─────────────────────────────────────────────────────── */}
+      <div aria-hidden style={{
+        position: 'absolute', top: 0, left: 0, right: 0,
+        height: '100px',
+        background: 'linear-gradient(to bottom, rgba(6,5,4,0.82) 0%, transparent 100%)',
+        pointerEvents: 'none', zIndex: 2,
+      }} />
+
+      {/* ── Film grain texture ───────────────────────────── */}
+      <div aria-hidden style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='280' height='280' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E")`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '280px 280px',
+        opacity: 0.033,
+        pointerEvents: 'none', zIndex: 1,
+      }} />
+
+      {/* ── Ambient gold orb ────────────────────────────── */}
+      <div
+        ref={orbRef}
+        aria-hidden
         style={{
-          position:       'sticky',
-          top:            0,
-          height:         '100vh',
-          background:     '#070605',
-          display:        'flex',
-          alignItems:     'center',
-          justifyContent: 'center',
-          overflow:       'hidden',
+          position: 'absolute',
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 'min(68vw, 780px)',
+          height: 'min(68vw, 780px)',
+          borderRadius: '50%',
+          background: `radial-gradient(ellipse at 50% 50%,
+            rgba(197,160,89,0.11)  0%,
+            rgba(197,160,89,0.04) 44%,
+            transparent           70%
+          )`,
+          pointerEvents: 'none', zIndex: 0,
+          willChange: 'transform, opacity',
         }}
-      >
-        {/* ── AMBIENT GLOW — breathes with the reveal ─────── */}
-        <div
-          ref={glowRef}
-          aria-hidden
-          style={{
-            position:  'absolute',
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '900px', height: '520px',
-            borderRadius: '50%',
-            background: 'radial-gradient(ellipse, rgba(197,160,89,0.055) 0%, transparent 65%)',
-            pointerEvents: 'none',
-            opacity: 0,
-          }}
-        />
+      />
 
-        {/* ── SUBTLE GRID TEXTURE ────────────────────────── */}
-        <div aria-hidden style={{
-          position:        'absolute', inset: 0,
-          backgroundImage: `
-            linear-gradient(rgba(197,160,89,0.015) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(197,160,89,0.015) 1px, transparent 1px)
-          `,
-          backgroundSize:  '80px 80px',
-          pointerEvents:   'none',
-          opacity:         1,
-        }} />
+      {/* ── Typography ──────────────────────────────────── */}
+      <div style={{
+        position: 'relative', zIndex: 3,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        padding: '0 clamp(24px, 5vw, 80px)',
+      }}>
 
-        {/* ── MAIN TEXT BLOCK ─────────────────────────────── */}
-        <div style={{
-          textAlign:     'center',
-          padding:       '0 clamp(32px, 8vw, 120px)',
-          display:       'flex',
-          flexDirection: 'column',
-          gap:           '0',
-          position:      'relative',
-          zIndex:        2,
-        }}>
-
-          {/* Eyebrow */}
-          <div
-            ref={eyebrowRef}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: '20px', marginBottom: 'clamp(28px, 3.5vw, 44px)', opacity: 0,
-            }}
-          >
-            <span style={{ display: 'block', width: '48px', height: '1px', background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.55))' }} />
-            <span style={{ fontSize: '0.55rem', letterSpacing: '0.38em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'rgba(197,160,89,0.5)' }}>
-              Our Philosophy
-            </span>
-            <span style={{ display: 'block', width: '48px', height: '1px', background: 'linear-gradient(to left, transparent, rgba(197,160,89,0.55))' }} />
-          </div>
-
-          {/* Line 1: "We don't" */}
-          <div style={{ overflow: 'hidden' }}>
-            <span ref={word1Ref} style={{ ...fontStyle, fontSize, color: 'rgba(248, 244, 238, 0.86)' }}>
-              We don't plan events.
-            </span>
-          </div>
-
-          {/* Ornamental rule between lines — draws in during hold phase */}
-          <div
-            ref={runeRef}
-            style={{
-              display:        'flex',
-              alignItems:     'center',
-              justifyContent: 'center',
-              gap:            '16px',
-              margin:         'clamp(14px, 2vw, 22px) 0',
-              opacity:        0,
-            }}
-          >
-            <span
-              ref={ruleLeftRef}
-              style={{
-                display:    'block',
-                width:      'clamp(60px, 8vw, 100px)',
-                height:     '1px',
-                background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.65))',
-                transformOrigin: 'right center',
-              }}
-            />
-            <span style={{
-              display: 'block', width: '4px', height: '4px', borderRadius: '50%',
-              background: 'rgba(197,160,89,0.65)',
-            }} />
-            <span
-              ref={ruleRightRef}
-              style={{
-                display:    'block',
-                width:      'clamp(60px, 8vw, 100px)',
-                height:     '1px',
-                background: 'linear-gradient(to left, transparent, rgba(197,160,89,0.65))',
-                transformOrigin: 'left center',
-              }}
-            />
-          </div>
-
-          {/* Line 2: "We craft" + "legacy." */}
-          <div style={{ overflow: 'hidden' }}>
-            <span ref={word3Ref} style={{ ...fontStyle, fontSize, color: 'rgba(248, 244, 238, 0.86)' }}>
-              We craft{' '}
-            </span>
-            <span ref={word4Ref} style={{ ...fontStyle, fontSize, color: 'var(--color-accent-1)', display: 'inline' }}>
-              legacy.
-            </span>
-          </div>
-
+        {/* "Not events." — the whispered premise */}
+        <div ref={line1Ref} style={{ opacity: 0 }}>
+          <span style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(1.4rem, 2.8vw, 3.2rem)',
+            fontWeight: 300,
+            letterSpacing: '-0.01em',
+            color: 'rgba(245,240,235,0.30)',
+            display: 'block',
+            marginBottom: 'clamp(1px, 0.3vw, 4px)',
+          }}>Not events.</span>
         </div>
 
-        {/* ── CORNER ORNAMENTS ────────────────────────────── */}
-        {(['tl','tr','bl','br'] as const).map((pos) => {
-          const styles: Record<string, React.CSSProperties> = {
-            tl: { top: '28px', left: '28px' },
-            tr: { top: '28px', right: '28px', transform: 'rotate(90deg)' },
-            bl: { bottom: '28px', left: '28px', transform: 'rotate(-90deg)' },
-            br: { bottom: '28px', right: '28px', transform: 'rotate(180deg)' },
-          };
-          return (
-            <div key={pos} aria-hidden style={{ position: 'absolute', width: '22px', height: '22px', opacity: 0.2, ...styles[pos] }}>
-              <svg viewBox="0 0 22 22" fill="none" className="w-full h-full">
-                <path d="M2 20 L2 2 L20 2" stroke="#C5A059" strokeWidth="0.8" />
-                <circle cx="2" cy="2" r="1.2" fill="#C5A059" opacity="0.7" />
-              </svg>
-            </div>
-          );
-        })}
+        {/* "Experiences." — the revelation */}
+        <div ref={line2Ref} style={{ opacity: 0 }}>
+          <span style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(3rem, 6.8vw, 7.8rem)',
+            fontWeight: 300,
+            fontStyle: 'italic',
+            letterSpacing: '-0.038em',
+            lineHeight: 0.95,
+            color: '#C5A059',
+            display: 'block',
+            marginBottom: 'clamp(18px, 3.2vw, 42px)',
+          }}>Experiences.</span>
+        </div>
 
-      </section>
-    </div>
+        {/* "Not moments." — the second premise */}
+        <div ref={line3Ref} style={{ opacity: 0 }}>
+          <span style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(1.4rem, 2.8vw, 3.2rem)',
+            fontWeight: 300,
+            letterSpacing: '-0.01em',
+            color: 'rgba(245,240,235,0.30)',
+            display: 'block',
+            marginBottom: 'clamp(1px, 0.3vw, 4px)',
+          }}>Not moments.</span>
+        </div>
+
+        {/* "Legacy." — the apex. This is the entire scene. */}
+        <div ref={line4Ref} style={{ opacity: 0 }}>
+          <span style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(5rem, 11.5vw, 13.5rem)',
+            fontWeight: 300,
+            fontStyle: 'italic',
+            letterSpacing: '-0.048em',
+            lineHeight: 0.90,
+            color: '#D6B97A',
+            display: 'block',
+            textShadow: `
+              0 0  80px rgba(197,160,89,0.22),
+              0 0 160px rgba(197,160,89,0.10),
+              0 0 320px rgba(197,160,89,0.04)
+            `,
+            willChange: 'transform, opacity, filter',
+          }}>Legacy.</span>
+        </div>
+
+        {/* Gold center rule — extends during the hold */}
+        <span ref={ruleRef} style={{
+          display: 'block',
+          width: 'clamp(44px, 5.5vw, 72px)',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.75), transparent)',
+          marginTop: 'clamp(16px, 2.5vw, 26px)',
+          opacity: 0,
+          transformOrigin: 'center',
+        }} />
+      </div>
+
+      {/* ── Statement → About: Cream bloom overlay ──────────
+          At end of scroll this is opacity:1 (#F7F5F1).
+          About's background IS #F7F5F1.
+          When pin releases → About enters from below in cream.
+          The eye sees one continuous cream surface. Zero seam.
+      ─────────────────────────────────────────────────────── */}
+      <div
+        ref={bloomRef}
+        aria-hidden
+        style={{
+          position: 'absolute', inset: 0,
+          background: '#F7F5F1',
+          opacity: 0,
+          pointerEvents: 'none',
+          zIndex: 10,
+        }}
+      />
+
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          #statement * {
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+          }
+        }
+      `}</style>
+    </section>
   );
 }

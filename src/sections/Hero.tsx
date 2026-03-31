@@ -21,6 +21,10 @@
  *    Video: only scales slightly, no brightness animation
  *    Overlay: delayed start, softer max — video stays visible until
  *             the section is mostly past the viewport
+ *
+ *  FIX 4 — GRADIENT BRIGHTNESS
+ *    Left anchor: 0.76 → 0.60 (less crushing on the left edge)
+ *    Top/bottom: tuned bottom to 0.82 to lock seam with Statement
  */
 
 import { useEffect, useRef } from 'react';
@@ -42,9 +46,9 @@ function WordLine({ words, italic = false, accent = false }: {
           <span
             className="hero-word"
             style={{
-              display:    'inline-block',
-              fontStyle:  italic ? 'italic' : 'normal',
-              color:      accent  ? 'var(--color-accent-1)' : 'inherit',
+              display:   'inline-block',
+              fontStyle: italic ? 'italic' : 'normal',
+              color:     accent  ? 'var(--color-accent-1)' : 'inherit',
             }}
           >
             {word}{'\u00a0'}
@@ -181,15 +185,15 @@ export function Hero() {
       const tl = gsap.timeline({ delay: 0.38 });
 
       tl
-        .to('.hero-word', { y: 0, opacity: 1, duration: 1.25, stagger: 0.058, ease: 'power4.out' })
-        .to('.hero-sub-statement', { y: 0, opacity: 1, duration: 1.0, ease: 'power3.out' }, '-=0.58')
-        .to('.hero-eyebrow',  { y: 0, opacity: 1, duration: 0.88, ease: 'power3.out' }, '-=0.78')
-        .to('.hero-sub',      { y: 0, opacity: 1, duration: 0.88, ease: 'power3.out' }, '-=0.58')
-        .to('.hero-cta',      { y: 0, opacity: 1, duration: 0.80, ease: 'power3.out' }, '-=0.52')
-        .to('.hero-stat',     { y: 0, opacity: 1, stagger: 0.12, duration: 0.78, ease: 'power2.out' }, '-=0.52')
-        .to('.hero-ornament', { opacity: 0.5, duration: 0.8, ease: 'power2.out' }, '-=0.56')
-        .to('.hero-side',     { opacity: 1,   duration: 0.8, ease: 'power2.out' }, '<')
-        .to('.hero-pulse',    { opacity: 1, y: 0, duration: 0.75, ease: 'power2.out' }, '-=0.4');
+        .to('.hero-word',          { y: 0, opacity: 1, duration: 1.25, stagger: 0.058, ease: 'power4.out' })
+        .to('.hero-sub-statement', { y: 0, opacity: 1, duration: 1.0,  ease: 'power3.out' }, '-=0.58')
+        .to('.hero-eyebrow',       { y: 0, opacity: 1, duration: 0.88, ease: 'power3.out' }, '-=0.78')
+        .to('.hero-sub',           { y: 0, opacity: 1, duration: 0.88, ease: 'power3.out' }, '-=0.58')
+        .to('.hero-cta',           { y: 0, opacity: 1, duration: 0.80, ease: 'power3.out' }, '-=0.52')
+        .to('.hero-stat',          { y: 0, opacity: 1, stagger: 0.12, duration: 0.78, ease: 'power2.out' }, '-=0.52')
+        .to('.hero-ornament',      { opacity: 0.5, duration: 0.8, ease: 'power2.out' }, '-=0.56')
+        .to('.hero-side',          { opacity: 1,   duration: 0.8, ease: 'power2.out' }, '<')
+        .to('.hero-pulse',         { opacity: 1, y: 0, duration: 0.75, ease: 'power2.out' }, '-=0.4');
     }, sectionRef);
 
     return () => ctx.revert();
@@ -223,11 +227,11 @@ export function Hero() {
 
       /* Overlay: DELAYED start — video stays clear for top 45% of scroll */
       gsap.to(overlayRef.current, {
-        opacity: 0.72,                    /* was 0.92 — video no longer disappears */
+        opacity: 0.72,               /* was 0.92 — video no longer disappears */
         ease: 'none',
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: '45% top',              /* was 'top top' — crucial fix */
+          start: '45% top',          /* was 'top top' — crucial fix */
           end:   'bottom top',
           scrub: 0.9,
         },
@@ -259,11 +263,11 @@ export function Hero() {
       ref={sectionRef}
       id="hero"
       style={{
-        height:     '100svh',
-        minHeight:  '660px',
-        position:   'relative',
-        overflow:   'hidden',
-        background: 'var(--color-bg)',     /* CREAM — matches loading screen */
+        height:    '100svh',
+        minHeight: '660px',
+        position:  'relative',
+        overflow:  'hidden',
+        background: 'var(--color-bg)',   /* CREAM — matches loading screen */
       }}
     >
       {/* ══ VIDEO ════════════════════════════════════════════
@@ -298,19 +302,19 @@ export function Hero() {
       `}</style>
 
       {/* ══ GRADIENTS ════════════════════════════════════════
-          Left anchor gradient — grounds text in the asymmetric layout.
-          Top/bottom vignette — cinematic framing.
+          FIX: Left anchor reduced 0.76 → 0.60 (less crushing).
+          FIX: Bottom locked to 0.82 to seam with Statement's bridge.
       ════════════════════════════════════════════════════ */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'linear-gradient(to right, rgba(0,0,0,0.76) 0%, rgba(0,0,0,0.50) 32%, rgba(0,0,0,0.22) 58%, rgba(0,0,0,0.05) 100%)',
+        background: 'linear-gradient(to right, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.38) 32%, rgba(0,0,0,0.14) 58%, rgba(0,0,0,0.02) 100%)',
       }} />
       <div className="absolute inset-0 pointer-events-none" style={{
         background: `linear-gradient(to bottom,
-          rgba(6,5,4,0.52)  0%,
-          rgba(6,5,4,0.10) 28%,
-          rgba(6,5,4,0.14) 56%,
-          rgba(6,5,4,0.68) 85%,
-          rgba(6,5,4,0.90) 100%
+          rgba(6,5,4,0.40)  0%,
+          rgba(6,5,4,0.06) 28%,
+          rgba(6,5,4,0.08) 56%,
+          rgba(6,5,4,0.60) 85%,
+          rgba(6,5,4,0.82) 100%
         )`,
       }} />
 

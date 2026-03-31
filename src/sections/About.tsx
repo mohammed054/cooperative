@@ -1,5 +1,5 @@
 /**
- * About — Scene 3 — AIR GAP FIX
+ * About — Scene 3
  * ─────────────────────────────────────────────────────────────
  * FIX: Reduced editorial outer from 300vh to 220vh.
  *   Active scroll = 220 - 100 = 120vh (was 200vh = too much emptiness).
@@ -8,9 +8,14 @@
  * FIX: Editorial scene uses a tighter timeline with NO dead zones.
  *   Every phase of the scroll drives visible change.
  *
- * FIX: Dark→light bridge height reduced to 60px (was 80px).
+ * FIX: Dark→light bridge REMOVED — Statement exits cream, not dark.
+ *   The old 60px dark gradient created a flash against the cream bloom.
  *
- * ALL existing design preserved: editorial grid, pillars, marquee, CTA.
+ * UPGRADE: Editorial watermark "03" — graphic depth and identity.
+ * UPGRADE: Pillar items — left border column identity.
+ * UPGRADE: Scene rail — vertical "About" label on left edge.
+ *
+ * ALL existing design preserved: editorial grid, marquee, CTA.
  */
 
 import { useEffect, useRef } from 'react';
@@ -130,17 +135,17 @@ export function About() {
         // 10 total duration units mapped across 120vh active scroll.
         // No dead zones — every unit drives a visible change.
         tl
-          .to(bgGlowRef.current,   { opacity: 1, duration: 0.15, ease: 'none' }, 0)
-          .to(eyebrowRef.current,  { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power2.out' }, 0.05)
+          .to(bgGlowRef.current,    { opacity: 1, duration: 0.15, ease: 'none' }, 0)
+          .to(eyebrowRef.current,   { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power2.out' }, 0.05)
           .to(headline1Ref.current, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.25, ease: 'power3.out' }, 0.15)
           .to(headline2Ref.current, { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1.0, duration: 0.28, ease: 'power3.out' }, 0.24)
           .to(goldRuleRef.current,  { scaleX: 1, opacity: 0.7, duration: 0.22, ease: 'power2.inOut' }, 0.36)
-          .to(para1Ref.current,    { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.22, ease: 'power2.out' }, 0.44)
-          .to(para2Ref.current,    { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power2.out' }, 0.54)
-          .to(pillar1Ref.current,  { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power3.out' }, 0.62)
-          .to(pillar2Ref.current,  { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power3.out' }, 0.72)
-          .to(pillar3Ref.current,  { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power3.out' }, 0.82)
-          .to(ctaRef.current,      { y: 0, opacity: 1, duration: 0.16, ease: 'power2.out' }, 0.92);
+          .to(para1Ref.current,     { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.22, ease: 'power2.out' }, 0.44)
+          .to(para2Ref.current,     { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power2.out' }, 0.54)
+          .to(pillar1Ref.current,   { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power3.out' }, 0.62)
+          .to(pillar2Ref.current,   { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power3.out' }, 0.72)
+          .to(pillar3Ref.current,   { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power3.out' }, 0.82)
+          .to(ctaRef.current,       { y: 0, opacity: 1, duration: 0.16, ease: 'power2.out' }, 0.92);
       }
 
       // ── Marquee fade ──────────────────────────────────────
@@ -162,13 +167,9 @@ export function About() {
       ref={sectionRef}
       style={{ position: 'relative', background: 'var(--color-bg)', overflow: 'clip' }}
     >
-      {/* Dark → light bridge — 60px soft gradient */}
-      <div aria-hidden style={{
-        position: 'absolute', top: 0, left: 0, right: 0,
-        height: '60px',
-        background: 'linear-gradient(to bottom, rgba(7,6,5,0.55) 0%, transparent 100%)',
-        pointerEvents: 'none', zIndex: 2,
-      }} />
+      {/* ── NO dark bridge — Statement exits cream (#F7F5F1 bloom)
+          Any dark gradient here would create a flash against the cream.
+          Statement's bloom overlay IS the transition. ─────────── */}
 
       {/* Subtle gold grid texture */}
       <div aria-hidden style={{
@@ -222,6 +223,45 @@ export function About() {
           overflow: 'hidden', background: 'var(--color-bg)',
           display: 'flex', alignItems: 'center',
         }}>
+          {/* Editorial section watermark — graphic depth and identity */}
+          <div aria-hidden style={{
+            position: 'absolute',
+            right: '-0.04em',
+            bottom: '-0.18em',
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(14rem, 26vw, 32rem)',
+            fontWeight: 300,
+            fontStyle: 'italic',
+            lineHeight: 1,
+            color: 'rgba(197,160,89,0.030)',
+            pointerEvents: 'none',
+            userSelect: 'none',
+            zIndex: 0,
+            letterSpacing: '-0.05em',
+          }}>03</div>
+
+          {/* Scene rail — left edge vertical label */}
+          <div aria-hidden style={{
+            position: 'absolute',
+            left: 'clamp(10px, 1.8vw, 22px)',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', gap: '10px',
+            opacity: 0.45,
+          }}>
+            <span style={{
+              fontSize: '0.55rem', letterSpacing: '0.3em',
+              textTransform: 'uppercase', writingMode: 'vertical-rl',
+              fontFamily: 'var(--font-body)', fontWeight: 400,
+              color: 'var(--color-text-muted)',
+            }}>About</span>
+            <span style={{
+              display: 'block', width: '1px', height: '44px',
+              background: 'linear-gradient(to bottom, rgba(197,160,89,0.55), transparent)',
+            }} />
+          </div>
+
           <div ref={bgGlowRef} aria-hidden style={{
             position: 'absolute', top: '40%', left: '0%',
             width: '55%', height: '120%',
@@ -274,7 +314,14 @@ export function About() {
                   { ref: pillar2Ref, n: '02', title: 'Precision over performance.', body: "Execution is not measured in headcount or decibels. It's measured in the quality of conversation the morning after." },
                   { ref: pillar3Ref, n: '03', title: 'Legacy over landmark.', body: "Any venue can impress once. We design experiences that compound — that become reference points in the memory of everyone in the room." },
                 ].map(({ ref, n, title, body }) => (
-                  <div key={n} ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '22px', borderTop: '1px solid var(--color-accent-3)', opacity: 0 }}>
+                  <div key={n} ref={ref} style={{
+                    display: 'flex', flexDirection: 'column', gap: '10px',
+                    paddingTop: '20px',
+                    paddingLeft: '14px',
+                    borderTop: '1px solid var(--color-accent-3)',
+                    borderLeft: '1px solid rgba(197,160,89,0.22)',
+                    opacity: 0,
+                  }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                       <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem', fontWeight: 300, letterSpacing: '0.1em', color: 'var(--color-text-muted)' }}>{n}</span>
                       <span style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1rem, 1.55vw, 1.3rem)', fontWeight: 300, fontStyle: 'italic', letterSpacing: '-0.01em', color: 'var(--color-text)' }}>{title}</span>

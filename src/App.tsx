@@ -17,19 +17,19 @@
  */
 
 import { useState } from 'react';
-import { gsap }       from 'gsap';
+import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import { ScrollLayout }  from '@/layouts/ScrollLayout';
+import { ScrollLayout } from '@/layouts/ScrollLayout';
 import { LoadingScreen } from '@/components/LoadingScreen';
-import { Navbar }        from '@/components/Navbar';
-import { Hero }          from '@/sections/Hero';
-import { Statement }     from '@/sections/Statement';
-import { About }         from '@/sections/About';
-import { CaseStudies }   from '@/sections/CaseStudies';
-import { Testimonials }  from '@/sections/Testimonials';
-import { Contact }       from '@/sections/Contact';
-import { Footer }        from '@/sections/Footer';
+import { Navbar } from '@/components/Navbar';
+import { Hero } from '@/sections/Hero';
+import { Statement } from '@/sections/Statement';
+import { About } from '@/sections/About';
+import { CaseStudies } from '@/sections/CaseStudies';
+import { Testimonials } from '@/sections/Testimonials';
+import { Contact } from '@/sections/Contact';
+import { Footer } from '@/sections/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -60,8 +60,8 @@ export default function App() {
       {/* Main site — hidden during load to prevent flash */}
       <div
         style={{
-          opacity:       loading ? 0 : 1,
-          transition:    'opacity 0.6s ease',
+          opacity: loading ? 0 : 1,
+          transition: 'opacity 0.6s ease',
           pointerEvents: loading ? 'none' : 'auto',
         }}
       >

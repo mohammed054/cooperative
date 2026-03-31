@@ -111,8 +111,8 @@ main, footer, header { overflow-x: hidden; }
 
 /* ── Testimonials — mobile single column ───────────────────────── */
 @media (max-width: 767px) {
-  #testimonials .t-step   { display: none !important; }
-  #testimonials .sticky-quote { position: relative !important; top: auto !important; transform: none !important; }
+  #testimonials .t-step          { display: none !important; }
+  #testimonials .sticky-quote    { position: relative !important; top: auto !important; transform: none !important; }
 }
 
 /* ── Case studies mobile ───────────────────────────────────────── */
