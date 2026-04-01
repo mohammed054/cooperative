@@ -1,17 +1,19 @@
 /**
- * Statement — Scene 2 — CINEMATIC REWRITE
+ * Statement — Scene 2
  * ─────────────────────────────────────────────────────────────
- * Architecture:
- *   • Section bg #060504 matches hero's exit overlay exactly → zero seam
- *   • 4-line typography with statement/response contrast hierarchy
- *   • Echo fade: statement lines recede when their response enters
- *   • Ambient gold orb — materializes and blooms with the narrative
- *   • Hold on "Legacy." — gold rule extends during the weighted pause
- *   • Cream bloom exit (#F7F5F1) — About's bg is already waiting
+ * CHANGE: end '+=320%' → '+=180%'
  *
- * Transition system:
- *   Hero bottom: rgba(6,5,4,0.82) ── seamless into ──► Statement: #060504
- *   Statement bloom: #F7F5F1 ──────── seamless into ──► About: var(--color-bg)
+ * Root cause of the air gap:
+ *   320% = 320vh of pinned scroll space. At 1080p that's over 3 full screens
+ *   of pinned scroll just for this scene. The user was scrolling through ~140vh
+ *   of "stuck" screen where the bloom was already 100% cream with no visible
+ *   change — felt like dead air before About arrived.
+ *
+ *   180% = 180vh. Timeline still maps 0→1.0 across this range.
+ *   Bloom hits 100% at exactly the pin end — no wasted scroll.
+ *   The transition to About is immediate when pin releases.
+ *
+ * All animation values, timings, and visual design preserved unchanged.
  */
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
@@ -45,7 +47,7 @@ export function Statement() {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top top',
-          end: '+=320%',
+          end: '+=180%',   /* CHANGE: was +=320% — eliminates ~140vh of dead-air scroll */
           scrub: 2.2,
           pin: true,
         },
@@ -58,19 +60,16 @@ export function Statement() {
       }, 0);
 
       // ── 0.10 → 0.28: First couplet enters ───────────────
-      // "Not events." rises from dark
       tl.to(line1Ref.current, {
         opacity: 1, y: 0, filter: 'blur(0px)',
         duration: 0.16, ease: 'power3.out',
       }, 0.10);
-      // "Experiences." blooms — the response
       tl.to(line2Ref.current, {
         opacity: 1, y: 0, filter: 'blur(0px)', scale: 1,
         duration: 0.20, ease: 'power3.out',
       }, 0.22);
 
       // ── 0.32 → 0.52: Echo fade + second couplet enters ──
-      // First couplet recedes into whisper
       tl.to(line1Ref.current, {
         opacity: 0.11, filter: 'blur(3.5px)',
         duration: 0.12, ease: 'power2.in',
@@ -79,29 +78,24 @@ export function Statement() {
         opacity: 0.14, filter: 'blur(2.5px)',
         duration: 0.12, ease: 'power2.in',
       }, 0.34);
-      // "Not moments." rises
       tl.to(line3Ref.current, {
         opacity: 1, y: 0, filter: 'blur(0px)',
         duration: 0.16, ease: 'power3.out',
       }, 0.38);
-      // "Legacy." — the apex — emerges
       tl.to(line4Ref.current, {
         opacity: 1, y: 0, filter: 'blur(0px)', scale: 1,
         duration: 0.26, ease: 'power3.out',
       }, 0.50);
 
       // ── 0.54 → 0.68: Legacy holds — ceremony ────────────
-      // Third line recedes
       tl.to(line3Ref.current, {
         opacity: 0.11, filter: 'blur(3.5px)',
         duration: 0.10, ease: 'power2.in',
       }, 0.54);
-      // Gold rule extends — this is the beat
       tl.to(ruleRef.current, {
         scaleX: 1, opacity: 0.65,
         duration: 0.18, ease: 'power2.inOut',
       }, 0.58);
-      // Orb breathes wider — Legacy is alive
       tl.to(orbRef.current, {
         scale: 1.28, opacity: 0.58,
         duration: 0.18, ease: 'power2.out',
@@ -111,27 +105,22 @@ export function Statement() {
       tl.to({}, { duration: 0.12 }, 0.68);
 
       // ── 0.80 → 1.00: Cream bloom exit ───────────────────
-      // Rule dissolves first
       tl.to(ruleRef.current, {
         opacity: 0, scaleX: 0.4,
         duration: 0.08, ease: 'power2.in',
       }, 0.80);
-      // Ghost lines vanish
       tl.to([line1Ref.current, line2Ref.current, line3Ref.current], {
         opacity: 0, y: -18, filter: 'blur(14px)',
         duration: 0.12, ease: 'power2.in',
       }, 0.81);
-      // "Legacy." dematerializes
       tl.to(line4Ref.current, {
         opacity: 0, scale: 1.04, filter: 'blur(22px)',
         duration: 0.15, ease: 'power2.in',
       }, 0.84);
-      // Orb expands into pure light
       tl.to(orbRef.current, {
         scale: 2.8, opacity: 0,
         duration: 0.20, ease: 'power2.in',
       }, 0.82);
-      // Cream bloom fills viewport — About bg is waiting
       tl.to(bloomRef.current, {
         opacity: 1,
         duration: 0.22, ease: 'power1.inOut',
@@ -157,10 +146,7 @@ export function Statement() {
         position: 'relative',
       }}
     >
-      {/* ── Hero → Statement bridge ──────────────────────────
-          Hero's bottom vignette ends at rgba(6,5,4,0.82).
-          This 100px gradient starts at exactly that value → invisible seam.
-      ─────────────────────────────────────────────────────── */}
+      {/* ── Hero → Statement bridge ────────────────────────── */}
       <div aria-hidden style={{
         position: 'absolute', top: 0, left: 0, right: 0,
         height: '100px',
@@ -168,7 +154,7 @@ export function Statement() {
         pointerEvents: 'none', zIndex: 2,
       }} />
 
-      {/* ── Film grain texture ───────────────────────────── */}
+      {/* ── Film grain texture ────────────────────────────── */}
       <div aria-hidden style={{
         position: 'absolute', inset: 0,
         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='280' height='280' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E")`,
@@ -178,7 +164,7 @@ export function Statement() {
         pointerEvents: 'none', zIndex: 1,
       }} />
 
-      {/* ── Ambient gold orb ────────────────────────────── */}
+      {/* ── Ambient gold orb ──────────────────────────────── */}
       <div
         ref={orbRef}
         aria-hidden
@@ -199,7 +185,7 @@ export function Statement() {
         }}
       />
 
-      {/* ── Typography ──────────────────────────────────── */}
+      {/* ── Typography ────────────────────────────────────── */}
       <div style={{
         position: 'relative', zIndex: 3,
         display: 'flex', flexDirection: 'column',
@@ -208,7 +194,7 @@ export function Statement() {
         padding: '0 clamp(24px, 5vw, 80px)',
       }}>
 
-        {/* "Not events." — the whispered premise */}
+        {/* "Not events." */}
         <div ref={line1Ref} style={{ opacity: 0 }}>
           <span style={{
             fontFamily: 'var(--font-display)',
@@ -221,7 +207,7 @@ export function Statement() {
           }}>Not events.</span>
         </div>
 
-        {/* "Experiences." — the revelation */}
+        {/* "Experiences." */}
         <div ref={line2Ref} style={{ opacity: 0 }}>
           <span style={{
             fontFamily: 'var(--font-display)',
@@ -236,7 +222,7 @@ export function Statement() {
           }}>Experiences.</span>
         </div>
 
-        {/* "Not moments." — the second premise */}
+        {/* "Not moments." */}
         <div ref={line3Ref} style={{ opacity: 0 }}>
           <span style={{
             fontFamily: 'var(--font-display)',
@@ -249,7 +235,7 @@ export function Statement() {
           }}>Not moments.</span>
         </div>
 
-        {/* "Legacy." — the apex. This is the entire scene. */}
+        {/* "Legacy." */}
         <div ref={line4Ref} style={{ opacity: 0 }}>
           <span style={{
             fontFamily: 'var(--font-display)',
@@ -269,7 +255,7 @@ export function Statement() {
           }}>Legacy.</span>
         </div>
 
-        {/* Gold center rule — extends during the hold */}
+        {/* Gold center rule */}
         <span ref={ruleRef} style={{
           display: 'block',
           width: 'clamp(44px, 5.5vw, 72px)',
@@ -281,12 +267,7 @@ export function Statement() {
         }} />
       </div>
 
-      {/* ── Statement → About: Cream bloom overlay ──────────
-          At end of scroll this is opacity:1 (#F7F5F1).
-          About's background IS #F7F5F1.
-          When pin releases → About enters from below in cream.
-          The eye sees one continuous cream surface. Zero seam.
-      ─────────────────────────────────────────────────────── */}
+      {/* ── Statement → About: Cream bloom overlay ──────────── */}
       <div
         ref={bloomRef}
         aria-hidden

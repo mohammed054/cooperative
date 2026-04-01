@@ -1,9 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   global.css — FIXED
-   Changes:
-     ✓ Explicit .nav-hamburger / .nav-desktop responsive rules
-       (Tailwind backup — hamburger was showing on desktop)
-     ✓ All other fixes preserved
+   global.css
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Reset ─────────────────────────────────────────────────────── */
@@ -16,6 +12,9 @@ html {
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   overflow-x: hidden;
+  /* Firefox scrollbar hidden */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 body {
@@ -24,16 +23,16 @@ body {
   color: var(--color-text);
   line-height: 1.6;
   overflow-x: hidden;
+  /* Firefox scrollbar hidden */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
+/* ── Scrollbar — hidden entirely ───────────────────────────────── */
+::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* ── Selection ─────────────────────────────────────────────────── */
 ::selection { background-color: var(--color-accent-1); color: #FFFFFF; }
-
-/* ── Scrollbar ─────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-accent-2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-accent-1); }
 
 /* ── Focus ─────────────────────────────────────────────────────── */
 :focus-visible { outline: 1px solid rgba(197,160,89,0.7); outline-offset: 4px; }
@@ -81,11 +80,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 /* ── Overflow control ──────────────────────────────────────────── */
 main, footer, header { overflow-x: hidden; }
 
-/* ── NAVBAR RESPONSIVE FIX ─────────────────────────────────────
-   Explicit media queries as a guaranteed backup for Tailwind classes.
-   Fixes hamburger visible on desktop (Tailwind 'lg:hidden' might not
-   compile correctly if content paths are misconfigured).
-────────────────────────────────────────────────────────────── */
+/* ── NAVBAR RESPONSIVE FIX ─────────────────────────────────────── */
 .nav-hamburger {
   display: flex !important;
   flex-direction: column;
@@ -132,7 +127,6 @@ main, footer, header { overflow-x: hidden; }
 
 /* ── Touch scroll performance ──────────────────────────────────── */
 @media (hover: none) and (pointer: coarse) {
-  ::-webkit-scrollbar { display: none; }
   #scroll-root { -webkit-overflow-scrolling: touch; }
 }
 

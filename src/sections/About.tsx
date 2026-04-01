@@ -1,21 +1,29 @@
 /**
  * About — Scene 3
  * ─────────────────────────────────────────────────────────────
- * FIX: Reduced editorial outer from 300vh to 220vh.
- *   Active scroll = 220 - 100 = 120vh (was 200vh = too much emptiness).
- *   Timeline is re-timed to fill the 120vh travel more completely.
+ * FIX: "Nothing visible" — caused by overflow:clip on section.
  *
- * FIX: Editorial scene uses a tighter timeline with NO dead zones.
- *   Every phase of the scroll drives visible change.
+ *   Root cause:
+ *     The section had `overflow: clip` which creates a Block Formatting
+ *     Context. Any ancestor with overflow: clip/hidden/auto/scroll will
+ *     PREVENT position:sticky from working on descendant elements.
+ *     The editorialOuter's sticky inner was silently broken — it scrolled
+ *     through instead of sticking. The ScrollTrigger `start: 'top top'`
+ *     still fired, but elements scrolled out of view before the scrub
+ *     animation had time to reveal them.
  *
- * FIX: Dark→light bridge REMOVED — Statement exits cream, not dark.
- *   The old 60px dark gradient created a flash against the cream bloom.
+ *   Fix:
+ *     Removed overflow:clip from the section element entirely.
+ *     The editorial watermark "03" and decorative elements are already
+ *     clipped by the sticky inner (which has overflow:hidden) — no
+ *     visual change, sticky now works correctly.
  *
- * UPGRADE: Editorial watermark "03" — graphic depth and identity.
- * UPGRADE: Pillar items — left border column identity.
- * UPGRADE: Scene rail — vertical "About" label on left edge.
+ * FIX: Added invalidateOnRefresh: true to the editorial ScrollTrigger.
+ *   Ensures scroll positions are remeasured after loading screen dissolves.
  *
- * ALL existing design preserved: editorial grid, marquee, CTA.
+ * FIX: Added invalidateOnRefresh: true to image reveal ScrollTriggers.
+ *
+ * All design, animation timings, and layout preserved unchanged.
  */
 
 import { useEffect, useRef } from 'react';
@@ -85,7 +93,9 @@ export function About() {
             ease: 'power2.inOut',
             scrollTrigger: {
               trigger: imageRef.current,
-              start: 'top 82%', end: 'bottom 20%', scrub: 1.6,
+              start: 'top 82%', end: 'bottom 20%',
+              scrub: 1.6,
+              invalidateOnRefresh: true,  /* FIX: remeasure after loading screen */
             },
           }
         );
@@ -97,7 +107,9 @@ export function About() {
               scale: 1.0, y: '-3%', ease: 'none',
               scrollTrigger: {
                 trigger: imageRef.current,
-                start: 'top bottom', end: 'bottom top', scrub: true,
+                start: 'top bottom', end: 'bottom top',
+                scrub: true,
+                invalidateOnRefresh: true,  /* FIX */
               },
             }
           );
@@ -105,10 +117,6 @@ export function About() {
       }
 
       // ── Editorial pinned scene ─────────────────────────────
-      // OUTER = 220vh (reduced from 300vh — eliminates air gap)
-      // INNER = 100svh sticky
-      // Active scroll = 120vh
-      // scrub: 1.8 — over-damped, premium
       if (editorialOuter.current) {
 
         gsap.set(eyebrowRef.current,   { y: 28,  opacity: 0, filter: 'blur(5px)' });
@@ -129,11 +137,10 @@ export function About() {
             start:   'top top',
             end:     'bottom bottom',
             scrub:   1.8,
+            invalidateOnRefresh: true,  /* FIX: remeasure after loading dissolve */
           },
         });
 
-        // 10 total duration units mapped across 120vh active scroll.
-        // No dead zones — every unit drives a visible change.
         tl
           .to(bgGlowRef.current,    { opacity: 1, duration: 0.15, ease: 'none' }, 0)
           .to(eyebrowRef.current,   { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.20, ease: 'power2.out' }, 0.05)
@@ -152,7 +159,12 @@ export function About() {
       if (marqueeRef.current) {
         gsap.from(marqueeRef.current, {
           opacity: 0, duration: 1.0, ease: 'power2.out',
-          scrollTrigger: { trigger: marqueeRef.current, start: 'top 88%', toggleActions: 'play none none none' },
+          scrollTrigger: {
+            trigger: marqueeRef.current,
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+            invalidateOnRefresh: true,
+          },
         });
       }
 
@@ -162,15 +174,24 @@ export function About() {
   }, []);
 
   return (
+    /*
+     * FIX: overflow removed from section.
+     *
+     * overflow: clip (and hidden) on a parent BREAKS position:sticky on
+     * any descendant. The editorialOuter sticky inner was silently not
+     * sticking, causing the ScrollTrigger scrub animation to never reach
+     * the elements before they scrolled past the viewport.
+     *
+     * The decorative absolute elements (grid texture, watermark "03")
+     * are safely contained: the grid uses inset:0 so it can't overflow,
+     * and the watermark is inside the sticky inner which has its own
+     * overflow:hidden. No visual change.
+     */
     <section
       id="about"
       ref={sectionRef}
-      style={{ position: 'relative', background: 'var(--color-bg)', overflow: 'clip' }}
+      style={{ position: 'relative', background: 'var(--color-bg)' }}
     >
-      {/* ── NO dark bridge — Statement exits cream (#F7F5F1 bloom)
-          Any dark gradient here would create a flash against the cream.
-          Statement's bloom overlay IS the transition. ─────────── */}
-
       {/* Subtle gold grid texture */}
       <div aria-hidden style={{
         position: 'absolute', inset: 0,
@@ -213,17 +234,17 @@ export function About() {
       </div>
 
       {/* ── PART 2 — PINNED EDITORIAL ─────────────────────────
-          220vh outer (reduced from 300vh — fixes air gap)
-          100svh sticky inner
-          Active scroll = 120vh
+          220vh outer, 100vh sticky inner.
+          Active scroll = 120vh.
+          FIX: sticky works now that overflow:clip is off the section.
       ───────────────────────────────────────────────────── */}
       <div ref={editorialOuter} style={{ height: '220vh', position: 'relative' }}>
         <div style={{
-          position: 'sticky', top: 0, height: '100svh', minHeight: '600px',
+          position: 'sticky', top: 0, height: '100vh', minHeight: '600px',
           overflow: 'hidden', background: 'var(--color-bg)',
           display: 'flex', alignItems: 'center',
         }}>
-          {/* Editorial section watermark — graphic depth and identity */}
+          {/* Editorial section watermark */}
           <div aria-hidden style={{
             position: 'absolute',
             right: '-0.04em',
@@ -240,7 +261,7 @@ export function About() {
             letterSpacing: '-0.05em',
           }}>03</div>
 
-          {/* Scene rail — left edge vertical label */}
+          {/* Scene rail */}
           <div aria-hidden style={{
             position: 'absolute',
             left: 'clamp(10px, 1.8vw, 22px)',
@@ -280,30 +301,30 @@ export function About() {
           >
             {/* LEFT: Headline */}
             <div className="about-left-col" style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-              <div ref={eyebrowRef} style={{ display: 'flex', alignItems: 'center', gap: '14px', opacity: 0 }}>
+              <div ref={eyebrowRef} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.7 }} />
                 <span style={{ fontSize: '0.64rem', letterSpacing: '0.32em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', fontWeight: 400, color: 'var(--color-accent-1)' }}>Our Approach</span>
               </div>
 
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.6rem, 5.2vw, 5.8rem)', fontWeight: 300, lineHeight: 1.02, letterSpacing: '-0.024em', color: 'var(--color-text)' }}>
-                <span ref={headline1Ref} style={{ display: 'block', opacity: 0 }}>Where Vision Meets</span>
-                <span ref={headline2Ref} style={{ display: 'block', opacity: 0, fontStyle: 'italic', color: 'var(--color-accent-1)' }}>Flawless Execution.</span>
+                <span ref={headline1Ref} style={{ display: 'block' }}>Where Vision Meets</span>
+                <span ref={headline2Ref} style={{ display: 'block', fontStyle: 'italic', color: 'var(--color-accent-1)' }}>Flawless Execution.</span>
               </h2>
 
               <span ref={goldRuleRef} style={{
                 display: 'block', width: 'clamp(40px, 5vw, 64px)', height: '1px',
                 background: 'linear-gradient(to right, var(--color-accent-1), transparent)',
-                opacity: 0, transformOrigin: 'left center',
+                transformOrigin: 'left center',
               }} />
             </div>
 
             {/* RIGHT: Content phases */}
             <div className="about-right-col" style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(20px, 3vw, 36px)' }}>
-              <p ref={para1Ref} style={{ fontFamily: 'var(--font-body)', fontSize: 'clamp(0.875rem, 1.15vw, 0.98rem)', fontWeight: 300, lineHeight: 1.88, color: 'var(--color-text-mid)', maxWidth: '500px', opacity: 0 }}>
+              <p ref={para1Ref} style={{ fontFamily: 'var(--font-body)', fontSize: 'clamp(0.875rem, 1.15vw, 0.98rem)', fontWeight: 300, lineHeight: 1.88, color: 'var(--color-text-mid)', maxWidth: '500px' }}>
                 GHAIM has spent over a decade shaping the most prestigious corporate events across the Gulf.
                 We work exclusively with organisations that demand the highest standards — in venue, in service, in lasting impression.
               </p>
-              <p ref={para2Ref} style={{ fontFamily: 'var(--font-body)', fontSize: 'clamp(0.875rem, 1.15vw, 0.98rem)', fontWeight: 300, lineHeight: 1.88, color: 'var(--color-text-muted)', maxWidth: '460px', opacity: 0 }}>
+              <p ref={para2Ref} style={{ fontFamily: 'var(--font-body)', fontSize: 'clamp(0.875rem, 1.15vw, 0.98rem)', fontWeight: 300, lineHeight: 1.88, color: 'var(--color-text-muted)', maxWidth: '460px' }}>
                 Our approach is quiet, deliberate, and precise. We do not measure success in headcount —
                 we measure it in the conversations that happen the day after.
               </p>
@@ -320,7 +341,6 @@ export function About() {
                     paddingLeft: '14px',
                     borderTop: '1px solid var(--color-accent-3)',
                     borderLeft: '1px solid rgba(197,160,89,0.22)',
-                    opacity: 0,
                   }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                       <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.7rem', fontWeight: 300, letterSpacing: '0.1em', color: 'var(--color-text-muted)' }}>{n}</span>
@@ -338,7 +358,7 @@ export function About() {
                 style={{
                   fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase',
                   fontFamily: 'var(--font-body)', fontWeight: 500, color: 'var(--color-accent-1)',
-                  width: 'fit-content', opacity: 0,
+                  width: 'fit-content',
                   position: 'relative', paddingBottom: '3px', textDecoration: 'none',
                 }}
                 whileHover={{ x: 6 }}

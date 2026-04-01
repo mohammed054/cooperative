@@ -1,30 +1,15 @@
 /**
- * Hero — Scene 1  (FIXED)
+ * Hero — Scene 1
  * ─────────────────────────────────────────────────────────────
- * FIXES:
+ * CHANGES FROM PREVIOUS VERSION:
  *
- *  FIX 1 — LIGHT BACKGROUND
- *    section background = var(--color-bg) (cream #F7F5F1).
- *    Loading screen is cream. Hero fallback is cream.
- *    = zero flash / zero jarring contrast on dissolve.
- *    Video fades in smoothly ON TOP of cream via CSS animation.
+ *  CHANGE 1 — VIDEO LESS DARK
+ *    Left gradient: 0.60 → 0.38 anchor (much lighter right-side luminosity)
+ *    Bottom gradient: top reduced 0.40 → 0.18, mid reduced
+ *    Bottom seam: 0.82 preserved exactly (Statement bridge depends on it)
+ *    Scroll exit overlay max: 0.72 → 0.50 (video stays more visible on scroll)
  *
- *  FIX 2 — VIDEO DISAPPEARS ON SLIGHTEST SCROLL
- *    Root cause: overlay animation started at 'top top' → any scroll
- *    instantly covered the video with a solid #060504 div.
- *    Fix: overlay animation delayed to start:  '45% top'
- *         overlay max opacity reduced:         0.92 → 0.72
- *         video filter animation removed       (was redundant + aggressive)
- *
- *  FIX 3 — SCROLL EXIT REBALANCED
- *    Content drift: unchanged (gentle parallax)
- *    Video: only scales slightly, no brightness animation
- *    Overlay: delayed start, softer max — video stays visible until
- *             the section is mostly past the viewport
- *
- *  FIX 4 — GRADIENT BRIGHTNESS
- *    Left anchor: 0.76 → 0.60 (less crushing on the left edge)
- *    Top/bottom: tuned bottom to 0.82 to lock seam with Statement
+ *  All other fixes from previous version preserved unchanged.
  */
 
 import { useEffect, useRef } from 'react';
@@ -199,17 +184,9 @@ export function Hero() {
     return () => ctx.revert();
   }, []);
 
-  /* ── Scroll exit — FIXED ────────────────────────────────
-   *  FIX: overlay delayed to 45% of section scroll
-   *       so the video is VISIBLE for the first half of scrolling.
-   *  FIX: max overlay opacity reduced 0.92 → 0.72
-   *       so video is never completely killed.
-   *  FIX: video filter animation REMOVED
-   *       (was compounding with overlay to black out video instantly).
-   ────────────────────────────────────────────────────── */
+  /* ── Scroll exit ────────────────────────────────────────── */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      /* Content drifts up — unchanged */
       gsap.to(contentRef.current, {
         y: -55, opacity: 0, ease: 'none',
         scrollTrigger: {
@@ -225,19 +202,22 @@ export function Hero() {
         },
       });
 
-      /* Overlay: DELAYED start — video stays clear for top 45% of scroll */
+      /*
+       * CHANGE: max opacity 0.72 → 0.50
+       * The video was getting too dark during scroll exit.
+       * Start trigger preserved at '45% top'.
+       */
       gsap.to(overlayRef.current, {
-        opacity: 0.72,               /* was 0.92 — video no longer disappears */
+        opacity: 0.50,
         ease: 'none',
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: '45% top',          /* was 'top top' — crucial fix */
+          start: '45% top',
           end:   'bottom top',
           scrub: 0.9,
         },
       });
 
-      /* Video: subtle scale only, no brightness kill */
       gsap.to(videoRef.current, {
         scale: 1.06,
         ease: 'none',
@@ -253,12 +233,6 @@ export function Hero() {
 
   /* ── Render ──────────────────────────────────────────── */
   return (
-    /*
-     * FIX: background is now var(--color-bg) — cream.
-     * Loading screen = cream. Hero fallback = cream.
-     * When loading screen dissolves, there is NO color flash.
-     * The video fades in on top via CSS animation (videoFadeIn).
-     */
     <section
       ref={sectionRef}
       id="hero"
@@ -267,13 +241,10 @@ export function Hero() {
         minHeight: '660px',
         position:  'relative',
         overflow:  'hidden',
-        background: 'var(--color-bg)',   /* CREAM — matches loading screen */
+        background: 'var(--color-bg)',
       }}
     >
-      {/* ══ VIDEO ════════════════════════════════════════════
-          Fades in over cream background for smooth transition.
-          CSS animation: opacity 0 → 1 over 1.0s with short delay.
-      ════════════════════════════════════════════════════ */}
+      {/* ══ VIDEO ════════════════════════════════════════════ */}
       <video
         ref={videoRef}
         autoPlay muted loop playsInline
@@ -293,7 +264,6 @@ export function Hero() {
         <source src="/videos/hero.webm" type="video/webm" />
       </video>
 
-      {/* CSS for video fade-in */}
       <style>{`
         @keyframes heroVideoFadeIn {
           from { opacity: 0; }
@@ -302,23 +272,24 @@ export function Hero() {
       `}</style>
 
       {/* ══ GRADIENTS ════════════════════════════════════════
-          FIX: Left anchor reduced 0.76 → 0.60 (less crushing).
-          FIX: Bottom locked to 0.82 to seam with Statement's bridge.
+          CHANGE: Left gradient lightened — 0.60 → 0.38 anchor.
+          CHANGE: Bottom top reduced 0.40 → 0.18, mid softened.
+          PRESERVED: Bottom seam at 0.82 — Statement bridge requires this.
       ════════════════════════════════════════════════════ */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'linear-gradient(to right, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.38) 32%, rgba(0,0,0,0.14) 58%, rgba(0,0,0,0.02) 100%)',
+        background: 'linear-gradient(to right, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.20) 32%, rgba(0,0,0,0.07) 58%, rgba(0,0,0,0.0) 100%)',
       }} />
       <div className="absolute inset-0 pointer-events-none" style={{
         background: `linear-gradient(to bottom,
-          rgba(6,5,4,0.40)  0%,
-          rgba(6,5,4,0.06) 28%,
-          rgba(6,5,4,0.08) 56%,
-          rgba(6,5,4,0.60) 85%,
+          rgba(6,5,4,0.18)  0%,
+          rgba(6,5,4,0.03) 28%,
+          rgba(6,5,4,0.05) 56%,
+          rgba(6,5,4,0.52) 85%,
           rgba(6,5,4,0.82) 100%
         )`,
       }} />
 
-      {/* Scroll-exit overlay — starts at 45% of section, max 0.72 opacity */}
+      {/* Scroll-exit overlay — CHANGE: max opacity 0.72 → 0.50 */}
       <div
         ref={overlayRef}
         className="absolute inset-0 pointer-events-none"
