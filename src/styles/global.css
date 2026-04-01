@@ -1,6 +1,17 @@
 /* ═══════════════════════════════════════════════════════════════
-   global.css
-   ═══════════════════════════════════════════════════════════════ */
+   global.css — FIXED
+   ═══════════════════════════════════════════════════════════════
+   KEY FIXES:
+   1. `main { overflow-x: clip }` NOT `hidden`.
+      overflow-x: hidden creates a Block Formatting Context which
+      silently prevents position:sticky from working on any descendant.
+      overflow-x: clip visually clips without creating a BFC — sticky
+      works correctly again.
+
+   2. Removed `html { scroll-behavior: smooth }`.
+      Lenis handles smooth scroll. Having both active causes dual-smooth
+      conflicts on anchor navigation and GSAP scrub sections.
+*/
 
 /* ── Reset ─────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -10,9 +21,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  scroll-behavior: smooth;
+  /* REMOVED: scroll-behavior: smooth — conflicts with Lenis */
   overflow-x: hidden;
-  /* Firefox scrollbar hidden */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -23,7 +33,6 @@ body {
   color: var(--color-text);
   line-height: 1.6;
   overflow-x: hidden;
-  /* Firefox scrollbar hidden */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -78,7 +87,15 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 .section-reveal.in-view { opacity: 1; transform: translateY(0); }
 
 /* ── Overflow control ──────────────────────────────────────────── */
-main, footer, header { overflow-x: hidden; }
+/*
+ * CRITICAL FIX: Use `overflow-x: clip` NOT `overflow-x: hidden`.
+ * `overflow-x: hidden` creates a BFC that breaks position:sticky
+ * on ALL descendants (About editorial, Testimonials sticky panel, etc).
+ * `overflow-x: clip` clips visually without creating a BFC.
+ */
+main   { overflow-x: clip; }
+footer { overflow-x: clip; }
+header { overflow-x: clip; }
 
 /* ── NAVBAR RESPONSIVE FIX ─────────────────────────────────────── */
 .nav-hamburger {
@@ -99,7 +116,7 @@ main, footer, header { overflow-x: hidden; }
 @media (max-width: 640px) { html { font-size: 15px; } }
 @media (max-width: 375px) { html { font-size: 14px; } }
 
-/* ── About — sticky headline disabled on mobile ─────────────────── */
+/* ── About — responsive ────────────────────────────────────────── */
 @media (max-width: 767px) {
   .about-headline-col { position: relative !important; top: auto !important; }
 }
