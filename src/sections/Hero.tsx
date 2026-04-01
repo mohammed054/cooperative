@@ -248,7 +248,6 @@ export function Hero() {
       <video
         ref={videoRef}
         autoPlay muted loop playsInline
-        poster="/images/hero-poster.jpg"
         style={{
           position:        'absolute',
           inset:           0,
@@ -260,8 +259,7 @@ export function Hero() {
           animation:       'heroVideoFadeIn 1.1s ease 0.25s both',
         }}
       >
-        <source src="/background.mp4"   type="video/mp4" />
-        <source src="/videos/hero.webm" type="video/webm" />
+        <source src="/background.mp4" type="video/mp4" />
       </video>
 
       <style>{`
