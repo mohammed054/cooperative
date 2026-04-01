@@ -22,6 +22,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeInUp, staggerContainer } from '@/animations/fadeInUp';
+import { BASE_PATH } from '@/utils/basePath';
 
 const NAV_GROUPS = [
   {
@@ -243,7 +244,7 @@ export function Footer() {
               style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
             >
               <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', width: 'fit-content' }}>
-                <img src="/logo.webp" alt="GHAIM" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+                <img src={`${BASE_PATH}logo.webp`} alt="GHAIM" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
                 <span style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '0.95rem', letterSpacing: '0.32em', textTransform: 'uppercase', color: 'var(--color-text)' }}>GHAIM</span>
               </a>
               <div style={{ width: '36px', height: '1px', background: 'var(--color-accent-1)', opacity: 0.5 }} />

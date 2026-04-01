@@ -14,6 +14,7 @@
 
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { BASE_PATH } from '@/utils/basePath';
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -102,7 +103,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         {/* Logo — dark filter so it reads on cream background */}
         <img
           ref={logoRef}
-          src="/logo.webp"
+          src={`${BASE_PATH}logo.webp`}
           alt="GHAIM"
           style={{
             width:  'clamp(50px, 7vw, 70px)',

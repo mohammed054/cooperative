@@ -16,6 +16,7 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { BASE_PATH } from '@/utils/basePath';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -259,7 +260,7 @@ export function Hero() {
           animation:       'heroVideoFadeIn 1.1s ease 0.25s both',
         }}
       >
-        <source src="/background.mp4" type="video/mp4" />
+        <source src={`${BASE_PATH}background.mp4`} type="video/mp4" />
       </video>
 
       <style>{`

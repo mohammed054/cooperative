@@ -8,6 +8,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BASE_PATH } from '@/utils/basePath';
 
 const NAV_ITEMS = [
   {
@@ -117,7 +118,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
         >
           <div style={{ padding: '22px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(197,160,89,0.1)' }}>
             <a href="#" onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <img src="/logo.webp" alt="GHAIM" style={{ width: '32px', height: 'auto' }} />
+              <img src={`${BASE_PATH}logo.webp`} alt="GHAIM" style={{ width: '32px', height: 'auto' }} />
               <span style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '1rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.9)' }}>GHAIM</span>
             </a>
             <button onClick={onClose} aria-label="Close menu" style={{ width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)', background: 'none', border: '1px solid rgba(197,160,89,0.2)', cursor: 'pointer' }}>
@@ -233,7 +234,7 @@ export function Navbar() {
         <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(20px, 4vw, 56px)', height: '70px', maxWidth: '1600px', margin: '0 auto' }}>
 
           <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, textDecoration: 'none' }}>
-            <img src="/logo.webp" alt="GHAIM" style={{ height: '36px', width: 'auto', objectFit: 'contain', filter: logoFilt, transition: 'filter 0.45s ease' }} />
+            <img src={`${BASE_PATH}logo.webp`} alt="GHAIM" style={{ height: '36px', width: 'auto', objectFit: 'contain', filter: logoFilt, transition: 'filter 0.45s ease' }} />
             <span style={{ fontFamily: 'var(--font-display)', fontWeight: 300, fontSize: '0.9rem', letterSpacing: '0.36em', textTransform: 'uppercase', color: logoColor, transition: 'color 0.45s ease' }}>GHAIM</span>
           </a>
 
