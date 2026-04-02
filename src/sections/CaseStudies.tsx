@@ -1,11 +1,14 @@
 /**
- * CaseStudies — Scene 4 (FIXED)
+ * CaseStudies — Scene 4
  * ─────────────────────────────────────────────────────────────
- * Fixes:
- *   ✓ Header text now centered (was aligned left, with image below — now text is centred above)
- *   ✓ Featured image takes full width below centered header — much more impactful
- *   ✓ All existing hover/gallery/lightbox behaviour preserved
- *   ✓ Mobile layout improvements maintained
+ * KEY FIX — Mobile gallery:
+ *   WAS: flex-direction:column on mobile → completely broken vertical stack
+ *   NOW: overflow-x:auto + scroll-snap-type:x mandatory → true horizontal
+ *        touch-scroll identical to desktop (just touch-driven not GSAP-driven)
+ *
+ * Added gallery-wrapper class to the overflow container so the mobile CSS
+ * override can target it. Everything else — featured card, lightbox,
+ * desktop GSAP pin — preserved unchanged.
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -15,16 +18,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ── Types ───────────────────────────────────────────────────── */
-
 interface CaseStat  { value: string; label: string; }
 interface CaseStudy {
   id: string; category: string; title: string;
   subtitle: string; location: string; year: string;
   image: string; stats: CaseStat[];
 }
-
-/* ── Data ────────────────────────────────────────────────────── */
 
 const FEATURED_STUDY: CaseStudy = {
   id: 'grand-cascade', category: 'Gala & Awards',
@@ -78,8 +77,6 @@ const GALLERY_STUDIES: CaseStudy[] = [
   },
 ];
 
-/* ── Helpers ─────────────────────────────────────────────────── */
-
 function GoldRule({ className = '' }: { className?: string }) {
   return (
     <div className={className} style={{ height: '1px', background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.55), transparent)' }} />
@@ -100,8 +97,6 @@ function CategoryTag({ label }: { label: string }) {
   );
 }
 
-/* ── Featured Study ──────────────────────────────────────────── */
-
 function FeaturedStudy({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseStudy) => void }) {
   return (
     <motion.div
@@ -120,7 +115,6 @@ function FeaturedStudy({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseSt
       </div>
       <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(to right, rgba(10,8,6,0.72) 0%, rgba(10,8,6,0.36) 45%, rgba(10,8,6,0.10) 100%), linear-gradient(to top, rgba(10,8,6,0.60) 0%, transparent 55%)`, borderRadius: 'inherit' }} />
       <motion.div className="absolute left-0 top-8 bottom-8 w-0.5 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, var(--color-accent-1), transparent)' }} variants={{ rest: { opacity: 0.45, scaleY: 0.7 }, hovered: { opacity: 0.85, scaleY: 1 } }} transition={{ duration: 0.45 }} />
-
       <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 lg:p-14">
         <div className="absolute top-8 left-8 md:left-12 lg:left-14 flex items-center gap-4">
           <CategoryTag label={study.category} />
@@ -155,8 +149,6 @@ function FeaturedStudy({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseSt
   );
 }
 
-/* ── Gallery Card ─────────────────────────────────────────────── */
-
 function GalleryCard({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseStudy) => void }) {
   return (
     <motion.article
@@ -180,10 +172,8 @@ function GalleryCard({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseStud
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(10,8,6,0.82) 0%, rgba(10,8,6,0.18) 55%, transparent 100%)', borderRadius: 'inherit' }} />
       <motion.div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(197,160,89,0.05)', borderRadius: 'inherit' }} variants={{ rest: { opacity: 0 }, hovered: { opacity: 1 } }} transition={{ duration: 0.35 }} />
       <motion.div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none" style={{ background: 'linear-gradient(to right, transparent, var(--color-accent-1), transparent)' }} variants={{ rest: { scaleX: 0, opacity: 0 }, hovered: { scaleX: 1, opacity: 0.8 } }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} />
-
       <div className="absolute top-5 left-5"><CategoryTag label={study.category} /></div>
       <motion.span className="absolute top-5 right-5" style={{ fontSize: '0.6rem', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'rgba(255,255,255,0.35)' }} variants={{ rest: { opacity: 0.35 }, hovered: { opacity: 0.65 } }}>{study.year}</motion.span>
-
       <div className="absolute bottom-0 left-0 right-0 p-6">
         <motion.h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 2.1vw, 1.75rem)', fontWeight: 300, lineHeight: 1.1, letterSpacing: '-0.01em', color: '#F8F4EE', marginBottom: '0.45rem' }} variants={{ rest: { y: 0 }, hovered: { y: -4 } }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
           {study.title}
@@ -196,8 +186,6 @@ function GalleryCard({ study, onOpen }: { study: CaseStudy; onOpen: (s: CaseStud
     </motion.article>
   );
 }
-
-/* ── Lightbox ─────────────────────────────────────────────────── */
 
 function Lightbox({ study, onClose }: { study: CaseStudy | null; onClose: () => void }) {
   useEffect(() => {
@@ -267,10 +255,6 @@ function Lightbox({ study, onClose }: { study: CaseStudy | null; onClose: () => 
   );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   CASE STUDIES — Main Export
-══════════════════════════════════════════════════════════════ */
-
 export function CaseStudies() {
   const sectionRef  = useRef<HTMLElement>(null);
   const headerRef   = useRef<HTMLDivElement>(null);
@@ -290,7 +274,6 @@ export function CaseStudies() {
           scrollTrigger: { trigger: headerRef.current, start: 'top 82%', toggleActions: 'play none none none' },
         });
       }
-
       if (featuredRef.current) {
         gsap.from(featuredRef.current, {
           opacity: 0, y: 48, scale: 0.98, duration: 1.1, ease: 'power3.out',
@@ -355,52 +338,27 @@ export function CaseStudies() {
       >
         <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `radial-gradient(ellipse 70% 50% at 90% 20%, rgba(197,160,89,0.03) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 10% 80%, rgba(197,160,89,0.02) 0%, transparent 60%)` }} />
 
-        {/* ── HEADER — NOW CENTRED ─────────────────────────── */}
-        <div
-          className="relative mx-auto w-full"
-          style={{ maxWidth: '1340px', padding: 'clamp(72px, 8vw, 112px) clamp(20px, 4vw, 64px) 0' }}
-        >
-          <div
-            ref={headerRef}
-            className="mb-10 md:mb-14 text-center mx-auto"
-            style={{ maxWidth: '640px' }}
-          >
-            {/* Eyebrow — centred */}
+        <div className="relative mx-auto w-full" style={{ maxWidth: '1340px', padding: 'clamp(72px, 8vw, 112px) clamp(20px, 4vw, 64px) 0' }}>
+          <div ref={headerRef} className="mb-10 md:mb-14 text-center mx-auto" style={{ maxWidth: '640px' }}>
             <div className="hdr-anim flex items-center justify-center gap-4 mb-6">
               <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.6 }} />
               <span style={{ fontSize: '0.62rem', letterSpacing: '0.34em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', fontWeight: 500, color: 'var(--color-accent-1)' }}>Our Work</span>
               <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.6 }} />
             </div>
-
-            {/* Headline — centred */}
-            <h2 className="hdr-anim" style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.2rem, 5vw, 4.8rem)',
-              fontWeight: 300, lineHeight: 1.04, letterSpacing: '-0.025em',
-              color: 'var(--color-text)', marginBottom: '1rem',
-            }}>
+            <h2 className="hdr-anim" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.2rem, 5vw, 4.8rem)', fontWeight: 300, lineHeight: 1.04, letterSpacing: '-0.025em', color: 'var(--color-text)', marginBottom: '1rem' }}>
               Moments That<br />
               <em style={{ fontStyle: 'italic', color: 'var(--color-accent-1)' }}>Define Legacy.</em>
             </h2>
-
-            {/* Subtext — centred */}
-            <p className="hdr-anim mx-auto" style={{
-              fontSize: 'clamp(0.8rem, 1vw, 0.88rem)',
-              fontFamily: 'var(--font-body)', fontWeight: 300,
-              lineHeight: 1.8, color: 'var(--color-text-muted)',
-            }}>
+            <p className="hdr-anim mx-auto" style={{ fontSize: 'clamp(0.8rem, 1vw, 0.88rem)', fontFamily: 'var(--font-body)', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-muted)' }}>
               Selected engagements across six continents — each one a study in precision,
               storytelling, and the art of leaving nothing to chance.
             </p>
           </div>
-
-          {/* Featured image — full width below centred header */}
           <div ref={featuredRef} className="mb-12 md:mb-18">
             <FeaturedStudy study={FEATURED_STUDY} onOpen={openLightbox} />
           </div>
         </div>
 
-        {/* Gallery label */}
         <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 clamp(20px, 4vw, 64px) 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <span style={{ height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.45, display: 'block' }} />
@@ -410,8 +368,12 @@ export function CaseStudies() {
           </div>
         </div>
 
-        {/* Horizontal gallery */}
-        <div ref={hWrapperRef} style={{ overflow: 'hidden', width: '100%' }}>
+        {/* ─── GALLERY WRAPPER ───────────────────────────────────────
+         *  Desktop: overflow:hidden, GSAP drives x-translation (pin)
+         *  Mobile:  overflow-x:auto, native touch-scroll with snap
+         *  The .gallery-wrapper class is the CSS hook for mobile override
+         * ─────────────────────────────────────────────────────────── */}
+        <div ref={hWrapperRef} className="gallery-wrapper" style={{ overflow: 'hidden', width: '100%' }}>
           <div
             ref={trackRef}
             className="gallery-track"
@@ -430,7 +392,6 @@ export function CaseStudies() {
           </div>
         </div>
 
-        {/* Bottom CTA */}
         <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 clamp(20px, 4vw, 64px)', paddingBottom: 'clamp(64px, 7vw, 96px)' }}>
           <motion.div
             className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
@@ -459,17 +420,36 @@ export function CaseStudies() {
         </div>
 
         <style>{`
+          /* ── MOBILE: horizontal touch-scroll with snap ── */
           @media (max-width: 767px) {
-            .gallery-track {
-              flex-direction: column !important;
-              width: 100% !important;
-              padding-left: 20px !important;
-              padding-right: 20px !important;
+            /* Make the wrapper scrollable instead of clipping */
+            .gallery-wrapper {
+              overflow-x: auto    !important;
+              overflow-y: visible !important;
+              -webkit-overflow-scrolling: touch;
+              scroll-snap-type: x mandatory;
+              scrollbar-width: none;
             }
+            .gallery-wrapper::-webkit-scrollbar { display: none; }
+
+            /* Track stays as a row — no column flip */
+            .gallery-track {
+              flex-direction: row    !important;
+              width: max-content     !important;
+              padding-left: 20px     !important;
+              padding-right: 20px    !important;
+              padding-bottom: 48px   !important;
+              gap: 14px              !important;
+            }
+
+            /* Each card: 82vw wide, snaps to start */
             .gallery-track .gallery-card {
-              width: 100% !important;
-              height: clamp(280px, 68vw, 440px) !important;
-              flex-shrink: unset !important;
+              flex-shrink: 0         !important;
+              width: 82vw            !important;
+              height: 68vw           !important;
+              min-height: 260px      !important;
+              scroll-snap-align: start;
+              scroll-snap-stop: always;
             }
           }
         `}</style>
