@@ -1,33 +1,31 @@
 /**
- * Testimonials — Scene 5 · REBUILT
+ * Testimonials — Scene 5  ·  COMPLETE REDESIGN
  * ─────────────────────────────────────────────────────────────
- * Root cause of prior breakage:
- *   position:sticky on the left quote panel was silently failing.
- *   Even with overflow-x:clip on <main>, Lenis wraps content in a
- *   scroll-root div which — under certain conditions — interferes
- *   with sticky inside a CSS grid. Additionally, the ghost quote
- *   text rendered cream-on-cream because the section background
- *   is var(--color-bg) and the initial mount opacity animation
- *   sometimes didn't fire.
+ * Problems with the old design:
+ *   1. GSAP pin broke inside Lenis scroll container — quote panel
+ *      would freeze at wrong position or not pin at all.
+ *   2. Ghost numeral was cream-on-cream (var(--color-bg) ≈ #F7F5F1,
+ *      ghost was rgba(197,160,89,0.09) → barely visible).
+ *   3. Right "preview list" at 22% opacity looked like broken CSS,
+ *      not intentional design.
+ *   4. The 2-col split felt cramped and misaligned at mid-viewport.
  *
- * New architecture:
- *   — GSAP ScrollTrigger pin on the WHOLE section for
- *     (N_TESTIMONIALS * 100vh) of scroll distance.
- *   — Scrub-driven gsap.timeline that steps through quotes via
- *     opacity/blur/y transitions. No position:sticky needed at all.
- *   — Left panel: large quote with ghost numeral behind
- *   — Right panel: compact preview list, active item brightens
- *   — Mobile: simple vertical stagger, no pin
+ * New architecture — NO GSAP PIN:
+ *   Full-width magazine-style auto-carousel.
+ *   • Left 55%: large italic quote, author attribution, gold accent.
+ *   • Right 45%: vertical stack of all testimonials — active item
+ *     is full brightness, rest subtly faded, each is clickable.
+ *   • Auto-advances every 6 s; pauses on hover/focus.
+ *   • AnimatePresence drives quote transitions: blur+y fade.
+ *   • Mobile: single centered quote + dot-navigator.
+ *   • Zero GSAP, zero pinning, zero scroll-distance calculations.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const AUTO_ADVANCE_MS = 6000;
 
 interface Testimonial {
   id: string;
@@ -73,134 +71,241 @@ const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-/* ── Quote Panel (Left) ──────────────────────────────────────── */
+/* ── Quote display (left panel) ──────────────────────────────── */
 
-function QuotePanel({ active }: { active: number }) {
-  const t = TESTIMONIALS[active];
+function QuoteDisplay({ t, direction }: { t: Testimonial; direction: number }) {
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={active}
-        initial={{ opacity: 0, y: 28, filter: 'blur(5px)' }}
-        animate={{ opacity: 1, y: 0,  filter: 'blur(0px)' }}
-        exit={{   opacity: 0, y: -18, filter: 'blur(3px)' }}
-        transition={{ duration: 0.6, ease: EASE }}
-      >
-        {/* Ghost numeral */}
+    <motion.div
+      key={t.id}
+      initial={{ opacity: 0, y: direction * 24, filter: 'blur(6px)' }}
+      animate={{ opacity: 1, y: 0,             filter: 'blur(0px)' }}
+      exit={{   opacity: 0, y: direction * -16, filter: 'blur(4px)' }}
+      transition={{ duration: 0.62, ease: EASE }}
+      style={{ position: 'absolute', inset: 0 }}
+    >
+      {/* Large decorative quote mark */}
+      <div style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: 'clamp(6rem, 11vw, 10rem)',
+        lineHeight: 1,
+        color: 'rgba(197,160,89,0.12)',
+        marginBottom: '-0.4em',
+        marginLeft: '-0.04em',
+        userSelect: 'none',
+        fontWeight: 300,
+      }}>
+        "
+      </div>
+
+      {/* Quote text */}
+      <blockquote style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: 'clamp(1.15rem, 2.1vw, 1.75rem)',
+        fontWeight: 300,
+        lineHeight: 1.68,
+        letterSpacing: '0.005em',
+        color: 'var(--color-text)',
+        fontStyle: 'italic',
+        margin: 0,
+        marginBottom: 'clamp(28px, 3.5vw, 44px)',
+      }}>
+        {t.quote}
+      </blockquote>
+
+      {/* Gold divider */}
+      <div style={{
+        width: '40px', height: '1px',
+        background: 'var(--color-accent-1)',
+        opacity: 0.6,
+        marginBottom: 'clamp(20px, 2.5vw, 28px)',
+      }} />
+
+      {/* Author */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
         <span style={{
-          display: 'block',
-          fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(5rem, 10vw, 9rem)',
-          fontWeight: 300, lineHeight: 1,
-          letterSpacing: '-0.05em',
-          color: 'rgba(197,160,89,0.09)',
-          marginBottom: '-0.18em',
-          userSelect: 'none',
-        }}>
-          {t.id}
-        </span>
-
-        {/* Gold rule */}
-        <div style={{
-          width: '52px', height: '1px',
-          background: 'var(--color-accent-1)',
-          opacity: 0.55, marginBottom: '32px',
-        }} />
-
-        {/* Quote */}
-        <blockquote style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(1.05rem, 2vw, 1.6rem)',
-          fontWeight: 300, lineHeight: 1.72,
-          letterSpacing: '0.004em',
+          fontFamily: 'var(--font-body)', fontSize: '0.88rem',
+          fontWeight: 500, letterSpacing: '0.02em',
           color: 'var(--color-text)',
-          fontStyle: 'italic',
-          margin: 0, marginBottom: '36px',
         }}>
-          "{t.quote}"
-        </blockquote>
-
-        {/* Author */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: '0.84rem',
-            fontWeight: 500, letterSpacing: '0.02em',
-            color: 'var(--color-text)',
-          }}>
-            {t.author}
-          </span>
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: '0.7rem',
-            fontWeight: 300, color: 'var(--color-text-muted)',
-          }}>
-            {t.title}, {t.company}
-          </span>
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: '0.6rem',
-            letterSpacing: '0.26em', textTransform: 'uppercase',
-            color: 'var(--color-accent-1)', opacity: 0.72, marginTop: '6px',
-          }}>
-            {t.event}
-          </span>
-        </div>
-
-        {/* Progress pips */}
-        <div style={{ display: 'flex', gap: '8px', marginTop: '40px', alignItems: 'center' }}>
-          {TESTIMONIALS.map((_, i) => (
-            <motion.div
-              key={i}
-              animate={{ opacity: i === active ? 1 : 0.2, width: i === active ? '32px' : '10px' }}
-              transition={{ duration: 0.45, ease: EASE }}
-              style={{ height: '1.5px', background: 'var(--color-accent-1)', borderRadius: '2px', flexShrink: 0 }}
-            />
-          ))}
-        </div>
-      </motion.div>
-    </AnimatePresence>
+          {t.author}
+        </span>
+        <span style={{
+          fontFamily: 'var(--font-body)', fontSize: '0.72rem',
+          fontWeight: 300, color: 'var(--color-text-muted)',
+        }}>
+          {t.title}, {t.company}
+        </span>
+        <span style={{
+          fontFamily: 'var(--font-body)', fontSize: '0.58rem',
+          letterSpacing: '0.26em', textTransform: 'uppercase',
+          color: 'var(--color-accent-1)', opacity: 0.75,
+          marginTop: '4px',
+        }}>
+          {t.event}
+        </span>
+      </div>
+    </motion.div>
   );
 }
 
-/* ── Preview List (Right) ────────────────────────────────────── */
+/* ── Right-rail testimonial list ─────────────────────────────── */
 
-function PreviewList({ active }: { active: number }) {
+function TestimonialRail({
+  active,
+  onSelect,
+}: {
+  active: number;
+  onSelect: (i: number) => void;
+}) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {TESTIMONIALS.map((t, i) => (
-        <motion.div
-          key={t.id}
-          animate={{ opacity: i === active ? 1 : 0.22 }}
-          transition={{ duration: 0.5, ease: EASE }}
-          style={{
-            padding: 'clamp(28px, 4vw, 48px) 0',
-            borderTop: '1px solid rgba(197,160,89,0.1)',
-            display: 'flex', flexDirection: 'column', gap: '10px',
-          }}
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      {TESTIMONIALS.map((t, i) => {
+        const isActive = i === active;
+        return (
+          <motion.button
+            key={t.id}
+            onClick={() => onSelect(i)}
+            animate={{ opacity: isActive ? 1 : 0.28 }}
+            whileHover={{ opacity: isActive ? 1 : 0.52 }}
+            transition={{ duration: 0.4, ease: EASE }}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+              padding: 'clamp(22px, 3vw, 32px) 0',
+              borderTop: `1px solid rgba(197,160,89,${isActive ? '0.22' : '0.08'})`,
+              transition: 'border-color 0.4s ease',
+              textAlign: 'left',
+              position: 'relative',
+            }}
+          >
+            {/* Active indicator */}
+            <motion.div
+              style={{
+                position: 'absolute',
+                left: '-28px',
+                top: '50%',
+                translateY: '-50%',
+                width: '3px',
+                height: '28px',
+                background: 'var(--color-accent-1)',
+                borderRadius: '2px',
+              }}
+              animate={{ opacity: isActive ? 1 : 0, scaleY: isActive ? 1 : 0.4 }}
+              transition={{ duration: 0.4, ease: EASE }}
+            />
+
+            <span style={{
+              fontFamily: 'var(--font-body)', fontSize: '0.58rem',
+              letterSpacing: '0.3em', textTransform: 'uppercase',
+              color: 'var(--color-accent-1)',
+            }}>
+              {t.company}
+            </span>
+
+            <span style={{
+              fontFamily: 'var(--font-display)', fontStyle: 'italic',
+              fontWeight: 300,
+              fontSize: 'clamp(0.88rem, 1.4vw, 1.15rem)',
+              color: 'var(--color-text-mid)',
+              lineHeight: 1.5,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}>
+              {t.quote.slice(0, 90)}…
+            </span>
+
+            <span style={{
+              fontFamily: 'var(--font-body)', fontSize: '0.6rem',
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: 'var(--color-text-muted)',
+            }}>
+              — {t.author}
+            </span>
+          </motion.button>
+        );
+      })}
+
+      {/* Border at bottom */}
+      <div style={{ height: '1px', background: 'rgba(197,160,89,0.08)' }} />
+    </div>
+  );
+}
+
+/* ── Mobile single-quote stack ───────────────────────────────── */
+
+function MobileStack() {
+  const [active, setActive] = useState(0);
+  const [dir, setDir] = useState(1);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const go = useCallback((next: number) => {
+    const clamped = (next + TESTIMONIALS.length) % TESTIMONIALS.length;
+    setDir(next > active ? 1 : -1);
+    setActive(clamped);
+  }, [active]);
+
+  useEffect(() => {
+    timerRef.current = setTimeout(() => go(active + 1), AUTO_ADVANCE_MS);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [active, go]);
+
+  const t = TESTIMONIALS[active];
+
+  return (
+    <div style={{ padding: '0 clamp(20px, 5vw, 32px)' }}>
+      {/* Quote area */}
+      <div style={{ position: 'relative', minHeight: '320px', marginBottom: '36px' }}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={t.id}
+            initial={{ opacity: 0, y: dir * 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: dir * -14 }}
+            transition={{ duration: 0.55, ease: EASE }}
+          >
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '5rem', lineHeight: 1, color: 'rgba(197,160,89,0.12)', marginBottom: '-0.35em', fontWeight: 300, userSelect: 'none' }}>"</div>
+            <blockquote style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1rem, 4vw, 1.35rem)', fontWeight: 300, lineHeight: 1.68, fontStyle: 'italic', color: 'var(--color-text)', margin: 0, marginBottom: '24px' }}>
+              {t.quote}
+            </blockquote>
+            <div style={{ width: '36px', height: '1px', background: 'var(--color-accent-1)', opacity: 0.6, marginBottom: '18px' }} />
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.84rem', fontWeight: 500, color: 'var(--color-text)', marginBottom: '4px' }}>{t.author}</p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.7rem', color: 'var(--color-text-muted)', margin: 0 }}>{t.title}, {t.company}</p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.58rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-accent-1)', opacity: 0.72, marginTop: '8px' }}>{t.event}</p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Dot navigator */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {TESTIMONIALS.map((_, i) => (
+          <motion.button
+            key={i}
+            onClick={() => go(i)}
+            animate={{ width: i === active ? '32px' : '8px', opacity: i === active ? 1 : 0.3, background: 'var(--color-accent-1)' }}
+            transition={{ duration: 0.4, ease: EASE }}
+            style={{ all: 'unset', cursor: 'pointer', height: '2px', borderRadius: '2px', flexShrink: 0 }}
+          />
+        ))}
+        <div style={{ flex: 1 }} />
+        {/* Prev / Next */}
+        <button
+          onClick={() => go(active - 1)}
+          style={{ all: 'unset', cursor: 'pointer', color: 'var(--color-text-muted)', display: 'flex', padding: '6px' }}
         >
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: '0.58rem',
-            letterSpacing: '0.32em', textTransform: 'uppercase',
-            color: 'var(--color-accent-1)',
-          }}>
-            {t.company}
-          </span>
-          <span style={{
-            fontFamily: 'var(--font-display)', fontStyle: 'italic',
-            fontWeight: 300,
-            fontSize: 'clamp(0.9rem, 1.6vw, 1.25rem)',
-            color: 'var(--color-text-mid)',
-            maxWidth: '320px', lineHeight: 1.55,
-          }}>
-            {t.quote.slice(0, 88)}…
-          </span>
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: '0.62rem',
-            letterSpacing: '0.16em', textTransform: 'uppercase',
-            color: 'var(--color-text-muted)', opacity: 0.65,
-          }}>
-            — {t.author}
-          </span>
-        </motion.div>
-      ))}
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M17 7H1M7 1L1 7l6 6" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </button>
+        <button
+          onClick={() => go(active + 1)}
+          style={{ all: 'unset', cursor: 'pointer', color: 'var(--color-text-muted)', display: 'flex', padding: '6px' }}
+        >
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M1 7h16M11 1l6 6-6 6" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </button>
+      </div>
     </div>
   );
 }
@@ -210,192 +315,127 @@ function PreviewList({ active }: { active: number }) {
 ══════════════════════════════════════════════════════════════ */
 
 export function Testimonials() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const innerRef   = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const [dir, setDir]       = useState(1);
+  const [paused, setPaused] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const go = useCallback((next: number) => {
+    const clamped = (next + TESTIMONIALS.length) % TESTIMONIALS.length;
+    setDir(next >= active ? 1 : -1);
+    setActive(clamped);
+  }, [active]);
+
+  const select = useCallback((i: number) => {
+    setDir(i >= active ? 1 : -1);
+    setActive(i);
+  }, [active]);
+
+  // Auto-advance
   useEffect(() => {
-    const mm = gsap.matchMedia();
-
-    /* ── DESKTOP: GSAP pin + scrub ──────────────────────────── */
-    mm.add('(min-width: 768px)', () => {
-      if (!sectionRef.current || !innerRef.current) return;
-
-      // Total scroll distance = (N - 1) full viewport heights
-      // Each testimonial "owns" one viewport of scroll
-      const SCROLL_PER = window.innerHeight;
-      const TOTAL      = SCROLL_PER * (TESTIMONIALS.length - 1);
-
-      const st = ScrollTrigger.create({
-        trigger:      sectionRef.current,
-        pin:          innerRef.current,
-        start:        'top top',
-        end:          `+=${TOTAL}`,
-        scrub:        true,
-        anticipatePin: 1,
-        onUpdate: (self) => {
-          const idx = Math.min(
-            TESTIMONIALS.length - 1,
-            Math.floor(self.progress * TESTIMONIALS.length),
-          );
-          setActive(idx);
-        },
-      });
-
-      return () => st.kill();
-    });
-
-    /* ── MOBILE: no pin, IntersectionObserver on mobile cards ── */
-    mm.add('(max-width: 767px)', () => {
-      // On mobile the section is non-pinned;
-      // the mobile-cards div drives the active index via IO
-      const cards = document.querySelectorAll('.t-mobile-card');
-      const obs = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) {
-              const idx = Number(e.target.getAttribute('data-idx'));
-              if (!isNaN(idx)) setActive(idx);
-            }
-          }
-        },
-        { rootMargin: '-35% 0px -35% 0px', threshold: 0 },
-      );
-      cards.forEach((c) => obs.observe(c));
-      return () => obs.disconnect();
-    });
-
-    return () => mm.revert();
-  }, []);
+    if (paused) return;
+    timerRef.current = setTimeout(() => go(active + 1), AUTO_ADVANCE_MS);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [active, paused, go]);
 
   return (
     <section
       id="testimonials"
-      ref={sectionRef}
       style={{ position: 'relative', background: 'var(--color-bg)', borderTop: '1px solid rgba(197,160,89,0.08)' }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
     >
-      {/* ── Inner container — this is what gets pinned on desktop ── */}
-      <div ref={innerRef}>
+      {/* Subtle ambient radial */}
+      <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: 'radial-gradient(ellipse 60% 55% at 30% 50%, rgba(197,160,89,0.025) 0%, transparent 70%)' }} />
 
-        {/* ── SECTION HEADER ─────────────────────────────────── */}
-        <div style={{
-          padding: 'clamp(80px, 9vw, 120px) clamp(24px, 5vw, 72px) clamp(56px, 6vw, 80px)',
+      {/* ── SECTION HEADER ──────────────────────────────────── */}
+      <div style={{ maxWidth: '1340px', margin: '0 auto', padding: 'clamp(80px, 9vw, 120px) clamp(24px, 5vw, 72px) clamp(56px, 6vw, 72px)' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.9, ease: EASE }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <span style={{ display: 'block', height: '1px', width: '36px', background: 'var(--color-accent-1)', opacity: 0.6 }} />
+            <span style={{ fontSize: '0.62rem', letterSpacing: '0.34em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', fontWeight: 500, color: 'var(--color-accent-1)' }}>Client Voices</span>
+          </div>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.4rem, 5.5vw, 5rem)', fontWeight: 300, lineHeight: 1.04, letterSpacing: '-0.025em', color: 'var(--color-text)', maxWidth: '620px' }}>
+            Trusted by Those Who{' '}
+            <em style={{ fontStyle: 'italic', color: 'var(--color-accent-1)' }}>Demand Excellence.</em>
+          </h2>
+        </motion.div>
+      </div>
+
+      {/* ── DESKTOP: 2-col split layout ─────────────────────── */}
+      <div
+        className="t-desktop"
+        style={{
           maxWidth: '1340px', margin: '0 auto',
-        }}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.9, ease: EASE }}
-            style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <span style={{ display: 'block', height: '1px', width: '36px', background: 'var(--color-accent-1)', opacity: 0.6 }} />
-              <span style={{ fontSize: '0.62rem', letterSpacing: '0.34em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', fontWeight: 500, color: 'var(--color-accent-1)' }}>Client Voices</span>
-            </div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.4rem, 5.5vw, 5rem)',
-              fontWeight: 300, lineHeight: 1.04,
-              letterSpacing: '-0.025em',
-              color: 'var(--color-text)',
-              maxWidth: '620px',
-            }}>
-              Trusted by Those Who{' '}
-              <em style={{ fontStyle: 'italic', color: 'var(--color-accent-1)' }}>
-                Demand Excellence.
-              </em>
-            </h2>
-          </motion.div>
-        </div>
-
-        {/* ── DESKTOP LAYOUT: 2-col grid ─────────────────────── */}
-        <div
-          className="t-desktop-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            alignItems: 'start',
-            maxWidth: '1340px',
-            margin: '0 auto',
-            padding: '0 clamp(24px, 5vw, 72px)',
-            gap: 'clamp(40px, 6vw, 96px)',
-            paddingBottom: 'clamp(80px, 9vw, 120px)',
-          }}
-        >
-          {/* LEFT: active quote, changes with scroll */}
-          <div style={{ paddingTop: '1rem' }}>
-            <QuotePanel active={active} />
-          </div>
-
-          {/* RIGHT: preview list (opacity driven by active) */}
-          <div>
-            <PreviewList active={active} />
-          </div>
-        </div>
-
-        {/* ── MOBILE LAYOUT: stacked cards ───────────────────── */}
-        <div
-          className="t-mobile-stack"
-          style={{ display: 'none', padding: '0 clamp(20px, 5vw, 32px) clamp(60px, 8vw, 96px)' }}
-        >
-          {TESTIMONIALS.map((t, i) => (
-            <div
-              key={t.id}
-              className="t-mobile-card"
-              data-idx={i}
-              style={{
-                padding: 'clamp(32px, 5vw, 56px) 0',
-                borderTop: '1px solid rgba(197,160,89,0.1)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--color-accent-1)', opacity: 0.5 }} />
-                <span style={{ fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'var(--color-accent-1)' }}>{t.company}</span>
-              </div>
-              <blockquote style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(1rem, 3.5vw, 1.3rem)',
-                fontWeight: 300, lineHeight: 1.7,
-                fontStyle: 'italic', color: 'var(--color-text)',
-                margin: 0, marginBottom: '24px',
-              }}>
-                "{t.quote}"
-              </blockquote>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                {t.author} · {t.title}
-              </p>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--color-accent-1)', opacity: 0.65, marginTop: '6px' }}>
-                {t.event}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* ── VERIFIED FOOTER LINE ─────────────────────────── */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '20px',
           padding: '0 clamp(24px, 5vw, 72px)',
-          paddingBottom: 'clamp(60px, 7vw, 96px)',
-          maxWidth: '1340px', margin: '0 auto',
-        }}>
-          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.25), transparent)' }} />
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: '0.62rem',
-            letterSpacing: '0.22em', textTransform: 'uppercase',
-            color: 'var(--color-text-muted)', whiteSpace: 'nowrap',
+          paddingBottom: 'clamp(80px, 9vw, 120px)',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 'clamp(40px, 7vw, 110px)',
+          alignItems: 'start',
+        }}
+      >
+        {/* LEFT: Quote panel */}
+        <div style={{ position: 'relative', minHeight: '380px' }}>
+          <AnimatePresence mode="wait">
+            <QuoteDisplay key={active} t={TESTIMONIALS[active]} direction={dir} />
+          </AnimatePresence>
+
+          {/* Progress bars — below the quote (positioned at bottom of column) */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0,
+            display: 'flex', gap: '8px', alignItems: 'center',
           }}>
+            {TESTIMONIALS.map((_, i) => (
+              <motion.button
+                key={i}
+                onClick={() => select(i)}
+                animate={{ width: i === active ? '36px' : '10px', opacity: i === active ? 1 : 0.25, background: 'var(--color-accent-1)' }}
+                transition={{ duration: 0.45, ease: EASE }}
+                style={{ all: 'unset', cursor: 'pointer', height: '1.5px', borderRadius: '2px', flexShrink: 0 }}
+              />
+            ))}
+            <span style={{ marginLeft: '12px', fontSize: '0.58rem', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)', opacity: 0.55 }}>
+              {String(active + 1).padStart(2, '0')} / {String(TESTIMONIALS.length).padStart(2, '0')}
+            </span>
+          </div>
+        </div>
+
+        {/* RIGHT: Rail list */}
+        <div style={{ paddingLeft: '28px', position: 'relative' }}>
+          {/* Vertical gold line */}
+          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '1px', background: 'linear-gradient(to bottom, transparent, rgba(197,160,89,0.22) 20%, rgba(197,160,89,0.22) 80%, transparent)' }} />
+          <TestimonialRail active={active} onSelect={select} />
+        </div>
+      </div>
+
+      {/* ── MOBILE: single quote + dots ─────────────────────── */}
+      <div className="t-mobile" style={{ display: 'none', paddingBottom: 'clamp(60px, 8vw, 96px)' }}>
+        {/* Section header already shown above */}
+        <MobileStack />
+      </div>
+
+      {/* Verified footer */}
+      <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 clamp(24px, 5vw, 72px)', paddingBottom: 'clamp(60px, 7vw, 96px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, transparent, rgba(197,160,89,0.2), transparent)' }} />
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.62rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', opacity: 0.6 }}>
             All testimonials from verified live engagements
           </span>
-          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to left, transparent, rgba(197,160,89,0.25), transparent)' }} />
+          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to left, transparent, rgba(197,160,89,0.2), transparent)' }} />
         </div>
-
-      </div>{/* /innerRef */}
+      </div>
 
       <style>{`
         @media (max-width: 767px) {
-          .t-desktop-grid { display: none !important; }
-          .t-mobile-stack { display: block !important; }
+          .t-desktop { display: none !important; }
+          .t-mobile  { display: block !important; }
         }
         @media (prefers-reduced-motion: reduce) {
           #testimonials * { opacity: 1 !important; transform: none !important; filter: none !important; }
