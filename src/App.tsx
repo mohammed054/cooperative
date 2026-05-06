@@ -10,7 +10,8 @@
  * pin/scrub positions.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -24,8 +25,44 @@ import { CaseStudies }   from '@/sections/CaseStudies';
 import { Testimonials }  from '@/sections/Testimonials';
 import { Contact }       from '@/sections/Contact';
 import { Footer }        from '@/sections/Footer';
+import { Projects }      from '@/pages/Projects';
 
 gsap.registerPlugin(ScrollTrigger);
+
+function Home() {
+  return (
+    <>
+      <main>
+        <Hero />
+        <Statement />
+        <About />
+        <CaseStudies />
+        <Testimonials />
+        <Contact />
+      </main>
+
+      <Footer />
+    </>
+  );
+}
+
+function ScrollToHash() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const target = document.getElementById(location.hash.replace('#', ''));
+      window.setTimeout(() => {
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+      return;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [location.pathname, location.hash]);
+
+  return null;
+}
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -54,17 +91,11 @@ export default function App() {
       >
         <ScrollLayout>
           <Navbar />
-
-          <main>
-            <Hero />
-            <Statement />
-            <About />
-            <CaseStudies />
-            <Testimonials />
-            <Contact />
-          </main>
-
-          <Footer />
+          <ScrollToHash />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/projects" element={<Projects />} />
+          </Routes>
         </ScrollLayout>
       </div>
     </>

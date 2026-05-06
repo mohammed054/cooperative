@@ -12,6 +12,20 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
+    <script type="text/javascript">
+      (function (location) {
+        if (location.search[1] === '/') {
+          var decoded = location.search
+            .slice(1)
+            .split('&')
+            .map(function (segment) {
+              return segment.replace(/~and~/g, '&');
+            })
+            .join('?');
+          window.history.replaceState(null, null, location.pathname.slice(0, -1) + decoded + location.hash);
+        }
+      })(window.location);
+    </script>
   </head>
   <body>
     <div id="root"></div>
