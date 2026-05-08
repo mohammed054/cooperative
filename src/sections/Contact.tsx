@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -6,9 +6,31 @@ import { brand } from '@/data/site';
 
 gsap.registerPlugin(ScrollTrigger);
 
+type BriefForm = {
+  name: string;
+  email: string;
+  company: string;
+  eventType: string;
+  timeline: string;
+  guests: string;
+  budget: string;
+  note: string;
+};
+
+const initialForm: BriefForm = {
+  name: '',
+  email: '',
+  company: '',
+  eventType: 'Executive forum',
+  timeline: '',
+  guests: '',
+  budget: 'AED 250k - 500k',
+  note: '',
+};
+
 export function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [email, setEmail] = useState('');
+  const [form, setForm] = useState<BriefForm>(initialForm);
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
@@ -30,20 +52,36 @@ export function Contact() {
     return () => ctx.revert();
   }, []);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const mailtoHref = useMemo(() => {
+    const body = [
+      `Name: ${form.name}`,
+      `Email: ${form.email}`,
+      `Company: ${form.company}`,
+      `Event type: ${form.eventType}`,
+      `Timeline: ${form.timeline}`,
+      `Guests: ${form.guests}`,
+      `Budget: ${form.budget}`,
+      '',
+      form.note,
+    ].join('\n');
+
+    return `mailto:${brand.email}?subject=${encodeURIComponent('Private event briefing')}&body=${encodeURIComponent(body)}`;
+  }, [form]);
+
+  const updateField = (field: keyof BriefForm, value: string) => {
+    setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!email.trim()) return;
+    if (!form.email.trim() || !form.name.trim()) return;
     setSent(true);
   };
 
   return (
     <section id="contact" ref={sectionRef} className="contact-section">
       <div className="contact-section__media" aria-hidden>
-        <img
-          src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1600&auto=format&fit=crop&q=84"
-          alt=""
-          loading="lazy"
-        />
+        <img src={`${import.meta.env.BASE_URL}event1.jpg`} alt="" loading="lazy" />
       </div>
       <div className="contact-section__shade" aria-hidden />
 
@@ -53,38 +91,119 @@ export function Contact() {
             <span />
             Begin the Conversation
           </div>
-          <h2 className="contact-reveal">Bring us the ambition. We will build the room around it.</h2>
+          <h2 className="contact-reveal">Bring the stakes. We will build the room around them.</h2>
           <p className="contact-reveal">
-            For board summits, investor forums, galas, launches, and private corporate commissions,
-            the first briefing is intentionally direct.
+            A serious brief needs more than an email capture. Share the first facts and the private
+            briefing desk can respond with the right senior lead, timeline, and next questions.
           </p>
+          <div className="contact-routes contact-reveal">
+            <a href={`mailto:${brand.email}`}>{brand.email}</a>
+            <a href={`tel:${brand.tel}`}>{brand.phone}</a>
+            <span>{brand.address}</span>
+          </div>
         </div>
 
         <div className="contact-panel contact-reveal">
           <div className="contact-panel__header">
             <span>Private Briefing Desk</span>
-            <strong>Dubai, UAE</strong>
+            <strong>Response within 1 business day</strong>
           </div>
 
           {!sent ? (
             <form onSubmit={handleSubmit} className="contact-form">
+              <div className="form-grid">
+                <label>
+                  <span>Name</span>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(event) => updateField('name', event.target.value)}
+                    placeholder="Your name"
+                    required
+                  />
+                </label>
+                <label>
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(event) => updateField('email', event.target.value)}
+                    placeholder="name@company.com"
+                    required
+                  />
+                </label>
+              </div>
+
               <label>
-                <span>Email address</span>
+                <span>Company or family office</span>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="name@company.com"
-                  required
+                  type="text"
+                  value={form.company}
+                  onChange={(event) => updateField('company', event.target.value)}
+                  placeholder="Organisation"
                 />
               </label>
+
+              <div className="form-grid">
+                <label>
+                  <span>Event type</span>
+                  <select value={form.eventType} onChange={(event) => updateField('eventType', event.target.value)}>
+                    <option>Executive forum</option>
+                    <option>Leadership summit</option>
+                    <option>Gala or awards</option>
+                    <option>Brand experience</option>
+                    <option>Private commission</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Budget range</span>
+                  <select value={form.budget} onChange={(event) => updateField('budget', event.target.value)}>
+                    <option>AED 250k - 500k</option>
+                    <option>AED 500k - 1m</option>
+                    <option>AED 1m - 3m</option>
+                    <option>AED 3m+</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="form-grid">
+                <label>
+                  <span>Timeline</span>
+                  <input
+                    type="text"
+                    value={form.timeline}
+                    onChange={(event) => updateField('timeline', event.target.value)}
+                    placeholder="Month / quarter"
+                  />
+                </label>
+                <label>
+                  <span>Guests</span>
+                  <input
+                    type="text"
+                    value={form.guests}
+                    onChange={(event) => updateField('guests', event.target.value)}
+                    placeholder="Approx. count"
+                  />
+                </label>
+              </div>
+
+              <label>
+                <span>What must the event achieve?</span>
+                <textarea
+                  value={form.note}
+                  onChange={(event) => updateField('note', event.target.value)}
+                  placeholder="Audience, objective, location, sensitivities, or anything that cannot go wrong."
+                  rows={4}
+                />
+              </label>
+
               <motion.button
                 type="submit"
                 className="button button--gold button--full"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Request Proposal
+                Prepare Briefing
               </motion.button>
             </form>
           ) : (
@@ -94,16 +213,16 @@ export function Contact() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             >
-              <strong>Brief received.</strong>
-              <span>We will be in touch personally.</span>
+              <strong>Brief captured.</strong>
+              <span>Open your email client to send the structured brief directly to GHAIM.</span>
+              <a href={mailtoHref} className="button button--gold button--full">
+                Send Brief by Email
+              </a>
+              <button type="button" className="text-cta" onClick={() => setSent(false)}>
+                Edit Brief
+              </button>
             </motion.div>
           )}
-
-          <div className="contact-details">
-            <a href={`mailto:${brand.email}`}>{brand.email}</a>
-            <a href="tel:+97140000000">{brand.phone}</a>
-            <span>{brand.address}</span>
-          </div>
         </div>
       </div>
     </section>

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { clients, services } from '@/data/site';
+import { clients, principles, services } from '@/data/site';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,43 +47,57 @@ export function About() {
             <span />
             About GHAIM
           </div>
-          <h2 className="about-reveal">Built for rooms where timing is reputation.</h2>
+          <h2 className="about-reveal">Built like a private command office, not an event supplier.</h2>
           <p className="about-reveal">
-            GHAIM operates like a private command office for premium corporate events. We translate
-            business intent into atmosphere, movement, protocol, and the exact service details that
-            make complex moments feel effortless.
+            Consequential rooms need more than beautiful production. They need a senior operating
+            layer that can translate business intent into timing, movement, service, protocol, and
+            calm decisions under pressure.
           </p>
           <p className="about-reveal">
-            Our work is intentionally understated. The production should never compete with the
-            people in the room. It should hold the room, protect the message, and give every guest
-            the sense that every step was already considered.
+            GHAIM sits above creative, production, protocol, hospitality, vendors, and venue teams
+            so the client has one senior standard from first conversation to post-event debrief.
           </p>
         </div>
 
         <div className="about-image about-reveal">
           <img
-            src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600&auto=format&fit=crop&q=84"
-            alt="Corporate event audience facing a premium illuminated stage"
+            src={`${import.meta.env.BASE_URL}event1.jpg`}
+            alt="Premium corporate event setup with dramatic lighting and a formal audience"
             loading="lazy"
           />
           <div className="image-caption">
-            <span>Dubai</span>
-            <strong>Investor Forum 2024</strong>
+            <span>Command View</span>
+            <strong>Executive Forum</strong>
           </div>
         </div>
       </div>
 
+      <div className="page-gutter principles-grid" aria-label="GHAIM operating principles">
+        {principles.map((principle) => (
+          <article className="principle-card about-reveal" key={principle.title}>
+            <strong>{principle.signal}</strong>
+            <h3>{principle.title}</h3>
+            <p>{principle.body}</p>
+          </article>
+        ))}
+      </div>
+
       <div className="page-gutter service-grid" aria-label="GHAIM service pillars">
-        {services.map((service, index) => (
+        {services.map((service) => (
           <motion.article
             className="service-card about-reveal"
             key={service.id}
             whileHover={{ y: -6 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span>0{index + 1}</span>
+            <span>{service.kicker}</span>
             <h3>{service.title}</h3>
             <p>{service.summary}</p>
+            <ul>
+              {service.deliverables.slice(0, 3).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </motion.article>
         ))}
       </div>

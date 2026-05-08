@@ -3,7 +3,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ── Stagger Cards Reveal ─────────────────────────────────
 export const staggerCards = (
   selector: string,
   containerSelector: string,
@@ -24,7 +23,6 @@ export const staggerCards = (
   });
 };
 
-// ── Section Reveal ────────────────────────────────────────
 export const sectionReveal = (
   trigger: string | Element,
   targets: string | Element | Element[],
@@ -44,7 +42,6 @@ export const sectionReveal = (
   });
 };
 
-// ── Parallax Layer ────────────────────────────────────────
 export const parallaxLayer = (
   selector: string,
   yOffset: number = 80,
@@ -61,7 +58,6 @@ export const parallaxLayer = (
   });
 };
 
-// ── Hero Scroll Fade ──────────────────────────────────────
 export const heroScrollFade = (selector: string) => {
   return gsap.to(selector, {
     opacity: 0,

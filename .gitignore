@@ -10,6 +10,8 @@
 /.vercel
 /.cache
 
+*.zip
+
 
 
 # IDE/editor folders

@@ -7,6 +7,7 @@ const logoUrl = `${import.meta.env.BASE_URL}logo.webp`;
 
 const footerLinks = [
   { label: 'Studio', to: { pathname: '/', hash: '#about' } },
+  { label: 'Operating System', to: { pathname: '/', hash: '#system' } },
   { label: 'Selected Work', to: { pathname: '/', hash: '#work' } },
   { label: 'Client Trust', to: { pathname: '/', hash: '#testimonials' } },
   { label: 'Projects', to: '/projects' },
@@ -49,6 +50,14 @@ export function Footer() {
   return (
     <>
       <footer className="site-footer">
+        <div className="page-gutter footer-cta">
+          <span>Private briefing desk</span>
+          <h2>When the room matters, the operating layer matters more.</h2>
+          <Link to={{ pathname: '/', hash: '#contact' }} className="button button--dark">
+            Start a Brief
+          </Link>
+        </div>
+
         <div className="page-gutter site-footer__inner">
           <div className="site-footer__brand">
             <Link to="/" className="brand-mark">
@@ -69,14 +78,14 @@ export function Footer() {
           <div className="site-footer__contact">
             <span>Private briefing</span>
             <a href={`mailto:${brand.email}`}>{brand.email}</a>
-            <a href="tel:+97140000000">{brand.phone}</a>
+            <a href={`tel:${brand.tel}`}>{brand.phone}</a>
             <small>{brand.address}</small>
           </div>
         </div>
 
         <div className="page-gutter site-footer__bottom">
-          <span>© {new Date().getFullYear()} GHAIM Events. All rights reserved.</span>
-          <span>Registered · Dubai, UAE</span>
+          <span>Copyright {new Date().getFullYear()} GHAIM Events. All rights reserved.</span>
+          <span>Registered in Dubai, UAE</span>
         </div>
       </footer>
       <BackToTop visible={backToTopVisible} />

@@ -9,8 +9,9 @@ type NavItem =
 
 const navItems: NavItem[] = [
   { label: 'Studio', type: 'hash', hash: '#about' },
+  { label: 'System', type: 'hash', hash: '#system' },
   { label: 'Work', type: 'hash', hash: '#work' },
-  { label: 'Clients', type: 'hash', hash: '#testimonials' },
+  { label: 'Trust', type: 'hash', hash: '#testimonials' },
   { label: 'Projects', type: 'route', path: '/projects' },
 ];
 
@@ -18,14 +19,6 @@ const logoUrl = `${import.meta.env.BASE_URL}logo.webp`;
 
 function navTarget(item: NavItem) {
   return item.type === 'route' ? item.path : { pathname: '/', hash: item.hash };
-}
-
-function DesktopNavLink({ item }: { item: NavItem }) {
-  return (
-    <Link to={navTarget(item)} className="nav-link">
-      {item.label}
-    </Link>
-  );
 }
 
 function WorkPreview() {
@@ -36,10 +29,11 @@ function WorkPreview() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      onMouseEnter={(event) => event.stopPropagation()}
     >
       <div className="nav-preview__intro">
         <span className="eyebrow">Selected Work</span>
-        <p>Private, corporate, and sovereign-scale engagements delivered with one command standard.</p>
+        <p>Case studies shaped by protocol, production command, and guest movement discipline.</p>
       </div>
       <div className="nav-preview__grid">
         {caseStudies.slice(0, 3).map((study) => (
@@ -86,7 +80,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
                 transition={{ duration: 0.45, delay: 0.08 + index * 0.05, ease: [0.22, 1, 0.36, 1] }}
               >
                 <Link to={navTarget(item)} onClick={onClose}>
-                  <span>0{index + 1}</span>
+                  <span>{String(index + 1).padStart(2, '0')}</span>
                   {item.label}
                 </Link>
               </motion.div>
@@ -96,7 +90,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
           <div className="mobile-menu__bottom">
             <a href={`mailto:${brand.email}`}>{brand.email}</a>
             <Link to={{ pathname: '/', hash: '#contact' }} onClick={onClose} className="text-cta">
-              Request Proposal
+              Request Briefing
               <svg width="18" height="10" viewBox="0 0 18 10" fill="none" aria-hidden>
                 <path d="M1 5h16M12 1l5 4-5 4" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -138,6 +132,7 @@ export function Navbar() {
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        onMouseLeave={() => setPreviewOpen(false)}
       >
         <div className="site-nav__inner">
           <Link to="/" className={`brand-mark ${elevated ? '' : 'brand-mark--light'}`}>
@@ -150,17 +145,18 @@ export function Navbar() {
               <span
                 key={item.label}
                 onMouseEnter={() => setPreviewOpen(item.label === 'Work')}
-                onMouseLeave={() => setPreviewOpen(false)}
                 onFocus={() => setPreviewOpen(item.label === 'Work')}
               >
-                <DesktopNavLink item={item} />
+                <Link to={navTarget(item)} className="nav-link">
+                  {item.label}
+                </Link>
               </span>
             ))}
           </nav>
 
           <div className="site-nav__actions">
             <Link to={{ pathname: '/', hash: '#contact' }} className="proposal-link">
-              Request Proposal
+              Private Briefing
             </Link>
             <button type="button" className="menu-button" onClick={() => setMenuOpen(true)} aria-label="Open menu">
               <span />

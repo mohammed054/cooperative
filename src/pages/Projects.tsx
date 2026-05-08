@@ -14,8 +14,8 @@ export function Projects() {
           </div>
           <h1>Selected engagements with quiet scale and visible consequence.</h1>
           <p>
-            A cross-section of corporate forums, private commissions, galas, and brand experiences
-            shaped by the same operating principle: control every detail, reveal only what matters.
+            Every engagement is framed through the operational scope, timeline, outcome, and
+            delivery responsibilities that sit beneath the visible experience.
           </p>
         </section>
 
@@ -29,7 +29,7 @@ export function Projects() {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.65, delay: index * 0.04, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span className="project-row__number">0{index + 1}</span>
+              <span className="project-row__number">{String(index + 1).padStart(2, '0')}</span>
               <div className="project-row__image">
                 <img src={project.image} alt={project.title} loading={index === 0 ? 'eager' : 'lazy'} />
               </div>
@@ -42,6 +42,11 @@ export function Projects() {
                 <h2>{project.title}</h2>
                 <p>{project.summary}</p>
                 <strong>{project.impact}</strong>
+                <div className="project-row__scope">
+                  {project.scope.slice(0, 4).map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
+                </div>
               </div>
             </motion.article>
           ))}

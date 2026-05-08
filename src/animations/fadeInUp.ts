@@ -1,6 +1,5 @@
 import type { Variants } from 'framer-motion';
 
-// ── Fade In Up ──────────────────────────────────────────
 export const fadeInUp: Variants = {
   hidden: {
     opacity: 0,
@@ -18,7 +17,6 @@ export const fadeInUp: Variants = {
   },
 };
 
-// ── Fade In ─────────────────────────────────────────────
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -30,7 +28,6 @@ export const fadeIn: Variants = {
   },
 };
 
-// ── Stagger Container ───────────────────────────────────
 export const staggerContainer: Variants = {
   hidden: {},
   visible: {
@@ -41,7 +38,6 @@ export const staggerContainer: Variants = {
   },
 };
 
-// ── Scale In ─────────────────────────────────────────────
 export const scaleIn: Variants = {
   hidden: {
     opacity: 0,
@@ -57,7 +53,6 @@ export const scaleIn: Variants = {
   },
 };
 
-// ── Slide In Left ────────────────────────────────────────
 export const slideInLeft: Variants = {
   hidden: { opacity: 0, x: -24 },
   visible: {
@@ -70,7 +65,6 @@ export const slideInLeft: Variants = {
   },
 };
 
-// ── Slide In Right ───────────────────────────────────────
 export const slideInRight: Variants = {
   hidden: { opacity: 0, x: 24 },
   visible: {

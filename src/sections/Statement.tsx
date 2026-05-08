@@ -51,7 +51,7 @@ export function Statement() {
       <div className="statement-scene__texture" aria-hidden />
       <div ref={quoteRef} className="statement-quote">
         <span className="eyebrow eyebrow--light">The standard</span>
-        <h2>Luxury is not how it looks. It is how little the guest notices the work.</h2>
+        <h2>Luxury is the absence of exposed effort.</h2>
         <span ref={lineRef} className="statement-quote__line" />
         <p>Private control, public ease, and a room that feels inevitable.</p>
       </div>

@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary:   'var(--color-primary)',
+        primary:   'var(--color-ink)',
         bg:        'var(--color-bg)',
         bgLight:   'var(--color-bg-light)',
         surface:   'var(--color-surface)',

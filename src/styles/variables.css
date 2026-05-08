@@ -1,6 +1,9 @@
 :root {
-  --color-ink: #080807;
-  --color-forest: #17211d;
+  --color-ink: #090a08;
+  --color-forest: #17231f;
+  --color-racing: #25443b;
+  --color-oxblood: #4e1f24;
+  --color-steel: #d8ddd7;
   --color-bg: #f4f1ea;
   --color-bg-light: #fbfaf7;
   --color-surface: #ffffff;
@@ -8,10 +11,10 @@
   --color-line-dark: rgba(244, 241, 234, 0.16);
   --color-text: #171512;
   --color-text-mid: #514c45;
-  --color-text-muted: #8a8378;
+  --color-text-muted: #81796d;
   --color-accent-1: #c5a059;
   --color-accent-1-dim: #8f6d33;
-  --color-accent-2: #b8c0ad;
+  --color-accent-2: #b7c4bd;
   --color-accent-3: #e4ded2;
 
   --font-display: 'Cormorant Garamond', Georgia, serif;
@@ -29,9 +32,9 @@
   --fs-4xl: 6.25rem;
 
   --ls-normal: 0;
-  --ls-wide: 0.08em;
-  --ls-wider: 0.16em;
-  --ls-widest: 0.28em;
+  --ls-wide: 0;
+  --ls-wider: 0;
+  --ls-widest: 0;
 
   --space-xs: 4px;
   --space-sm: 8px;
@@ -44,6 +47,7 @@
   --shadow-light: 0 8px 24px rgba(8, 8, 7, 0.06);
   --shadow-medium: 0 18px 48px rgba(8, 8, 7, 0.12);
   --shadow-deep: 0 30px 70px rgba(8, 8, 7, 0.24);
+  --shadow-gold: 0 18px 42px rgba(197, 160, 89, 0.22);
 
   --radius-sm: 4px;
   --radius-md: 8px;

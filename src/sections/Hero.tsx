@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { clients, stats } from '@/data/site';
+import { brand, clients, stats } from '@/data/site';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,7 +40,7 @@ export function Hero() {
         muted
         loop
         playsInline
-        poster="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1800&auto=format&fit=crop&q=85"
+        poster={`${import.meta.env.BASE_URL}event1.jpg`}
       >
         <source src={`${import.meta.env.BASE_URL}background.mp4`} type="video/mp4" />
       </video>
@@ -55,14 +55,12 @@ export function Hero() {
         >
           <div className="eyebrow eyebrow--light">
             <span />
-            Luxury Corporate Event Management
+            {brand.tagline}
           </div>
-          <h1>
-            Designing executive moments that move markets, reputations, and rooms.
-          </h1>
+          <h1>Private command for events where reputation is in the room.</h1>
           <p>
-            GHAIM builds high-stakes corporate events for boards, founders, sovereign guests, and
-            global brands that cannot afford visible friction.
+            GHAIM designs and operates executive forums, galas, launches, and private commissions
+            for clients who need the experience to feel effortless because the stakes are not.
           </p>
           <div className="hero-actions">
             <Link to={{ pathname: '/', hash: '#work' }} className="button button--gold">
@@ -82,8 +80,8 @@ export function Hero() {
           aria-label="GHAIM performance metrics"
         >
           <div className="hero-brief__top">
-            <span>Command Standard</span>
-            <strong>Protocol, production, hospitality.</strong>
+            <span>Current Command Standard</span>
+            <strong>Protocol, production, hospitality, and risk in one operating layer.</strong>
           </div>
           <div className="hero-stats">
             {stats.map((stat) => (
