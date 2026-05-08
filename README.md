@@ -27,6 +27,10 @@ npm run typecheck
 npm run build
 ```
 
+## Handoff
+
+See `docs/handoff.md` for final QA, deployment, and local review notes.
+
 ## Project Structure
 
 ```text
