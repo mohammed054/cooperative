@@ -418,9 +418,10 @@ section[id] {
 .nav-preview {
   position: absolute;
   top: 76px;
-  left: 50%;
+  left: 0;
+  right: 0;
   width: min(820px, calc(100vw - 40px));
-  transform: translateX(-50%);
+  margin-inline: auto;
   display: grid;
   grid-template-columns: 0.7fr 1.3fr;
   gap: 24px;
