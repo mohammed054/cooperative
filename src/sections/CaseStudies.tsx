@@ -195,12 +195,15 @@ export function CaseStudies() {
 
         <div className="page-gutter">
           <motion.button
+            key={featuredStudy.id}
             type="button"
             className="featured-study work-reveal"
             onClick={() => setSelectedStudy(featuredStudy)}
             whileHover="hover"
             initial="rest"
             animate="rest"
+            layout
+            transition={{ layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
           >
             <img src={featuredStudy.image} alt={featuredStudy.title} loading="eager" />
             <div className="featured-study__shade" aria-hidden />
@@ -226,26 +229,32 @@ export function CaseStudies() {
           </motion.button>
 
           <div className="study-grid" aria-label="More selected case studies">
-            {galleryStudies.map((study) => (
-              <motion.button
-                key={study.id}
-                type="button"
-                className="study-card work-reveal"
-                onClick={() => setSelectedStudy(study)}
-                whileHover={{ y: -8 }}
-                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="study-card__image">
-                  <img src={study.image} alt={study.title} loading="lazy" />
-                </div>
-                <div className="study-card__body">
-                  <StudyMeta study={study} />
-                  <h3>{study.title}</h3>
-                  <p>{study.summary}</p>
-                  <strong>{study.metric}</strong>
-                </div>
-              </motion.button>
-            ))}
+            <AnimatePresence mode="popLayout">
+              {galleryStudies.map((study) => (
+                <motion.button
+                  key={study.id}
+                  type="button"
+                  className="study-card work-reveal"
+                  onClick={() => setSelectedStudy(study)}
+                  layout
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 16 }}
+                  whileHover={{ y: -8 }}
+                  transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <div className="study-card__image">
+                    <img src={study.image} alt={study.title} loading="lazy" />
+                  </div>
+                  <div className="study-card__body">
+                    <StudyMeta study={study} />
+                    <h3>{study.title}</h3>
+                    <p>{study.summary}</p>
+                    <strong>{study.metric}</strong>
+                  </div>
+                </motion.button>
+              ))}
+            </AnimatePresence>
           </div>
         </div>
       </section>

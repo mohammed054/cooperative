@@ -1163,6 +1163,7 @@ section[id] {
   color: #fff;
   background: var(--color-ink);
   box-shadow: var(--shadow-deep);
+  will-change: transform;
 }
 
 .featured-study img,
@@ -1293,6 +1294,15 @@ section[id] {
   background: var(--color-ink);
   border: 1px solid rgba(197, 160, 89, 0.14);
   box-shadow: var(--shadow-medium);
+  will-change: transform;
+  transition:
+    border-color 260ms var(--ease-authority),
+    box-shadow 260ms var(--ease-authority);
+}
+
+.study-card:hover {
+  border-color: rgba(197, 160, 89, 0.34);
+  box-shadow: var(--shadow-deep);
 }
 
 .study-card__image {
@@ -1411,6 +1421,16 @@ section[id] {
   background: rgba(251, 250, 247, 0.72);
   border: 1px solid var(--color-line);
   backdrop-filter: blur(10px);
+  transition:
+    background 220ms var(--ease-authority),
+    border-color 220ms var(--ease-authority),
+    transform 220ms var(--ease-authority);
+}
+
+.lightbox__close:hover {
+  transform: translateY(-2px);
+  background: rgba(251, 250, 247, 0.94);
+  border-color: rgba(197, 160, 89, 0.36);
 }
 
 .lightbox__content h3 {
