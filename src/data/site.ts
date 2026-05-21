@@ -205,7 +205,7 @@ export const caseStudies: CaseStudy[] = [
     location: 'Davos, Switzerland',
     year: '2025',
     image:
-      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&auto=format&fit=crop&q=84',
+      'https://images.unsplash.com/photo-1774092137702-2abdbf38e683?w=1600&auto=format&fit=crop&q=84',
     summary:
       'An executive leadership summit designed for board-level decision making, private dinners, and keynote transitions at altitude.',
     metric: '132 executives',
@@ -222,7 +222,7 @@ export const caseStudies: CaseStudy[] = [
     location: 'Singapore',
     year: '2024',
     image:
-      'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1600&auto=format&fit=crop&q=84',
+      'https://images.unsplash.com/photo-1769798643655-e0f10f62c3fd?w=1600&auto=format&fit=crop&q=84',
     summary:
       'A finance forum blending investor theatre, broadcast-grade production, and hospitality routes for global delegates.',
     metric: '480 delegates',
@@ -239,7 +239,7 @@ export const caseStudies: CaseStudy[] = [
     location: 'Tromso, Norway',
     year: '2024',
     image:
-      'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1600&auto=format&fit=crop&q=84',
+      'https://images.unsplash.com/photo-1770140304098-46700a5c45c8?w=1600&auto=format&fit=crop&q=84',
     summary:
       'A private brand dinner where sound, scent, table service, and reveal lighting were choreographed as a single story.',
     metric: '86 VIP guests',
@@ -256,7 +256,7 @@ export const caseStudies: CaseStudy[] = [
     location: 'Paris, France',
     year: '2023',
     image:
-      'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1600&auto=format&fit=crop&q=84',
+      'https://images.unsplash.com/photo-1763231575952-98244918f99b?w=1600&auto=format&fit=crop&q=84',
     summary:
       'A museum awards evening curated in chapters, using arrival, dinner, performance, and after-hours rooms as narrative acts.',
     metric: '360 patrons',

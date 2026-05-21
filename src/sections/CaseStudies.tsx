@@ -204,6 +204,10 @@ export function CaseStudies() {
           >
             <img src={featuredStudy.image} alt={featuredStudy.title} loading="eager" />
             <div className="featured-study__shade" aria-hidden />
+            <div className="featured-study__badge" aria-label="Featured case signal">
+              <span>Signature Case</span>
+              <strong>{featuredStudy.timeline}</strong>
+            </div>
             <div className="featured-study__content">
               <StudyMeta study={featuredStudy} />
               <motion.h3 variants={{ rest: { y: 0 }, hover: { y: -6 } }}>{featuredStudy.title}</motion.h3>
