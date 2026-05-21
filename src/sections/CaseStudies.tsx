@@ -56,7 +56,9 @@ function Lightbox({ study, onClose }: { study: CaseStudy | null; onClose: () => 
             transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
             onClick={(event) => event.stopPropagation()}
           >
-            <img src={study.image} alt={study.title} />
+            <div className="lightbox__image">
+              <img src={study.image} alt={study.title} />
+            </div>
             <div className="lightbox__content">
               <button type="button" className="lightbox__close" onClick={onClose} aria-label="Close case study">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
