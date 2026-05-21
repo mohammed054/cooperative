@@ -54,6 +54,7 @@ h1, h2, h3, h4, h5, h6 {
 p {
   font-weight: 300;
   line-height: 1.75;
+  text-wrap: pretty;
 }
 
 ul {
@@ -796,7 +797,19 @@ section[id] {
 .footer-cta h2 {
   margin-top: 24px;
   font-size: 4rem;
-  line-height: 1.02;
+  line-height: 1;
+}
+
+.about-copy h2,
+.system-copy h2,
+.trust-copy h2,
+.contact-copy h2 {
+  max-width: 760px;
+}
+
+.work-header h2,
+.projects-hero h1 {
+  max-width: 980px;
 }
 
 .about-copy p,
@@ -1118,6 +1131,7 @@ section[id] {
 }
 
 .work-header p {
+  max-width: 520px;
   font-size: var(--fs-md);
   color: var(--color-text-mid);
 }
@@ -1658,7 +1672,7 @@ section[id] {
 }
 
 .contact-copy p {
-  max-width: 580px;
+  max-width: 620px;
   margin-top: 26px;
   font-size: var(--fs-md);
   color: rgba(255, 255, 255, 0.68);
