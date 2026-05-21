@@ -101,6 +101,11 @@ export function Contact() {
             <a href={`tel:${brand.tel}`}>{brand.phone}</a>
             <span>{brand.address}</span>
           </div>
+          <div className="contact-assurance contact-reveal" aria-label="Briefing assurances">
+            <span>Senior lead assigned</span>
+            <span>Private response path</span>
+            <span>No public intake queue</span>
+          </div>
         </div>
 
         <div className="contact-panel contact-reveal">

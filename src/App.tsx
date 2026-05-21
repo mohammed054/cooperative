@@ -36,20 +36,38 @@ function Home() {
   );
 }
 
-function ScrollToHash() {
+function scrollToHashTarget(hash: string, behavior: ScrollBehavior = 'smooth') {
+  const target = document.getElementById(hash.replace('#', ''));
+  if (!target) return;
+
+  const nav = document.querySelector<HTMLElement>('.site-nav');
+  const offset = (nav?.offsetHeight ?? 76) + 16;
+  const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - offset);
+  window.scrollTo({ top, behavior });
+}
+
+function ScrollToHash({ ready }: { ready: boolean }) {
   const location = useLocation();
 
   useEffect(() => {
+    if (!ready) return;
+
     if (location.hash) {
-      const target = document.getElementById(location.hash.replace('#', ''));
-      window.setTimeout(() => {
-        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const initial = window.setTimeout(() => {
+        scrollToHashTarget(location.hash);
       }, 80);
-      return;
+      const settled = window.setTimeout(() => {
+        scrollToHashTarget(location.hash, 'auto');
+      }, 620);
+
+      return () => {
+        window.clearTimeout(initial);
+        window.clearTimeout(settled);
+      };
     }
 
     window.scrollTo({ top: 0, behavior: 'auto' });
-  }, [location.pathname, location.hash]);
+  }, [location.pathname, location.hash, ready]);
 
   return null;
 }
@@ -78,7 +96,7 @@ export default function App() {
       >
         <ScrollLayout>
           <Navbar />
-          <ScrollToHash />
+          <ScrollToHash ready={!loading} />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/projects" element={<Projects />} />

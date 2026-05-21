@@ -1689,17 +1689,71 @@ section[id] {
   color: var(--color-accent-1);
 }
 
+.contact-assurance {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  max-width: 620px;
+  margin-top: 34px;
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  background: rgba(197, 160, 89, 0.18);
+  box-shadow: 0 24px 58px rgba(8, 8, 7, 0.24);
+}
+
+.contact-assurance span {
+  display: grid;
+  min-height: 60px;
+  align-items: center;
+  padding: 15px 16px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(8, 8, 7, 0.48);
+  backdrop-filter: blur(14px);
+}
+
 .contact-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
   gap: 26px;
   padding: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(8, 8, 7, 0.58);
-  backdrop-filter: blur(16px);
-  box-shadow: var(--shadow-deep);
+  border: 1px solid rgba(197, 160, 89, 0.24);
+  background:
+    linear-gradient(180deg, rgba(8, 8, 7, 0.76), rgba(8, 8, 7, 0.58)),
+    linear-gradient(135deg, rgba(197, 160, 89, 0.14), transparent 42%, rgba(78, 31, 36, 0.24));
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 42px 90px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.contact-panel::before,
+.contact-panel::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.contact-panel::before {
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.92), rgba(255, 236, 181, 0.96), transparent);
+}
+
+.contact-panel::after {
+  inset: 1px;
+  background:
+    linear-gradient(125deg, rgba(255, 255, 255, 0.14), transparent 30%),
+    linear-gradient(180deg, transparent 58%, rgba(197, 160, 89, 0.08));
 }
 
 .contact-panel__header {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -1724,6 +1778,7 @@ section[id] {
 }
 
 .contact-form {
+  position: relative;
   display: grid;
   gap: 18px;
 }
@@ -1773,6 +1828,7 @@ section[id] {
 .contact-form select:focus,
 .contact-form textarea:focus {
   border-color: rgba(197, 160, 89, 0.82);
+  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.18);
 }
 
 .contact-form input::placeholder,
@@ -1781,6 +1837,7 @@ section[id] {
 }
 
 .contact-success {
+  position: relative;
   display: grid;
   gap: 14px;
   padding: 24px;
@@ -2182,6 +2239,15 @@ section[id] {
   .contact-panel,
   .lightbox__content {
     padding: 24px;
+  }
+
+  .contact-assurance {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  .contact-assurance span {
+    min-height: 52px;
   }
 
   .featured-study h3 {
