@@ -234,7 +234,7 @@ export function CaseStudies() {
                 <motion.button
                   key={study.id}
                   type="button"
-                  className="study-card work-reveal"
+                  className="study-card"
                   onClick={() => setSelectedStudy(study)}
                   layout
                   initial={{ opacity: 0, y: 18 }}
