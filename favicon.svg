@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#0E0E0E"/>
+  <!-- Corner marks -->
+  <path d="M8 56 L8 8 L56 8" stroke="#C5A059" stroke-width="1.5" fill="none"/>
+  <path d="M56 8 L56 56 L8 56" stroke="#C5A059" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <!-- G letterform – thin serif stroke -->
+  <text
+    x="32" y="41"
+    text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="28"
+    font-weight="300"
+    fill="#C5A059"
+    letter-spacing="0.02em"
+  >G</text>
+</svg>

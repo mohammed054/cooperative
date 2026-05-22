@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>GHAIM</title>
+    <script type="text/javascript">
+      (function (location) {
+        var base = '/cooperative';
+        var path = location.pathname.indexOf(base) === 0
+          ? location.pathname.slice(base.length)
+          : location.pathname;
+        var target = base + '/?/' + path.replace(/^\//, '') + location.search.replace(/&/g, '~and~') + location.hash;
+        location.replace(target);
+      })(window.location);
+    </script>
+  </head>
+  <body></body>
+</html>
