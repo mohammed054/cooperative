@@ -63,11 +63,11 @@ export function Hero() {
             for clients who need the experience to feel effortless because the stakes are not.
           </p>
           <div className="hero-actions">
-            <Link to={{ pathname: '/', hash: '#work' }} className="button button--gold">
-              View Selected Work
-            </Link>
-            <Link to={{ pathname: '/', hash: '#contact' }} className="button button--glass">
+            <Link to={{ pathname: '/', hash: '#contact' }} className="button button--gold">
               Request a Private Briefing
+            </Link>
+            <Link to={{ pathname: '/', hash: '#work' }} className="button button--glass">
+              View Selected Work
             </Link>
           </div>
         </motion.div>
