@@ -1857,21 +1857,57 @@ section[id] {
 }
 
 .site-footer {
-  padding-block: 78px 0;
+  position: relative;
+  overflow: hidden;
+  padding-block: 0;
   background: var(--color-bg-light);
   color: var(--color-text);
 }
 
 .footer-cta {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 32px;
-  align-items: end;
-  padding-bottom: 70px;
-  border-bottom: 1px solid var(--color-line);
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 0.42fr);
+  gap: 56px;
+  align-items: center;
+  padding-block: 96px 88px;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.footer-cta span {
+.footer-cta::before,
+.footer-cta::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset-block: 0;
+}
+
+.footer-cta::before {
+  z-index: -2;
+  inset-inline: calc((100vw - 100%) / -2);
+  background:
+    linear-gradient(110deg, rgba(9, 10, 8, 0.98), rgba(23, 35, 31, 0.96) 56%, rgba(78, 31, 36, 0.94)),
+    linear-gradient(180deg, rgba(197, 160, 89, 0.16), transparent 34%, rgba(0, 0, 0, 0.2));
+}
+
+.footer-cta::after {
+  z-index: -1;
+  inset-inline: 0;
+  border-top: 1px solid rgba(197, 160, 89, 0.4);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.22);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 20%, transparent 80%, rgba(255, 255, 255, 0.06)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 18%);
+  opacity: 0.62;
+}
+
+.footer-cta__copy {
+  display: grid;
+  align-content: center;
+}
+
+.footer-cta__copy span {
   font-size: var(--fs-xs);
   font-weight: 700;
   text-transform: uppercase;
@@ -1879,15 +1915,60 @@ section[id] {
 }
 
 .footer-cta h2 {
-  max-width: 760px;
+  max-width: 840px;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.footer-cta__action {
+  display: grid;
+  gap: 22px;
+  align-content: end;
+}
+
+.footer-cta__proof {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  background: rgba(197, 160, 89, 0.22);
+}
+
+.footer-cta__proof span {
+  display: grid;
+  min-height: 92px;
+  align-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(8, 8, 7, 0.42);
+}
+
+.footer-cta__proof strong {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.footer-cta__proof small {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-cta__action .button {
+  justify-self: stretch;
+  color: var(--color-accent-1);
 }
 
 .site-footer__inner {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(260px, 0.55fr);
+  grid-template-columns: minmax(0, 1fr) minmax(160px, auto) minmax(260px, 0.55fr);
   gap: 56px;
   align-items: start;
-  padding-top: 56px;
+  padding-top: 66px;
   padding-bottom: 56px;
 }
 
@@ -1895,6 +1976,36 @@ section[id] {
   max-width: 360px;
   margin-top: 22px;
   color: var(--color-text-mid);
+}
+
+.site-footer__seal {
+  display: grid;
+  max-width: 360px;
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(197, 160, 89, 0.28);
+}
+
+.site-footer__seal span,
+.site-footer__seal small {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.site-footer__seal strong {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(3.8rem, 9vw, 8.2rem);
+  font-weight: 300;
+  line-height: 0.88;
+  color: rgba(23, 21, 18, 0.12);
+}
+
+.site-footer__seal small {
+  margin-top: 12px;
+  color: var(--color-accent-1);
 }
 
 .site-footer__nav,
@@ -2149,6 +2260,10 @@ section[id] {
     align-content: start;
     border-left: 0;
   }
+
+  .footer-cta__action {
+    max-width: 640px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -2191,6 +2306,25 @@ section[id] {
 
   .button {
     width: 100%;
+  }
+
+  .footer-cta {
+    gap: 34px;
+    padding-block: 76px 72px;
+  }
+
+  .footer-cta__proof {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-cta__proof span {
+    min-height: 66px;
+    grid-template-columns: 78px 1fr;
+    align-items: center;
+  }
+
+  .footer-cta__proof strong {
+    font-size: 1.7rem;
   }
 
   .hero-stats,

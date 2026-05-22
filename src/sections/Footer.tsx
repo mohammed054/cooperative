@@ -14,6 +14,12 @@ const footerLinks = [
   { label: 'Contact', to: { pathname: '/', hash: '#contact' } },
 ];
 
+const footerSignals = [
+  { value: '01', label: 'Senior owner' },
+  { value: '1 day', label: 'Briefing response' },
+  { value: 'DIFC', label: 'Dubai command' },
+];
+
 function BackToTop({ visible }: { visible: boolean }) {
   return (
     <AnimatePresence>
@@ -51,11 +57,23 @@ export function Footer() {
     <>
       <footer className="site-footer">
         <div className="page-gutter footer-cta">
-          <span>Private briefing desk</span>
-          <h2>When the room matters, the operating layer matters more.</h2>
-          <Link to={{ pathname: '/', hash: '#contact' }} className="button button--dark">
-            Start a Brief
-          </Link>
+          <div className="footer-cta__copy">
+            <span>Private briefing desk</span>
+            <h2>When the room matters, the operating layer matters more.</h2>
+          </div>
+          <div className="footer-cta__action">
+            <div className="footer-cta__proof" aria-label="Briefing signals">
+              {footerSignals.map((signal) => (
+                <span key={signal.label}>
+                  <strong>{signal.value}</strong>
+                  <small>{signal.label}</small>
+                </span>
+              ))}
+            </div>
+            <Link to={{ pathname: '/', hash: '#contact' }} className="button button--gold">
+              Start a Brief
+            </Link>
+          </div>
         </div>
 
         <div className="page-gutter site-footer__inner">
@@ -65,6 +83,11 @@ export function Footer() {
               <span>{brand.name}</span>
             </Link>
             <p>{brand.tagline}. Built for rooms where every guest, route, and minute matters.</p>
+            <div className="site-footer__seal">
+              <span>Private Event Command</span>
+              <strong>GHAIM</strong>
+              <small>Protocol / Production / Hospitality</small>
+            </div>
           </div>
 
           <nav className="site-footer__nav" aria-label="Footer navigation">
