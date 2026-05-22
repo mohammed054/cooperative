@@ -484,6 +484,8 @@ section[id] {
   z-index: 1300;
   display: flex;
   flex-direction: column;
+  min-height: 100dvh;
+  overflow: hidden;
   background: var(--color-ink);
   color: rgba(255, 255, 255, 0.88);
 }
@@ -500,6 +502,7 @@ section[id] {
 
 .mobile-menu__bottom {
   align-items: flex-start;
+  flex: 0 0 auto;
   border-top: 1px solid var(--color-line-dark);
   border-bottom: 0;
 }
@@ -510,9 +513,12 @@ section[id] {
 
 .mobile-menu__nav {
   flex: 1;
+  min-height: 0;
   display: grid;
   align-content: center;
   padding-inline: 34px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .mobile-menu__nav a {
